@@ -70,7 +70,7 @@ describe("جولة المستخدم — كل صفحة تُرسم بمحتواه�
     { to: "/stores/$storeId", params: { storeId: "store-1" }, expect: "متجر التجربة" },
     { to: "/category/$catId", params: { catId: "shoes" }, expect: "الأحذية" },
     { to: "/products/$productId", params: { productId: "prod-1" }, expect: "حذاء رياضي" },
-    { to: "/map", expect: "تقريب الخريطة" },
+    { to: "/map", expect: "خريطة تجريبية" },
     { to: "/bag", expect: "سلة التسوق" },
     { to: "/checkout", expect: /تحتاج لدخول الحساب|تسجيل الدخول|دخول/ },
     { to: "/favorites", expect: "المفضلة" },
@@ -297,7 +297,7 @@ describe("جولة المستخدم — تدفقات حقيقية", () => {
 
     // الخطوة 1: العنوان والولاية
     fireEvent.click(screen.getByRole("button", { name: "متابعة إلى العنوان" }));
-    await expectText("العنوان والولاية");
+    await expectText("عنوان التوصيل");
     // ننتظر تحميل الولايات حتى يوجد خيار value="16" فعلًا
     await screen.findByRole("option", { name: /16 - الجزائر/ });
     fireEvent.change(screen.getByLabelText("اختيار الولاية"), { target: { value: "16" } });
