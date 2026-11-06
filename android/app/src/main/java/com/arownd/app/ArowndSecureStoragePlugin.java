@@ -86,7 +86,7 @@ public class ArowndSecureStoragePlugin extends Plugin {
                 value = decrypt(stored);
             } catch (Exception error) {
                 // A corrupted or invalidated ciphertext must never be returned as plaintext.
-                preferences().edit().remove(key).apply();
+                preferences().edit().remove(key).commit();
             }
         }
         JSObject result = new JSObject();
@@ -103,7 +103,11 @@ public class ArowndSecureStoragePlugin extends Plugin {
             return;
         }
         try {
-            preferences().edit().putString(key, encrypt(value)).apply();
+            boolean saved = preferences().edit().putString(key, encrypt(value)).commit();
+            if (!saved) {
+                call.reject("Could not persist secure storage value");
+                return;
+            }
             call.resolve();
         } catch (Exception error) {
             call.reject("Could not encrypt secure storage value", error);
@@ -117,7 +121,10 @@ public class ArowndSecureStoragePlugin extends Plugin {
             call.reject("A storage key is required");
             return;
         }
-        preferences().edit().remove(key).apply();
+        if (!preferences().edit().remove(key).commit()) {
+            call.reject("Could not remove secure storage value");
+            return;
+        }
         call.resolve();
     }
 }
