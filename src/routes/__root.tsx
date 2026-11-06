@@ -33,7 +33,6 @@ import { parseNativeAuthCallback, parseNativeRouteLink } from "@/lib/native-deep
 import { openExternalUrl, syncNativeStatusBar } from "@/lib/native-sharing";
 import { useTheme } from "@/lib/theme";
 import { NativePushNotifications } from "@/components/NativePushNotifications";
-import { NativeBiometricGate } from "@/components/NativeBiometricGate";
 import { ConfirmDialog } from "@/components/sooqy/confirm-dialog";
 
 function NotFoundComponent() {
@@ -635,7 +634,6 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <NativeRuntimeSync queryClient={queryClient} />
-          <NativeBiometricGate />
           <NativeAppUpdatePrompt />
           <NativeKeyboardSync />
           <NativePushNotifications />
