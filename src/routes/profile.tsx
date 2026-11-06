@@ -3,8 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
   BadgeCheck,
+  Bell,
   Camera,
   CalendarDays,
+  ChevronLeft,
   Heart,
   MapPin,
   Package,
@@ -24,6 +26,7 @@ import {
   fetchMyOrders,
   fetchMyReservations,
   fetchMyProfile,
+  fetchMyNotifications,
   fetchPublicProfile,
   fetchMyAccountType,
   fetchMyRoles,
@@ -42,6 +45,9 @@ import { ReportContentButton } from "@/components/moderation/ReportContentButton
 import { SeoHead } from "@/components/seo/SeoHead";
 import { ErrorState } from "@/components/sooqy/error-state";
 import { useTranslation } from "@/lib/i18n";
+import { formatDateTime } from "@/lib/market";
+import { useRealtimeSubscription } from "@/hooks/use-realtime";
+import { getRecentActivity } from "@/lib/profile-activity";
 
 export const Route = createFileRoute("/profile")({
   validateSearch: (s: Record<string, unknown>): { setup?: boolean; public_id?: string } => ({
@@ -78,6 +84,11 @@ function ProfilePage() {
     queryFn: fetchMyReservations,
     enabled: !!user && !public_id,
   });
+  const notifications = useQuery({
+    queryKey: ["notifications"],
+    queryFn: fetchMyNotifications,
+    enabled: !!user && !public_id,
+  });
   const roleQuery = useQuery({
     queryKey: ["my-role", user?.id],
     queryFn: fetchMyRoles,
@@ -91,6 +102,13 @@ function ProfilePage() {
   const isMerchant = accountTypeQuery.data === "merchant" && (roleQuery.data?.includes("merchant") ?? false);
   const wilayas = useQuery(wilayasQuery);
   const favorites = useFavorites();
+  useRealtimeSubscription({
+    table: "notifications",
+    filter: user?.id ? `user_id=eq.${user.id}` : undefined,
+    queryKeys: [["notifications"]],
+    enabled: !!user && !public_id,
+  });
+  const recentNotifications = getRecentActivity(notifications.data ?? [], 3);
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -176,11 +194,7 @@ function ProfilePage() {
         showSuccess(t("profile_saved"));
       }
       setEditing(false);
-      if (setup) {
-        navigate({ to: "/", replace: true });
-      } else {
-        navigate({ to: "/settings" });
-      }
+      if (setup) navigate({ to: "/", replace: true });
     } catch (e) {
       showError(e);
     } finally {
@@ -217,66 +231,67 @@ function ProfilePage() {
           <ErrorState scope="profile" error={profile.error} onRetry={() => profile.refetch()} />
         )}
 
-        {/* بطاقة الهوية: غلاف + صورة متداخلة + بيانات + إحصاءات سريعة */}
-        <section className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-card ">
-          <div className="h-20 bg-gradient-to-br from-primary via-primary/70 to-primary-soft" />
-          <div className="px-5 pb-5">
-            <div className="-mt-10 flex items-end justify-between gap-3">
-              <div className="relative shrink-0">
-                <div className="flex size-20 items-center justify-center overflow-hidden rounded-full bg-primary-soft ring-4 ring-card">
-                  {avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt={t("profile_avatar_alt")}
-                      loading="lazy"
-                      decoding="async"
-                      className="size-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-3xl font-extrabold text-accent-ink">
-                      {(displayName || initial).trim()[0]}
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="absolute -bottom-1 -end-1 flex size-8 items-center justify-center rounded-full bg-primary text-accent-ink-foreground ring-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-card transition active:scale-95"
-                  aria-label={t("profile_change_avatar")}
-                >
-                  <Camera className="size-4" />
-                </button>
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/heic,image/heif"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0] ?? null;
-                    setAvatar(f);
-                    setAvatarPreview((old) => {
-                      if (old?.startsWith("blob:")) URL.revokeObjectURL(old);
-                      return f ? URL.createObjectURL(f) : (profile.data?.avatar_url ?? null);
-                    });
-                  }}
-                  className="hidden"
-                />
+        {profile.isLoading && !profile.data && !public_id && (
+          <div className="h-28 animate-pulse rounded-3xl bg-muted" aria-hidden="true" />
+        )}
+
+        {/* Minimal identity: no decorative cover or duplicated account metrics. */}
+        <section className="rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-5">
+          <div className="flex items-center gap-3">
+            <div className="relative size-16 shrink-0">
+              <div className="flex size-16 items-center justify-center overflow-hidden rounded-full bg-primary-soft text-2xl font-extrabold text-accent-ink">
+                {avatarPreview && !public_id ? (
+                  <img
+                    src={avatarPreview}
+                    alt={t("profile_avatar_alt")}
+                    loading="lazy"
+                    decoding="async"
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  (displayName || initial).trim()[0]
+                )}
               </div>
-              <button
-                type="button"
-                onClick={() => setEditing(true)}
-                className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-primary px-5 text-sm font-bold text-accent-ink-foreground transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <Pencil className="size-4" /> {t("profile_edit_button")}
-              </button>
+              {!public_id && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    className="absolute -bottom-1 -end-1 flex size-8 items-center justify-center rounded-full border-2 border-card bg-primary text-accent-ink-foreground transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={t("profile_change_avatar")}
+                  >
+                    <Camera className="size-4" />
+                  </button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/heic,image/heif"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      setAvatar(f);
+                      setAvatarPreview((old) => {
+                        if (old?.startsWith("blob:")) URL.revokeObjectURL(old);
+                        return f ? URL.createObjectURL(f) : (profile.data?.avatar_url ?? null);
+                      });
+                    }}
+                    className="hidden"
+                  />
+                </>
+              )}
             </div>
 
-            <div className="mt-3 min-w-0">
-              <h2 className="truncate text-xl font-extrabold text-foreground">{displayName}</h2>
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-lg font-extrabold text-foreground">{displayName}</h2>
               {!public_id && (
-                <p className="truncate text-sm text-muted-foreground">{user?.email ?? ""}</p>
+                <p className="mt-0.5 truncate text-sm text-muted-foreground">{user?.email ?? ""}</p>
+              )}
+              {!public_id && profile.data?.is_phone_verified && (
+                <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-success">
+                  <BadgeCheck className="size-3.5" /> {t("profile_phone_verified")}
+                </span>
               )}
               {public_id && user?.id !== public_id && (
-                <div className="mt-2">
+                <div className="mt-1">
                   <ReportContentButton
                     targetType="user"
                     targetId={public_id}
@@ -286,15 +301,28 @@ function ProfilePage() {
               )}
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {profile.data?.phone && (
-                <span className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
+            {!public_id && (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border px-3 text-sm font-bold text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Pencil className="size-4" />
+                {t("profile_edit_button")}
+              </button>
+            )}
+          </div>
+
+          {!public_id && (profile.data?.phone || profile.data?.commune || profile.data?.wilaya_id != null) && (
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">
+              {profile.data.phone && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">
                   <Phone className="size-3.5 text-muted-foreground" />
                   <span dir="ltr">{profile.data.phone}</span>
                 </span>
               )}
-              {(profile.data?.commune || profile.data?.wilaya_id != null) && (
-                <span className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground">
+              {(profile.data.commune || profile.data.wilaya_id != null) && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">
                   <MapPin className="size-3.5 text-muted-foreground" />
                   <span className="truncate">
                     {profile.data.commune ?? ""}
@@ -308,59 +336,122 @@ function ProfilePage() {
                   </span>
                 </span>
               )}
-              {profile.data?.is_phone_verified && (
-                <span className="flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-xs font-bold text-success">
-                  <BadgeCheck className="size-3.5" /> {t("profile_phone_verified")}
-                </span>
-              )}
             </div>
-          </div>
+          )}
         </section>
 
-        {/* نشاط الحساب — وصول مباشر إلى أهم الوجهات */}
-        <section className="space-y-2" aria-label={t("profile_activity")}>
-          <SectionTitle>{t("profile_activity")}</SectionTitle>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {[
-              {
-                to: "/orders",
-                Icon: Package,
-                label: t("profile_orders"),
-                value: orders.data?.length ?? 0,
-              },
-              {
-                to: "/reservations",
-                Icon: CalendarDays,
-                label: t("profile_reservations"),
-                value: reservations.data?.length ?? 0,
-              },
-              { to: "/favorites", Icon: Heart, label: t("profile_favorites"), value: favCount },
-              { to: "/wallet", Icon: Wallet, label: t("profile_wallet"), value: null },
-            ].map(({ to, Icon, label, value }) => (
+        {!public_id && (
+          <section className="space-y-3" aria-label={t("profile_activity")}>
+            <div className="flex items-center justify-between gap-3">
+              <SectionTitle>{t("profile_activity")}</SectionTitle>
               <Link
-                key={to}
-                to={to}
-                className="card-premium flex min-h-24 flex-col items-center justify-center gap-1 p-3 text-center"
+                to="/notifications"
+                className="inline-flex min-h-10 items-center gap-1 rounded-full px-2 text-xs font-bold text-accent-ink transition hover:bg-primary-soft"
               >
-                <span className="flex size-9 items-center justify-center rounded-[var(--radius-control)] bg-primary-soft text-accent-ink">
-                  <Icon className="size-4.5" aria-hidden="true" />
+                {t("profile_activity_all")}
+                <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden="true" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                {
+                  to: "/orders",
+                  Icon: Package,
+                  label: t("profile_orders"),
+                  value: orders.isLoading ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0),
+                },
+                {
+                  to: "/reservations",
+                  Icon: CalendarDays,
+                  label: t("profile_reservations"),
+                  value: reservations.isLoading ? "…" : reservations.isError ? "—" : String(reservations.data?.length ?? 0),
+                },
+                {
+                  to: "/favorites",
+                  Icon: Heart,
+                  label: t("profile_favorites"),
+                  value: String(favCount),
+                },
+                {
+                  to: "/wallet",
+                  Icon: Wallet,
+                  label: t("profile_wallet"),
+                  value: null,
+                },
+              ].map(({ to, Icon, label, value }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="flex min-h-[68px] items-center gap-3 rounded-2xl border border-border bg-card px-3 py-2.5 transition hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-accent-ink">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1 text-start">
+                    <span className="block truncate text-sm font-bold text-foreground">{label}</span>
+                    {value !== null && (
+                      <span className="mt-0.5 block text-xs tabular-nums text-muted-foreground">{value}</span>
+                    )}
+                  </span>
+                  <ChevronLeft className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" aria-hidden="true" />
+                </Link>
+              ))}
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-primary-soft text-accent-ink">
+                  <Bell className="size-4.5" aria-hidden="true" />
                 </span>
-                <span className="text-xs font-bold text-foreground">{label}</span>
-                {value !== null && (
-                  <span className="text-lg font-extrabold leading-none text-foreground">
-                    {to === "/orders"
-                      ? orders.isLoading
-                        ? "…"
-                        : orders.isError
-                          ? "—"
-                          : value
-                      : value}
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-bold text-foreground">{t("profile_activity_latest")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("profile_notifications_hint")}</p>
+                </div>
+                {notifications.data?.some((item) => !item.read) && (
+                  <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-extrabold text-accent-ink">
+                    {notifications.data.filter((item) => !item.read).length}
                   </span>
                 )}
-              </Link>
-            ))}
-          </div>
-        </section>
+              </div>
+
+              {notifications.isLoading && (
+                <div className="space-y-3 p-4">
+                  {[0, 1, 2].map((item) => (
+                    <div key={item} className="h-10 animate-pulse rounded-xl bg-muted" />
+                  ))}
+                </div>
+              )}
+              {notifications.isError && (
+                <div className="p-3">
+                  <ErrorState scope="profile:activity" error={notifications.error} onRetry={() => void notifications.refetch()} />
+                </div>
+              )}
+              {!notifications.isLoading && !notifications.isError && recentNotifications.length === 0 && (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-sm font-semibold text-foreground">{t("profile_activity_empty")}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("profile_activity_empty_hint")}</p>
+                </div>
+              )}
+              {recentNotifications.length > 0 && (
+                <ul className="divide-y divide-border">
+                  {recentNotifications.map((item) => (
+                    <li key={item.id} className="flex items-start gap-3 px-4 py-3">
+                      <span className={`mt-1 size-2 shrink-0 rounded-full ${item.read ? "bg-muted-foreground/30" : "bg-primary"}`} aria-hidden="true" />
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-1 text-sm font-semibold text-foreground">{item.title}</p>
+                        {item.body && <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.body}</p>}
+                      </div>
+                      <time className="shrink-0 text-[11px] text-muted-foreground" dateTime={item.created_at}>
+                        {formatDateTime(item.created_at)}
+                      </time>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
+        )}
 
         <div className="pt-1">
           <p className="pt-3 text-center text-xs text-muted-foreground">
