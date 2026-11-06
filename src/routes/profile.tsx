@@ -111,7 +111,7 @@ function ProfilePage() {
   useRealtimeSubscription({
     table: "notifications",
     filter: user?.id ? `user_id=eq.${user.id}` : undefined,
-    queryKeys: [["notifications"]],
+    queryKeys: [["notifications"], ["unread-notification-count"]],
     enabled: !!user && !public_id,
   });
   const recentNotifications = getRecentActivity(notifications.data ?? [], 3);
