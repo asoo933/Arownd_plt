@@ -27,6 +27,7 @@ import {
   fetchMyReservations,
   fetchMyProfile,
   fetchMyNotifications,
+  fetchUnreadNotificationCount,
   fetchPublicProfile,
   fetchMyAccountType,
   fetchMyRoles,
@@ -89,6 +90,11 @@ function ProfilePage() {
     queryFn: fetchMyNotifications,
     enabled: !!user && !public_id,
   });
+  const unreadNotifications = useQuery({
+    queryKey: ["unread-notification-count", user?.id],
+    queryFn: fetchUnreadNotificationCount,
+    enabled: !!user && !public_id,
+  });
   const roleQuery = useQuery({
     queryKey: ["my-role", user?.id],
     queryFn: fetchMyRoles,
@@ -109,8 +115,7 @@ function ProfilePage() {
     enabled: !!user && !public_id,
   });
   const recentNotifications = getRecentActivity(notifications.data ?? [], 3);
-  const unreadNotificationCount =
-    notifications.data?.filter((item) => !item.read).length ?? 0;
+  const unreadNotificationCount = unreadNotifications.data ?? 0;
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
