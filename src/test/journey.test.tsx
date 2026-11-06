@@ -70,7 +70,7 @@ describe("جولة المستخدم — كل صفحة تُرسم بمحتواه�
     { to: "/stores/$storeId", params: { storeId: "store-1" }, expect: "متجر التجربة" },
     { to: "/category/$catId", params: { catId: "shoes" }, expect: "الأحذية" },
     { to: "/products/$productId", params: { productId: "prod-1" }, expect: "حذاء رياضي" },
-    { to: "/map", placeholder: "ابحث عن متجر أو مكان..." },
+    { to: "/map", expect: "تقريب الخريطة" },
     { to: "/bag", expect: "سلة التسوق" },
     { to: "/checkout", expect: /تحتاج لدخول الحساب|تسجيل الدخول|دخول/ },
     { to: "/favorites", expect: "المفضلة" },
@@ -296,7 +296,7 @@ describe("جولة المستخدم — تدفقات حقيقية", () => {
     expect(screen.getByText(/أبيض · L/)).toBeInTheDocument();
 
     // الخطوة 1: العنوان والولاية
-    fireEvent.click(screen.getByRole("button", { name: "متابعة" }));
+    fireEvent.click(screen.getByRole("button", { name: "متابعة إلى العنوان" }));
     await expectText("العنوان والولاية");
     // ننتظر تحميل الولايات حتى يوجد خيار value="16" فعلًا
     await screen.findByRole("option", { name: /16 - الجزائر/ });
@@ -310,14 +310,14 @@ describe("جولة المستخدم — تدفقات حقيقية", () => {
     fireEvent.change(screen.getByPlaceholderText("رقم الهاتف"), {
       target: { value: "0551234567" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "متابعة" }));
+    fireEvent.click(screen.getByRole("button", { name: "متابعة إلى التوصيل" }));
 
     // الخطوة 2: التوصيل المنزلي — Checkout يعتمد عنواناً تفصيلياً ولا يعرض خيار الاستلام من المكتب.
     await expectText("طريقة التوصيل");
     fireEvent.change(screen.getByPlaceholderText("عنوان التوصيل التفصيلي (مطلوب للتوصيل للمنزل)"), {
       target: { value: "شارع ديدوش مراد، الجزائر الوسطى" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "متابعة" }));
+    fireEvent.click(screen.getByRole("button", { name: "متابعة إلى الدفع" }));
 
     // الخطوة 3: الدفع عند الاستلام (افتراضي)
     await expectText("طريقة الدفع");
