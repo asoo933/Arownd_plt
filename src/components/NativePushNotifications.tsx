@@ -73,7 +73,10 @@ export function NativePushNotifications() {
 
         listenerHandles.push(
           await PushNotifications.addListener("pushNotificationReceived", () => {
-            void queryClient.invalidateQueries({ queryKey: ["notifications"] });
+            void Promise.all([
+              queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+              queryClient.invalidateQueries({ queryKey: ["unread-notification-count"] }),
+            ]);
           }),
         );
 
