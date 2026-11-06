@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { Camera, MapPin, Save, Store } from "lucide-react";
+import { Camera, Eye, MapPin, Save, Store } from "lucide-react";
 import { toast } from "sonner";
 import { showError, showSuccess } from "@/lib/feedback";
 import { useAuth } from "@/lib/auth";
@@ -265,6 +265,14 @@ function StoreSettingsPage() {
         title={t("studio_settings_heading")}
         subtitle={t("studio_settings_subtitle")}
       />
+      <Link
+        to="/stores/$storeId"
+        params={{ storeId: store.data?.id ?? "" }}
+        className="inline-flex min-h-10 items-center gap-2 self-start rounded-full border border-border bg-card px-4 text-sm font-bold text-foreground transition active:scale-95"
+      >
+        <Eye className="size-4" />
+        {t("studio_preview_store")}
+      </Link>
 
       {/* بطاقة الهوية: الغلاف + الشعار + الاسم */}
       <section className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-card ">
