@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-const dashboard = readFileSync(new URL("../routes/delivery-dashboard.tsx", import.meta.url), "utf8");
-const registration = readFileSync(new URL("../routes/delivery-register.tsx", import.meta.url), "utf8");
+const dashboard = readFileSync(path.resolve(process.cwd(), "src/routes/delivery-dashboard.tsx"), "utf8");
+const registration = readFileSync(path.resolve(process.cwd(), "src/routes/delivery-register.tsx"), "utf8");
 
 describe("delivery company mobile experience", () => {
   it("reserves the native bottom safe area and keeps dashboard tabs scrollable", () => {
