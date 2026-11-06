@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { categoryLabel, filterAndSortStoreOffers, inventoryLevel, primaryImage, stockLevel } from "./sooqy";
+import { buildStoreMediaPatch, categoryLabel, filterAndSortStoreOffers, inventoryLevel, primaryImage, stockLevel } from "./sooqy";
 import type { ProductImage } from "./sooqy";
 
 describe("stockLevel", () => {
@@ -94,5 +94,24 @@ describe("filterAndSortStoreOffers", () => {
       "older",
       "cheapest",
     ]);
+  });
+});
+
+
+describe("buildStoreMediaPatch", () => {
+  it("updates the logo without overwriting the existing cover", () => {
+    expect(buildStoreMediaPatch({ logoUrl: "https://cdn.example/logo.webp" })).toEqual({
+      logo_url: "https://cdn.example/logo.webp",
+    });
+  });
+
+  it("updates the cover independently from the logo", () => {
+    expect(buildStoreMediaPatch({ coverUrl: "https://cdn.example/cover.webp" })).toEqual({
+      cover_url: "https://cdn.example/cover.webp",
+    });
+  });
+
+  it("returns an empty patch when no image was uploaded", () => {
+    expect(buildStoreMediaPatch({})).toEqual({});
   });
 });
