@@ -109,6 +109,8 @@ function ProfilePage() {
     enabled: !!user && !public_id,
   });
   const recentNotifications = getRecentActivity(notifications.data ?? [], 3);
+  const unreadNotificationCount =
+    notifications.data?.filter((item) => !item.read).length ?? 0;
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -325,7 +327,7 @@ function ProfilePage() {
             )}
           </div>
 
-          {!public_id && (profile.data?.phone || profile.data?.commune || profile.data?.wilaya_id != null) && (
+          {!public_id && profile.data && (profile.data.phone || profile.data.commune || profile.data.wilaya_id != null) && (
             <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">
               {profile.data.phone && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-foreground">
@@ -428,9 +430,9 @@ function ProfilePage() {
                   <h3 className="text-sm font-bold text-foreground">{t("profile_activity_latest")}</h3>
                   <p className="text-xs text-muted-foreground">{t("profile_notifications_hint")}</p>
                 </div>
-                {notifications.data?.some((item) => !item.read) && (
+                {unreadNotificationCount > 0 && (
                   <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-extrabold text-accent-ink">
-                    {notifications.data.filter((item) => !item.read).length}
+                    {unreadNotificationCount}
                   </span>
                 )}
               </div>
