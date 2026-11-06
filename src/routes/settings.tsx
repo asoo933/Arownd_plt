@@ -36,7 +36,7 @@ import { useTranslation, translate } from "@/lib/i18n";
 import { parseLocalePrefix, withLocalePrefix } from "@/lib/locale";
 import { isAndroidNativePlatform } from "@/lib/platform";
 import { clearUserScopedCaches } from "@/lib/pwa";
-import { addNativeUpdateListener, checkNativeAppUpdate, completeNativeAppUpdate, startNativeAppUpdate } from "@/lib/native-app-update";
+import { addNativeUpdateListener, checkNativeAppUpdate, completeNativeAppUpdate, startNativeAppUpdate, wasNativeUpdateAccepted } from "@/lib/native-app-update";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: translate("settings_seo_title") }] }),
@@ -127,7 +127,8 @@ function SettingsPage() {
         toast.error(t("settings_update_blocked"));
         return;
       }
-      await startNativeAppUpdate(updateType);
+      const updateResult = await startNativeAppUpdate(updateType);
+      if (!wasNativeUpdateAccepted(updateResult)) return;
       showSuccess(updateType === "immediate"
         ? t("settings_update_immediate")
         : t("settings_update_flexible"));
