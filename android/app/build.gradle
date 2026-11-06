@@ -1,0 +1,114 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace = "com.arownd.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.arownd.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // First public release. CI overrides these values for subsequent releases.
+        versionCode = (project.findProperty("versionCodeOverride") ?: "1").toString().toInteger()
+        versionName = (project.findProperty("versionNameOverride") ?: "1.0.0").toString()
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            // Release credentials must come from the CI/host environment.
+            // Never fall back to a keystore committed inside the repository.
+            def releaseKeystorePath = System.getenv("ANDROID_KEYSTORE_PATH")
+            storeFile file(releaseKeystorePath ?: "${rootDir}/.missing-release.keystore")
+            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD_NEW") ?: System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: ""
+            keyAlias System.getenv("ANDROID_KEY_ALIAS") ?: ""
+            keyPassword System.getenv("ANDROID_KEY_PASSWORD_NEW") ?: System.getenv("ANDROID_KEY_PASSWORD") ?: ""
+        }
+    }
+
+    // Fail closed before any release artifact can be packaged or uploaded.
+    def validateReleaseSigning = tasks.register("validateReleaseSigning") {
+        doLast {
+            def required = [
+                ANDROID_KEYSTORE_PATH: System.getenv("ANDROID_KEYSTORE_PATH"),
+                ANDROID_KEYSTORE_PASSWORD_NEW: System.getenv("ANDROID_KEYSTORE_PASSWORD_NEW") ?: System.getenv("ANDROID_KEYSTORE_PASSWORD"),
+                ANDROID_KEY_ALIAS: System.getenv("ANDROID_KEY_ALIAS"),
+                ANDROID_KEY_PASSWORD_NEW: System.getenv("ANDROID_KEY_PASSWORD_NEW") ?: System.getenv("ANDROID_KEY_PASSWORD")
+            ]
+            def missing = required.findAll { key, value -> !value?.trim() }.keySet()
+            if (!missing.isEmpty()) {
+                throw new GradleException(
+                    "Release signing is not configured. Set these environment variables: ${missing.join(', ')}"
+                )
+            }
+
+            def keystore = file(required.ANDROID_KEYSTORE_PATH)
+            if (!keystore.isFile()) {
+                throw new GradleException("ANDROID_KEYSTORE_PATH does not point to an existing keystore file.")
+            }
+            def versionCodeValue = project.findProperty("versionCodeOverride")
+            if (!versionCodeValue || versionCodeValue.toString().toInteger() < 1) {
+                throw new GradleException("Set versionCodeOverride to a positive, store-increasing integer for every release.")
+            }
+            def versionNameValue = project.findProperty("versionNameOverride")
+            if (!versionNameValue?.toString()?.trim()) {
+                throw new GradleException("Set versionNameOverride for the release version.")
+            }
+        }
+    }
+
+    tasks.configureEach { task ->
+        def taskName = task.name.toLowerCase(Locale.ROOT)
+        if (task.name != "validateReleaseSigning" &&
+            taskName.contains("release") &&
+            (taskName.startsWith("pre") ||
+             taskName.startsWith("package") ||
+             taskName.startsWith("assemble") ||
+             taskName.startsWith("bundle") ||
+             taskName.startsWith("validate"))) {
+            task.dependsOn(validateReleaseSigning)
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation "androidx.biometric:biometric:1.1.0"
+    implementation "com.google.android.play:app-update:2.1.0"
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

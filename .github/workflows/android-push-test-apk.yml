@@ -1,0 +1,73 @@
+name: Android push test APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-push-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Validate Firebase Android configuration
+        run: |
+          set -euo pipefail
+          test -s android/app/google-services.json
+          grep -q '"project_id": "arownd-271d1"' android/app/google-services.json
+          grep -q '"package_name": "com.arownd.app"' android/app/google-services.json
+
+      - name: Verify Capacitor CLI and Android platform dependencies
+        run: |
+          node -e "const p=require('./package.json'); const has=(name)=>Boolean(p.dependencies?.[name] || p.devDependencies?.[name]); const missing=['@capacitor/cli','@capacitor/android'].filter((name)=>!has(name)); if(missing.length){console.error('Missing declared native build dependencies: '+missing.join(', ')); process.exit(1)}"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Capacitor web assets
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          test -n "$VITE_SUPABASE_URL"
+          test -n "$VITE_SUPABASE_PUBLISHABLE_KEY"
+          pnpm run build:capacitor
+
+      - name: Sync native Android plugins
+        run: pnpm exec cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: arownd-android-push-test-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

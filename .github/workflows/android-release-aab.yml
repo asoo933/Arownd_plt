@@ -1,0 +1,167 @@
+name: Android signed release AAB and APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: Android versionName (for the first release use 1.0.0)
+        required: true
+        type: string
+        default: "1.0.0"
+      version_code:
+        description: Android versionCode (must increase for every Play release)
+        required: true
+        type: string
+        default: "1"
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve and validate Android release identity
+        id: release
+        env:
+          INPUT_VERSION_NAME: ${{ inputs.version_name }}
+          INPUT_VERSION_CODE: ${{ inputs.version_code }}
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          set -euo pipefail
+          if [ "$REF_TYPE" = "tag" ]; then
+            VERSION_NAME="${REF_NAME#v}"
+            VERSION_CODE="$GITHUB_RUN_NUMBER"
+          else
+            VERSION_NAME="$INPUT_VERSION_NAME"
+            VERSION_CODE="$INPUT_VERSION_CODE"
+          fi
+          if [[ ! "$VERSION_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]; then
+            echo "::error::version_name must look like 1.0.0 (optional prerelease suffix allowed)."
+            exit 1
+          fi
+          if [[ ! "$VERSION_CODE" =~ ^[1-9][0-9]*$ ]] || [ "$VERSION_CODE" -gt 2100000000 ]; then
+            echo "::error::version_code must be a positive integer no greater than 2100000000."
+            exit 1
+          fi
+          if ! grep -q 'applicationId "com.arownd.app"' android/app/build.gradle; then
+            echo "::error::Unexpected Android applicationId."
+            exit 1
+          fi
+          if ! grep -q '"appId": "com.arownd.app"' capacitor.config.json; then
+            echo "::error::Unexpected Capacitor appId."
+            exit 1
+          fi
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "Release identity: com.arownd.app $VERSION_NAME ($VERSION_CODE)"
+
+      - name: Validate release signing and public build secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD_NEW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD_NEW }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD_NEW: ${{ secrets.ANDROID_KEY_PASSWORD_NEW }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD_NEW ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD_NEW VITE_SUPABASE_URL VITE_SUPABASE_PUBLISHABLE_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required GitHub Actions secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Verify Capacitor CLI and Android platform dependencies
+        run: |
+          node -e "const p=require('./package.json'); const has=(name)=>Boolean(p.dependencies?.[name] || p.devDependencies?.[name]); const missing=['@capacitor/cli','@capacitor/android'].filter((name)=>!has(name)); if(missing.length){console.error('Missing declared native build dependencies: '+missing.join(', ')); process.exit(1)}"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Capacitor web assets
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: pnpm run build:capacitor
+
+      - name: Sync Android project
+        run: pnpm exec cap sync android
+
+      - name: Restore Android upload keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          KEYSTORE_PATH="$RUNNER_TEMP/arownd-upload-key.jks"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+          chmod 600 "$KEYSTORE_PATH"
+          test -s "$KEYSTORE_PATH"
+          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+
+      - name: Build signed release bundle
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD_NEW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD_NEW }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD_NEW: ${{ secrets.ANDROID_KEY_PASSWORD_NEW }}
+        run: |
+          ./gradlew bundleRelease --no-daemon \
+            -PversionCodeOverride=${{ steps.release.outputs.version_code }} \
+            -PversionNameOverride="${{ steps.release.outputs.version_name }}"
+
+      - name: Build signed release APK
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD_NEW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD_NEW }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD_NEW: ${{ secrets.ANDROID_KEY_PASSWORD_NEW }}
+        run: |
+          ./gradlew assembleRelease --no-daemon \
+            -PversionCodeOverride=${{ steps.release.outputs.version_code }} \
+            -PversionNameOverride="${{ steps.release.outputs.version_name }}"
+
+      - name: Upload signed AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: arownd-release-aab-${{ steps.release.outputs.version_name }}-${{ steps.release.outputs.version_code }}
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload signed APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: arownd-release-apk-${{ steps.release.outputs.version_name }}-${{ steps.release.outputs.version_code }}
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30

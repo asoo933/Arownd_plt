@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Arownd"
+description = "Arownd is an Arabic-first local marketplace for discovering nearby stores, browsing products, managing a shopping bag, and placing orders."
+version = "1.0.0"
+id = "artifacts/arownd"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22493
+
+[services.development]
+run = "pnpm --filter @workspace/arownd run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/arownd", "run", "build" ]
+serve = "static"
+publicDir = "dist/client"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22493"
+BASE_PATH = "/"
