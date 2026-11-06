@@ -18,6 +18,7 @@ import {
   markNotificationsRead,
   markNotificationRead,
   deleteNotification,
+  fetchUnreadNotificationCount,
 } from "@/lib/sooqy";
 import { formatDateTime } from "@/lib/market";
 import { EmptyState } from "@/components/sooqy/empty-state";
@@ -28,6 +29,7 @@ import { PageHeader } from "@/components/sooqy/page-header";
 import { useState } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { showError, showSuccess } from "@/lib/feedback";
+import { filterNotifications, type NotificationFilter } from "@/lib/notification-filters";
 
 export const Route = createFileRoute("/notifications")({
   head: () => ({}),
@@ -100,11 +102,18 @@ function NotificationsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [markingAll, setMarkingAll] = useState(false);
+  const [filter, setFilter] = useState<NotificationFilter>("all");
   const q = useQuery({
     queryKey: ["notifications"],
     queryFn: fetchMyNotifications,
     enabled: !!user,
   });
+  const unreadCount = useQuery({
+    queryKey: ["unread-notification-count", user?.id],
+    queryFn: fetchUnreadNotificationCount,
+    enabled: !!user,
+  });
+  const filteredNotifications = filterNotifications(q.data ?? [], filter);
 
   // تحديثات حية: إشعارات جديدة (Supabase Realtime)
   useRealtimeSubscription({
@@ -181,7 +190,7 @@ function NotificationsPage() {
           title={t("notifications_title")}
           back="/profile"
           action={
-            q.data && q.data.some((n) => !n.read) ? (
+            q.data && (unreadCount.data ?? q.data.some((n) => !n.read)) ? (
               <button
                 type="button"
                 onClick={() => void markAll()}
@@ -234,9 +243,45 @@ function NotificationsPage() {
           </div>
         )}
 
+
+        {user && q.data && q.data.length > 0 && (
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1" role="group" aria-label={t("notifications_title")}>
+            {([
+              ["all", "notifications_filter_all"],
+              ["unread", "notifications_filter_unread"],
+              ["orders", "notifications_filter_orders"],
+              ["offers", "notifications_filter_offers"],
+            ] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setFilter(value)}
+                aria-pressed={filter === value}
+                className={cn(
+                  "min-h-10 shrink-0 rounded-full border px-4 text-xs font-bold transition-colors",
+                  filter === value
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-card text-muted-foreground hover:bg-muted",
+                )}
+              >
+                {t(label)}
+                {value === "unread" && (unreadCount.data ?? 0) > 0 ? (
+                  <span className="ms-1.5 tabular-nums">({unreadCount.data})</span>
+                ) : null}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {user && q.data && q.data.length > 0 && filteredNotifications.length === 0 && (
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            {t("notifications_filter_empty")}
+          </p>
+        )}
+
         {user && q.data && q.data.length > 0 && (
           <div className="space-y-2 py-4">
-            {q.data.map((n) => {
+            {filteredNotifications.map((n) => {
               const Icon = TYPE_ICON[n.type as keyof typeof TYPE_ICON] ?? Info;
               const isExpanded = expandedId === n.id;
               const open = () => handleClick(n);
