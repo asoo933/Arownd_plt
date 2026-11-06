@@ -82,7 +82,10 @@ export function NativePushNotifications() {
 
         listenerHandles.push(
           await PushNotifications.addListener("pushNotificationActionPerformed", (event) => {
-            void queryClient.invalidateQueries({ queryKey: ["notifications"] });
+            void Promise.all([
+              queryClient.invalidateQueries({ queryKey: ["notifications"] }),
+              queryClient.invalidateQueries({ queryKey: ["unread-notification-count"] }),
+            ]);
             const route = event.notification.data?.["route"];
             if (typeof route === "string" && route.startsWith("/") && !route.startsWith("//")) {
               window.location.assign(route);
