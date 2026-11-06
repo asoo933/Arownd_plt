@@ -63,6 +63,46 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
+      - name: Verify merged Android runtime permissions
+        working-directory: android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          import xml.etree.ElementTree as ET
+
+          android_ns = "{http://schemas.android.com/apk/res/android}"
+          manifests = [
+              path for path in Path("app/build/intermediates").rglob("AndroidManifest.xml")
+              if "merged_manifest" in str(path) or "merged_manifests" in str(path)
+          ]
+          if not manifests:
+              print("::error::No merged debug AndroidManifest.xml was produced.")
+              sys.exit(1)
+
+          manifest = max(manifests, key=lambda path: path.stat().st_mtime)
+          root = ET.parse(manifest).getroot()
+          permissions = {
+              node.attrib.get(android_ns + "name")
+              for node in root
+              if node.tag in {"uses-permission", "uses-permission-sdk-23"}
+          }
+          required = {
+              "android.permission.CAMERA",
+              "android.permission.ACCESS_COARSE_LOCATION",
+              "android.permission.ACCESS_FINE_LOCATION",
+              "android.permission.POST_NOTIFICATIONS",
+          }
+          missing = sorted(required - permissions)
+          print(f"Verified merged manifest: {manifest}")
+          print("Merged permissions:")
+          for permission in sorted(permissions):
+              print(f"  - {permission}")
+          if missing:
+              print("::error::Missing expected Android permissions: " + ", ".join(missing))
+              sys.exit(1)
+          PY
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
