@@ -51,6 +51,14 @@ const DATE_GROUP_LABELS = {
   older: "notifications_group_older",
 } as const;
 
+const TYPE_TONE = {
+  order: "bg-sky-500/10 text-sky-700 dark:text-sky-300",
+  offer: "bg-lime-500/15 text-lime-800 dark:text-lime-300",
+  reservation: "bg-violet-500/10 text-violet-700 dark:text-violet-300",
+  system: "bg-muted text-muted-foreground",
+  info: "bg-muted text-muted-foreground",
+} as const;
+
 type NotificationData = {
   order_id?: string;
   merchant_order_id?: string;
@@ -216,6 +224,29 @@ function NotificationsPage() {
           }
         />
 
+        {user && q.data && q.data.length > 0 && (unreadCount.data ?? 0) > 0 && (
+          <div className="mt-3 flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary-soft/50 p-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <Bell className="size-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {t("notifications_filter_unread")}
+              </p>
+              <p className="mt-0.5 text-xl font-extrabold tabular-nums text-foreground">
+                {unreadCount.data}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilter("unread")}
+              className="min-h-10 rounded-xl bg-card px-3 text-xs font-bold text-accent-ink shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {t("notifications_filter_unread")}
+            </button>
+          </div>
+        )}
+
         {!user && (
           <EmptyState
             Icon={Lock}
@@ -271,10 +302,10 @@ function NotificationsPage() {
                 onClick={() => setFilter(value)}
                 aria-pressed={filter === value}
                 className={cn(
-                  "min-h-10 shrink-0 rounded-full border px-4 text-xs font-bold transition-colors",
+                  "min-h-11 shrink-0 rounded-full border px-4 text-xs font-bold transition-all duration-200",
                   filter === value
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted",
+                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:bg-primary-soft/40",
                 )}
               >
                 {t(label)}
@@ -309,13 +340,18 @@ function NotificationsPage() {
                 <div
                   key={n.id}
                   className={cn(
-                    "card-premium !shadow-none p-3",
-                    !n.read && "!border-accent-ink/30 bg-primary-soft/40",
+                    "group/notif relative overflow-hidden rounded-2xl border bg-card p-3 shadow-none transition-all duration-200 hover:border-primary/35 hover:shadow-sm",
+                    !n.read && "border-s-4 border-s-primary border-y-primary/30 border-e-primary/30 bg-primary-soft/35",
                   )}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-accent-ink-soft-foreground">
-                      <Icon className="size-4" aria-hidden="true" />
+                    <span
+                      className={cn(
+                        "mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-2xl",
+                        TYPE_TONE[n.type as keyof typeof TYPE_TONE] ?? "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      <Icon className="size-[18px]" strokeWidth={1.8} aria-hidden="true" />
                     </span>
                     <div
                       role="button"
@@ -329,17 +365,21 @@ function NotificationsPage() {
                       }}
                       className="min-w-0 flex-1 cursor-pointer text-start outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      <p className="flex items-center gap-1.5 text-sm font-bold text-foreground">
-                        {n.title}
+                      <p className="flex items-start gap-2 text-sm font-bold leading-6 text-foreground">
+                        <span className="min-w-0 flex-1">{n.title}</span>
                         {!n.read && (
                           <span
-                            className="size-2 shrink-0 rounded-full bg-primary"
+                            className="mt-2 size-2 shrink-0 rounded-full bg-primary ring-4 ring-primary/10"
                             aria-label={t("notifications_unread")}
                           />
                         )}
                       </p>
-                      {n.body && <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>}
-                      <p className="mt-1 text-caption text-muted-foreground">
+                      {n.body && (
+                        <p className="mt-1 line-clamp-3 text-xs leading-5 text-muted-foreground">
+                          {n.body}
+                        </p>
+                      )}
+                      <p className="mt-2 text-[11px] font-medium tabular-nums text-muted-foreground/80">
                         {formatDateTime(n.created_at)}
                       </p>
                     </div>
@@ -348,19 +388,19 @@ function NotificationsPage() {
                       onClick={() => setExpandedId(isExpanded ? null : n.id)}
                       aria-expanded={isExpanded}
                       aria-label={isExpanded ? t("notifications_hide_options") : t("notifications_show_options")}
-                      className="icon-btn shrink-0"
+                      className="flex size-10 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <MoreHorizontal className="size-4" aria-hidden="true" />
                     </button>
                   </div>
                   {isExpanded && (
-                    <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border pt-2">
+                    <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/70 pt-3">
                       {!n.read ? (
                         <button
                           type="button"
                           onClick={() => void handleMarkRead(n.id)}
                           disabled={markingId === n.id}
-                          className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-primary-soft text-xs font-bold text-accent-ink disabled:opacity-50"
+                          className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-primary-soft text-xs font-bold text-accent-ink transition-colors hover:bg-primary/20 disabled:opacity-50"
                         >
                           {markingId === n.id ? (
                             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -376,7 +416,7 @@ function NotificationsPage() {
                         type="button"
                         onClick={() => handleDelete(n.id)}
                         disabled={deletingId === n.id}
-                        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-danger-soft text-xs font-bold text-danger disabled:opacity-50"
+                        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-danger-soft text-xs font-bold text-danger transition-colors hover:bg-danger/15 disabled:opacity-50"
                       >
                         {deletingId === n.id ? (
                           <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
