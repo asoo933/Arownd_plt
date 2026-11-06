@@ -1,6 +1,18 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { distanceKm, formatDA, formatKm, greeting, isOpenNow, useGeo } from "./geo";
+import { isNativePlatform } from "./platform";
+import { Geolocation } from "@capacitor/geolocation";
+
+vi.mock("./platform", () => ({ isNativePlatform: vi.fn() }));
+vi.mock("@capacitor/geolocation", () => ({
+  Geolocation: {
+    checkPermissions: vi.fn(),
+    requestPermissions: vi.fn(),
+    getCurrentPosition: vi.fn(),
+  },
+}));
 
 describe("formatDA", () => {
   it("يضيف وحدة دج", () => {
@@ -67,6 +79,7 @@ describe("greeting", () => {
 describe("useGeo hydration", () => {
   beforeEach(() => {
     window.sessionStorage.clear();
+    vi.mocked(isNativePlatform).mockReturnValue(false);
   });
 
   it("restores the cached position after the initial render", async () => {
@@ -78,5 +91,30 @@ describe("useGeo hydration", () => {
     await waitFor(() => {
       expect(result.current.pos).toEqual({ lat: 36.75, lng: 3.05 });
     });
+  });
+});
+
+
+describe("useGeo native permissions", () => {
+  beforeEach(() => {
+    vi.mocked(isNativePlatform).mockReturnValue(true);
+    vi.mocked(Geolocation.checkPermissions).mockResolvedValue({ location: "prompt", coarseLocation: "prompt" });
+    vi.mocked(Geolocation.requestPermissions).mockResolvedValue({ location: "granted", coarseLocation: "granted" });
+    vi.mocked(Geolocation.getCurrentPosition).mockResolvedValue({
+      coords: { latitude: 36.75, longitude: 3.05, accuracy: 10, altitude: null, altitudeAccuracy: null, heading: null, speed: null },
+      timestamp: Date.now(),
+    });
+  });
+
+  it("uses Capacitor runtime permissions without a Web Permissions preflight", async () => {
+    const { result } = renderHook(() => useGeo());
+
+    await act(async () => {
+      await result.current.ask();
+    });
+
+    expect(Geolocation.checkPermissions).toHaveBeenCalledOnce();
+    expect(Geolocation.requestPermissions).toHaveBeenCalledWith({ permissions: ["location"] });
+    expect(Geolocation.getCurrentPosition).toHaveBeenCalledOnce();
   });
 });
