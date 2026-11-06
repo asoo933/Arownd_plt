@@ -100,7 +100,19 @@ describe("useGeo native permissions", () => {
     vi.mocked(Geolocation.checkPermissions).mockResolvedValue({ location: "prompt", coarseLocation: "prompt" });
     vi.mocked(Geolocation.requestPermissions).mockResolvedValue({ location: "granted", coarseLocation: "granted" });
     vi.mocked(Geolocation.getCurrentPosition).mockResolvedValue({
-      coords: { latitude: 36.75, longitude: 3.05, accuracy: 10, altitude: null, altitudeAccuracy: null, heading: null, speed: null },
+      coords: {
+        latitude: 36.75,
+        longitude: 3.05,
+        accuracy: 10,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        speed: null,
+        magneticHeading: null,
+        trueHeading: null,
+        headingAccuracy: null,
+        course: null,
+      },
       timestamp: Date.now(),
     });
   });
