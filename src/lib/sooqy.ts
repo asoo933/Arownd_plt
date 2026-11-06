@@ -469,9 +469,8 @@ export async function submitReview(
   rating: number,
   comment?: string,
 ) {
-  // المراجعات الموثّقة: عبر دالة RPC تتحقق من طلب مُسلَّم أو حجز مُستلَم
-  // (هجرة 202610140001). إن كانت القاعدة غير مهاجَرة (الدالة غير موجودة)
-  // نرجع للإدراج المباشر القديم حتى لا تنكسر الميزة.
+  // The backend RPC verifies a completed order or collected reservation.
+  // Never fall back to direct table INSERT: that would bypass the verification path.
   const rpcArgs: {
     _comment?: string;
     _rating: number;
@@ -483,23 +482,10 @@ export async function submitReview(
     _rating: rating,
   };
   if (comment?.trim()) rpcArgs._comment = comment.trim();
-  const { data: rpcData, error: rpcError } = await supabase.rpc("submit_review", rpcArgs);
-  if (rpcError?.message?.includes("Could not find the function")) {
-    const { data: direct, error: dErr } = await supabase
-      .from("reviews")
-      .insert({
-        target_type: targetType,
-        target_id: targetId,
-        rating,
-        comment: comment?.trim() || null,
-      })
-      .select()
-      .single();
-    if (dErr) throw new Error(friendlyError(dErr));
-    return direct as unknown as Review;
-  }
-  if (rpcError) throw new Error(friendlyError(rpcError));
-  return rpcData as unknown as Review;
+  const { data, error } = await supabase.rpc("submit_review", rpcArgs);
+  if (error) throw new Error(friendlyError(error));
+  if (!data) throw new Error("review_submission_failed");
+  return data as unknown as Review;
 }
 
 export async function getOffersByIds(ids: string[]): Promise<OfferFull[]> {

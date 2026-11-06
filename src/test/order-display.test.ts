@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getMerchantOrderDisplayTotal } from "@/lib/order-display";
+import { getMerchantOrderDisplayState, getMerchantOrderDisplayTotal } from "@/lib/order-display";
 
 describe("getMerchantOrderDisplayTotal", () => {
   it("does not show a retained quote as payable after cancellation", () => {
@@ -13,5 +13,24 @@ describe("getMerchantOrderDisplayTotal", () => {
 
   it("keeps the product subtotal while a store quote is pending", () => {
     expect(getMerchantOrderDisplayTotal("pending", 2500, 0)).toBe(2500);
+  });
+});
+
+
+describe("getMerchantOrderDisplayState", () => {
+  it("keeps each merchant suborder state visible independently", () => {
+    expect(getMerchantOrderDisplayState("pending")).toBe("awaiting_merchant");
+    expect(getMerchantOrderDisplayState("quoted")).toBe("awaiting_customer");
+    expect(getMerchantOrderDisplayState("cancelled")).toBe("cancelled");
+  });
+
+  it("uses the tracking timeline after the buyer accepts the quote", () => {
+    expect(getMerchantOrderDisplayState("confirmed")).toBe("tracking");
+    expect(getMerchantOrderDisplayState("shipped")).toBe("tracking");
+    expect(getMerchantOrderDisplayState("delivered")).toBe("tracking");
+  });
+
+  it("does not guess when the backend returns an unknown status", () => {
+    expect(getMerchantOrderDisplayState("unexpected")).toBe("unknown");
   });
 });

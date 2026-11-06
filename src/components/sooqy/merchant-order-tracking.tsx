@@ -11,6 +11,8 @@ import { ErrorState } from "@/components/sooqy/error-state";
 import { useRealtimeSubscription } from "@/hooks/use-realtime";
 import { fetchShipmentByMerchantOrderId } from "@/lib/delivery";
 import { useTranslation } from "@/lib/i18n";
+import { getMerchantOrderDisplayState } from "@/lib/order-display";
+import { Link } from "@tanstack/react-router";
 
 type DeliveryType = "home" | "desk";
 
@@ -51,6 +53,11 @@ export function MerchantOrderTracking({
   const query = useQuery({
     queryKey: ["merchant-order-tracking", merchantOrderId],
     queryFn: () => fetchMerchantOrderTracking(merchantOrderId),
+  });
+  useRealtimeSubscription({
+    table: "merchant_order_tracking_events",
+    filter: `merchant_order_id=eq.${merchantOrderId}`,
+    queryKeys: [["merchant-order-tracking", merchantOrderId]],
   });
   const events = query.data ?? [];
   const steps = getSteps(deliveryType, t);
@@ -151,7 +158,8 @@ export function CustomerOrderTracking({
   storeCommune?: string | null;
 }) {
   const { t } = useTranslation();
-  const shouldTrackProgress = orderStatus === "confirmed" || orderStatus === "delivered";
+  const displayState = getMerchantOrderDisplayState(orderStatus);
+  const shouldTrackProgress = displayState === "tracking";
   const shipmentQuery = useQuery({
     queryKey: ["merchant-order-shipment", merchantOrderId],
     queryFn: () => fetchShipmentByMerchantOrderId(merchantOrderId),
@@ -179,9 +187,6 @@ export function CustomerOrderTracking({
   const events = query.data ?? [];
   const steps = getSteps(deliveryType, t);
 
-  if (!shouldTrackProgress && !(deliveryType === "desk" && storeName)) {
-    return null;
-  }
   if (deliveryType === "home" && shouldTrackProgress) {
     if (shipmentQuery.isLoading) {
       return (
@@ -205,6 +210,30 @@ export function CustomerOrderTracking({
   return (
     <section className="space-y-3 rounded-[var(--radius-card)] border border-border bg-card p-4">
       <h2 className="font-bold text-foreground">{t("customer_tracking_heading")}</h2>
+      {storeName && (
+        <p className="text-xs font-semibold text-muted-foreground">{storeName}</p>
+      )}
+      {displayState !== "tracking" && (
+        <div className="space-y-2 rounded-xl bg-background p-3">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {displayState === "awaiting_merchant"
+              ? t("customer_order_waiting_merchant")
+              : displayState === "awaiting_customer"
+                ? t("customer_order_waiting_customer")
+                : displayState === "cancelled"
+                  ? t("customer_order_cancelled")
+                  : t("customer_order_status_unknown")}
+          </p>
+          {displayState === "awaiting_customer" && (
+            <Link
+              to="/orders"
+              className="inline-flex min-h-10 items-center font-semibold text-accent-ink underline underline-offset-4"
+            >
+              {t("customer_order_review_quote")}
+            </Link>
+          )}
+        </div>
+      )}
       {deliveryType === "desk" && storeName && (
         <div className="rounded-xl bg-primary-soft/70 p-3">
           <p className="text-xs font-semibold text-muted-foreground">
