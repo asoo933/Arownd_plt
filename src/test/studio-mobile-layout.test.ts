@@ -1,11 +1,12 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { t } from "@/lib/i18n";
 
-const studioDashboard = readFileSync(new URL("../routes/studio.index.tsx", import.meta.url), "utf8");
-const addProduct = readFileSync(new URL("../routes/studio.add-product.tsx", import.meta.url), "utf8");
-const productRow = readFileSync(new URL("../components/sooqy/studio-product-row.tsx", import.meta.url), "utf8");
-const shipments = readFileSync(new URL("../routes/studio.shipments.tsx", import.meta.url), "utf8");
+const studioDashboard = readFileSync(path.resolve(process.cwd(), "src/routes/studio.index.tsx"), "utf8");
+const addProduct = readFileSync(path.resolve(process.cwd(), "src/routes/studio.add-product.tsx"), "utf8");
+const productRow = readFileSync(path.resolve(process.cwd(), "src/components/sooqy/studio-product-row.tsx"), "utf8");
+const shipments = readFileSync(path.resolve(process.cwd(), "src/routes/studio.shipments.tsx"), "utf8");
 
 describe("merchant studio mobile experience", () => {
   it("keeps the dashboard compact and responsive", () => {
