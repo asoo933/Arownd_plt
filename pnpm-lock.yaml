@@ -165,9 +165,6 @@ importers:
       '@capacitor/push-notifications':
         specifier: 8.1.2
         version: 8.1.2(@capacitor/core@8.6.0)
-      '@capawesome/capacitor-app-update':
-        specifier: 8.1.1
-        version: 8.1.1(@capacitor/core@8.6.0)
       '@fontsource/tajawal':
         specifier: ^5.3.0
         version: 5.3.0
@@ -710,10 +707,6 @@ packages:
   '@capacitor/synapse@1.0.4':
     resolution: {integrity: sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw==}
 
-  '@capawesome/capacitor-app-update@8.1.1':
-    resolution: {integrity: sha512-1TzM4hMN4wgCDu3O0UhaIIoVspUFNfNJ+q+K/EKSQRKkfCbG79S1Fn/sXwMdtMO1Me55LQxdjw1I9rctFtKBOQ==}
-    peerDependencies:
-      '@capacitor/core': '>=8.0.0'
 
   '@colors/colors@1.6.0':
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
@@ -6513,9 +6506,6 @@ snapshots:
 
   '@capacitor/synapse@1.0.4': {}
 
-  '@capawesome/capacitor-app-update@8.1.1(@capacitor/core@8.6.0)':
-    dependencies:
-      '@capacitor/core': 8.6.0
 
   '@colors/colors@1.6.0': {}
 
