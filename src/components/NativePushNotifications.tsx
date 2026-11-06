@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getSafeNotificationRoute } from "@/lib/native-notification-route";
 import { createPushRegistrationGate } from "@/lib/native-push-registration";
+import { addManagedNativeListener } from "@/lib/native-listeners";
 
 /**
  * Native Android push registration.
@@ -24,6 +25,8 @@ export function NativePushNotifications() {
     let disposed = false;
     const registrationGate = createPushRegistrationGate();
     const listenerHandles: Array<{ remove: () => Promise<void> }> = [];
+    const addListener = (create: () => Promise<{ remove: () => Promise<void> }>) =>
+      addManagedNativeListener(create, () => disposed, listenerHandles);
 
     void import("@capacitor/push-notifications")
       .then(async ({ PushNotifications }) => {
@@ -36,8 +39,8 @@ export function NativePushNotifications() {
           ]);
         };
 
-        listenerHandles.push(
-          await PushNotifications.addListener("registration", async ({ value }) => {
+        if (!(await addListener(() =>
+          PushNotifications.addListener("registration", async ({ value }) => {
             if (disposed || !value) return;
             const { error } = await supabase.rpc("register_my_push_device", {
               _token: value,
@@ -56,21 +59,21 @@ export function NativePushNotifications() {
               // The server registration remains valid if WebView storage is unavailable.
             }
           }),
-        );
+        ))) return;
 
-        listenerHandles.push(
-          await PushNotifications.addListener("registrationError", (error) => {
+        if (!(await addListener(() =>
+          PushNotifications.addListener("registrationError", (error) => {
             registrationGate.markFailed();
             console.error("[push] Firebase registration failed", error);
           }),
-        );
+        ))) return;
 
-        listenerHandles.push(
-          await PushNotifications.addListener("pushNotificationReceived", refreshNotifications),
-        );
+        if (!(await addListener(() =>
+          PushNotifications.addListener("pushNotificationReceived", refreshNotifications),
+        ))) return;
 
-        listenerHandles.push(
-          await PushNotifications.addListener("pushNotificationActionPerformed", (event) => {
+        if (!(await addListener(() =>
+          PushNotifications.addListener("pushNotificationActionPerformed", (event) => {
             refreshNotifications();
             const route = getSafeNotificationRoute(
               event.notification.data?.["route"],
@@ -78,7 +81,7 @@ export function NativePushNotifications() {
             );
             if (route) window.location.assign(route);
           }),
-        );
+        ))) return;
 
         const ensureRegistration = async (allowPrompt: boolean) => {
           if (disposed || !registrationGate.begin()) return;
@@ -130,11 +133,11 @@ export function NativePushNotifications() {
 
         const { App } = await import("@capacitor/app");
         if (disposed) return;
-        listenerHandles.push(
-          await App.addListener("appStateChange", ({ isActive }) => {
+        if (!(await addListener(() =>
+          App.addListener("appStateChange", ({ isActive }) => {
             if (isActive) void ensureRegistration(false);
           }),
-        );
+        ))) return;
 
         await ensureRegistration(true);
       })
