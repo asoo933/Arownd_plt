@@ -1506,8 +1506,8 @@ export async function merchantUpdateStore(
     latitude: number | null;
     longitude: number | null;
     opening_hours: { open: string; close: string; closed_days: number[] };
-    logo_url?: string;
-    cover_url?: string;
+    logo_url?: string | null;
+    cover_url?: string | null;
     instagram_url?: string | null;
     facebook_url?: string | null;
     category?: string | null;
