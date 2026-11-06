@@ -29,6 +29,7 @@ import { PageHeader } from "@/components/sooqy/page-header";
 import { useState } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { showError, showSuccess } from "@/lib/feedback";
+import { ConfirmDialog } from "@/components/sooqy/confirm-dialog";
 import { filterNotifications, type NotificationFilter } from "@/lib/notification-filters";
 
 export const Route = createFileRoute("/notifications")({
@@ -100,6 +101,7 @@ function NotificationsPage() {
   const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [markingAll, setMarkingAll] = useState(false);
   const [filter, setFilter] = useState<NotificationFilter>("all");
@@ -155,15 +157,20 @@ function NotificationsPage() {
     }
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDeletingId(id);
+  const handleDelete = (id: string) => {
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId || deletingId) return;
+    setDeletingId(pendingDeleteId);
     try {
-      await deleteNotification(id);
+      await deleteNotification(pendingDeleteId);
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["notifications"] }),
         qc.invalidateQueries({ queryKey: ["unread-notification-count"] }),
       ]);
+      setPendingDeleteId(null);
       showSuccess(t("notifications_deleted"));
     } catch (error) {
       showError(error);
@@ -355,7 +362,7 @@ function NotificationsPage() {
                       )}
                       <button
                         type="button"
-                        onClick={(e) => void handleDelete(n.id, e)}
+                        onClick={() => handleDelete(n.id)}
                         disabled={deletingId === n.id}
                         className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-danger-soft text-xs font-bold text-danger disabled:opacity-50"
                       >
@@ -374,6 +381,15 @@ function NotificationsPage() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title={t("notifications_delete_confirm_title")}
+        message={t("notifications_delete_confirm_message")}
+        confirmLabel={t("notifications_delete_confirm_action")}
+        busy={deletingId !== null}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </>
   );
 }
