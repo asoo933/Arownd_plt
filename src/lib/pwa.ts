@@ -61,7 +61,6 @@ function notifyUpdate() {
   updateListeners.forEach((cb) => cb());
 }
 
-/** يفعّل التحديث فورًا (المستخدم اختار «تحديث»). */
 /**
  * يمسح أي كاش بيانات قديم عند إنهاء الجلسة.
  * تُرسل الرسالتان للتوافق مع Service Workers السابقة التي كانت تستخدم CLEAR_DATA_CACHE.
@@ -92,15 +91,19 @@ export function applyUpdate(): void {
   });
 }
 
+let serviceWorkerRegistrationStarted = false;
+
 /**
  * يسجّل Service Worker مرة واحدة.
- * آمن للاستدعاء المتكرر، ولا يرمي استثناءات أبدًا.
+ * آمن للاستدعاء المتكرر، ويتعامل مع استدعائه قبل أو بعد حدث load.
  */
 export function registerServiceWorker(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || serviceWorkerRegistrationStarted) return;
   // Native apps are updated through the app stores, not a web Service Worker.
   if (isNativePlatform()) return;
   if (!("serviceWorker" in navigator)) return;
+
+  serviceWorkerRegistrationStarted = true;
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
@@ -113,7 +116,7 @@ export function registerServiceWorker(): void {
     notifyInstall();
   });
 
-  window.addEventListener("load", () => {
+  const register = () => {
     let hasController = Boolean(navigator.serviceWorker.controller);
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (hasController) {
@@ -129,7 +132,6 @@ export function registerServiceWorker(): void {
     navigator.serviceWorker
       .register(`${serviceWorkerUrl.pathname}${serviceWorkerUrl.search}`, { scope: "/" })
       .then((registration) => {
-        // تحديث متاح الآن
         if (registration.waiting) notifyUpdate();
         registration.addEventListener("updatefound", () => {
           const installing = registration.installing;
@@ -145,7 +147,6 @@ export function registerServiceWorker(): void {
         // فشل التسجيل لا يجب أن يُعطّل التطبيق (مثلًا في بيئة غير آمنة)
       });
 
-    // فحص دوري للتحديثات (كل ساعة) — يكفي دون إغراق الشبكة.
     window.setInterval(
       () => {
         navigator.serviceWorker
@@ -154,5 +155,11 @@ export function registerServiceWorker(): void {
       },
       60 * 60 * 1000,
     );
-  });
+  };
+
+  if (document.readyState === "complete") {
+    register();
+  } else {
+    window.addEventListener("load", register, { once: true });
+  }
 }
