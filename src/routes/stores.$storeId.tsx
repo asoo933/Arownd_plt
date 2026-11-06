@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Clock,
   Eye,
@@ -18,7 +18,8 @@ import {
   Star,
   Store,
 } from "lucide-react";
-import { formatDA, formatKm, isOpenNow, useGeo, type OpeningHours } from "@/lib/geo";
+import { formatKm, isOpenNow, useGeo, type OpeningHours } from "@/lib/geo";
+import { formatMoney, getMarketForLang } from "@/lib/market";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import {
@@ -74,6 +75,7 @@ function StorePage() {
   const [tab, setTab] = useState<Tab>("products");
   const [productSearch, setProductSearch] = useState("");
   const [productSort, setProductSort] = useState<StoreOfferSort>("newest");
+  const [open, setOpen] = useState(false);
   const favs = useFavorites();
   const store = useQuery({ queryKey: ["store", storeId], queryFn: () => getStore(storeId) });
   useRealtimeSubscription({ table: "store_offers", filter: "store_id=eq." + storeId, queryKeys: [["store", storeId], ["store-offers", storeId]] });
@@ -81,6 +83,13 @@ function StorePage() {
     queryKey: ["store-offers", storeId],
     queryFn: () => getStoreOffers(storeId),
   });
+
+  // Keep the first render deterministic: opening status is evaluated after hydration.
+  useEffect(() => {
+    if (store.data) setOpen(isOpenNow(store.data.opening_hours));
+  }, [store.data?.opening_hours]);
+
+  const market = getMarketForLang(lang);
 
   if (store.isLoading) return <StoreDetailSkeleton />;
 
@@ -106,7 +115,6 @@ function StorePage() {
       </div>
     );
   const oh = (s.opening_hours ?? {}) as OpeningHours;
-  const open = isOpenNow(s.opening_hours);
   const distance = storeDistance(s, pos);
   const followed = favs.stores.includes(s.id);
   // مالِك المتجر يرى صفحته كما يراها الزائر + شريط اختصارات إدارية
@@ -425,7 +433,7 @@ function StorePage() {
                         </div>
                         <div className="p-3">
                           <p className="line-clamp-1 text-sm font-semibold">{o.product.name}</p>
-                          <p className="text-price text-accent-ink">{formatDA(o.price)}</p>
+                          <p className="text-price text-accent-ink">{formatMoney(o.price, market)}</p>
                         </div>
                       </Link>
                     ))}
