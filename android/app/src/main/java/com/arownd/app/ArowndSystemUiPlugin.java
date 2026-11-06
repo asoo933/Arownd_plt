@@ -45,7 +45,7 @@ public class ArowndSystemUiPlugin extends Plugin {
             controller.setAppearanceLightNavigationBars(!dark);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // The app draws edge-to-edge on Android 10+; remove automatic contrast scrims.
+                // Keep system-bar icon contrast predictable; edge-to-edge insets remain OS/WebView managed.
                 window.setStatusBarContrastEnforced(false);
                 window.setNavigationBarContrastEnforced(false);
             }
