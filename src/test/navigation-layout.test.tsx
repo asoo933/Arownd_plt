@@ -3,8 +3,9 @@ import { describe, expect, it } from "vitest";
 import { AppShell } from "@/components/sooqy/app-shell";
 import { t, useTranslation } from "@/lib/i18n";
 import { readFileSync } from "node:fs";
+import path from "node:path";
 
-const rootLayout = readFileSync(new URL("../routes/__root.tsx", import.meta.url), "utf8");
+const rootLayout = readFileSync(path.resolve(process.cwd(), "src/routes/__root.tsx"), "utf8");
 
 describe("mobile application shell and role navigation labels", () => {
   it("uses a dynamic viewport and clips horizontal overflow", () => {
