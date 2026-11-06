@@ -52,6 +52,24 @@ describe("groupNotificationsByDate", () => {
     ]);
   });
 
+  it("uses Algeria's calendar day consistently across device timezones", () => {
+    const now = new Date("2026-11-06T00:30:00.000Z");
+    const items = [
+      { id: "algeria-today", created_at: "2026-11-05T23:30:00.000Z" },
+      { id: "algeria-yesterday", created_at: "2026-11-04T22:30:00.000Z" },
+    ];
+
+    expect(
+      groupNotificationsByDate(items, now, "Africa/Algiers").map((group) => [
+        group.key,
+        group.items.map((item) => item.id),
+      ]),
+    ).toEqual([
+      ["today", ["algeria-today"]],
+      ["yesterday", ["algeria-yesterday"]],
+    ]);
+  });
+
   it("places invalid timestamps in the older group", () => {
     const groups = groupNotificationsByDate(
       [{ id: "invalid", created_at: "not-a-date" }],
