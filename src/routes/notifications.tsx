@@ -30,7 +30,7 @@ import { useState } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { showError, showSuccess } from "@/lib/feedback";
 import { ConfirmDialog } from "@/components/sooqy/confirm-dialog";
-import { filterNotifications, type NotificationFilter } from "@/lib/notification-filters";
+import { filterNotifications, groupNotificationsByDate, type NotificationFilter } from "@/lib/notification-filters";
 
 export const Route = createFileRoute("/notifications")({
   head: () => ({}),
@@ -43,6 +43,12 @@ const TYPE_ICON = {
   reservation: CalendarCheck,
   system: Info,
   info: Info,
+} as const;
+
+const DATE_GROUP_LABELS = {
+  today: "notifications_group_today",
+  yesterday: "notifications_group_yesterday",
+  older: "notifications_group_older",
 } as const;
 
 type NotificationData = {
@@ -287,8 +293,14 @@ function NotificationsPage() {
         )}
 
         {user && q.data && q.data.length > 0 && (
-          <div className="space-y-2 py-4">
-            {filteredNotifications.map((n) => {
+          <div className="space-y-5 py-4">
+            {groupNotificationsByDate(filteredNotifications).map((group) => (
+              <section key={group.key} className="space-y-2">
+                <h2 className="px-1 text-xs font-bold text-muted-foreground">
+                  {t(DATE_GROUP_LABELS[group.key])}
+                </h2>
+                <div className="space-y-2">
+                  {group.items.map((n) => {
               const Icon = TYPE_ICON[n.type as keyof typeof TYPE_ICON] ?? Info;
               const isExpanded = expandedId === n.id;
               const open = () => handleClick(n);
@@ -377,7 +389,10 @@ function NotificationsPage() {
                   )}
                 </div>
               );
-            })}
+                  })}
+                </div>
+              </section>
+            ))}
           </div>
         )}
       </div>
