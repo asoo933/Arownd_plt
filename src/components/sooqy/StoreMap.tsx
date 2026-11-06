@@ -469,9 +469,25 @@ const StoreMapComponent = React.memo(
       const onClusterLeave = () => {
         map.getCanvas().style.cursor = "";
       };
+      const onStorePointClick = (event: maplibregl.MapMouseEvent) => {
+        const features = map.queryRenderedFeatures(event.point, { layers: [pointLayerId] });
+        const storeId = features[0]?.properties?.["id"];
+        if (typeof storeId !== "string" && typeof storeId !== "number") return;
+        onSelect?.(String(storeId));
+      };
+      const onStorePointEnter = () => {
+        map.getCanvas().style.cursor = "pointer";
+      };
+      const onStorePointLeave = () => {
+        map.getCanvas().style.cursor = "";
+      };
+
       map.on("click", clusterLayerId, onClusterClick);
       map.on("mouseenter", clusterLayerId, onClusterEnter);
       map.on("mouseleave", clusterLayerId, onClusterLeave);
+      map.on("click", pointLayerId, onStorePointClick);
+      map.on("mouseenter", pointLayerId, onStorePointEnter);
+      map.on("mouseleave", pointLayerId, onStorePointLeave);
 
       const features = stores.flatMap((store) => {
         const item = store as Store & {
@@ -575,6 +591,9 @@ const StoreMapComponent = React.memo(
         map.off("click", clusterLayerId, onClusterClick);
         map.off("mouseenter", clusterLayerId, onClusterEnter);
         map.off("mouseleave", clusterLayerId, onClusterLeave);
+        map.off("click", pointLayerId, onStorePointClick);
+        map.off("mouseenter", pointLayerId, onStorePointEnter);
+        map.off("mouseleave", pointLayerId, onStorePointLeave);
         map.off("zoomend", renderDetailMarkers);
       };
     }, [stores, activeId, mapReady, onSelect]);
