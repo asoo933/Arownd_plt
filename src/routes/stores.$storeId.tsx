@@ -427,7 +427,10 @@ function StorePage() {
                   </div>
                 </section>
               ))}
-              {!offers.isLoading && !offers.isError && !!offers.data?.length && visibleOffers.length === 0 && (\n                <EmptyState Icon={Store} title={t("store_product_search_empty_title")} hint={t("store_product_search_empty_hint")} />\n              )}\n              {!offers.isLoading && !offers.isError && !offers.data?.length && (
+              {!offers.isLoading && !offers.isError && !!offers.data?.length && visibleOffers.length === 0 && (
+                <EmptyState Icon={Store} title={t("store_product_search_empty_title")} hint={t("store_product_search_empty_hint")} />
+              )}
+              {!offers.isLoading && !offers.isError && !offers.data?.length && (
                 <EmptyState
                   Icon={Store}
                   title={isOwner ? t("store_owner_empty_title") : t("store_empty_title")}
