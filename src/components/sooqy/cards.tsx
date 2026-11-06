@@ -141,39 +141,64 @@ export function ProductCard({ g }: { g: ProductGroup }) {
 /** بطاقة متجر قابلة للضغط: شعار، اسم + توثيق، موقع، حالة الفتح، تقييم، ومسافة. */
 export function StoreCard({ s, distance }: { s: Store; distance?: number | null }) {
   const { t } = useTranslation();
-  const logoUrl = s.logo_url ?? s.cover_url ?? STORE_PLACEHOLDER;
+  const coverUrl = s.cover_url ?? STORE_PLACEHOLDER;
+  const logoUrl = s.logo_url ?? STORE_PLACEHOLDER;
   const status = getStoreStatus(s.opening_hours);
 
   return (
     <Link
       to="/stores/$storeId"
       params={{ storeId: s.id }}
-      className="card-premium flex items-center gap-3 p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      preload="intent"
+      className="card-premium group block min-w-0 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
-      <img
-        src={logoUrl}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        className="size-14 shrink-0 rounded-2xl bg-muted object-cover"
-      />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <h3 className="truncate text-sm font-bold text-foreground">{s.name}</h3>
-          {s.is_verified && (
-            <BadgeCheck
-              className="size-4 shrink-0 text-accent-ink"
-              aria-label={t("badge_verified")}
-            />
-          )}
-        </div>
+      <div className="relative h-28 overflow-hidden bg-muted sm:h-32">
+        <img
+          src={coverUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={(event) => {
+            event.currentTarget.src = STORE_PLACEHOLDER;
+          }}
+          className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.025]"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+        {s.is_verified && (
+          <span className="absolute end-3 top-3 flex size-8 items-center justify-center rounded-full bg-card/95 text-accent-ink shadow-sm backdrop-blur">
+            <BadgeCheck className="size-4" aria-label={t("badge_verified")} />
+          </span>
+        )}
+      </div>
+
+      <div className="relative px-3 pb-3 pt-8">
+        <img
+          src={logoUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onError={(event) => {
+            event.currentTarget.src = STORE_PLACEHOLDER;
+          }}
+          className="absolute -top-7 start-3 size-14 rounded-2xl border-[3px] border-card bg-card object-cover shadow-sm"
+        />
+        <ChevronLeft
+          className="absolute end-3 top-3 size-4 text-muted-foreground ltr:rotate-180"
+          aria-hidden="true"
+        />
+        <h3 className="truncate pe-7 text-sm font-extrabold text-foreground">{s.name}</h3>
+        {s.description && (
+          <p className="mt-1 line-clamp-2 min-h-9 text-xs leading-5 text-muted-foreground">
+            {s.description}
+          </p>
+        )}
         {(s.commune || s.address_line) && (
-          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+          <p className="mt-2 flex min-w-0 items-center gap-1 truncate text-xs text-muted-foreground">
             <MapPin className="size-3 shrink-0" aria-hidden="true" />
             <span className="truncate">{s.commune ?? s.address_line}</span>
           </p>
         )}
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 border-t border-border/70 pt-2">
           <OpenBadge detailed status={status} />
           {s.rating > 0 && <RatingStars rating={s.rating} showValue />}
           {distance != null && (
@@ -183,10 +208,6 @@ export function StoreCard({ s, distance }: { s: Store; distance?: number | null 
           )}
         </div>
       </div>
-      <ChevronLeft
-        className="size-4 shrink-0 text-muted-foreground ltr:rotate-180"
-        aria-hidden="true"
-      />
     </Link>
   );
 }
