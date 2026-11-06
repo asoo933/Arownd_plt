@@ -34,6 +34,7 @@ import { BottomSheet } from "@/components/sooqy/bottom-sheet";
 import { SideSheet } from "@/components/sooqy/side-sheet";
 import { cn } from "@/lib/utils";
 import { useTranslation, translate } from "@/lib/i18n";
+import { parseLocalePrefix, withLocalePrefix } from "@/lib/locale";
 import { isAndroidNativePlatform } from "@/lib/platform";
 import { clearUserScopedCaches } from "@/lib/pwa";
 import { getNativeBiometricStatus, setNativeBiometricEnabled } from "@/lib/native-biometric";
@@ -46,7 +47,7 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { theme, setTheme } = useTheme();
@@ -368,7 +369,19 @@ function SettingsPage() {
         <SectionTitle>{t("settings_preferences_section")}</SectionTitle>
         <MenuCard>
           <MenuRow icon={Bell} label={t("settings_notifications")} hint={t("settings_notifications_hint")} to="/notifications" />
-          <MenuRow icon={Globe} label={t("settings_language")} hint={t("settings_language_ar")} soon />
+          <MenuRow
+            icon={Globe}
+            label={t("settings_language")}
+            hint={lang === "ar" ? t("english") : t("arabic")}
+            onClick={() => {
+              const current = parseLocalePrefix(window.location.pathname);
+              const pathname = current?.rest ?? window.location.pathname;
+              const nextLang = lang === "ar" ? "en" : "ar";
+              window.location.assign(
+                withLocalePrefix(nextLang, pathname) + window.location.search + window.location.hash,
+              );
+            }}
+          />
           <MenuRow
             icon={Moon}
             label={t("settings_theme")}
