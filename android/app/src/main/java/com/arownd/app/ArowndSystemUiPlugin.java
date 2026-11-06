@@ -30,20 +30,39 @@ public class ArowndSystemUiPlugin extends Plugin {
 
         getActivity().runOnUiThread(() -> {
             Window window = getActivity().getWindow();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                WindowInsetsControllerCompat controller =
-                    WindowCompat.getInsetsController(window, window.getDecorView());
-                controller.setAppearanceLightStatusBars(!dark);
+            int barColor = Color.TRANSPARENT;
+            if (color != null && !color.isEmpty()) {
+                try {
+                    barColor = Color.parseColor(color);
+                } catch (IllegalArgumentException ignored) {
+                    // Keep transparent system bars when the web theme color is invalid.
+                }
             }
 
-            if (Build.VERSION.SDK_INT < 35 && color != null && !color.isEmpty()) {
-                try {
-                    window.setStatusBarColor(Color.parseColor(color));
-                } catch (IllegalArgumentException ignored) {
-                    // Ignore invalid CSS colors instead of breaking native navigation.
-                }
-            } else if (Build.VERSION.SDK_INT >= 35) {
+            WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(window, window.getDecorView());
+            controller.setAppearanceLightStatusBars(!dark);
+            controller.setAppearanceLightNavigationBars(!dark);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // The app draws edge-to-edge on Android 10+; remove automatic contrast scrims.
+                window.setStatusBarContrastEnforced(false);
+                window.setNavigationBarContrastEnforced(false);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                // Android 15+ enforces edge-to-edge for apps targeting API 35 or newer.
                 window.setStatusBarColor(Color.TRANSPARENT);
+                window.setNavigationBarColor(Color.TRANSPARENT);
+            } else {
+                window.setStatusBarColor(barColor);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    window.setNavigationBarColor(barColor);
+                }
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.setNavigationBarDividerColor(Color.TRANSPARENT);
             }
             call.resolve();
         });
