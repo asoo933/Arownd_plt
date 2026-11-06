@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-const stylesheet = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+const stylesheet = readFileSync(path.resolve(process.cwd(), "src/styles.css"), "utf8");
 
 describe("Arownd Premium Marketplace design tokens", () => {
   it("preserves the approved brand palette", () => {
