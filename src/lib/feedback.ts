@@ -21,6 +21,9 @@ export function friendlyErrorMessage(
 ) {
   const message = error instanceof Error ? error.message : String(error ?? "");
   const normalized = message.toLowerCase();
+  if (normalized === "notification_delete_not_confirmed") {
+    return translate("notifications_delete_not_confirmed");
+  }
 
   if (
     (typeof navigator !== "undefined" && !navigator.onLine) ||
