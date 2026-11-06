@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { formatMoney, getMarket, zonedParts } from "./market";
 import { isNativePlatform } from "./platform";
 
@@ -145,7 +145,12 @@ export async function askPermission(): Promise<boolean> {
  *  لا ترمي استثناءً أبدًا: بعض بيئات WebView ترمي خطأ متزامنًا
  *  (سياق غير آمن) ولو تركناه لانقلب الوعد إلى رفض غير معالج. */
 export function useGeo() {
-  const [pos, setPos] = useState<LatLng | null>(() => readLastPosition());
+  // Keep the first client render identical to SSR; restore session data after hydration.
+  const [pos, setPos] = useState<LatLng | null>(null);
+
+  useEffect(() => {
+    setPos(readLastPosition());
+  }, []);
   const [denied, setDenied] = useState(false);
   const [locating, setLocating] = useState(false);
   const [reason, setReason] = useState<GeoReason | null>(null);
