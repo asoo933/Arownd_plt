@@ -42,11 +42,13 @@ export function NativePushNotifications() {
         if (!(await addListener(() =>
           PushNotifications.addListener("registration", async ({ value }) => {
             if (disposed || !value) return;
-            const { error } = await supabase.rpc("register_my_push_device", {
-              _token: value,
-              _platform: "android",
-            });
-            if (error) {
+            try {
+              const { error } = await supabase.rpc("register_my_push_device", {
+                _token: value,
+                _platform: "android",
+              });
+              if (error) throw error;
+            } catch (error) {
               registrationGate.markFailed();
               console.error("[push] Device token registration failed", error);
               return;
