@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { Search, ShoppingBag } from "lucide-react";
+import { MapPinned, Search, ShoppingBag } from "lucide-react";
 import { CategoryIcon } from "@/components/sooqy/category-icons";
 import { useGeo } from "@/lib/geo";
 import { searchProducts, type SortBy } from "@/lib/sooqy";
@@ -100,6 +100,14 @@ function ExplorePage() {
             {t("explore_description")}
           </p>
         </header>
+
+        <Link
+          to="/map"
+          className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 px-4 text-sm font-extrabold text-foreground shadow-sm transition hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <MapPinned className="size-5 text-accent-ink" aria-hidden="true" />
+          {t("explore_open_map")}
+        </Link>
 
         <SearchField
           value={query}
