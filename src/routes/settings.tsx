@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   Bell,
   FileText,
-  Fingerprint,
   Eye,
   EyeOff,
   Globe,
@@ -37,7 +36,6 @@ import { useTranslation, translate } from "@/lib/i18n";
 import { parseLocalePrefix, withLocalePrefix } from "@/lib/locale";
 import { isAndroidNativePlatform } from "@/lib/platform";
 import { clearUserScopedCaches } from "@/lib/pwa";
-import { getNativeBiometricStatus, setNativeBiometricEnabled } from "@/lib/native-biometric";
 import { addNativeUpdateListener, checkNativeAppUpdate, completeNativeAppUpdate, startNativeAppUpdate } from "@/lib/native-app-update";
 
 export const Route = createFileRoute("/settings")({
@@ -78,9 +76,6 @@ function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [androidNative, setAndroidNative] = useState(false);
-  const [biometricAvailable, setBiometricAvailable] = useState(false);
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
-  const [biometricBusy, setBiometricBusy] = useState(false);
   const [nativeUpdateBusy, setNativeUpdateBusy] = useState(false);
   const [nativeUpdateDownloaded, setNativeUpdateDownloaded] = useState(false);
 
@@ -89,14 +84,6 @@ function SettingsPage() {
     setAndroidNative(true);
     let disposed = false;
     let removeUpdateListener: (() => Promise<void>) | undefined;
-
-    void getNativeBiometricStatus()
-      .then((status) => {
-        if (disposed) return;
-        setBiometricAvailable(status.available);
-        setBiometricEnabled(status.enabled);
-      })
-      .catch((error: unknown) => console.warn("[native] Could not read biometric settings", error));
 
     void addNativeUpdateListener((state) => {
       if (!disposed && state.downloaded) setNativeUpdateDownloaded(true);
@@ -112,24 +99,6 @@ function SettingsPage() {
       removeUpdateListener?.();
     };
   }, []);
-
-  const toggleNativeBiometric = async () => {
-    if (biometricBusy || (!biometricAvailable && !biometricEnabled)) return;
-    setBiometricBusy(true);
-    try {
-      await setNativeBiometricEnabled(!biometricEnabled);
-      const status = await getNativeBiometricStatus();
-      setBiometricAvailable(status.available);
-      setBiometricEnabled(status.enabled);
-      showSuccess(status.enabled
-        ? t("settings_biometric_on_success")
-        : t("settings_biometric_off_success"));
-    } catch (error) {
-      showError(error);
-    } finally {
-      setBiometricBusy(false);
-    }
-  };
 
   const checkAndInstallNativeUpdate = async () => {
     if (nativeUpdateBusy) return;
@@ -325,32 +294,6 @@ function SettingsPage() {
         <section className="space-y-2">
           <SectionTitle>{t("settings_android_section")}</SectionTitle>
           <MenuCard>
-            <div className="flex items-center justify-between gap-3 p-4">
-              <div className="min-w-0">
-                <p className="font-bold text-foreground">{t("settings_biometric_title")}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {biometricAvailable
-                    ? biometricEnabled ? t("settings_biometric_required") : t("settings_biometric_available")
-                    : t("settings_biometric_unavailable")}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {t("settings_biometric_note")}
-                </p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={biometricEnabled}
-                onClick={() => void toggleNativeBiometric()}
-                disabled={biometricBusy || (!biometricAvailable && !biometricEnabled)}
-                className={cn(
-                  "min-h-11 shrink-0 rounded-full px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50",
-                  biometricEnabled ? "bg-primary text-accent-ink-foreground" : "border border-border text-foreground",
-                )}
-              >
-                {biometricBusy ? t("settings_saving") : biometricEnabled ? t("settings_enabled") : t("settings_enable")}
-              </button>
-            </div>
             <MenuRow
               icon={RefreshCw}
               label={nativeUpdateDownloaded ? t("settings_install_update") : t("settings_check_update")}
