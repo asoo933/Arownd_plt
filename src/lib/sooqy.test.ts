@@ -67,7 +67,7 @@ describe("filterAndSortStoreOffers", () => {
       price,
       created_at: createdAt,
       product: { name },
-    }) as import("./sooqy").OfferFull;
+    }) as unknown as import("./sooqy").OfferFull;
 
   const offers = [
     makeOffer("older", "قميص أزرق", 2500, "2026-01-01T00:00:00Z"),
