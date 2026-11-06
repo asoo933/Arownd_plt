@@ -626,6 +626,7 @@ function RootComponent() {
   useServiceWorkerRegistration();
   const location = useLocation();
   const isAuth = location.pathname === "/auth";
+  const isMap = location.pathname === "/map" || location.pathname.endsWith("/map");
   // Merchant Studio needs the full desktop canvas; consumer pages stay phone-first.
   const isStudio = location.pathname === "/studio" || location.pathname.startsWith("/studio/");
 
@@ -646,7 +647,7 @@ function RootComponent() {
           <BagProvider>
             <div
               className={
-                isAuth
+                isAuth || isMap
                   ? "min-h-dvh w-full min-w-0 max-w-none overflow-x-clip pt-[env(safe-area-inset-top)] pb-0"
                   : isStudio
                     ? "min-h-dvh w-full min-w-0 max-w-none overflow-x-clip pt-[env(safe-area-inset-top)] pb-[calc(var(--nav-height)+env(safe-area-inset-bottom))]"
@@ -657,7 +658,7 @@ function RootComponent() {
                 <Outlet />
               </PageTransition>
             </div>
-            {!isAuth && (
+            {!isAuth && !isMap && (
               <>
                 <ConnectionBanner />
                 <DynamicIsland />
