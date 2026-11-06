@@ -45,6 +45,13 @@ export function NativePushNotifications() {
             });
             if (error) {
               console.error("[push] Device token registration failed", error);
+              return;
+            }
+            try {
+              // Settings sign-out unregisters this token while the session is valid.
+              window.localStorage.setItem("arownd-push-token", value);
+            } catch {
+              // The server registration remains valid if WebView storage is unavailable.
             }
           }),
         );
