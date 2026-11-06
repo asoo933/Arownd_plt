@@ -18,8 +18,7 @@ const MAX_ASSETS = 80;
 const SHELL_ASSETS = [
   "/offline.html",
   "/manifest.webmanifest",
-  "/icon-192.png",
-  "/icon-512.png",
+  "/pwa-icon.svg",
 ];
 
 self.addEventListener("install", (event) => {
