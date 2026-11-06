@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getSafeNotificationRoute } from "@/lib/native-notification-route";
+import { createPushRegistrationGate } from "@/lib/native-push-registration";
 
 /**
  * Native Android push registration.
@@ -21,8 +22,7 @@ export function NativePushNotifications() {
     }
 
     let disposed = false;
-    let registrationRequested = false;
-    let registrationInFlight = false;
+    const registrationGate = createPushRegistrationGate();
     const listenerHandles: Array<{ remove: () => Promise<void> }> = [];
 
     void import("@capacitor/push-notifications")
@@ -44,9 +44,11 @@ export function NativePushNotifications() {
               _platform: "android",
             });
             if (error) {
+              registrationGate.markFailed();
               console.error("[push] Device token registration failed", error);
               return;
             }
+            if (disposed) return;
             try {
               // Settings sign-out unregisters this token while the session is valid.
               window.localStorage.setItem("arownd-push-token", value);
@@ -58,7 +60,7 @@ export function NativePushNotifications() {
 
         listenerHandles.push(
           await PushNotifications.addListener("registrationError", (error) => {
-            registrationRequested = false;
+            registrationGate.markFailed();
             console.error("[push] Firebase registration failed", error);
           }),
         );
@@ -79,8 +81,7 @@ export function NativePushNotifications() {
         );
 
         const ensureRegistration = async (allowPrompt: boolean) => {
-          if (disposed || registrationRequested || registrationInFlight) return;
-          registrationInFlight = true;
+          if (disposed || !registrationGate.begin()) return;
           try {
             const permission = await PushNotifications.checkPermissions();
             let receivePermission = permission.receive;
@@ -97,7 +98,10 @@ export function NativePushNotifications() {
             // A user who denied notifications can enable them in Android
             // Settings. The app-resume listener below rechecks this state
             // without showing an unsolicited prompt.
-            if (receivePermission !== "granted" || disposed) return;
+            if (receivePermission !== "granted" || disposed) {
+              registrationGate.markFailed();
+              return;
+            }
 
             await PushNotifications.createChannel({
               id: "arownd_updates_v2",
@@ -111,14 +115,16 @@ export function NativePushNotifications() {
             });
 
             if (!disposed) {
+              // Mark before awaiting: the registration event may arrive before
+              // the native register() promise settles.
+              registrationGate.markRequested();
               await PushNotifications.register();
-              registrationRequested = true;
+            } else {
+              registrationGate.markFailed();
             }
           } catch (error) {
-            registrationRequested = false;
+            registrationGate.markFailed();
             console.error("[push] Native push setup failed", error);
-          } finally {
-            registrationInFlight = false;
           }
         };
 
