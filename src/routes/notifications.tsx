@@ -20,7 +20,7 @@ import {
   deleteNotification,
   fetchUnreadNotificationCount,
 } from "@/lib/sooqy";
-import { formatDateTime } from "@/lib/market";
+import { DEFAULT_MARKET, MARKETS, formatDateTime } from "@/lib/market";
 import { EmptyState } from "@/components/sooqy/empty-state";
 import { ErrorState } from "@/components/sooqy/error-state";
 import { cn } from "@/lib/utils";
@@ -110,7 +110,10 @@ function navigateForNotification(
 
 function NotificationsPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
+  // Avoid getMarket() here: it reads localStorage during the first browser
+  // render, while SSR has no localStorage, which can produce React #418.
+  const notificationMarket = MARKETS.find((market) => market.lang === lang) ?? DEFAULT_MARKET;
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -380,7 +383,7 @@ function NotificationsPage() {
                         </p>
                       )}
                       <p className="mt-2 text-[11px] font-medium tabular-nums text-muted-foreground/80">
-                        {formatDateTime(n.created_at)}
+                        {formatDateTime(n.created_at, notificationMarket)}
                       </p>
                     </div>
                     <button
