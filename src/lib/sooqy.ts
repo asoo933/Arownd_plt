@@ -59,6 +59,26 @@ export { categoryLabel, categoryEmoji } from "./taxonomy";
 const OFFER_SELECT =
   "*, product:products!inner(*), store:stores!inner(*), images:product_images(*)";
 
+export type StoreOfferSort = "newest" | "price-asc" | "price-desc";
+
+/** Client-side catalog controls for the already-loaded offers of one store. */
+export function filterAndSortStoreOffers(
+  offers: OfferFull[],
+  query: string,
+  sort: StoreOfferSort,
+): OfferFull[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const filtered = normalizedQuery
+    ? offers.filter((offer) => offer.product.name.toLocaleLowerCase().includes(normalizedQuery))
+    : [...offers];
+
+  return filtered.sort((a, b) => {
+    if (sort === "price-asc") return a.price - b.price;
+    if (sort === "price-desc") return b.price - a.price;
+    return Date.parse(b.created_at) - Date.parse(a.created_at);
+  });
+}
+
 export function primaryImage(images: ProductImage[] | undefined) {
   if (!images?.length) return null;
   return (images.find((i) => i.is_primary) ?? images[0])!.image_url;
