@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: arownd-release-gate-${{ github.ref }}
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -38,6 +38,24 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      - name: Regenerate lockfile from package manifests
+        run: pnpm install --lockfile-only --no-frozen-lockfile
+
+      - name: Commit synchronized lockfile on main
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: synchronize pnpm lockfile"
+            git push origin HEAD:main
+          fi
+
+      - name: Verify lockfile is committed in pull requests
+        if: ${{ github.event_name == 'pull_request' }}
+        run: git diff --exit-code -- pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
