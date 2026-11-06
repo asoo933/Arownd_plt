@@ -60,6 +60,11 @@ export const MARKETS: Market[] = [
 
 export const DEFAULT_MARKET: Market = MARKETS[0]!;
 
+/** Resolve presentation market from the SSR-stable page language. */
+export function getMarketForLang(lang: MarketLang): Market {
+  return MARKETS.find((market) => market.lang === lang) ?? DEFAULT_MARKET;
+}
+
 const STORAGE_KEY = "arownd:market";
 const LEGACY_STORAGE_KEY = "sooqy:market";
 const MARKET_EVENT = "arownd:market";
