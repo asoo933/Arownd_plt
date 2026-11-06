@@ -32,8 +32,11 @@ describe("delivery company mobile experience", () => {
 
   it("uses dictionary keys instead of hardcoded Arabic UI strings", () => {
     const arabicLiteral = /["'`][^"'`]*[\u0600-\u06FF][^"'`]*["'`]/;
-    expect(dashboard).not.toMatch(arabicLiteral);
-    expect(registration).not.toMatch(arabicLiteral);
+    const withoutComments = (source: string) =>
+      source.replace(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*/g, "");
+
+    expect(withoutComments(dashboard)).not.toMatch(arabicLiteral);
+    expect(withoutComments(registration)).not.toMatch(arabicLiteral);
   });
 
   it("does not contain escaped newline fragments in JSX", () => {
