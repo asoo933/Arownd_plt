@@ -211,22 +211,34 @@ function ProfilePage() {
         ogType="website"
       />
       <AppShell className="mx-auto max-w-xl space-y-5 pb-24 pt-6">
-        {isMerchant ? (
-          <div className="flex min-h-11 items-center justify-end gap-2">
-            <Link to="/bag" aria-label={t("profile_bag_aria")} title={t("profile_bag_aria")} className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:bg-muted active:scale-95">
-              <ShoppingBag className="size-5" />
-            </Link>
-            <Link to="/settings" aria-label={t("profile_settings_aria")} title={t("profile_settings_aria")} className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:bg-muted active:scale-95">
-              <Settings className="size-5" />
-            </Link>
-          </div>
-        ) : (
-          <PageHeader title={t("profile_hub_title")} subtitle={t("profile_hub_subtitle")} action={
-            <Link to="/settings" aria-label={t("profile_settings_aria")} title={t("profile_settings_aria")} className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:bg-muted active:scale-95">
-              <Settings className="size-5" />
-            </Link>
-          } />
-        )}
+        <PageHeader
+          title={public_id ? t("profile_public_title") : t("profile_hub_title")}
+          subtitle={public_id ? t("profile_public_subtitle") : t("profile_hub_subtitle")}
+          action={
+            !public_id ? (
+              <div className="flex items-center gap-2">
+                {isMerchant && (
+                  <Link
+                    to="/bag"
+                    aria-label={t("profile_bag_aria")}
+                    title={t("profile_bag_aria")}
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:bg-muted active:scale-95"
+                  >
+                    <ShoppingBag className="size-5" />
+                  </Link>
+                )}
+                <Link
+                  to="/settings"
+                  aria-label={t("profile_settings_aria")}
+                  title={t("profile_settings_aria")}
+                  className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition hover:bg-muted active:scale-95"
+                >
+                  <Settings className="size-5" />
+                </Link>
+              </div>
+            ) : undefined
+          }
+        />
         {profile.isError && (
           <ErrorState scope="profile" error={profile.error} onRetry={() => profile.refetch()} />
         )}
@@ -359,13 +371,21 @@ function ProfilePage() {
                   to: "/orders",
                   Icon: Package,
                   label: t("profile_orders"),
-                  value: orders.isLoading ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0),
+                  value: orders.isLoading
+                    ? "…"
+                    : orders.isError
+                      ? "—"
+                      : String(orders.data?.length ?? 0),
                 },
                 {
                   to: "/reservations",
                   Icon: CalendarDays,
                   label: t("profile_reservations"),
-                  value: reservations.isLoading ? "…" : reservations.isError ? "—" : String(reservations.data?.length ?? 0),
+                  value: reservations.isLoading
+                    ? "…"
+                    : reservations.isError
+                      ? "—"
+                      : String(reservations.data?.length ?? 0),
                 },
                 {
                   to: "/favorites",
@@ -424,7 +444,11 @@ function ProfilePage() {
               )}
               {notifications.isError && (
                 <div className="p-3">
-                  <ErrorState scope="profile:activity" error={notifications.error} onRetry={() => void notifications.refetch()} />
+                  <ErrorState
+                    scope="profile:activity"
+                    error={notifications.error}
+                    onRetry={() => void notifications.refetch()}
+                  />
                 </div>
               )}
               {!notifications.isLoading && !notifications.isError && recentNotifications.length === 0 && (
