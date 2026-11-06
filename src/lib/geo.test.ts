@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { distanceKm, formatDA, formatKm, greeting, isOpenNow } from "./geo";
+import { renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { distanceKm, formatDA, formatKm, greeting, isOpenNow, useGeo } from "./geo";
 
 describe("formatDA", () => {
   it("يضيف وحدة دج", () => {
@@ -59,5 +60,23 @@ describe("greeting", () => {
   });
   it("تصبح على خير في الليل", () => {
     expect(greeting(new Date("2026-01-15T22:00:00Z"))).toBe("تصبح على خير 🌙");
+  });
+});
+
+
+describe("useGeo hydration", () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+  });
+
+  it("restores the cached position after the initial render", async () => {
+    const cachedPosition = { lat: 36.75, lng: 3.05, savedAt: Date.now() };
+    window.sessionStorage.setItem("arownd:last-position", JSON.stringify(cachedPosition));
+
+    const { result } = renderHook(() => useGeo());
+
+    await waitFor(() => {
+      expect(result.current.pos).toEqual({ lat: 36.75, lng: 3.05 });
+    });
   });
 });
