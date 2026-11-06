@@ -11,6 +11,7 @@ import {
   fetchMyRoles,
   fetchMyStore,
   merchantUpdateStore,
+  buildStoreMediaPatch,
   uploadImageToBucket,
 } from "@/lib/sooqy";
 import { childrenOf } from "@/lib/taxonomy";
@@ -84,9 +85,22 @@ function StoreSettingsPage() {
   const [closedDays, setClosedDays] = useState<number[]>([]);
   const [logo, setLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [cover, setCover] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!logoPreview?.startsWith("blob:")) return;
+    return () => URL.revokeObjectURL(logoPreview);
+  }, [logoPreview]);
+
+  useEffect(() => {
+    if (!coverPreview?.startsWith("blob:")) return;
+    return () => URL.revokeObjectURL(coverPreview);
+  }, [coverPreview]);
 
   // تعبئة النموذج من بيانات المتجر الحالية — مرة واحدة
   useEffect(() => {
@@ -112,6 +126,7 @@ function StoreSettingsPage() {
     });
     setClosedDays(oh.closed_days ?? []);
     setLogoPreview(s.logo_url ?? null);
+    setCoverPreview(s.cover_url ?? null);
     setLoaded(true);
   }, [store.data, loaded]);
 
@@ -193,6 +208,11 @@ function StoreSettingsPage() {
     setLogoPreview(file ? URL.createObjectURL(file) : (store.data?.logo_url ?? null));
   };
 
+  const pickCover = (file: File | null) => {
+    setCover(file);
+    setCoverPreview(file ? URL.createObjectURL(file) : (store.data?.cover_url ?? null));
+  };
+
   const toggleDay = (i: number) =>
     setClosedDays((prev) => (prev.includes(i) ? prev.filter((d) => d !== i) : [...prev, i].sort()));
 
@@ -206,8 +226,9 @@ function StoreSettingsPage() {
     try {
       // الإحداثيات تُحفظ فقط إذا اكتمل الزوج (خط عرض + خط طول)
       const hasCoords = form.latitude != null && form.longitude != null;
-      let logoUrl = store.data.logo_url ?? null;
-      if (logo) logoUrl = await uploadImageToBucket(logo, "store-media");
+      const uploadedMedia: { logoUrl?: string; coverUrl?: string } = {};
+      if (logo) uploadedMedia.logoUrl = await uploadImageToBucket(logo, "store-media");
+      if (cover) uploadedMedia.coverUrl = await uploadImageToBucket(cover, "store-media");
       await merchantUpdateStore(store.data.id, {
         name: form.name.trim(),
         description: form.description.trim() || null,
@@ -219,8 +240,7 @@ function StoreSettingsPage() {
         latitude: hasCoords ? form.latitude : null,
         longitude: hasCoords ? form.longitude : null,
         opening_hours: { open: form.open, close: form.close, closed_days: closedDays },
-        ...(logoUrl ? { logo_url: logoUrl } : {}),
-        cover_url: logoUrl ?? undefined,
+        ...buildStoreMediaPatch(uploadedMedia),
         instagram_url: form.instagram.trim() || null,
         facebook_url: form.facebook.trim() || null,
         category: form.category,
@@ -249,9 +269,9 @@ function StoreSettingsPage() {
       {/* بطاقة الهوية: الغلاف + الشعار + الاسم */}
       <section className="overflow-hidden rounded-[var(--radius-card)] border border-border bg-card ">
         <div className="relative h-32 bg-muted/40 sm:h-40">
-          {logoPreview ? (
+          {coverPreview ? (
             <img
-              src={logoPreview}
+              src={coverPreview}
               alt={t("studio_settings_cover_alt")}
               fetchPriority="low"
               decoding="async"
@@ -262,6 +282,15 @@ function StoreSettingsPage() {
               {form.name.trim() ? form.name.trim()[0] : "؟"}
             </div>
           )}
+          <button
+            type="button"
+            onClick={() => coverInputRef.current?.click()}
+            className="absolute bottom-3 end-3 inline-flex min-h-10 items-center gap-2 rounded-full bg-card/95 px-3 text-xs font-bold text-foreground shadow-sm backdrop-blur transition active:scale-95"
+            aria-label={t("studio_change_store_cover")}
+          >
+            <Camera className="size-4" />
+            {t("studio_change_store_cover")}
+          </button>
         </div>
         <div className="flex items-end gap-3 px-3.5 pb-3.5 sm:px-4 sm:pb-4">
           <button
@@ -299,6 +328,13 @@ function StoreSettingsPage() {
           type="file"
           accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/heic,image/heif"
           onChange={(e) => pickLogo(e.target.files?.[0] ?? null)}
+          className="hidden"
+        />
+        <input
+          ref={coverInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/heic,image/heif"
+          onChange={(e) => pickCover(e.target.files?.[0] ?? null)}
           className="hidden"
         />
       </section>
