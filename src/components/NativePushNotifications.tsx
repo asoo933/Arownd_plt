@@ -27,6 +27,8 @@ export function NativePushNotifications() {
         if (disposed) return;
 
         const permission = await PushNotifications.checkPermissions();
+        // Do not repeatedly prompt users who have explicitly denied notifications.
+        if (permission.receive === "denied") return;
         const permissionResult =
           permission.receive === "granted"
             ? permission
