@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getMerchantOrderDisplayState, getMerchantOrderDisplayTotal } from "@/lib/order-display";
+import { getMerchantOrderDisplayState, getMerchantOrderDisplayTotal, shouldShowParentOrderTimeline } from "@/lib/order-display";
 
 describe("getMerchantOrderDisplayTotal", () => {
   it("does not show a retained quote as payable after cancellation", () => {
@@ -32,5 +32,14 @@ describe("getMerchantOrderDisplayState", () => {
 
   it("does not guess when the backend returns an unknown status", () => {
     expect(getMerchantOrderDisplayState("unexpected")).toBe("unknown");
+  });
+});
+
+
+describe("shouldShowParentOrderTimeline", () => {
+  it("uses the parent timeline only when there are no merchant suborders", () => {
+    expect(shouldShowParentOrderTimeline(0)).toBe(true);
+    expect(shouldShowParentOrderTimeline(1)).toBe(false);
+    expect(shouldShowParentOrderTimeline(3)).toBe(false);
   });
 });

@@ -36,3 +36,8 @@ export function getMerchantOrderDisplayState(status: string): MerchantOrderDispl
       return "unknown";
   }
 }
+
+/** Parent status is only authoritative for legacy orders without merchant suborders. */
+export function shouldShowParentOrderTimeline(merchantOrderCount: number): boolean {
+  return merchantOrderCount <= 0;
+}

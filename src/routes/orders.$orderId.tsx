@@ -21,6 +21,7 @@ import { ErrorState } from "@/components/sooqy/error-state";
 import { goBackOrTo } from "@/lib/nav";
 import { OrderTrackingSkeleton } from "@/components/sooqy/skeleton";
 import { CustomerOrderTracking } from "@/components/sooqy/merchant-order-tracking";
+import { shouldShowParentOrderTimeline } from "@/lib/order-display";
 
 export const Route = createFileRoute("/orders/$orderId")({
   head: () => ({
@@ -104,6 +105,7 @@ function TrackPage() {
   }
 
   const cancelled = order.status === "cancelled" || order.status === "rejected";
+  const showParentTimeline = shouldShowParentOrderTimeline(order.merchant_orders?.length ?? 0);
   const statusIdx = STEPS.findIndex((s) => s.id === order.status);
   const date = formatDate(order.created_at, undefined, {
     day: "numeric",
@@ -136,67 +138,73 @@ function TrackPage() {
         </div>
       </div>
 
-      {/* الخط الزمني */}
-      {cancelled ? (
-        <div className="flex items-center gap-3 rounded-2xl border border-danger/30 bg-danger-soft p-4">
-          <XCircle className="size-6 shrink-0 text-danger" />
-          <div>
-            <p className="text-sm font-bold text-danger">
-              {order.status === "rejected" ? t("track_rejected") : t("track_cancelled")}
-            </p>
-            <p className="text-xs text-muted-foreground">{t("track_cancelled_hint")}</p>
+      {/* حالة الطلب العام للطلبات أحادية المتجر فقط؛ الطلبات متعددة المتاجر تتبع كل متجر منفصلًا. */}
+      {showParentTimeline ? (
+        cancelled ? (
+          <div className="flex items-center gap-3 rounded-2xl border border-danger/30 bg-danger-soft p-4">
+            <XCircle className="size-6 shrink-0 text-danger" />
+            <div>
+              <p className="text-sm font-bold text-danger">
+                {order.status === "rejected" ? t("track_rejected") : t("track_cancelled")}
+              </p>
+              <p className="text-xs text-muted-foreground">{t("track_cancelled_hint")}</p>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="rounded-[var(--radius-card)] border border-border bg-card p-4">
-          <ol className="space-y-0">
-            {STEPS.map((step, i) => {
-              const done = i <= statusIdx;
-              const current = i === statusIdx;
-              return (
-                <li key={step.id} className="relative flex gap-3 pb-5 last:pb-0">
-                  {i < STEPS.length - 1 && (
+        ) : (
+          <div className="rounded-[var(--radius-card)] border border-border bg-card p-4">
+            <ol className="space-y-0">
+              {STEPS.map((step, i) => {
+                const done = i <= statusIdx;
+                const current = i === statusIdx;
+                return (
+                  <li key={step.id} className="relative flex gap-3 pb-5 last:pb-0">
+                    {i < STEPS.length - 1 && (
+                      <span
+                        className={cn(
+                          "absolute top-7 start-4 h-[calc(100%-var(--space-8)+var(--space-1))] w-0.5 rounded-full",
+                          i < statusIdx ? "bg-primary" : "bg-border",
+                        )}
+                      />
+                    )}
                     <span
                       className={cn(
-                        "absolute top-7 start-4 h-[calc(100%-var(--space-8)+var(--space-1))] w-0.5 rounded-full",
-                        i < statusIdx ? "bg-primary" : "bg-border",
-                      )}
-                    />
-                  )}
-                  <span
-                    className={cn(
-                      "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full border-2 transition",
-                      done
-                        ? "border-accent-ink bg-primary text-accent-ink-foreground"
-                        : "border-border bg-card text-muted-foreground",
-                    )}
-                  >
-                    {done ? <Check className="size-4" /> : <Package className="size-4" />}
-                  </span>
-                  <div className="min-w-0 pt-1">
-                    <p
-                      className={cn(
-                        "text-sm font-bold",
-                        current
-                          ? "text-accent-ink"
-                          : done
-                            ? "text-foreground"
-                            : "text-muted-foreground",
+                        "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full border-2 transition",
+                        done
+                          ? "border-accent-ink bg-primary text-accent-ink-foreground"
+                          : "border-border bg-card text-muted-foreground",
                       )}
                     >
-                      {t(step.labelKey)}
-                      {current && (
-                        <span className="ms-2 text-caption font-semibold text-accent-ink">
-                          {t("track_current")}
-                        </span>
-                      )}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{t(step.descKey)}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                      {done ? <Check className="size-4" /> : <Package className="size-4" />}
+                    </span>
+                    <div className="min-w-0 pt-1">
+                      <p
+                        className={cn(
+                          "text-sm font-bold",
+                          current
+                            ? "text-accent-ink"
+                            : done
+                              ? "text-foreground"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {t(step.labelKey)}
+                        {current && (
+                          <span className="ms-2 text-caption font-semibold text-accent-ink">
+                            {t("track_current")}
+                          </span>
+                        )}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{t(step.descKey)}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        )
+      ) : (
+        <div className="rounded-[var(--radius-card)] border border-border bg-primary-soft/50 p-4">
+          <p className="text-sm font-semibold text-foreground">{t("track_per_store_progress")}</p>
         </div>
       )}
 
