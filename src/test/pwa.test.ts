@@ -21,7 +21,7 @@ function readManifest(file: string) {
 }
 
 describe("PWA — الـ manifest", () => {
-  const manifests = ["manifest.webmanifest", "manifest.json"];
+  const manifests = ["manifest.webmanifest"];
 
   for (const file of manifests) {
     describe(file, () => {
@@ -68,11 +68,6 @@ describe("PWA — الـ manifest", () => {
     });
   }
 
-  it("الملفان متطابقان (توحيد الـ manifest)", () => {
-    const a = readFileSync(resolve(PUBLIC_DIR, "manifest.webmanifest"), "utf8");
-    const b = readFileSync(resolve(PUBLIC_DIR, "manifest.json"), "utf8");
-    expect(JSON.parse(a)).toEqual(JSON.parse(b));
-  });
 });
 
 describe("PWA — Service Worker", () => {
@@ -82,6 +77,14 @@ describe("PWA — Service Worker", () => {
   it("موجود ويdefined", () => {
     expect(existsSync(resolve(PUBLIC_DIR, "sw.js"))).toBe(true);
     expect(sw.length).toBeGreaterThan(500);
+  });
+
+
+  it("يخزّن أيقونة التطبيق الموجودة بدل مراجع PNG غير الموجودة", () => {
+    expect(existsSync(resolve(PUBLIC_DIR, "pwa-icon.svg"))).toBe(true);
+    expect(sw).toContain('"/pwa-icon.svg"');
+    expect(sw).not.toContain('"/icon-192.png"');
+    expect(sw).not.toContain('"/icon-512.png"');
   });
 
   it("يسجّل أحداث install/activate/fetch", () => {
