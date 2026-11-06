@@ -267,7 +267,7 @@ function StoreSettingsPage() {
       />
       <Link
         to="/stores/$storeId"
-        params={{ storeId: store.data?.id ?? "" }}
+        params={{ storeId: store.data.id }}
         className="inline-flex min-h-10 items-center gap-2 self-start rounded-full border border-border bg-card px-4 text-sm font-bold text-foreground transition active:scale-95"
       >
         <Eye className="size-4" />
