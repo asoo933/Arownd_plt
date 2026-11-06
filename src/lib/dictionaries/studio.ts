@@ -125,6 +125,7 @@ export const studio: DictGroup = {
     studio_day_friday: "الجمعة",
     studio_day_saturday: "السبت",
     studio_settings_heading: "تخصيص المتجر",
+    studio_preview_store: "معاينة المتجر",
     studio_settings_subtitle: "هوية متجرك تظهر للعملاء في صفحته",
     studio_settings_intro: "حدّث معلومات متجرك وموقعه وساعات عمله من مكان واحد",
     studio_store_name_ph: "اسم المتجر",
@@ -436,6 +437,7 @@ export const studio: DictGroup = {
     studio_day_friday: "Friday",
     studio_day_saturday: "Saturday",
     studio_settings_heading: "Customize store",
+    studio_preview_store: "Preview store",
     studio_settings_subtitle: "Your store identity as customers see it",
     studio_settings_intro:
       "Update your store information, location, and opening hours in one place",
