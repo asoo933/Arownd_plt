@@ -31,13 +31,29 @@ export type GroupedNotifications<T> = {
   items: T[];
 };
 
-/** Group notifications by the user's local calendar day, preserving newest-first order. */
+/**
+ * Group notifications by a fixed market timezone so SSR and browser hydration
+ * classify the same timestamp identically, regardless of the device timezone.
+ */
 export function groupNotificationsByDate<T extends { created_at: string }>(
   notifications: readonly T[],
   now: Date = new Date(),
+  timeZone = "Africa/Algiers",
 ): GroupedNotifications<T>[] {
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1).getTime();
+  const calendarDay = (date: Date): number => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const value = (type: Intl.DateTimeFormatPartTypes): number =>
+      Number(parts.find((part) => part.type === type)?.value ?? 0);
+    return Date.UTC(value("year"), value("month") - 1, value("day"));
+  };
+
+  const today = calendarDay(now);
+  const yesterday = today - 24 * 60 * 60 * 1000;
   const groups: Record<NotificationDateGroup, T[]> = {
     today: [],
     yesterday: [],
@@ -46,10 +62,7 @@ export function groupNotificationsByDate<T extends { created_at: string }>(
 
   for (const notification of notifications) {
     const timestamp = Date.parse(notification.created_at);
-    const date = Number.isFinite(timestamp) ? new Date(timestamp) : null;
-    const day = date
-      ? new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
-      : Number.NaN;
+    const day = Number.isFinite(timestamp) ? calendarDay(new Date(timestamp)) : Number.NaN;
     const key: NotificationDateGroup =
       day === today ? "today" : day === yesterday ? "yesterday" : "older";
     groups[key].push(notification);
