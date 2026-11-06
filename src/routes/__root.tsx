@@ -33,6 +33,7 @@ import { parseNativeAuthCallback, parseNativeRouteLink } from "@/lib/native-deep
 import { openExternalUrl, syncNativeStatusBar } from "@/lib/native-sharing";
 import { useTheme } from "@/lib/theme";
 import { NativePushNotifications } from "@/components/NativePushNotifications";
+import { addManagedNativeListener } from "@/lib/native-listeners";
 import { ConfirmDialog } from "@/components/sooqy/confirm-dialog";
 
 function NotFoundComponent() {
@@ -190,13 +191,17 @@ function NativeKeyboardSync() {
     void import("@capacitor/keyboard")
       .then(async ({ Keyboard }) => {
         if (disposed) return;
-        handles.push(await Keyboard.addListener("keyboardWillShow", (info) => show(info.keyboardHeight)));
-        handles.push(await Keyboard.addListener("keyboardDidShow", (info) => show(info.keyboardHeight)));
-        handles.push(await Keyboard.addListener("keyboardWillHide", hide));
-        handles.push(await Keyboard.addListener("keyboardDidHide", hide));
-        if (disposed) {
-          for (const handle of handles) void handle.remove();
-        }
+        const addListener = (create: () => Promise<{ remove: () => Promise<void> }>) =>
+          addManagedNativeListener(create, () => disposed, handles);
+
+        if (!(await addListener(() =>
+          Keyboard.addListener("keyboardWillShow", (info) => show(info.keyboardHeight)),
+        ))) return;
+        if (!(await addListener(() =>
+          Keyboard.addListener("keyboardDidShow", (info) => show(info.keyboardHeight)),
+        ))) return;
+        if (!(await addListener(() => Keyboard.addListener("keyboardWillHide", hide)))) return;
+        if (!(await addListener(() => Keyboard.addListener("keyboardDidHide", hide)))) return;
       })
       .catch((error: unknown) => {
         console.warn("[native] Could not subscribe to keyboard events", error);
