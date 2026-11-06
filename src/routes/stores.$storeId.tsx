@@ -68,7 +68,7 @@ function StorePage() {
       timeZone: "UTC",
     }).format(new Date(Date.UTC(2024, 0, 7 + index))),
   );
-  const [tab, setTab] = useState<Tab>("products");
+  const [tab, setTab] = useState<Tab>("products");\n  const [productSearch, setProductSearch] = useState("");\n  const [productSort, setProductSort] = useState<StoreOfferSort>("newest");
   const favs = useFavorites();
   const store = useQuery({ queryKey: ["store", storeId], queryFn: () => getStore(storeId) });
   useRealtimeSubscription({ table: "store_offers", filter: "store_id=eq." + storeId, queryKeys: [["store", storeId], ["store-offers", storeId]] });
@@ -336,6 +336,38 @@ function StorePage() {
           {/* المنتجات */}
           {tab === "products" && (
             <div className="space-y-4">
+              {!offers.isLoading && !offers.isError && !!offers.data?.length && (
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      value={productSearch}
+                      onChange={(event) => setProductSearch(event.target.value)}
+                      placeholder={t("store_product_search_placeholder")}
+                      aria-label={t("store_product_search_aria")}
+                      className="h-11 w-full rounded-[var(--radius-control)] border border-border bg-card ps-10 pe-3 text-sm outline-none transition focus:border-accent-ink focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {t("store_product_count", { count: visibleOffers.length })}
+                    </p>
+                    <label className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                      <span>{t("store_sort_label")}</span>
+                      <select
+                        value={productSort}
+                        onChange={(event) => setProductSort(event.target.value as StoreOfferSort)}
+                        aria-label={t("store_sort_label")}
+                        className="min-h-9 rounded-lg border border-border bg-card px-2 text-xs font-semibold text-foreground"
+                      >
+                        <option value="newest">{t("store_sort_newest")}</option>
+                        <option value="price-asc">{t("store_sort_price_asc")}</option>
+                        <option value="price-desc">{t("store_sort_price_desc")}</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+              )}
               {offers.isError && (
                 <ErrorState
                   scope="store:offers"
@@ -392,7 +424,7 @@ function StorePage() {
                   </div>
                 </section>
               ))}
-              {!offers.isLoading && !offers.isError && !offers.data?.length && (
+              {!offers.isLoading && !offers.isError && !!offers.data?.length && visibleOffers.length === 0 && (\n                <EmptyState Icon={Store} title={t("store_product_search_empty_title")} hint={t("store_product_search_empty_hint")} />\n              )}\n              {!offers.isLoading && !offers.isError && !offers.data?.length && (
                 <EmptyState
                   Icon={Store}
                   title={isOwner ? t("store_owner_empty_title") : t("store_empty_title")}
