@@ -87,6 +87,17 @@ describe("PWA — Service Worker", () => {
     expect(sw).not.toContain('"/icon-512.png"');
   });
 
+  it("يسجّل Service Worker مرة واحدة حتى مع استدعاء التسجيل المتكرر", () => {
+    expect(pwaClient).toContain("let serviceWorkerRegistrationStarted = false;");
+    expect(pwaClient).toContain("serviceWorkerRegistrationStarted) return;");
+    expect(pwaClient).toContain("serviceWorkerRegistrationStarted = true;");
+  });
+
+  it("لا يفوّت التسجيل إذا بدأ بعد حدث load", () => {
+    expect(pwaClient).toContain('document.readyState === "complete"');
+    expect(pwaClient).toContain('window.addEventListener("load", register, { once: true })');
+  });
+
   it("يسجّل أحداث install/activate/fetch", () => {
     expect(sw).toContain('addEventListener("install"');
     expect(sw).toContain('addEventListener("activate"');
