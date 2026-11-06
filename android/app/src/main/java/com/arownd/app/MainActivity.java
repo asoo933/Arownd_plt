@@ -9,7 +9,6 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(ArowndSystemUiPlugin.class);
         registerPlugin(ArowndSecureStoragePlugin.class);
-        registerPlugin(ArowndBiometricPlugin.class);
         registerPlugin(ArowndAppUpdatePlugin.class);
         super.onCreate(savedInstanceState);
 
