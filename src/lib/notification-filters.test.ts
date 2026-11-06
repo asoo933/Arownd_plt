@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterNotifications } from "./notification-filters";
+import { filterNotifications, groupNotificationsByDate } from "./notification-filters";
 
 const notifications = [
   { id: "order-unread", type: "order", read: false },
@@ -33,5 +33,30 @@ describe("filterNotifications", () => {
 
   it("returns only offers in the offers filter", () => {
     expect(filterNotifications(notifications, "offers").map((item) => item.id)).toEqual(["offer"]);
+  });
+});
+
+describe("groupNotificationsByDate", () => {
+  it("groups by the local calendar day and keeps groups newest-first", () => {
+    const now = new Date(2026, 10, 6, 12, 0, 0);
+    const items = [
+      { id: "today", created_at: new Date(2026, 10, 6, 8, 0, 0).toISOString() },
+      { id: "yesterday", created_at: new Date(2026, 10, 5, 8, 0, 0).toISOString() },
+      { id: "older", created_at: new Date(2026, 10, 4, 8, 0, 0).toISOString() },
+    ];
+
+    expect(groupNotificationsByDate(items, now).map((group) => [group.key, group.items[0]?.id])).toEqual([
+      ["today", "today"],
+      ["yesterday", "yesterday"],
+      ["older", "older"],
+    ]);
+  });
+
+  it("places invalid timestamps in the older group", () => {
+    const groups = groupNotificationsByDate(
+      [{ id: "invalid", created_at: "not-a-date" }],
+      new Date(2026, 10, 6, 12, 0, 0),
+    );
+    expect(groups).toEqual([{ key: "older", items: [{ id: "invalid", created_at: "not-a-date" }] }]);
   });
 });
