@@ -255,6 +255,11 @@ export function useGeo() {
    */
   const ask = useCallback(async (): Promise<GeoResult> => {
     markGeoAsked();
+
+    // Capacitor owns Android's runtime permission prompt. Do not let the Web
+    // Permissions API preflight (unsupported in Android WebView) block it.
+    if (isNativePlatform()) return request();
+
     const perm = await geoPermission();
     if (perm === "denied") {
       const ok = await askPermission();
