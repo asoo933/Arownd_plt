@@ -119,8 +119,8 @@ function applyMarkerStyle(el: HTMLElement, active: boolean, label = ""): HTMLEle
     ? C.primaryDeep
     : `linear-gradient(135deg, ${C.primary} 0%, ${C.primaryDark} 100%)`;
   pin.style.transform = active ? "scale(1.12)" : "scale(1)";
-  pin.style.background = "#FFFFFF";
-  pin.style.borderColor = active ? "#DFFF72" : "#FFFFFF";
+  pin.style.background = active ? "#C6F135" : "#FFFFFF";
+  pin.style.borderColor = "#FFFFFF";
   el.style.zIndex = active ? "20" : "1";
 
   return el;
