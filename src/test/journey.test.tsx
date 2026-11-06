@@ -301,9 +301,9 @@ describe("جولة المستخدم — تدفقات حقيقية", () => {
     // ننتظر تحميل الولايات حتى يوجد خيار value="16" فعلًا
     await screen.findByRole("option", { name: /16 - الجزائر/ });
     fireEvent.change(screen.getByLabelText("اختيار الولاية"), { target: { value: "16" } });
-    fireEvent.change(screen.getByPlaceholderText("البلدية"), {
-      target: { value: "الجزائر الوسطى" },
-    });
+    const communeSelect = await screen.findByRole("combobox", { name: "اختيار البلدية" });
+    await waitFor(() => expect(communeSelect).toBeEnabled());
+    fireEvent.change(communeSelect, { target: { value: "الجزائر الوسطى" } });
     fireEvent.change(screen.getByPlaceholderText("الاسم الكامل"), {
       target: { value: "محمد أمين" },
     });
