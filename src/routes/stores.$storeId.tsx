@@ -71,7 +71,9 @@ function StorePage() {
       timeZone: "UTC",
     }).format(new Date(Date.UTC(2024, 0, 7 + index))),
   );
-  const [tab, setTab] = useState<Tab>("products");\n  const [productSearch, setProductSearch] = useState("");\n  const [productSort, setProductSort] = useState<StoreOfferSort>("newest");
+  const [tab, setTab] = useState<Tab>("products");
+  const [productSearch, setProductSearch] = useState("");
+  const [productSort, setProductSort] = useState<StoreOfferSort>("newest");
   const favs = useFavorites();
   const store = useQuery({ queryKey: ["store", storeId], queryFn: () => getStore(storeId) });
   useRealtimeSubscription({ table: "store_offers", filter: "store_id=eq." + storeId, queryKeys: [["store", storeId], ["store-offers", storeId]] });
@@ -110,8 +112,9 @@ function StorePage() {
   // مالِك المتجر يرى صفحته كما يراها الزائر + شريط اختصارات إدارية
   const isOwner = !!user && s.owner_id === user.id;
 
-  const byCat = new Map<string, NonNullable<typeof offers.data>>();
-  for (const o of offers.data ?? []) {
+  const visibleOffers = filterAndSortStoreOffers(offers.data ?? [], productSearch, productSort);
+  const byCat = new Map<string, typeof visibleOffers>();
+  for (const o of visibleOffers) {
     const k = o.product.category;
     byCat.set(k, [...(byCat.get(k) ?? []), o]);
   }
@@ -192,7 +195,7 @@ function StorePage() {
         )}
 
         {/* الغلاف */}
-        <div className="relative h-36 bg-muted sm:h-44">
+        <div className="relative h-40 overflow-hidden bg-muted sm:h-52">
           {s.cover_url && (
             <img
               src={s.cover_url}
@@ -202,6 +205,7 @@ function StorePage() {
               className="size-full object-cover"
             />
           )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
           <button
             onClick={share}
             aria-label={t("store_share_aria")}
@@ -226,15 +230,16 @@ function StorePage() {
           </div>
         </div>
 
-        <div className="space-y-4 px-4 pt-11">
+        <div className="space-y-4 px-4 pt-12">
           {/* الاسم والحالة */}
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h1 className="text-h1 text-foreground">{s.name}</h1>
+            <h1 className="min-w-0 flex-1 text-h1 font-extrabold tracking-tight text-foreground">{s.name}</h1>
             {!isOwner && (
               <ReportContentButton targetType="store" targetId={s.id} label={t("store_report")} />
             )}
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
+            {s.description && <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{s.description}</p>}
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <OpenBadge open={open} />
               {s.is_verified && <VerifiedBadge />}
