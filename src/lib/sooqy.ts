@@ -756,13 +756,17 @@ export async function markNotificationRead(notificationId: string) {
 
 export async function deleteNotification(notificationId: string) {
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) return;
-  const { error } = await supabase
+  if (!u.user) throw new Error(ERRORS["not_authenticated"]);
+  const { data, error } = await supabase
     .from("notifications")
     .delete()
     .eq("id", notificationId)
-    .eq("user_id", u.user.id);
+    .eq("user_id", u.user.id)
+    .select("id");
   if (error) throw error;
+  if (!data || data.length === 0) {
+    throw new Error("notification_delete_not_confirmed");
+  }
 }
 
 /** Upload user-owned media. Catalog media uses public URLs; payment receipts remain private paths. */
