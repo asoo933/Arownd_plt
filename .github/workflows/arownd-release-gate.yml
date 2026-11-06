@@ -53,8 +53,19 @@ jobs:
             git push origin HEAD:main
           fi
 
-      - name: Verify lockfile is committed in pull requests
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Commit synchronized lockfile on same-repository pull requests
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: synchronize pnpm lockfile"
+            git push origin "HEAD:${GITHUB_HEAD_REF}"
+          fi
+
+      - name: Verify lockfile is committed for fork pull requests
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: git diff --exit-code -- pnpm-lock.yaml
 
       - name: Install dependencies
