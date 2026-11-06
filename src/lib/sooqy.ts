@@ -61,6 +61,17 @@ const OFFER_SELECT =
 
 export type StoreOfferSort = "newest" | "price-asc" | "price-desc";
 
+/** Build only the media fields that were actually uploaded, keeping logo and cover independent. */
+export function buildStoreMediaPatch(uploaded: {
+  logoUrl?: string;
+  coverUrl?: string;
+}): Pick<Database["public"]["Tables"]["stores"]["Update"], "logo_url" | "cover_url"> {
+  return {
+    ...(uploaded.logoUrl ? { logo_url: uploaded.logoUrl } : {}),
+    ...(uploaded.coverUrl ? { cover_url: uploaded.coverUrl } : {}),
+  };
+}
+
 /** Client-side catalog controls for the already-loaded offers of one store. */
 export function filterAndSortStoreOffers(
   offers: OfferFull[],
