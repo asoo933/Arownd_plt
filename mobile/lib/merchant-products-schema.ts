@@ -5,6 +5,7 @@ export const MerchantProductOfferSchema = z.object({
   store_id: z.string().uuid(),
   product_id: z.string().uuid(),
   price: z.coerce.number(),
+  old_price: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional(),
   stock_quantity: z.coerce.number(),
   options: z.object({
     sizes: z.array(z.string()).default([]),
