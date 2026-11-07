@@ -29,7 +29,10 @@ function statusLabel(status: string): string {
     picked_up: translate("shipmentStatusPickedUp"),
     in_transit: translate("shipmentStatusTransit"),
     failed: translate("shipmentStatusFailed"),
-    returned: translate("shipmentStatusReturned")
+    returned: translate("shipmentStatusReturned"),
+    preparing: translate("orderTrackingPreparing"),
+    ready_for_dispatch: translate("orderTrackingReady"),
+    out_for_delivery: translate("orderTrackingOutForDelivery")
   };
   return labels[status] ?? translate("orderStatusUnknown");
 }
@@ -156,6 +159,13 @@ export default function OrderDetailsScreen() {
         {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</Text></View> : null}
         {!cancelled ? <View style={styles.totalRow}><Text style={styles.sectionTitle}>{translate("orderStoreTotal")}</Text><Text style={styles.total}>{formatDZD(subTotal)}</Text></View> : null}
         {merchantOrder.status === "quoted" ? <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text> : null}
+        {(query.data.trackingEvents.find((entry) => entry.merchantOrderId === merchantOrder.id)?.events ?? []).map((event) => (
+          <View key={event.id} style={styles.trackingEvent}>
+            <Text style={styles.shipmentStatus}>{statusLabel(event.status)}</Text>
+            <Text style={styles.meta}>{dateLabel(event.created_at)}</Text>
+            {event.note ? <Text style={styles.meta}>{event.note}</Text> : null}
+          </View>
+        ))}
         {order.delivery_type === "desk" && merchantOrder.store?.address_line ? <Text style={styles.meta}>{translate("orderPickupAddress")}: {merchantOrder.store.address_line} · {merchantOrder.store.commune ?? ""}</Text> : null}
       </View>;
     })}
@@ -213,6 +223,7 @@ const styles = StyleSheet.create({
   notice: { color: "#8A6412", fontSize: 11, textAlign: "right", lineHeight: 18 },
   recipient: { fontSize: 13, fontWeight: "900", textAlign: "right" },
   shipment: { borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 9, gap: 5 },
+  trackingEvent: { borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 9, gap: 4 },
   shipmentStatus: { color: "#647D13", fontSize: 12, fontWeight: "900", textAlign: "right" },
   secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: "#D4D4D4", justifyContent: "center", alignItems: "center" },
   secondaryText: { color: "#647D13", fontSize: 13, fontWeight: "900" }
