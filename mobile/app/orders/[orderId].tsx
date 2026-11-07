@@ -5,7 +5,7 @@ import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View, useColorSc
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { formatDZD } from "@/lib/catalog";
-import { fetchCustomerOrderDetails, getOrderStatusTone, respondToMerchantQuote } from "@/lib/orders";
+import { fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 
@@ -106,7 +106,7 @@ export default function OrderDetailsScreen() {
   const merchantOrders = order.merchant_orders;
   const showParentTimeline = merchantOrders.length === 0;
   const parentCancelled = order.status === "cancelled" || order.status === "rejected";
-  const activeStep = STEPS.findIndex((step) => step.status === order.status);
+  const activeStep = getOrderTrackingSteps(order.status);
   const orderCode = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
 
   return <CustomerScreen>
