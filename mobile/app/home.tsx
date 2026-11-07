@@ -103,6 +103,7 @@ export default function CustomerHomeScreen() {
         <NavItem label={translate("navExplore")} icon="⌕" onPress={() => router.push("/explore")} />
         <NavItem label={translate("navStores")} icon="▦" onPress={() => router.push("/stores")} />
         <NavItem label={translate("favoriteTitleShort")} icon="♡" onPress={() => router.push("/favorites")} />
+        <NavItem label={translate("ordersTitle")} icon="▤" onPress={() => router.push("/orders")} />
       </View>
     </CustomerScreen>
   );
