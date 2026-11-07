@@ -3,8 +3,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AuthLayout, ActionButton } from "@/components/auth-ui";
 import { translate } from "@/lib/i18n";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function AccountTypeScreen() {
+  const theme = useAppTheme();
   return (
     <AuthLayout
       title={translate("chooseAccountTitle")}
@@ -15,26 +17,38 @@ export default function AccountTypeScreen() {
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push("/signup-personal")}
-          style={({ pressed }) => [styles.option, pressed ? styles.pressed : undefined]}
+          style={({ pressed }) => [
+            styles.option,
+            { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+            pressed ? { borderColor: theme.colors.accentMuted, opacity: 0.82 } : undefined
+          ]}
         >
-          <View style={styles.iconCircle}><Text style={styles.icon}>◎</Text></View>
-          <View style={styles.copy}>
-            <Text style={styles.optionTitle}>{translate("personalTitle")}</Text>
-            <Text style={styles.optionDescription}>{translate("personalDescription")}</Text>
+          <View style={[styles.iconCircle, { backgroundColor: theme.colors.surfaceMuted }]}>
+            <Text style={[styles.icon, { color: theme.colors.foreground }]}>◎</Text>
           </View>
-          <Text style={styles.arrow}>‹</Text>
+          <View style={styles.copy}>
+            <Text style={[styles.optionTitle, { color: theme.colors.foreground }]}>{translate("personalTitle")}</Text>
+            <Text style={[styles.optionDescription, { color: theme.colors.muted }]}>{translate("personalDescription")}</Text>
+          </View>
+          <Text style={[styles.arrow, { color: theme.colors.muted }]}>‹</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push("/signup-business")}
-          style={({ pressed }) => [styles.option, pressed ? styles.pressed : undefined]}
+          style={({ pressed }) => [
+            styles.option,
+            { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+            pressed ? { borderColor: theme.colors.accentMuted, opacity: 0.82 } : undefined
+          ]}
         >
-          <View style={styles.iconCircle}><Text style={styles.icon}>▦</Text></View>
-          <View style={styles.copy}>
-            <Text style={styles.optionTitle}>{translate("businessTitle")}</Text>
-            <Text style={styles.optionDescription}>{translate("businessDescription")}</Text>
+          <View style={[styles.iconCircle, { backgroundColor: theme.colors.surfaceMuted }]}>
+            <Text style={[styles.icon, { color: theme.colors.foreground }]}>▦</Text>
           </View>
-          <Text style={styles.arrow}>‹</Text>
+          <View style={styles.copy}>
+            <Text style={[styles.optionTitle, { color: theme.colors.foreground }]}>{translate("businessTitle")}</Text>
+            <Text style={[styles.optionDescription, { color: theme.colors.muted }]}>{translate("businessDescription")}</Text>
+          </View>
+          <Text style={[styles.arrow, { color: theme.colors.muted }]}>‹</Text>
         </Pressable>
         <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/login")} />
       </View>
@@ -43,30 +57,26 @@ export default function AccountTypeScreen() {
 }
 
 const styles = StyleSheet.create({
-  options: { gap: 14 },
+  options: { gap: designTokens.spacing.md + 2 },
   option: {
     minHeight: 112,
-    borderRadius: 18,
+    borderRadius: designTokens.radius.lg,
     borderWidth: 1,
-    borderColor: "#E5E5E5",
-    backgroundColor: "#FFFFFF",
-    padding: 17,
+    padding: designTokens.spacing.lg,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 13
+    gap: designTokens.spacing.md
   },
-  pressed: { opacity: 0.75, borderColor: "#A7C82A" },
   iconCircle: {
     width: 46,
     height: 46,
-    borderRadius: 14,
-    backgroundColor: "#F0F8D7",
+    borderRadius: designTokens.radius.md,
     alignItems: "center",
     justifyContent: "center"
   },
-  icon: { color: "#0A0A0A", fontSize: 25, fontWeight: "800" },
-  copy: { flex: 1, gap: 5 },
-  optionTitle: { color: "#0A0A0A", fontSize: 15, fontWeight: "800", textAlign: "right" },
-  optionDescription: { color: "#737373", fontSize: 12, lineHeight: 20, textAlign: "right" },
-  arrow: { color: "#737373", fontSize: 25 }
+  icon: { fontSize: 25, fontWeight: "800" },
+  copy: { flex: 1, gap: designTokens.spacing.xs + 1 },
+  optionTitle: { fontSize: 15, fontWeight: "800", textAlign: "right" },
+  optionDescription: { fontSize: 12, lineHeight: 20, textAlign: "right" },
+  arrow: { fontSize: 25 }
 });
