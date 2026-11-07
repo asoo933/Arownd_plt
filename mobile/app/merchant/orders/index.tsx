@@ -257,10 +257,14 @@ function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: A
         ? theme.colors.warningSurface
         : theme.colors.surfaceMuted;
 
+  const displayKey = order.status === "shipped" && order.deliveryType === "desk"
+    ? "merchantOrderStatusPrepared"
+    : labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
+
   return (
     <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 5 }}>
       <Text style={{ color: tone, fontSize: 10, fontWeight: "900" }}>
-        {translate(labelByStatus[order.status] ?? "merchantOrderStatusUnknown")}
+        {translate(displayKey)}
       </Text>
     </View>
   );
