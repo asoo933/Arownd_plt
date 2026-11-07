@@ -20,4 +20,13 @@ describe("delivery profile validation", () => {
   it("normalizes phone formatting before validation", () => {
     expect(normalizeAlgerianPhone("+213 550-123-456")).toBe("+213550123456");
   });
+
+  it("accepts normalized international Algerian mobile numbers", () => {
+    expect(DeliveryProfileSchema.safeParse({
+      full_name: "أحمد",
+      phone: normalizeAlgerianPhone("+213 550-123-456"),
+      wilaya_id: 9,
+      commune: "البليدة"
+    }).success).toBe(true);
+  });
 });
