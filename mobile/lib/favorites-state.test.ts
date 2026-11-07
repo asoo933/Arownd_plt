@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   EMPTY_FAVORITES,
+  getFavoritesStorageKey,
   hasFavorite,
   parseFavorites,
   toggleFavoriteId
@@ -30,6 +31,12 @@ describe("favorites state", () => {
       "s1"
     );
     expect(result).toEqual({ products: ["p1"], stores: ["s1"] });
+  });
+
+  it("isolates favorites storage between accounts and anonymous sessions", () => {
+    expect(getFavoritesStorageKey("user-a")).toBe("arownd:favorites:user-a");
+    expect(getFavoritesStorageKey("user-b")).toBe("arownd:favorites:user-b");
+    expect(getFavoritesStorageKey(null)).toBe("arownd:favorites:anonymous");
   });
 
   it("ignores empty identifiers", () => {
