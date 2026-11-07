@@ -164,8 +164,11 @@ export default function MerchantEditProductScreen() {
       await updateMerchantProductOffer(offerId, storeId, { ...values, options });
       await refreshProductData();
       setNotice(translate("merchantProductEditSaved"));
-    } catch {
-      setActionError(translate("merchantProductEditError"));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "";
+      setActionError(message.includes("active_promotion_must_end")
+        ? translate("merchantPromotionMustEnd")
+        : translate("merchantProductEditError"));
     } finally {
       setSaving(false);
     }
@@ -524,6 +527,7 @@ export default function MerchantEditProductScreen() {
                     {translate("merchantPromotionActive")}: {offer.old_price.toLocaleString("ar-DZ")} ← {offer.price.toLocaleString("ar-DZ")} دج
                     {getPromotionDiscountPercent(offer.old_price, offer.price) !== null ? " · " + getPromotionDiscountPercent(offer.old_price, offer.price) + "%" : ""}
                   </Text>
+                  <Text style={[styles.hint, { color: theme.colors.muted }]}>{translate("merchantPromotionMustEnd")}</Text>
                   <Pressable accessibilityRole="button" disabled={isBusy} onPress={() => void stopPromotion()} style={[styles.primaryButton, { backgroundColor: theme.colors.accent, opacity: isBusy ? 0.55 : 1 }]}>
                     {promotionBusy ? <ActivityIndicator color={theme.colors.accentForeground} /> : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate("merchantPromotionEnd")}</Text>}
                   </Pressable>
