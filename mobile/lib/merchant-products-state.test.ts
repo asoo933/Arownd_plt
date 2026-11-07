@@ -17,6 +17,7 @@ function offer(overrides: Partial<MerchantProductOffer> = {}): MerchantProductOf
     product_id: "product-1",
     price: 2500,
     stock_quantity: 8,
+    options: { sizes: ["M"], colors: ["Black"] },
     is_available: true,
     is_merchant_hidden: false,
     created_at: "2026-11-07T10:00:00.000Z",
@@ -118,6 +119,7 @@ describe("MerchantProductOfferSchema", () => {
 
     expect(parsed.price).toBe(1500);
     expect(parsed.stock_quantity).toBe(4);
+    expect(parsed.options).toEqual({ sizes: [], colors: [] });
     expect(parsed.images).toEqual([]);
   });
 });
