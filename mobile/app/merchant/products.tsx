@@ -30,7 +30,7 @@ import {
   type MerchantInventoryFilter,
   type MerchantProductOffer
 } from "@/lib/merchant-products-state";
-import { translate, type TranslationKey } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
 export default function MerchantProductsScreen() {
@@ -326,6 +326,9 @@ function MerchantOfferCard({
             accessibilityLabel={translate("merchantProductsStockLabel")}
             style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
           />
+          <Text style={[styles.stockHint, { color: theme.colors.subtle }]}>
+            {translate("merchantProductsStockHint")}
+          </Text>
         </View>
       </View>
 
@@ -491,6 +494,7 @@ function createStyles(theme: AppTheme) {
     inputsRow: { flexDirection: "row-reverse", gap: 9 },
     inputGroup: { flex: 1, gap: 5 },
     inputLabel: { fontSize: 10, fontWeight: "800", textAlign: "right" },
+    stockHint: { fontSize: 9, lineHeight: 14, textAlign: "right" },
     valueInput: { minHeight: 46, borderWidth: 1, borderRadius: 12, paddingHorizontal: 11, textAlign: "right", fontSize: 14, fontWeight: "800" },
     actionsRow: { flexDirection: "row-reverse", gap: 8 },
     saveButton: { flex: 1, minHeight: 46, borderRadius: 13, alignItems: "center", justifyContent: "center" },
