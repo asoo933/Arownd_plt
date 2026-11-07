@@ -108,6 +108,7 @@ export default function AddressesScreen() {
   return <CustomerScreen>
     <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></Pressable>
     <CustomerHeading title={translate("addressesTitle")} subtitle={translate("addressesSubtitle")} />
+    {defaultMutation.isError ? <Text style={styles.error}>{translate("addressesDefaultError")}</Text> : null}
     <Pressable accessibilityRole="button" onPress={() => openEditor(null)} style={styles.addButton}>
       <Text style={styles.addText}>＋ {translate("addressesAdd")}</Text>
     </Pressable>
