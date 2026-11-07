@@ -78,6 +78,13 @@ export default function DeliveryProfileScreen() {
       color: dark ? "#FFFFFF" : "#0A0A0A"
     }
   ];
+  const pickerStyle = [
+    styles.picker,
+    {
+      backgroundColor: dark ? "#171717" : "#FFFFFF",
+      borderColor: dark ? "#383838" : "#E5E5E5"
+    }
+  ];
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
     ? (wilayas.data ?? []).map((item) => ({
         id: String(item.id),
@@ -106,11 +113,11 @@ export default function DeliveryProfileScreen() {
       <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("checkoutPhonePlaceholder")}</Text>
       <TextInput value={phone} onChangeText={setPhone} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("checkoutWilaya")}</Text>
-      <Pressable onPress={() => setPicker("wilaya")} style={fieldStyle}>
+      <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <Text style={[styles.pickerText, { color: selectedWilaya ? (dark ? "#FFFFFF" : "#0A0A0A") : "#888888" }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
       </Pressable>
       <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("checkoutCommune")}</Text>
-      <Pressable disabled={wilayaId === null} onPress={() => setPicker("commune")} style={[fieldStyle, wilayaId === null && styles.disabled]}>
+      <Pressable disabled={wilayaId === null} onPress={() => setPicker("commune")} style={[pickerStyle, wilayaId === null && styles.disabled]}>
         <Text style={[styles.pickerText, { color: commune ? (dark ? "#FFFFFF" : "#0A0A0A") : "#888888" }]}>{commune || translate("checkoutChooseCommune")}</Text>
       </Pressable>
       {communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
@@ -153,6 +160,7 @@ const styles = StyleSheet.create({
   panel: { borderRadius: 18, padding: 16, gap: 10 },
   label: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, justifyContent: "center", fontSize: 13 },
+  picker: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, justifyContent: "center" },
   pickerText: { textAlign: "right", fontSize: 13 },
   saveButton: { minHeight: 49, borderRadius: 13, backgroundColor: "#C6F135", justifyContent: "center", alignItems: "center", marginTop: 5 },
   saveText: { color: "#0A0A0A", fontSize: 13, fontWeight: "900" },
