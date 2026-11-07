@@ -23,8 +23,24 @@ export type CartEvaluation = { lines: CartLine[]; subtotal: number; blockingCoun
 export const EMPTY_CART: CartItem[] = [];
 export const MAX_CART_QUANTITY = 10;
 
+/** Keeps option identity independent from the current interface language. */
+export function normalizeCartOptions(options: Record<string, string>): Record<string, string> {
+  const normalized: Record<string, string> = {};
+  for (const [rawKey, value] of Object.entries(options)) {
+    const key = rawKey.trim();
+    const alias = key.toLocaleLowerCase();
+    const canonicalKey = alias === "size" || alias === "sizes" || key === "المقاس" || key === "مقاس"
+      ? "size"
+      : alias === "color" || alias === "colors" || key === "اللون" || key === "لون"
+        ? "color"
+        : key;
+    if (canonicalKey && typeof value === "string") normalized[canonicalKey] = value.trim();
+  }
+  return normalized;
+}
+
 export function cartLineKey(item: Pick<CartItem, "offerId" | "options">): string {
-  const options = Object.entries(item.options)
+  const options = Object.entries(normalizeCartOptions(item.options))
     .filter(([key, value]) => key.length > 0 && typeof value === "string")
     .sort(([left], [right]) => left.localeCompare(right));
   return item.offerId + "::" + JSON.stringify(options);
@@ -35,7 +51,7 @@ function cleanOptions(value: unknown): Record<string, string> {
   const entries: [string, string][] = Object.entries(value).flatMap(([key, item]): [string, string][] =>
     key.length > 0 && typeof item === "string" ? [[key, item]] : []
   );
-  return Object.fromEntries(entries);
+  return normalizeCartOptions(Object.fromEntries(entries));
 }
 
 export function sanitizeCart(value: unknown): CartItem[] {
