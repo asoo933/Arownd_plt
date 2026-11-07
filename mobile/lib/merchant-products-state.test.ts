@@ -75,7 +75,7 @@ describe("filterMerchantProducts", () => {
   it("searches product names and brands without changing the source list", () => {
     expect(filterMerchantProducts(offers, "NORTH", "all").map((item) => item.id)).toEqual(["offer-2"]);
     expect(filterMerchantProducts(offers, "قميص", "all").map((item) => item.id)).toEqual(["offer-1"]);
-    expect(offers).toHaveLength(3);
+    expect(offers).toHaveLength(4);
   });
 });
 
@@ -138,6 +138,27 @@ describe("MerchantProductOfferSchema", () => {
     expect(parsed.images).toEqual([]);
     expect(parsed.product.description).toBe("وصف تجريبي");
     expect(parsed.product.category).toBe("clothing");
+  });
+
+  it("defaults optional shared metadata for older product records", () => {
+    const parsed = MerchantProductOfferSchema.parse({
+      id: "00000000-0000-4000-8000-000000000011",
+      store_id: "00000000-0000-4000-8000-000000000012",
+      product_id: "00000000-0000-4000-8000-000000000013",
+      price: 1500,
+      stock_quantity: 1,
+      is_available: true,
+      is_merchant_hidden: false,
+      created_at: "2026-11-07T10:00:00.000Z",
+      product: {
+        id: "00000000-0000-4000-8000-000000000013",
+        name: "منتج قديم"
+      }
+    });
+
+    expect(parsed.product.description).toBeNull();
+    expect(parsed.product.brand).toBeNull();
+    expect(parsed.product.category).toBe("other");
   });
 });
 
