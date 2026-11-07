@@ -8,7 +8,7 @@ import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
 type OrderRow = {
@@ -74,6 +74,7 @@ function toRows(orders: CustomerOrder[]): OrderRow[] {
 
 export default function OrdersScreen() {
   const theme = useAppTheme();
+  const styles = createStyles(theme);
   const [tab, setTab] = useState<OrdersTab>("all");
   const auth = useQuery({
     queryKey: ["customer-orders-auth"],
@@ -155,28 +156,29 @@ export default function OrdersScreen() {
   </CustomerScreen>;
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: AppTheme) { return StyleSheet.create({
   tabs: { flexDirection: "row-reverse", gap: 7, flexWrap: "wrap" },
-  tab: { minHeight: 40, borderRadius: 13, borderWidth: 1, borderColor: "#D4D4D4", paddingHorizontal: 12, justifyContent: "center" },
-  tabActive: { backgroundColor: "#C6F135", borderColor: "#C6F135" },
-  tabText: { color: "#737373", fontSize: 11, fontWeight: "800" },
-  tabTextActive: { color: "#0A0A0A" },
+  tab: { minHeight: 40, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.border, paddingHorizontal: 12, justifyContent: "center" },
+  tabActive: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
+  tabText: { color: theme.colors.muted, fontSize: 11, fontWeight: "800" },
+  tabTextActive: { color: theme.colors.foreground },
   card: { borderRadius: 18, padding: 14, gap: 10 },
   cardHeader: { flexDirection: "row-reverse", alignItems: "flex-start", justifyContent: "space-between", gap: 8 },
   cardHeading: { flex: 1, alignItems: "flex-end", gap: 4 },
   orderCode: { fontSize: 13, fontWeight: "900" },
-  date: { color: "#737373", fontSize: 10 },
+  date: { color: theme.colors.muted, fontSize: 10 },
   status: { borderRadius: 10, paddingHorizontal: 9, paddingVertical: 6 },
-  statusSuccess: { backgroundColor: "#E8F5D0" },
-  statusDanger: { backgroundColor: "#FDE8E7" },
-  statusPending: { backgroundColor: "#FFF3D6" },
-  statusMuted: { backgroundColor: "#E5E5E5" },
-  statusText: { color: "#333333", fontSize: 10, fontWeight: "800" },
-  storeName: { color: "#647D13", fontSize: 12, fontWeight: "900", textAlign: "right" },
+  statusSuccess: { backgroundColor: theme.colors.successSurface },
+  statusDanger: { backgroundColor: theme.colors.dangerSurface },
+  statusPending: { backgroundColor: theme.colors.warningSurface },
+  statusMuted: { backgroundColor: theme.colors.border },
+  statusText: { color: theme.colors.foreground, fontSize: 10, fontWeight: "800" },
+  storeName: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900", textAlign: "right" },
   meta: { fontSize: 11, textAlign: "right" },
-  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 10 },
-  openLabel: { color: "#647D13", fontSize: 11, fontWeight: "900" },
-  total: { color: "#647D13", fontSize: 14, fontWeight: "900" },
-  primary: { minHeight: 50, borderRadius: 14, backgroundColor: "#C6F135", justifyContent: "center", alignItems: "center" },
-  primaryText: { color: "#0A0A0A", fontWeight: "900" }
-});
+  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 10 },
+  openLabel: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "900" },
+  total: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900" },
+  primary: { minHeight: 50, borderRadius: 14, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
+  primaryText: { color: theme.colors.foreground, fontWeight: "900" }
+}); }
+
