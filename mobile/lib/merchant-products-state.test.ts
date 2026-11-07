@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { MerchantProductOfferSchema } from "@/lib/merchant-products-schema";
 import {
   filterMerchantProducts,
   getMerchantInventoryLevel,
@@ -93,5 +94,29 @@ describe("validateMerchantOfferValues", () => {
     expect(validateMerchantOfferValues("0", "2")).toBeNull();
     expect(validateMerchantOfferValues("1200", "-1")).toBeNull();
     expect(validateMerchantOfferValues("1200", "10000")).toBeNull();
+  });
+});
+
+describe("MerchantProductOfferSchema", () => {
+  it("normalizes an offer and defaults missing image relations to an empty list", () => {
+    const parsed = MerchantProductOfferSchema.parse({
+      id: "00000000-0000-4000-8000-000000000001",
+      store_id: "00000000-0000-4000-8000-000000000002",
+      product_id: "00000000-0000-4000-8000-000000000003",
+      price: "1500",
+      stock_quantity: "4",
+      is_available: true,
+      is_merchant_hidden: false,
+      created_at: "2026-11-07T10:00:00.000Z",
+      product: {
+        id: "00000000-0000-4000-8000-000000000003",
+        name: "قميص",
+        brand: null
+      }
+    });
+
+    expect(parsed.price).toBe(1500);
+    expect(parsed.stock_quantity).toBe(4);
+    expect(parsed.images).toEqual([]);
   });
 });
