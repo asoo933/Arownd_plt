@@ -98,7 +98,7 @@ export async function fetchMerchantProducts(storeId: string): Promise<MerchantPr
 
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, store_id, product_id, price, stock_quantity, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, brand), images:product_images(id, image_url, is_primary)")
+    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, brand), images:product_images(id, image_url, is_primary)")
     .eq("store_id", storeId)
     .order("created_at", { ascending: false });
 
@@ -114,7 +114,7 @@ export async function fetchMerchantProductOffer(
 
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, store_id, product_id, price, stock_quantity, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, brand), images:product_images(id, image_url, is_primary)")
+    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, brand), images:product_images(id, image_url, is_primary)")
     .eq("store_id", storeId)
     .eq("id", offerId)
     .maybeSingle();
@@ -153,7 +153,11 @@ export async function updateMerchantProductOffer(
 ): Promise<void> {
   const parsed = z.object({
     price: z.number().int().positive().max(2_147_483_647),
-    stock_quantity: z.number().int().min(0).max(9999)
+    stock_quantity: z.number().int().min(0).max(9999),
+    options: z.object({
+      sizes: z.array(z.string().trim().min(1).max(40)).max(20),
+      colors: z.array(z.string().trim().min(1).max(40)).max(20)
+    }).optional()
   }).parse(values);
 
   await updateOwnedOffer(offerId, storeId, parsed);
