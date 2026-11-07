@@ -202,6 +202,9 @@ export default function CheckoutScreen() {
 
     <View style={[styles.section, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <Text style={styles.sectionTitle}>{translate("checkoutContactTitle")}</Text>
+      <Pressable onPress={() => router.push("/delivery-profile")} hitSlop={8}>
+        <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
+      </Pressable>
       <TextInput value={fullName} onChangeText={setFullName} placeholder={translate("fullNamePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" maxLength={120} />
       <TextInput value={phone} onChangeText={setPhone} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
