@@ -40,9 +40,7 @@ jobs:
         run: npm run typecheck
 
       - name: Vitest
-        if: always()
         run: npm test
 
       - name: Expo Doctor
-        if: always()
         run: npm run doctor
