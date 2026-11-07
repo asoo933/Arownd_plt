@@ -79,3 +79,27 @@ export async function setMerchantProductVisibility(
     is_merchant_hidden: !isVisible
   });
 }
+
+import type { MerchantProductInput } from "@/lib/merchant-product-create-state";
+
+export async function createMerchantProductOffer(
+  storeId: string,
+  input: MerchantProductInput
+): Promise<string> {
+  await assertOwnedStore(storeId);
+
+  const { data, error } = await getSupabaseClient().rpc("create_merchant_product_offer", {
+    _store_id: storeId,
+    _name: input.name,
+    _price: input.price,
+    _stock_quantity: input.stock_quantity,
+    _category: input.category,
+    _brand: input.brand,
+    _description: input.description,
+    _options: input.options,
+    _images: []
+  });
+
+  if (error) throw error;
+  return z.string().uuid().parse(data as unknown);
+}
