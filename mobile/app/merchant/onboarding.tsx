@@ -29,7 +29,8 @@ import {
 import {
   merchantStoreErrorKey,
   merchantStoreSchema,
-  type MerchantStoreFormValues
+  type MerchantStoreFormValues,
+  type MerchantStoreFormInput
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
@@ -71,7 +72,7 @@ export default function MerchantOnboardingScreen() {
     setValue,
     watch,
     formState: { errors, isSubmitting }
-  } = useForm<z.input<typeof merchantStoreSchema>, unknown, MerchantStoreFormValues>({
+  } = useForm<MerchantStoreFormInput, unknown, MerchantStoreFormValues>({
     resolver: zodResolver(merchantStoreSchema),
     defaultValues: {
       storeName: "",
