@@ -119,3 +119,10 @@ create policy "Users read own reviews"
   for select
   to authenticated
   using (user_id = (select auth.uid()));
+
+-- Direct table writes would bypass the eligibility RPC and could self-approve a
+-- review. Keep writes inside the SECURITY DEFINER function only.
+revoke insert, update, delete on public.reviews from anon, authenticated;
+drop policy if exists "Users insert own review" on public.reviews;
+drop policy if exists "Users update own review" on public.reviews;
+drop policy if exists "Users delete own review" on public.reviews;
