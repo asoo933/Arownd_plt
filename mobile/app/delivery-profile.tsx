@@ -113,7 +113,7 @@ export default function DeliveryProfileScreen() {
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
       <TextInput value={fullName} onChangeText={setFullName} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
-      <TextInput value={phone} onChangeText={setPhone} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" />
+      <TextInput value={phone} onChangeText={setPhone} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
       <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <Text style={[styles.pickerText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
@@ -125,7 +125,7 @@ export default function DeliveryProfileScreen() {
         editable={wilayaId !== null}
         maxLength={100}
         placeholder={translate("checkoutCommunePlaceholder")}
-        placeholderTextColor="#888888"
+        placeholderTextColor={theme.colors.placeholder}
         style={[fieldStyle, wilayaId === null && styles.disabled]}
         textAlign="right"
       />
