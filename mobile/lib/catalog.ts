@@ -25,8 +25,8 @@ const StoreSummarySchema = z.object({
   rating: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional(),
   is_verified: z.boolean().optional(),
   opening_hours: z.unknown().optional(),
-  latitude: z.number().nullable().optional(),
-  longitude: z.number().nullable().optional()
+  latitude: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional(),
+  longitude: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional()
 }).passthrough();
 
 const ProductImageSchema = z.object({
