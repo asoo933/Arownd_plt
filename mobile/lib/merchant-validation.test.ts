@@ -32,7 +32,7 @@ describe("merchantStoreSchema", () => {
     }).success).toBe(false);
   });
 
-  it("rejects invalid phone numbers and invalid time ranges", () => {
+  it("rejects invalid phone numbers and invalid time formats", () => {
     expect(merchantStoreSchema.safeParse({
       ...validStore,
       phone: "12",
