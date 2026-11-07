@@ -329,7 +329,9 @@ function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: A
       : order.status === "pending" || order.status === "quoted"
         ? theme.colors.warningSurface
         : theme.colors.surfaceMuted;
-  const key = labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
+  const key = order.status === "shipped" && order.deliveryType === "desk"
+    ? "merchantOrderStatusPrepared"
+    : labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
 
   return (
     <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 }}>
