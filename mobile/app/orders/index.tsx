@@ -48,7 +48,7 @@ function dateLabel(value: string): string {
 }
 
 function toRows(orders: CustomerOrder[]): OrderRow[] {
-  return orders.flatMap((order) => {
+  return orders.flatMap<OrderRow>((order) => {
     if (order.merchant_orders.length === 0) {
       return [{
         order,
