@@ -142,7 +142,7 @@ export async function fetchProductDetails(productId: string): Promise<ProductSum
 export async function fetchProductOffers(productId: string): Promise<ProductOffer[]> {
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("*, product:products!inner(id, name, description, category, brand), store:stores!inner(*), images:product_images(*)")
+    .select("id, product_id, price, old_price, stock_quantity, is_available, last_confirmed_at, options, product:products!inner(id, name, description, category, brand), store:stores!inner(id, name, logo_url, commune, address_line, rating, is_verified, phone, whatsapp), images:product_images(image_url, is_primary)")
     .eq("product_id", productId)
     .order("price", { ascending: true });
 
@@ -153,7 +153,7 @@ export async function fetchProductOffers(productId: string): Promise<ProductOffe
 export async function fetchStoreDetails(storeId: string): Promise<StoreDetails | null> {
   const { data, error } = await getSupabaseClient()
     .from("stores")
-    .select("*")
+    .select("id, name, description, logo_url, cover_url, commune, address_line, phone, whatsapp, instagram_url, facebook_url, rating, is_verified, opening_hours, latitude, longitude")
     .eq("id", storeId)
     .maybeSingle();
 
