@@ -108,6 +108,7 @@ export default function ProfileScreen() {
             <MenuAction label={translate("profileOrders")} hint={translate("profileOrdersHint")} onPress={() => router.push("/orders")} colors={colors} />
             <MenuAction label={translate("profileFavorites")} hint={translate("profileFavoritesHint")} onPress={() => router.push("/favorites")} colors={colors} />
             <MenuAction label={translate("profileNotifications")} hint={translate("profileNotificationsHint")} onPress={() => router.push("/notifications")} colors={colors} />
+            <MenuAction label={translate("myReviewsTitle")} hint={translate("myReviewsSubtitle")} onPress={() => router.push("/my-reviews")} colors={colors} />
             <MenuAction label={translate("profileSettings")} hint={translate("profileSettingsHint")} onPress={() => router.push("/settings")} colors={colors} />
             <MenuAction label={translate("profileBusiness")} hint={translate("profileBusinessHint")} onPress={() => router.push("/merchant")} colors={colors} />
           </View>
