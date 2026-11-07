@@ -399,7 +399,7 @@ const stylesForScreen = StyleSheet.create({
   message: { fontSize: 14, lineHeight: 22, textAlign: "center", fontWeight: "700" },
   action: { minHeight: 46, borderRadius: 14, paddingHorizontal: 20, alignItems: "center", justifyContent: "center" },
   actionText: { fontSize: 13, fontWeight: "900" },
-  metricCard: { flex: 1, minHeight: 112, borderWidth: 1, borderRadius: 16, padding: 13, gap: 5 },
+  metricCard: { width: "48%", minHeight: 112, borderWidth: 1, borderRadius: 16, padding: 13, gap: 5 },
   metricLabel: { fontSize: 11, textAlign: "right", fontWeight: "800" },
   metricValue: { fontSize: 23, textAlign: "right", fontWeight: "900" },
   metricHint: { fontSize: 10, textAlign: "right", lineHeight: 15 }
