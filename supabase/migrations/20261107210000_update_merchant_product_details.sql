@@ -1,4 +1,6 @@
 -- Protect shared product metadata across both Native and Web clients.
+-- RLS scopes updates to the creator/merchant/store owner. The trigger performs
+-- the locked single-offer check so direct Web updates receive an explicit error.
 -- Existing authenticated grants are column-scoped to product metadata, so the RPC
 -- remains SECURITY INVOKER and relies on RLS rather than bypassing it.
 
@@ -103,11 +105,6 @@ using (
     where ur.user_id = (select auth.uid())
       and ur.role = 'merchant'::public.app_role
   )
-  and (
-    select count(*)
-    from public.store_offers so
-    where so.product_id = products.id
-  ) = 1
   and exists (
     select 1
     from public.store_offers so
@@ -125,11 +122,6 @@ with check (
     where ur.user_id = (select auth.uid())
       and ur.role = 'merchant'::public.app_role
   )
-  and (
-    select count(*)
-    from public.store_offers so
-    where so.product_id = products.id
-  ) = 1
   and exists (
     select 1
     from public.store_offers so
