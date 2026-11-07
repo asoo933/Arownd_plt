@@ -3,6 +3,10 @@ import { z } from "zod";
 import { getSupabaseClient } from "@/lib/supabase";
 import { createStoreSlug, merchantStoreSchema, type MerchantStoreFormValues } from "@/lib/merchant-validation";
 import {
+  groupMerchantOrderRows,
+  type MerchantOrderRow
+} from "@/lib/merchant-dashboard-state";
+import {
   resolveMerchantAccessStatus,
   type MerchantAccessStatus
 } from "@/lib/merchant-state";
@@ -115,4 +119,99 @@ export async function createMerchantStore(
 
   if (error) throw new Error(`${error.code ?? ""} ${error.message}`.trim());
   return z.string().uuid().parse(data as unknown);
+}
+
+
+const MerchantDashboardStoreSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  slug: z.string(),
+  phone: z.string().nullable(),
+  commune: z.string().nullable(),
+  logo_url: z.string().nullable(),
+  is_verified: z.boolean(),
+  rating: z.preprocess(
+    (value: unknown) => value === null || value === undefined ? null : Number(value),
+    z.number().nullable()
+  )
+}).passthrough();
+
+const MerchantOrderRowSchema = z.object({
+  id: z.string().uuid(),
+  product_name: z.string().nullable(),
+  quantity: z.coerce.number(),
+  merchant_order: z.object({
+    id: z.string().uuid(),
+    status: z.string(),
+    subtotal: z.coerce.number(),
+    shipping_fee: z.coerce.number().default(0),
+    quoted_at: z.string().nullable().default(null)
+  }),
+  order: z.object({
+    id: z.string().uuid(),
+    status: z.string(),
+    full_name: z.string().nullable(),
+    commune: z.string().nullable(),
+    delivery_type: z.string(),
+    created_at: z.string(),
+    wilaya: z.object({ name_ar: z.string().nullable() }).nullable()
+  }).nullable()
+}).passthrough();
+
+export type MerchantDashboardStore = z.infer<typeof MerchantDashboardStoreSchema>;
+
+export type MerchantDashboard = {
+  store: MerchantDashboardStore;
+  productCount: number;
+  orders: ReturnType<typeof groupMerchantOrderRows>["orders"];
+  pendingOrderCount: number;
+  quotedOrderCount: number;
+};
+
+export async function fetchMerchantDashboard(storeId: string): Promise<MerchantDashboard> {
+  const client = getSupabaseClient();
+  const { data: authData, error: authError } = await client.auth.getUser();
+
+  if (authError) throw authError;
+  if (!authData.user) throw new Error("not_authenticated");
+
+  const { data: storeData, error: storeError } = await client
+    .from("stores")
+    .select("id, name, slug, phone, commune, logo_url, is_verified, rating")
+    .eq("id", storeId)
+    .eq("owner_id", authData.user.id)
+    .maybeSingle();
+
+  if (storeError) throw storeError;
+  if (!storeData) throw new Error("merchant_store_not_found");
+
+  const [offerCountResult, orderItemsResult] = await Promise.all([
+    client
+      .from("store_offers")
+      .select("id", { count: "exact", head: true })
+      .eq("store_id", storeId),
+    client
+      .from("order_items")
+      .select("id, product_name, quantity, merchant_order:merchant_orders!inner(id, status, subtotal, shipping_fee, quoted_at), order:orders(id, status, full_name, commune, delivery_type, created_at, wilaya:wilayas(name_ar))")
+      .eq("store_id", storeId)
+      .eq("merchant_order.store_id", storeId)
+      .is("merchant_archived_at", null)
+      .order("id", { ascending: false })
+      .limit(100)
+  ]);
+
+  if (offerCountResult.error) throw offerCountResult.error;
+  if (orderItemsResult.error) throw orderItemsResult.error;
+
+  const store = MerchantDashboardStoreSchema.parse(storeData as unknown);
+  const rows = MerchantOrderRowSchema.array().parse(orderItemsResult.data as unknown) as MerchantOrderRow[];
+  const summary = groupMerchantOrderRows(rows);
+
+  return {
+    store,
+    productCount: offerCountResult.count ?? 0,
+    orders: summary.orders,
+    pendingOrderCount: summary.pendingCount,
+    quotedOrderCount: summary.quotedCount
+  };
 }
