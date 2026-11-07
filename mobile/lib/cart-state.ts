@@ -15,7 +15,7 @@ export type CartOffer = {
   is_available: boolean;
   product: { id: string; name: string };
   store: { id: string; name: string };
-  images: { image_url: string | null; is_primary?: boolean }[];
+  images: { image_url: string | null; is_primary?: boolean | undefined }[];
 };
 export type CartLine = { item: CartItem; offer: CartOffer | null; issues: CartIssueKind[] };
 export type CartEvaluation = { lines: CartLine[]; subtotal: number; blockingCount: number; loaded: boolean };
@@ -49,7 +49,7 @@ export function sanitizeCart(value: unknown): CartItem[] {
       offerId: row.offerId,
       productId: typeof row.productId === "string" ? row.productId : "",
       name: typeof row.name === "string" ? row.name : "",
-      price: typeof row.price === "number" && Number.isFinite(row.price) && row.price >= 0 ? row.price : undefined,
+      ...(typeof row.price === "number" && Number.isFinite(row.price) && row.price >= 0 ? { price: row.price } : {}),
       quantity: Math.max(1, Math.min(MAX_CART_QUANTITY, Math.floor(Number(row.quantity)) || 1)),
       options: cleanOptions(row.options)
     };
