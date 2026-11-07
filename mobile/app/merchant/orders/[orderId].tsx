@@ -21,6 +21,7 @@ import {
   fetchMerchantOrderTracking,
   rejectMerchantOrder,
   submitMerchantOrderQuote,
+  updateMerchantOrderStatus,
   updateMerchantOrderTracking,
   type MerchantTrackingStatus
 } from "@/lib/merchant";
@@ -69,7 +70,7 @@ export default function MerchantOrderDetailsScreen() {
   const tracking = useQuery({
     queryKey: ["merchant-order-tracking", orderId],
     queryFn: () => fetchMerchantOrderTracking(orderId ?? ""),
-    enabled: isReady && !!merchantOrder && merchantOrder.status === "confirmed" && merchantManaged,
+    enabled: isReady && !!merchantOrder && (merchantOrder.status === "confirmed" || merchantOrder.status === "shipped") && merchantManaged,
     retry: false
   });
 
@@ -104,12 +105,23 @@ export default function MerchantOrderDetailsScreen() {
   });
 
   const trackingMutation = useMutation({
-    mutationFn: (status: MerchantTrackingStatus) => updateMerchantOrderTracking(orderId ?? "", status),
+    mutationFn: async (status: MerchantTrackingStatus) => {
+      if (status === "out_for_delivery" && order.status === "confirmed") {
+        await updateMerchantOrderStatus(orderId ?? "", "shipped");
+      }
+      await updateMerchantOrderTracking(orderId ?? "", status);
+    },
     onSuccess: async () => {
       setActionError(null);
       await refresh();
     },
-    onError: (error) => setActionError(getErrorMessage(error))
+    onError: async (error) => {
+      setActionError(getErrorMessage(error));
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["merchant-order-detail", storeId, orderId] }),
+        queryClient.invalidateQueries({ queryKey: ["merchant-order-tracking", orderId] })
+      ]);
+    }
   });
 
   if (access.isPending) return <LoadingScreen theme={theme} label={translate("merchantLoading")} />;
