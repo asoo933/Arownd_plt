@@ -83,9 +83,14 @@ export function validateMerchantOfferOptions(
 ): MerchantProductOptions | null {
   const parseList = (value: string): string[] | null => {
     const entries = value.split(/[،,]/).map((entry) => entry.trim()).filter(Boolean);
-    const unique = [...new Set(entries)];
-    if (unique.length > 20 || unique.some((entry) => entry.length > 40)) return null;
-    return unique;
+    const unique = new Map<string, string>();
+    for (const entry of entries) {
+      const identity = entry.normalize("NFKC").toLocaleLowerCase();
+      if (!unique.has(identity)) unique.set(identity, entry);
+    }
+    const normalized = [...unique.values()];
+    if (normalized.length > 20 || normalized.some((entry) => entry.length > 40)) return null;
+    return normalized;
   };
 
   const sizes = parseList(sizesInput);
