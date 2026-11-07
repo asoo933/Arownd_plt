@@ -23,6 +23,7 @@ import {
   updateMerchantOrderStatus
 } from "@/lib/merchant";
 import { getNextMerchantOrderStatus } from "@/lib/merchant-dashboard-state";
+import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
@@ -153,6 +154,7 @@ export default function MerchantOrderDetailsScreen() {
               <View style={styles.itemInfo}>
                 <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name || translate("merchantOrderItems")}</Text>
                 <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderQuantity")}: {item.quantity}</Text>
+                {Object.entries(readCartOptions(item.options)).length > 0 ? <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</Text> : null}
               </View>
               <Text style={[styles.itemPrice, { color: theme.colors.foreground }]}>{formatDZD(item.unit_price * item.quantity)}</Text>
             </View>
