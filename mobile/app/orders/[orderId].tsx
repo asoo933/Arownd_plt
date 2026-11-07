@@ -44,14 +44,22 @@ function dateLabel(value: string | null | undefined): string {
 export default function OrderDetailsScreen() {
   const dark = useColorScheme() === "dark";
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
+  const auth = useQuery({
+    queryKey: ["customer-order-details-auth"],
+    queryFn: async () => {
+      const { data, error } = await getSupabaseClient().auth.getUser();
+      if (error) throw error;
+      return data.user;
+    }
+  });
   const query = useQuery({
     queryKey: ["customer-order-details", orderId],
     queryFn: () => fetchCustomerOrderDetails(orderId),
-    enabled: Boolean(orderId)
+    enabled: Boolean(orderId) && auth.isSuccess && auth.data !== null
   });
 
   useEffect(() => {
-    if (!orderId) return;
+    if (!orderId || !auth.data) return;
     const client = getSupabaseClient();
     const channel = client.channel("native-customer-order-" + orderId)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: "id=eq." + orderId }, () => { void query.refetch(); })
@@ -59,12 +67,16 @@ export default function OrderDetailsScreen() {
       .on("postgres_changes", { event: "*", schema: "public", table: "shipments", filter: "order_id=eq." + orderId }, () => { void query.refetch(); })
       .subscribe();
     return () => { void client.removeChannel(channel); };
-  }, [orderId, query.refetch]);
+  }, [orderId, auth.data?.id, query.refetch]);
 
-  if (query.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
-  if (query.isError) return <CustomerScreen>
+  if (auth.isPending || (auth.data && query.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (auth.isError || query.isError) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
+  </CustomerScreen>;
+  if (!auth.data) return <CustomerScreen>
+    <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersLoginHint")} />
+    <Pressable onPress={() => router.push("/login")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("login")}</Text></Pressable>
   </CustomerScreen>;
   const order = query.data.order;
   if (!order) return <CustomerScreen>
