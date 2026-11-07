@@ -190,7 +190,7 @@ export async function addMerchantProductImage(
 
   const { data: currentImages, error: imagesError } = await client
     .from("product_images")
-    .select("id")
+    .select("id, is_primary")
     .eq("offer_id", offerId)
     .limit(PRODUCT_IMAGE_MAX_COUNT);
 
@@ -205,7 +205,7 @@ export async function addMerchantProductImage(
     .insert({
       offer_id: offerId,
       image_url: uploaded.url,
-      is_primary: (currentImages ?? []).length === 0
+      is_primary: !(currentImages ?? []).some((image) => image.is_primary)
     })
     .select("id, image_url, is_primary")
     .single();
@@ -249,7 +249,8 @@ export async function removeMerchantProductImage(
 
   if (imagesError) throw imagesError;
 
-  const image = (currentImages ?? []).find((item) => item.id === imageId);
+  const imageReferences = z.array(MerchantProductImageSchema).parse(currentImages ?? []);
+  const image = imageReferences.find((item) => item.id === imageId);
   if (!image) throw new Error("merchant_product_image_not_found");
 
   const { data: removed, error: deleteError } = await client
@@ -265,18 +266,20 @@ export async function removeMerchantProductImage(
 
   let primaryPromotionPending = false;
   const nextPrimaryId = getNextPrimaryProductImageId(
-    (currentImages ?? []) as MerchantProductImageReference[],
+    imageReferences as MerchantProductImageReference[],
     imageId
   );
 
   if (nextPrimaryId) {
-    const { error: primaryError } = await client
+    const { data: promotedImage, error: primaryError } = await client
       .from("product_images")
       .update({ is_primary: true })
       .eq("offer_id", offerId)
-      .eq("id", nextPrimaryId);
+      .eq("id", nextPrimaryId)
+      .select("id")
+      .maybeSingle();
 
-    primaryPromotionPending = !!primaryError;
+    primaryPromotionPending = !!primaryError || !promotedImage;
   }
 
   const storagePath = getProductImageStoragePath(removed.image_url, userId);
