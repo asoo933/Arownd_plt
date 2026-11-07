@@ -8,13 +8,24 @@ import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } 
 import { translate } from "@/lib/i18n";
 
 export default function ExploreScreen() {
-  const params = useLocalSearchParams<{ q?: string }>();
-  const [query, setQuery] = useState(params.q ?? "");
-  useEffect(() => setQuery(params.q ?? ""), [params.q]);
-  const normalized = query.trim();
+  const params = useLocalSearchParams<{ q?: string; category?: string }>();
+  const initialQuery = typeof params.q === "string" ? params.q : "";
+  const category = typeof params.category === "string" ? params.category : undefined;
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+
+  useEffect(() => setQuery(initialQuery), [initialQuery]);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const normalized = debouncedQuery;
   const products = useQuery({
-    queryKey: ["customer-explore-products", normalized],
-    queryFn: () => normalized ? searchCatalogProducts(normalized) : fetchHomeProducts(),
+    queryKey: ["customer-explore-products", normalized, category],
+    queryFn: () => normalized || category
+      ? searchCatalogProducts(normalized, category)
+      : fetchHomeProducts(),
     staleTime: 30_000
   });
 
