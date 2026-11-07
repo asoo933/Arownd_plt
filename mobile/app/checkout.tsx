@@ -28,7 +28,7 @@ import { CART_QUERY_KEY, clearCart, getCart } from "@/lib/cart";
 import { evaluateCart } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
 
 type Picker = "wilaya" | "commune" | null;
 
@@ -39,6 +39,7 @@ function validAlgerianPhone(value: string): boolean {
 
 export default function CheckoutScreen() {
   const theme = useAppTheme();
+  const styles = createStyles(theme);
   const queryClient = useQueryClient();
   const [deliveryType, setDeliveryType] = useState<CheckoutDeliveryType>("home");
   const [fullName, setFullName] = useState("");
@@ -205,7 +206,7 @@ export default function CheckoutScreen() {
       <Pressable onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
       </Pressable>
-      <TextInput value={fullName} onChangeText={setFullName} placeholder={translate("fullNamePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" maxLength={120} />
+      <TextInput value={fullName} onChangeText={setFullName} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" maxLength={120} />
       <TextInput value={phone} onChangeText={setPhone} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
 
@@ -270,7 +271,7 @@ export default function CheckoutScreen() {
 
     {formError ? <Text accessibilityRole="alert" style={styles.errorText}>{formError}</Text> : null}
     <Pressable onPress={submit} disabled={mutation.isPending || offers.isPending || offers.isError || hasBlockingItems || wilayas.isError} style={[styles.primary, (mutation.isPending || offers.isPending || offers.isError || hasBlockingItems) && styles.disabled]}>
-      {mutation.isPending ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.primaryText}>{translate("checkoutConfirm")}</Text>}
+      {mutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.primaryText}>{translate("checkoutConfirm")}</Text>}
     </Pressable>
 
     <Modal visible={picker !== null} transparent animationType="slide" onRequestClose={() => setPicker(null)}>
@@ -301,43 +302,44 @@ export default function CheckoutScreen() {
   </CustomerScreen>;
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: AppTheme) { return StyleSheet.create({
   topRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  back: { color: "#647D13", fontSize: 13, fontWeight: "900" },
+  back: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   section: { borderRadius: 18, padding: 14, gap: 11 },
-  sectionTitle: { color: "#647D13", fontSize: 15, fontWeight: "900", textAlign: "right" },
+  sectionTitle: { color: theme.colors.accentMuted, fontSize: 15, fontWeight: "900", textAlign: "right" },
   input: { minHeight: 49, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, fontSize: 14 },
   multiline: { minHeight: 90, textAlignVertical: "top", paddingTop: 12 },
-  fieldLabel: { color: "#737373", fontSize: 12, fontWeight: "800", textAlign: "right", marginTop: 4 },
+  fieldLabel: { color: theme.colors.muted, fontSize: 12, fontWeight: "800", textAlign: "right", marginTop: 4 },
   select: { minHeight: 49, borderRadius: 13, paddingHorizontal: 13, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  selectText: { color: "#0A0A0A", fontSize: 13, fontWeight: "700", textAlign: "right" },
-  placeholder: { color: "#888888" },
-  fieldHint: { color: "#737373", fontSize: 11, lineHeight: 17, textAlign: "right" },
-  retryText: { color: "#647D13", fontSize: 12, fontWeight: "800", textAlign: "right" },
+  selectText: { color: theme.colors.foreground, fontSize: 13, fontWeight: "700", textAlign: "right" },
+  placeholder: { color: theme.colors.placeholder },
+  fieldHint: { color: theme.colors.muted, fontSize: 11, lineHeight: 17, textAlign: "right" },
+  retryText: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "800", textAlign: "right" },
   deliveryOptions: { flexDirection: "row-reverse", gap: 8 },
-  deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: "#D4D4D4", borderRadius: 14, padding: 10, gap: 7 },
-  deliverySelected: { borderColor: "#829E19", backgroundColor: "#F0F5DF" },
-  deliveryTitle: { color: "#0A0A0A", fontSize: 13, fontWeight: "900", textAlign: "right" },
-  deliveryTextSelected: { color: "#536A0D" },
-  deliveryHint: { color: "#737373", fontSize: 10, lineHeight: 15, textAlign: "right" },
-  summaryRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#E5E5E5" },
+  deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 14, padding: 10, gap: 7 },
+  deliverySelected: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
+  deliveryTitle: { color: theme.colors.foreground, fontSize: 13, fontWeight: "900", textAlign: "right" },
+  deliveryTextSelected: { color: theme.colors.accentMuted },
+  deliveryHint: { color: theme.colors.muted, fontSize: 10, lineHeight: 15, textAlign: "right" },
+  summaryRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   summaryInfo: { flex: 1, alignItems: "flex-end", gap: 3 },
   summaryName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  summaryPrice: { color: "#647D13", fontSize: 12, fontWeight: "900" },
+  summaryPrice: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900" },
   totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingTop: 8 },
-  total: { color: "#647D13", fontSize: 19, fontWeight: "900" },
-  errorText: { color: "#B42318", fontSize: 12, fontWeight: "800", textAlign: "right", lineHeight: 18 },
-  primary: { minHeight: 52, borderRadius: 15, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center", paddingHorizontal: 15 },
-  primaryText: { color: "#0A0A0A", fontSize: 14, fontWeight: "900" },
+  total: { color: theme.colors.accentMuted, fontSize: 19, fontWeight: "900" },
+  errorText: { color: theme.colors.danger, fontSize: 12, fontWeight: "800", textAlign: "right", lineHeight: 18 },
+  primary: { minHeight: 52, borderRadius: 15, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center", paddingHorizontal: 15 },
+  primaryText: { color: theme.colors.foreground, fontSize: 14, fontWeight: "900" },
   disabled: { opacity: 0.45 },
   successPanel: { borderRadius: 20, padding: 20, gap: 16, alignItems: "center" },
-  successMark: { width: 58, height: 58, overflow: "hidden", borderRadius: 29, backgroundColor: "#C6F135", color: "#0A0A0A", textAlign: "center", textAlignVertical: "center", fontSize: 30, fontWeight: "900" },
-  orderLabel: { color: "#737373", fontSize: 12, fontWeight: "700" },
+  successMark: { width: 58, height: 58, overflow: "hidden", borderRadius: 29, backgroundColor: theme.colors.accent, color: theme.colors.foreground, textAlign: "center", textAlignVertical: "center", fontSize: 30, fontWeight: "900" },
+  orderLabel: { color: theme.colors.muted, fontSize: 12, fontWeight: "700" },
   orderId: { fontSize: 12, fontWeight: "800", textAlign: "center" },
-  hint: { color: "#737373", fontSize: 12, lineHeight: 19, textAlign: "center" },
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+  hint: { color: theme.colors.muted, fontSize: 12, lineHeight: 19, textAlign: "center" },
+  modalBackdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" },
   modalPanel: { maxHeight: "78%", minHeight: "45%", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 17, gap: 12 },
   modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  pickerItem: { minHeight: 48, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: "#D4D4D4" },
+  pickerItem: { minHeight: 48, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border },
   pickerText: { fontSize: 14, textAlign: "right", fontWeight: "700" }
-});
+}); }
+
