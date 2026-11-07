@@ -161,11 +161,15 @@ export default function MerchantEditProductScreen() {
       setNotice(translate("merchantProductImageAdded"));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "";
-      setActionError(
-        errorMessage === "product_image_limit_reached"
-          ? translate("merchantProductImagesLimit")
-          : translate("merchantProductImageAddError")
-      );
+      if (errorMessage.endsWith("cleanup_required")) {
+        setWarning(translate("merchantProductImageUploadCleanupPending"));
+      } else {
+        setActionError(
+          errorMessage === "product_image_limit_reached"
+            ? translate("merchantProductImagesLimit")
+            : translate("merchantProductImageAddError")
+        );
+      }
     } finally {
       setImageBusy(false);
     }
