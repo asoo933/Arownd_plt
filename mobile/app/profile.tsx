@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
@@ -9,14 +9,15 @@ import { translate } from "@/lib/i18n";
 import { fetchMyOrders } from "@/lib/orders";
 import { getProfileDisplayName, getProfileInitial } from "@/lib/profile-state";
 import { getSupabaseClient } from "@/lib/supabase";
+import { useAppTheme } from "@/lib/theme";
 
 export default function ProfileScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const colors = {
-    text: dark ? "#F5F5F5" : "#0A0A0A",
-    muted: "#737373",
-    card: dark ? "#171717" : "#FFFFFF",
-    border: dark ? "#333333" : "#E5E5E5"
+    text: theme.colors.foreground,
+    muted: theme.colors.muted,
+    card: theme.colors.surface,
+    border: theme.colors.border
   };
   const user = useQuery({
     queryKey: ["current-user"],
@@ -145,8 +146,8 @@ function MenuAction({ label, hint, onPress, colors }: {
 
 const styles = StyleSheet.create({
   identity: { minHeight: 104, borderWidth: 1, borderRadius: 20, padding: 16, flexDirection: "row-reverse", alignItems: "center", gap: 13 },
-  avatar: { width: 58, height: 58, borderRadius: 29, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  avatarText: { color: "#0A0A0A", fontSize: 23, fontWeight: "900" },
+  avatar: { width: 58, height: 58, borderRadius: 29, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  avatarText: { color: theme.colors.accentForeground, fontSize: 23, fontWeight: "900" },
   identityCopy: { flex: 1, alignItems: "flex-end", gap: 4 },
   name: { fontSize: 16, fontWeight: "900" },
   email: { fontSize: 12 },
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   menuCopy: { flex: 1, alignItems: "flex-end", gap: 4 },
   menuTitle: { fontSize: 14, fontWeight: "800" },
   menuHint: { fontSize: 11, textAlign: "right" },
-  arrow: { color: "#7A7A7A", fontSize: 24 },
+  arrow: { color: theme.colors.muted, fontSize: 24 },
   primary: { minHeight: 48, borderRadius: 14, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
   primaryText: { color: "#0A0A0A", fontWeight: "900" }
 });
