@@ -16,20 +16,21 @@ export default function AuthCallbackScreen() {
   useEffect(() => {
     let active = true;
 
-    if (!code) {
-      setState("error");
-      return () => {
-        active = false;
-      };
-    }
+    const exchangeCode = async (): Promise<void> => {
+      if (!code) {
+        setState("error");
+        return;
+      }
 
-    void getSupabaseClient().auth.exchangeCodeForSession(code)
-      .then(({ error }) => {
+      try {
+        const { error } = await getSupabaseClient().auth.exchangeCodeForSession(code);
         if (active) setState(error ? "error" : "success");
-      })
-      .catch(() => {
+      } catch {
         if (active) setState("error");
-      });
+      }
+    };
+
+    void exchangeCode();
 
     return () => {
       active = false;
