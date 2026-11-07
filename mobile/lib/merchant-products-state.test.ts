@@ -50,13 +50,25 @@ describe("filterMerchantProducts", () => {
       product_id: "product-3",
       stock_quantity: 0,
       product: { id: "product-3", name: "حقيبة", brand: null }
+    }),
+    offer({
+      id: "offer-hidden",
+      is_merchant_hidden: true,
+      stock_quantity: 8,
+      product: { id: "product-hidden", name: "منتج مخفي", brand: null }
     })
   ];
 
   it("filters products by inventory state", () => {
     expect(filterMerchantProducts(offers, "", "low").map((item) => item.id)).toEqual(["offer-2"]);
     expect(filterMerchantProducts(offers, "", "out").map((item) => item.id)).toEqual(["offer-3"]);
-    expect(filterMerchantProducts(offers, "", "all")).toHaveLength(3);
+    expect(filterMerchantProducts(offers, "", "all")).toHaveLength(4);
+  });
+
+  it("shows hidden offers independently from their inventory level", () => {
+    expect(filterMerchantProducts(offers, "", "hidden").map((item) => item.id)).toEqual(["offer-hidden"]);
+    expect(filterMerchantProducts(offers, "منتج مخفي", "hidden").map((item) => item.id)).toEqual(["offer-hidden"]);
+    expect(filterMerchantProducts(offers, "", "low").map((item) => item.id)).toEqual(["offer-2"]);
   });
 
   it("searches product names and brands without changing the source list", () => {
