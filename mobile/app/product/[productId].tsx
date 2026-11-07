@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 
@@ -40,7 +41,10 @@ export default function ProductDetailsScreen() {
       <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
         <Text style={styles.backText}>{translate("back")}</Text>
       </Pressable>
-      <Text style={[styles.pageTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("detailProductTitle")}</Text>
+      <View style={styles.titleRow}>
+        <Text style={[styles.pageTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("detailProductTitle")}</Text>
+        <FavoriteButton kind="products" id={productId} />
+      </View>
       <View style={styles.heroImage}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
       </View>
@@ -94,6 +98,7 @@ export default function ProductDetailsScreen() {
 const styles = StyleSheet.create({
   back: { minHeight: 42, justifyContent: "center", alignItems: "flex-end" },
   backText: { color: "#647D13", fontSize: 13, fontWeight: "800" },
+  titleRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10 },
   pageTitle: { fontSize: 21, fontWeight: "900", textAlign: "right" },
   heroImage: { height: 300, borderRadius: 22, backgroundColor: "#ECEFE4", overflow: "hidden", alignItems: "center", justifyContent: "center" },
   imageFallback: { color: "#8A9B55", fontSize: 46 },
