@@ -54,7 +54,7 @@ describe("filterMerchantProducts", () => {
     offer({
       id: "offer-hidden",
       is_merchant_hidden: true,
-      stock_quantity: 8,
+      stock_quantity: 2,
       product: { id: "product-hidden", name: "منتج مخفي", brand: null }
     })
   ];
@@ -69,6 +69,7 @@ describe("filterMerchantProducts", () => {
     expect(filterMerchantProducts(offers, "", "hidden").map((item) => item.id)).toEqual(["offer-hidden"]);
     expect(filterMerchantProducts(offers, "منتج مخفي", "hidden").map((item) => item.id)).toEqual(["offer-hidden"]);
     expect(filterMerchantProducts(offers, "", "low").map((item) => item.id)).toEqual(["offer-2"]);
+    expect(filterMerchantProducts(offers, "", "out").map((item) => item.id)).toEqual(["offer-3"]);
   });
 
   it("searches product names and brands without changing the source list", () => {
