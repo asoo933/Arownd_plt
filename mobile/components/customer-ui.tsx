@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CustomerNavigation } from "@/components/customer-navigation";
 import {
   ActivityIndicator,
   Image,
@@ -18,9 +19,10 @@ export function CustomerScreen({ children }: { children: ReactNode }) {
   const dark = useColorScheme() === "dark";
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: dark ? "#0A0A0A" : "#F5F5F5" }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
+      <CustomerNavigation />
     </SafeAreaView>
   );
 }
@@ -138,6 +140,7 @@ export function ErrorState({ title, retryLabel, onRetry }: {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  scroll: { flex: 1 },
   content: { paddingHorizontal: 18, paddingTop: 10, paddingBottom: 28, gap: 22 },
   heading: { gap: 5, alignItems: "flex-end" },
   headingTitle: { fontSize: 22, fontWeight: "900", textAlign: "right" },
