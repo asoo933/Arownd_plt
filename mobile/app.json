@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Arownd",
+    "slug": "arownd-mobile",
+    "scheme": "com.arownd.app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.arownd.app"
+    },
+    "android": {
+      "package": "com.arownd.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0A"
+      }
+    }
+  }
+}
