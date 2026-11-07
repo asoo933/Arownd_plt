@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CartButton } from "@/components/cart-button";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/components/customer-ui";
 import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 const categories = [
   { id: "fashion", icon: "👗", label: "categoryFashion" },
@@ -27,7 +28,7 @@ const categories = [
 ] as const;
 
 export default function CustomerHomeScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const [search, setSearch] = useState("");
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
@@ -37,7 +38,7 @@ export default function CustomerHomeScreen() {
       <View style={styles.topBar}>
         <View style={styles.brandWrap}>
           <View style={styles.brandMark}><Text style={styles.brandMarkText}>A</Text></View>
-          <Text style={[styles.brand, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>arownd</Text>
+          <Text style={[styles.brand, { color: theme.colors.foreground }]}>arownd</Text>
           <CartButton />
         </View>
         <Pressable accessibilityRole="button" style={styles.location} onPress={() => router.push("/stores")}>
@@ -60,9 +61,9 @@ export default function CustomerHomeScreen() {
         <SectionTitle title={translate("homeCategories")} action={translate("homeSeeAll")} onAction={() => router.push("/explore")} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRail}>
           {categories.map((category) => (
-            <Pressable key={category.id} accessibilityRole="button" onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })} style={[styles.category, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+            <Pressable key={category.id} accessibilityRole="button" onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })} style={[styles.category, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}>
               <Text style={styles.categoryIcon}>{category.icon}</Text>
-              <Text style={[styles.categoryLabel, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate(category.label)}</Text>
+              <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</Text>
             </Pressable>
           ))}
         </ScrollView>
