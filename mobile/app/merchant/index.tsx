@@ -1,113 +1,453 @@
 import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { fetchMerchantAccess } from "@/lib/merchant";
-import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import {
+  fetchMerchantAccess,
+  fetchMerchantDashboard
+} from "@/lib/merchant";
+import { formatDZD } from "@/lib/catalog";
+import { translate, type TranslationKey } from "@/lib/i18n";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
+import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
+  const styles = createStyles(theme);
+
   const access = useQuery({
     queryKey: ["merchant-access"],
     queryFn: fetchMerchantAccess,
     retry: false
   });
 
+  const storeId = access.data?.store?.id ?? null;
+  const isMerchantReady = access.data?.status === "merchant_ready" && !!storeId;
+
+  const dashboard = useQuery({
+    queryKey: ["merchant-dashboard", storeId],
+    queryFn: () => fetchMerchantDashboard(storeId ?? ""),
+    enabled: isMerchantReady,
+    retry: false
+  });
+
   if (access.isPending) {
+    return <LoadingScreen theme={theme} label={translate("merchantLoading")} />;
+  }
+
+  if (access.isError) {
+    return (
+      <MessageScreen
+        theme={theme}
+        title={translate("merchantLoadError")}
+        actionLabel={translate("merchantRetry")}
+        onAction={() => void access.refetch()}
+      />
+    );
+  }
+
+  if (!access.data) return <Redirect href="/login" />;
+
+  if (access.data.status === "personal" || access.data.status === "merchant_setup_required") {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.center}>
-          <Text style={[styles.body, { color: theme.colors.muted }]}>{translate("merchantLoading")}</Text>
-        </View>
+        <ScrollView contentContainerStyle={styles.entryContent}>
+          <Pressable onPress={() => router.replace("/profile")} style={styles.backButton}>
+            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
+              {translate("merchantBackToProfile")}
+            </Text>
+          </Pressable>
+          <View style={[styles.entryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("businessTitle")}</Text>
+            <Text style={[styles.title, { color: theme.colors.foreground }]}>
+              {translate("merchantEntryTitle")}
+            </Text>
+            <Text style={[styles.body, { color: theme.colors.muted }]}>
+              {access.data.status === "personal"
+                ? translate("merchantStatusPersonalHint")
+                : translate("merchantStatusSetupHint")}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push("/merchant/onboarding")}
+              style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
+            >
+              <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
+                {translate("merchantStartOnboarding")}
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
-  if (access.data === null && !access.isError) return <Redirect href="/login" />;
+  if (access.data.status !== "merchant_ready" || !storeId) {
+    const message = access.data.status === "delivery_company"
+      ? translate("merchantStatusDeliveryHint")
+      : translate("merchantStatusInconsistentHint");
 
-  const status = access.data?.status;
-  const content = status === "merchant_ready"
-    ? { title: translate("merchantStatusReadyTitle"), hint: translate("merchantStatusReadyHint"), tone: theme.colors.success }
-    : status === "merchant_setup_required"
-      ? { title: translate("merchantStatusSetupTitle"), hint: translate("merchantStatusSetupHint"), tone: theme.colors.warning }
-      : status === "delivery_company"
-        ? { title: translate("merchantStatusDeliveryTitle"), hint: translate("merchantStatusDeliveryHint"), tone: theme.colors.warning }
-        : status === "inconsistent"
-          ? { title: translate("merchantStatusInconsistentTitle"), hint: translate("merchantStatusInconsistentHint"), tone: theme.colors.danger }
-          : { title: translate("merchantStatusPersonalTitle"), hint: translate("merchantStatusPersonalHint"), tone: theme.colors.muted };
+    return (
+      <MessageScreen
+        theme={theme}
+        title={message}
+        actionLabel={translate("merchantBackToProfile")}
+        onAction={() => router.replace("/profile")}
+      />
+    );
+  }
+
+  if (dashboard.isPending) {
+    return <LoadingScreen theme={theme} label={translate("merchantDashboardLoading")} />;
+  }
+
+  if (dashboard.isError) {
+    return (
+      <MessageScreen
+        theme={theme}
+        title={translate("merchantDashboardError")}
+        actionLabel={translate("merchantRetry")}
+        onAction={() => void dashboard.refetch()}
+      />
+    );
+  }
+
+  const data = dashboard.data;
+  const recentOrders = data.orders.slice(0, 5);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={translate("back")}
-          onPress={() => router.back()}
-          style={styles.back}
-        >
-          <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("back")}</Text>
-        </Pressable>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.replace("/profile")} style={styles.backButton}>
+            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
+              {translate("merchantBackToProfile")}
+            </Text>
+          </Pressable>
+          <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
+            {translate("merchantDashboardEyebrow")}
+          </Text>
+          <Text style={[styles.title, { color: theme.colors.foreground }]}>
+            {translate("merchantDashboardTitle")}
+          </Text>
+          <Text style={[styles.body, { color: theme.colors.muted }]}>
+            {translate("merchantDashboardSubtitle")}
+          </Text>
+        </View>
 
-        <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-          <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("businessTitle")}</Text>
-          <Text style={[styles.title, { color: theme.colors.foreground }]}>{translate("merchantEntryTitle")}</Text>
-          <Text style={[styles.body, { color: theme.colors.muted }]}>{translate("merchantEntrySubtitle")}</Text>
-          {access.isError ? (
-            <View style={[styles.notice, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-              <Text style={[styles.noticeTitle, { color: theme.colors.danger }]}>{translate("merchantLoadError")}</Text>
-              <Pressable accessibilityRole="button" onPress={() => void access.refetch()} style={styles.retry}>
-                <Text style={[styles.retryText, { color: theme.colors.accentMuted }]}>{translate("merchantRetry")}</Text>
-              </Pressable>
+        <View style={[styles.storeCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <View style={styles.storeHeader}>
+            <View style={[styles.storeAvatar, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
+              {data.store.logo_url ? (
+                <Image source={{ uri: data.store.logo_url }} style={styles.storeImage} resizeMode="cover" />
+              ) : (
+                <Text style={[styles.storeAvatarText, { color: theme.colors.accentMuted }]}>A</Text>
+              )}
             </View>
-          ) : (
-            <View style={[styles.notice, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
-              <Text style={[styles.statusTitle, { color: content.tone }]}>{content.title}</Text>
-              <Text style={[styles.body, { color: theme.colors.muted }]}>{content.hint}</Text>
-              {access.data?.store ? (
-                <Text style={[styles.storeName, { color: theme.colors.foreground }]}>{access.data.store.name}</Text>
-              ) : null}
+            <View style={styles.storeInfo}>
+              <Text style={[styles.storeName, { color: theme.colors.foreground }]} numberOfLines={2}>
+                {data.store.name}
+              </Text>
+              <Text style={[styles.storeMeta, { color: theme.colors.muted }]} numberOfLines={1}>
+                {data.store.commune || translate("merchantStoreLocationMissing")}
+              </Text>
+              <View style={styles.storeBadges}>
+                <View style={[styles.statusPill, { backgroundColor: data.store.is_verified ? theme.colors.successSurface : theme.colors.warningSurface }]}>
+                  <Text style={[styles.statusPillText, { color: data.store.is_verified ? theme.colors.success : theme.colors.warning }]}>
+                    {data.store.is_verified
+                      ? translate("merchantStoreVerified")
+                      : translate("merchantStoreNotVerified")}
+                  </Text>
+                </View>
+                <View style={[styles.statusPill, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <Text style={[styles.statusPillText, { color: theme.colors.muted }]}>
+                    {translate("merchantStoreRating")}: {data.store.rating == null ? "—" : data.store.rating.toFixed(1)}
+                  </Text>
+                </View>
+              </View>
             </View>
-          )}
-          {status === "personal" || status === "merchant_setup_required" ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push("/merchant/onboarding")}
-              style={[styles.action, { backgroundColor: theme.colors.accent }]}
-            >
-              <Text style={[styles.actionText, { color: theme.colors.accentForeground }]}>{translate("merchantStartOnboarding")}</Text>
-            </Pressable>
-          ) : null}
+          </View>
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.replace("/profile")}
-            style={[styles.action, { backgroundColor: theme.colors.surfaceMuted, borderWidth: 1, borderColor: theme.colors.border }]}
+            onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } })}
+            style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
           >
-            <Text style={[styles.actionText, { color: theme.colors.foreground }]}>{translate("merchantBackToProfile")}</Text>
+            <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
+              {translate("merchantPreviewStore")}
+            </Text>
           </Pressable>
         </View>
+
+        <View style={styles.sectionHeading}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+            {translate("merchantOverviewTitle")}
+          </Text>
+          <Text style={[styles.sectionHint, { color: theme.colors.muted }]}>
+            {translate("merchantOverviewHint")}
+          </Text>
+        </View>
+
+        <View style={styles.metricsGrid}>
+          <MetricCard
+            theme={theme}
+            label={translate("merchantMetricProducts")}
+            value={String(data.productCount)}
+            hint={translate("merchantMetricProductsHint")}
+          />
+          <MetricCard
+            theme={theme}
+            label={translate("merchantMetricNeedsAction")}
+            value={String(data.pendingOrderCount)}
+            hint={translate("merchantMetricNeedsActionHint")}
+            tone="warning"
+          />
+          <MetricCard
+            theme={theme}
+            label={translate("merchantMetricQuoted")}
+            value={String(data.quotedOrderCount)}
+            hint={translate("merchantMetricQuotedHint")}
+          />
+          <MetricCard
+            theme={theme}
+            label={translate("merchantMetricOrders")}
+            value={String(data.orders.length)}
+            hint={translate("merchantMetricOrdersHint")}
+          />
+        </View>
+
+        <View style={styles.sectionHeading}>
+          <View style={styles.sectionHeadingText}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+              {translate("merchantRecentOrdersTitle")}
+            </Text>
+            <Text style={[styles.sectionHint, { color: theme.colors.muted }]}>
+              {translate("merchantRecentOrdersHint")}
+            </Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push("/merchant/orders")}
+            style={styles.textButton}
+          >
+            <Text style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
+              {translate("merchantViewAllOrders")}
+            </Text>
+          </Pressable>
+        </View>
+
+        {recentOrders.length === 0 ? (
+          <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
+              {translate("merchantOrdersEmpty")}
+            </Text>
+            <Text style={[styles.body, { color: theme.colors.muted }]}>
+              {translate("merchantOrdersEmptyHint")}
+            </Text>
+          </View>
+        ) : (
+          <View style={[styles.ordersCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            {recentOrders.map((order, index) => (
+              <View
+                key={order.id}
+                style={[
+                  styles.orderRow,
+                  index < recentOrders.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
+                ]}
+              >
+                <View style={styles.orderMain}>
+                  <View style={styles.orderTopLine}>
+                    <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>
+                      {translate("merchantOrderNumber", { id: order.parentOrderId.slice(0, 8) })}
+                    </Text>
+                    <OrderStatus order={order} theme={theme} />
+                  </View>
+                  <Text style={[styles.orderCustomer, { color: theme.colors.muted }]} numberOfLines={1}>
+                    {order.customerName || translate("merchantCustomerUnknown")}
+                  </Text>
+                  <Text style={[styles.orderItems, { color: theme.colors.muted }]} numberOfLines={2}>
+                    {order.productNames.join("، ") || translate("merchantOrderItems")}
+                    {" · "}
+                    {translate("merchantOrderQuantity", { count: order.totalQuantity })}
+                  </Text>
+                </View>
+                <Text style={[styles.orderAmount, { color: theme.colors.accentMuted }]}>
+                  {formatDZD(order.subtotal + order.shippingFee)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/merchant/orders")}
+          style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
+        >
+          <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
+            {translate("merchantManageOrders")}
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: AppTheme }) {
+  const labelByStatus: Record<string, TranslationKey> = {
+    pending: "merchantOrderStatusPending",
+    quoted: "merchantOrderStatusQuoted",
+    confirmed: "merchantOrderStatusConfirmed",
+    shipped: "merchantOrderStatusShipped",
+    delivered: "merchantOrderStatusDelivered",
+    cancelled: "merchantOrderStatusCancelled"
+  };
+  const tone = order.status === "delivered"
+    ? theme.colors.success
+    : order.status === "cancelled"
+      ? theme.colors.danger
+      : order.status === "pending" || order.status === "quoted"
+        ? theme.colors.warning
+        : theme.colors.muted;
+  const background = order.status === "delivered"
+    ? theme.colors.successSurface
+    : order.status === "cancelled"
+      ? theme.colors.dangerSurface
+      : order.status === "pending" || order.status === "quoted"
+        ? theme.colors.warningSurface
+        : theme.colors.surfaceMuted;
+  const key = labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
+
+  return (
+    <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 }}>
+      <Text style={{ color: tone, fontSize: 10, fontWeight: "900" }}>{translate(key)}</Text>
+    </View>
+  );
+}
+
+function MetricCard({
+  theme,
+  label,
+  value,
+  hint,
+  tone = "normal"
+}: {
+  theme: AppTheme;
+  label: string;
+  value: string;
+  hint: string;
+  tone?: "normal" | "warning";
+}) {
+  return (
+    <View style={[stylesForScreen.metricCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+      <Text style={[stylesForScreen.metricLabel, { color: theme.colors.muted }]}>{label}</Text>
+      <Text style={[stylesForScreen.metricValue, { color: tone === "warning" ? theme.colors.warning : theme.colors.foreground }]}>{value}</Text>
+      <Text style={[stylesForScreen.metricHint, { color: theme.colors.subtle }]}>{hint}</Text>
+    </View>
+  );
+}
+
+function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
+  return (
+    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+      <View style={stylesForScreen.center}>
+        <ActivityIndicator color={theme.colors.accentMuted} />
+        <Text style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function MessageScreen({
+  theme,
+  title,
+  actionLabel,
+  onAction
+}: {
+  theme: AppTheme;
+  title: string;
+  actionLabel: string;
+  onAction: () => void;
+}) {
+  return (
+    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+      <View style={stylesForScreen.center}>
+        <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onAction}
+          style={[stylesForScreen.action, { backgroundColor: theme.colors.accent }]}
+        >
+          <Text style={[stylesForScreen.actionText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const stylesForScreen = StyleSheet.create({
   safe: { flex: 1 },
-  content: { flexGrow: 1, padding: 20, gap: 20 },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
-  back: { minHeight: 44, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 4 },
-  backText: { fontSize: 14, fontWeight: "800" },
-  card: { borderWidth: 1, borderRadius: 22, padding: 20, gap: 14 },
-  eyebrow: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  title: { fontSize: 23, fontWeight: "900", textAlign: "right" },
-  body: { fontSize: 13, lineHeight: 21, textAlign: "right" },
-  notice: { borderWidth: 1, borderRadius: 16, padding: 15, gap: 8 },
-  noticeTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
-  statusTitle: { fontSize: 16, fontWeight: "900", textAlign: "right" },
-  storeName: { fontSize: 14, fontWeight: "800", textAlign: "right" },
-  retry: { minHeight: 40, justifyContent: "center", alignSelf: "flex-start" },
-  retryText: { fontSize: 13, fontWeight: "800" },
-  action: { minHeight: 48, borderRadius: 14, alignItems: "center", justifyContent: "center", paddingHorizontal: 16 },
-  actionText: { fontSize: 14, fontWeight: "900" }
+  center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: 16 },
+  message: { fontSize: 14, lineHeight: 22, textAlign: "center", fontWeight: "700" },
+  action: { minHeight: 46, borderRadius: 14, paddingHorizontal: 20, alignItems: "center", justifyContent: "center" },
+  actionText: { fontSize: 13, fontWeight: "900" },
+  metricCard: { flex: 1, minHeight: 112, borderWidth: 1, borderRadius: 16, padding: 13, gap: 5 },
+  metricLabel: { fontSize: 11, textAlign: "right", fontWeight: "800" },
+  metricValue: { fontSize: 23, textAlign: "right", fontWeight: "900" },
+  metricHint: { fontSize: 10, textAlign: "right", lineHeight: 15 }
 });
+
+function createStyles(theme: AppTheme) {
+  return StyleSheet.create({
+    safe: { flex: 1 },
+    content: { padding: 17, paddingBottom: 36, gap: 15 },
+    entryContent: { flexGrow: 1, padding: 20, gap: 18 },
+    header: { alignItems: "flex-end", gap: 7 },
+    backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
+    backText: { fontSize: 12, fontWeight: "800" },
+    eyebrow: { fontSize: 11, fontWeight: "900" },
+    title: { fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
+    body: { fontSize: 12, lineHeight: 20, textAlign: "right" },
+    entryCard: { borderWidth: 1, borderRadius: 22, padding: 19, gap: 13 },
+    storeCard: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 14 },
+    storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
+    storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: 17, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+    storeImage: { width: "100%", height: "100%" },
+    storeAvatarText: { fontSize: 25, fontWeight: "900" },
+    storeInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
+    storeName: { fontSize: 17, fontWeight: "900", textAlign: "right" },
+    storeMeta: { fontSize: 11, textAlign: "right" },
+    storeBadges: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 6, marginTop: 3 },
+    statusPill: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 5 },
+    statusPillText: { fontSize: 10, fontWeight: "900" },
+    secondaryButton: { minHeight: 43, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+    secondaryButtonText: { fontSize: 12, fontWeight: "800" },
+    sectionHeading: { flexDirection: "row-reverse", alignItems: "flex-end", justifyContent: "space-between", gap: 10, marginTop: 2 },
+    sectionHeadingText: { flex: 1, alignItems: "flex-end", gap: 3 },
+    sectionTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
+    sectionHint: { fontSize: 10, lineHeight: 16, textAlign: "right" },
+    metricsGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
+    textButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 3 },
+    textButtonLabel: { fontSize: 11, fontWeight: "900" },
+    ordersCard: { borderWidth: 1, borderRadius: 17, overflow: "hidden" },
+    orderRow: { paddingHorizontal: 12, paddingVertical: 13, flexDirection: "row-reverse", alignItems: "center", gap: 10 },
+    orderMain: { flex: 1, alignItems: "flex-end", gap: 5 },
+    orderTopLine: { width: "100%", flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 7 },
+    orderCode: { fontSize: 11, fontWeight: "900" },
+    orderCustomer: { width: "100%", fontSize: 11, textAlign: "right" },
+    orderItems: { width: "100%", fontSize: 10, lineHeight: 15, textAlign: "right" },
+    orderAmount: { fontSize: 11, fontWeight: "900" },
+    emptyCard: { borderWidth: 1, borderRadius: 17, padding: 17, gap: 7, alignItems: "flex-end" },
+    emptyTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
+    primaryButton: { minHeight: 50, borderRadius: 15, alignItems: "center", justifyContent: "center", paddingHorizontal: 14 },
+    primaryButtonText: { fontSize: 13, fontWeight: "900" }
+  });
+}
