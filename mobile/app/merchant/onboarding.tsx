@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { useState, type ReactNode } from "react";
+import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -70,7 +71,7 @@ export default function MerchantOnboardingScreen() {
     setValue,
     watch,
     formState: { errors, isSubmitting }
-  } = useForm<MerchantStoreFormValues>({
+  } = useForm<z.input<typeof merchantStoreSchema>, unknown, MerchantStoreFormValues>({
     resolver: zodResolver(merchantStoreSchema),
     defaultValues: {
       storeName: "",
