@@ -101,7 +101,7 @@ export default function SettingsScreen() {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>{translate("settingsAccountTitle")}</Text>
         <Pressable accessibilityRole="button" onPress={() => router.push("/delivery-profile")} style={styles.linkRow}>
           <Text style={[styles.linkText, { color: colors.text }]}>{translate("profileEditDetails")}</Text>
-          <Text style={styles.arrow}>‹</Text>
+          <Text style={[styles.arrow, { color: theme.colors.muted }]}>‹</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={() => router.push("/forgot-password")} style={styles.linkRow}>
           <Text style={[styles.linkText, { color: colors.text }]}>{translate("forgotPassword")}</Text>
@@ -123,14 +123,14 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
   hint: { fontSize: 12, lineHeight: 19, textAlign: "right" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, textAlign: "right", fontSize: 14 },
-  primary: { minHeight: 47, borderRadius: 13, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-  primaryText: { color: theme.colors.accentForeground, fontWeight: "900" },
+  primary: { minHeight: 47, borderRadius: 13, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
+  primaryText: { color: "#0A0A0A", fontWeight: "900" },
   disabled: { opacity: 0.6 },
-  error: { color: theme.colors.danger, fontSize: 12, textAlign: "right" },
-  success: { color: theme.colors.success, fontSize: 12, textAlign: "right", fontWeight: "700" },
+  error: { color: "#D94848", fontSize: 12, textAlign: "right" },
+  success: { color: "#668414", fontSize: 12, textAlign: "right", fontWeight: "700" },
   linkRow: { minHeight: 45, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
   linkText: { fontSize: 13, fontWeight: "700" },
-  arrow: { color: theme.colors.muted, fontSize: 22 },
-  signOut: { minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
+  arrow: { color: "#7A7A7A", fontSize: 22 },
+  signOut: { minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: "#D94848", alignItems: "center", justifyContent: "center" },
   signOutText: { color: "#D94848", fontWeight: "900" }
 });
