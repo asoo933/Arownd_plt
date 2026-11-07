@@ -76,6 +76,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
   store: string;
   price: string;
   imageUrl: string | null;
+  onPress?: () => void;
 }) {
   const dark = useColorScheme() === "dark";
   return (
@@ -86,7 +87,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
       <Text numberOfLines={2} style={[styles.productName, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{name}</Text>
       <Text numberOfLines={1} style={styles.productStore}>{store}</Text>
       <Text style={styles.productPrice}>{price}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -96,6 +97,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, onPress
   logoUrl?: string | null;
   commune?: string | null;
   rating?: number | null;
+  onPress?: () => void;
 }) {
   const dark = useColorScheme() === "dark";
   return (
@@ -109,7 +111,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, onPress
         {rating != null ? <Text style={styles.storeRating}>★ {rating.toFixed(1)}</Text> : null}
       </View>
       <Text style={styles.verified}>✓</Text>
-    </View>
+    </Pressable>
   );
 }
 
