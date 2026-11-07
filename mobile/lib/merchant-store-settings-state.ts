@@ -11,6 +11,7 @@ function isHttpsUrl(value: string): boolean {
 
 export const MerchantStoreSettingsSchema = z.object({
   name: z.string().trim().min(2).max(100),
+  wilaya_id: z.number().int().positive(),
   description: z.string().trim().max(2000),
   phone: z.string().trim().regex(/^[+0-9()\s-]{7,20}$/),
   whatsapp: z.string().trim().max(20).refine((value) => value.length === 0 || /^[+0-9()\s-]{7,20}$/.test(value)),
