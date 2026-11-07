@@ -88,9 +88,10 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`${name}، ${store}، ${price}`}
       onPress={onPress}
       disabled={!onPress}
-      style={[styles.productTile, { backgroundColor: theme.colors.surface }]}
+      style={[styles.productTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
     >
       <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
@@ -115,9 +116,10 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`${name}${commune ? `، ${commune}` : ""}${rating != null ? `، ${rating.toFixed(1)}` : ""}${verified ? `، ${translate("storeVerified")}` : ""}`}
       onPress={onPress}
       disabled={!onPress}
-      style={[styles.storeTile, { backgroundColor: theme.colors.surface }]}
+      style={[styles.storeTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
     >
       <View style={[styles.storeLogo, { backgroundColor: theme.colors.surfaceMuted }]}>
         {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>⌂</Text>}
@@ -182,13 +184,13 @@ const styles = StyleSheet.create({
   sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
   sectionText: { fontSize: designTokens.typography.subtitle, fontWeight: "900", textAlign: "right" },
   sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
-  productTile: { width: 158, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
+  productTile: { width: 158, borderRadius: designTokens.radius.lg, borderWidth: 1, padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
   productImage: { height: 132, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   imageFallback: { fontSize: 35 },
   productName: { minHeight: 38, fontSize: 13, fontWeight: "800", textAlign: "right" },
   productStore: { fontSize: designTokens.typography.caption, textAlign: "right" },
   productPrice: { fontSize: designTokens.typography.body, fontWeight: "900", textAlign: "right" },
-  storeTile: { minHeight: 82, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md - 1 },
+  storeTile: { minHeight: 82, borderWidth: 1, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md - 1 },
   storeLogo: { width: 54, height: 54, borderRadius: designTokens.radius.md + 2, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   storeInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-end" },
   storeName: { fontSize: designTokens.typography.body, fontWeight: "800" },
