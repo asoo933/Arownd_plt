@@ -73,11 +73,14 @@ begin
     raise exception 'invalid_merchant_product_category';
   end if;
 
-  if _options is null or jsonb_typeof(_options) <> 'object'
-     or exists (
-       select 1 from jsonb_object_keys(_options) as option_key
-       where option_key not in ('sizes', 'colors')
-     ) then
+  if _options is null or jsonb_typeof(_options) <> 'object' then
+    raise exception 'invalid_merchant_product_options';
+  end if;
+
+  if exists (
+    select 1 from jsonb_object_keys(_options) as option_key
+    where option_key not in ('sizes', 'colors')
+  ) then
     raise exception 'invalid_merchant_product_options';
   end if;
 
@@ -108,8 +111,11 @@ begin
     raise exception 'invalid_merchant_product_options';
   end if;
 
-  if _images is null or jsonb_typeof(_images) <> 'array'
-     or jsonb_array_length(_images) > 5 then
+  if _images is null or jsonb_typeof(_images) <> 'array' then
+    raise exception 'invalid_merchant_product_images';
+  end if;
+
+  if jsonb_array_length(_images) > 5 then
     raise exception 'invalid_merchant_product_images';
   end if;
 
