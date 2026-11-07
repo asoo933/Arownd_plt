@@ -93,7 +93,7 @@ export default function CartScreen() {
         </View>;
       })}
     </View>)}
-    <View style={[style.summary, { backgroundColor: dark ? "#171717" : theme.colors.surface }]}>
+    <View style={[style.summary, { backgroundColor: theme.colors.surface }]}>
       <View style={style.summaryRow}><Text style={style.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={style.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
       <Text style={style.note}>{translate("cartDeliveryNote")}</Text>
       <Pressable
