@@ -6,6 +6,7 @@ import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/m
 const StoreSettingsRecordSchema = z.object({
   id: z.string().uuid(),
   owner_id: z.string().uuid(),
+  wilaya_id: z.number().int().positive(),
   name: z.string(),
   description: z.string().nullable(),
   phone: z.string().nullable(),
@@ -28,7 +29,7 @@ export async function fetchMyMerchantStoreSettings(storeId: string): Promise<Mer
   if (!auth.user) throw new Error("not_authenticated");
 
   const { data, error } = await client.from("stores")
-    .select("id, owner_id, name, description, phone, whatsapp, commune, address_line, opening_hours, instagram_url, facebook_url")
+    .select("id, owner_id, name, description, phone, whatsapp, wilaya_id, commune, address_line, opening_hours, instagram_url, facebook_url")
     .eq("id", storeId)
     .eq("owner_id", auth.user.id)
     .maybeSingle();
@@ -38,6 +39,7 @@ export async function fetchMyMerchantStoreSettings(storeId: string): Promise<Mer
   const record = StoreSettingsRecordSchema.parse(data as unknown);
   return MerchantStoreSettingsSchema.parse({
     name: record.name,
+    wilaya_id: record.wilaya_id,
     description: record.description ?? "",
     phone: record.phone ?? "",
     whatsapp: record.whatsapp ?? "",
