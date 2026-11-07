@@ -84,6 +84,10 @@ export default function CheckoutScreen() {
   });
 
   useEffect(() => {
+    if (auth.data === null) {
+      router.replace("/login");
+      return;
+    }
     if (!profile.data || profileApplied) return;
     setFullName(profile.data.full_name ?? auth.data?.user_metadata?.["full_name"] ?? "");
     setPhone(profile.data.phone ?? auth.data?.phone ?? "");
