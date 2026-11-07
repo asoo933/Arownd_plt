@@ -18,7 +18,7 @@ const signupBaseSchema = z.object({
 });
 
 const matchingPasswords = {
-  path: ["confirmPassword"] as const,
+  path: ["confirmPassword"],
   message: "passwordMismatch"
 };
 
