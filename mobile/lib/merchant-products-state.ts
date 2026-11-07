@@ -14,7 +14,9 @@ export type MerchantProductOffer = {
   product: {
     id: string;
     name: string;
+    description: string | null;
     brand: string | null;
+    category: string;
   };
   images: Array<{
     id: string;
