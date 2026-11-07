@@ -8,12 +8,13 @@ import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
 
 type Picker = "wilaya" | "commune" | null;
 
 export default function DeliveryProfileScreen() {
   const theme = useAppTheme();
+  const styles = createStyles(theme);
   const queryClient = useQueryClient();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -110,12 +111,12 @@ export default function DeliveryProfileScreen() {
     <CustomerHeading title={translate("deliveryProfileTitle")} subtitle={translate("deliveryProfileSubtitle")} />
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
-      <TextInput value={fullName} onChangeText={setFullName} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" />
+      <TextInput value={fullName} onChangeText={setFullName} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
       <TextInput value={phone} onChangeText={setPhone} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
       <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
-        <Text style={[styles.pickerText, { color: selectedWilaya ? (theme.colors.foreground) : "#888888" }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
+        <Text style={[styles.pickerText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
       </Pressable>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutCommune")}</Text>
       <TextInput
@@ -134,7 +135,7 @@ export default function DeliveryProfileScreen() {
       {communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
       {formError ? <Text style={styles.error}>{formError}</Text> : null}
       <Pressable disabled={mutation.isPending} onPress={submit} style={[styles.saveButton, mutation.isPending && styles.disabled]}>
-        {mutation.isPending ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.saveText}>{translate("deliveryProfileSave")}</Text>}
+        {mutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.saveText}>{translate("deliveryProfileSave")}</Text>}
       </Pressable>
       {mutation.isSuccess ? <Text style={styles.success}>{translate("deliveryProfileSaved")}</Text> : null}
     </View>
@@ -143,7 +144,7 @@ export default function DeliveryProfileScreen() {
       <View style={styles.backdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <Text style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</Text>
-          {picker === "commune" && communes.isPending ? <ActivityIndicator color="#647D13" /> : null}
+          {picker === "commune" && communes.isPending ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
           {picker === "commune" && communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
           <ScrollView style={styles.options}>
             {pickerItems.map((item) => <Pressable key={item.id} onPress={() => {
@@ -165,28 +166,29 @@ export default function DeliveryProfileScreen() {
   </CustomerScreen>;
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: AppTheme) { return StyleSheet.create({
   back: { minHeight: 40, justifyContent: "center", alignSelf: "flex-start" },
-  backText: { color: "#647D13", fontSize: 13, fontWeight: "900" },
+  backText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   panel: { borderRadius: 18, padding: 16, gap: 10 },
   label: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, fontSize: 13 },
   picker: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, justifyContent: "center" },
   pickerText: { textAlign: "right", fontSize: 13 },
   suggestionButton: { alignSelf: "flex-start", minHeight: 34, justifyContent: "center" },
-  suggestionText: { color: "#647D13", fontSize: 11, fontWeight: "800" },
-  saveButton: { minHeight: 49, borderRadius: 13, backgroundColor: "#C6F135", justifyContent: "center", alignItems: "center", marginTop: 5 },
-  saveText: { color: "#0A0A0A", fontSize: 13, fontWeight: "900" },
-  error: { color: "#B42318", fontSize: 11, textAlign: "right" },
-  success: { color: "#647D13", fontSize: 12, textAlign: "right", fontWeight: "800" },
-  note: { color: "#737373", fontSize: 11, lineHeight: 18, textAlign: "right" },
+  suggestionText: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "800" },
+  saveButton: { minHeight: 49, borderRadius: 13, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center", marginTop: 5 },
+  saveText: { color: theme.colors.foreground, fontSize: 13, fontWeight: "900" },
+  error: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
+  success: { color: theme.colors.accentMuted, fontSize: 12, textAlign: "right", fontWeight: "800" },
+  note: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
   disabled: { opacity: 0.5 },
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 18 },
+  backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: 18 },
   modalPanel: { maxHeight: "80%", borderRadius: 18, padding: 16, gap: 12 },
-  modalTitle: { color: "#647D13", fontSize: 14, fontWeight: "900", textAlign: "right" },
+  modalTitle: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900", textAlign: "right" },
   options: { maxHeight: 440 },
-  option: { minHeight: 45, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: "#E5E5E5" },
+  option: { minHeight: 45, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   optionText: { textAlign: "right", fontSize: 13 },
-  closeButton: { minHeight: 42, justifyContent: "center", alignItems: "center", borderRadius: 11, backgroundColor: "#C6F135" },
-  closeText: { color: "#0A0A0A", fontWeight: "900", fontSize: 12 }
-});
+  closeButton: { minHeight: 42, justifyContent: "center", alignItems: "center", borderRadius: 11, backgroundColor: theme.colors.accent },
+  closeText: { color: theme.colors.foreground, fontWeight: "900", fontSize: 12 }
+}); }
+
