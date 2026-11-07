@@ -61,19 +61,21 @@ export async function fetchMerchantAccess(): Promise<MerchantAccess | null> {
 const MerchantCategorySchema = z.object({
   id: z.string(),
   parent_id: z.string().nullable(),
-  label_ar: z.string()
+  label_ar: z.string(),
+  emoji: z.string().default("🛍️")
 }).passthrough();
 
 export type MerchantCategory = {
   id: string;
   parentId: string | null;
   label: string;
+  emoji: string;
 };
 
 export async function fetchMerchantCategories(): Promise<MerchantCategory[]> {
   const { data, error } = await getSupabaseClient()
     .from("categories")
-    .select("id, parent_id, label_ar")
+    .select("id, parent_id, label_ar, emoji")
     .eq("is_active", true)
     .order("sort_order");
 
@@ -82,7 +84,8 @@ export async function fetchMerchantCategories(): Promise<MerchantCategory[]> {
   return MerchantCategorySchema.array().parse(data as unknown).map((category) => ({
     id: category.id,
     parentId: category.parent_id,
-    label: category.label_ar
+    label: category.label_ar,
+    emoji: category.emoji
   }));
 }
 
