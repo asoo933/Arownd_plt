@@ -5,7 +5,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
-import { cartLineKey, evaluateCart, type CartItem } from "@/lib/cart-state";
+import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem } from "@/lib/cart-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme } from "@/lib/theme";
 
@@ -77,7 +77,7 @@ export default function CartScreen() {
             <View style={style.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={style.imageMark}>▧</Text>}</View>
             <View style={style.details}>
               <Text style={[style.name, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name}</Text>
-              <Text style={style.options}>{Object.entries(item.options).map(([optionName, value]) => optionName + ": " + value).join(" · ")}</Text>
+              <Text style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Text>
               {line?.issues.map((issue) => <Text key={issue} style={[style.issue, issue === "priceChanged" && style.priceIssue]}>{issueLabels[issue]}</Text>)}
               <Text style={style.price}>{formatDZD(currentPrice * item.quantity)}</Text>
               {item.quantity > 1 ? <Text style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
