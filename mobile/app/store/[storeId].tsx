@@ -72,7 +72,7 @@ export default function StoreDetailsScreen() {
         ) : (
           <View style={styles.productGrid}>
             {offers.data.map((item) => (
-              <ProductTile key={item.id} name={item.product.name} store={details.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} />
+              <ProductTile key={item.id} name={item.product.name} store={details.name} price={formatDZD(item.price)} oldPrice={item.old_price != null && item.old_price > item.price ? formatDZD(item.old_price) : null} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} />
             ))}
           </View>
         )
