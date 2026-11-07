@@ -5,7 +5,7 @@ import {
   loginSchema,
   personalSignupSchema,
   recoverySchema
-} from "@/lib/auth-validation";
+} from "./auth-validation";
 
 describe("auth validation", () => {
   it("rejects an invalid login email", () => {
