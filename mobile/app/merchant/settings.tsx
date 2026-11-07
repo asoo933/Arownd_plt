@@ -56,6 +56,21 @@ export default function MerchantStoreSettingsScreen() {
   const updateHours = (key: "open" | "close", value: string) => {
     update("opening_hours", { ...form.opening_hours, [key]: value });
   };
+  const weekdays = [
+    { value: 6, key: "merchantWeekdaySaturday" },
+    { value: 0, key: "merchantWeekdaySunday" },
+    { value: 1, key: "merchantWeekdayMonday" },
+    { value: 2, key: "merchantWeekdayTuesday" },
+    { value: 3, key: "merchantWeekdayWednesday" },
+    { value: 4, key: "merchantWeekdayThursday" },
+    { value: 5, key: "merchantWeekdayFriday" }
+  ] as const;
+  const toggleClosedDay = (day: number) => {
+    const closedDays = form.opening_hours.closed_days.includes(day)
+      ? form.opening_hours.closed_days.filter((item) => item !== day)
+      : [...form.opening_hours.closed_days, day];
+    update("opening_hours", { ...form.opening_hours, closed_days: closedDays });
+  };
   const submit = () => {
     const parsed = MerchantStoreSettingsSchema.safeParse(form);
     if (!parsed.success) {
@@ -83,6 +98,17 @@ export default function MerchantStoreSettingsScreen() {
           <View style={styles.row}>
             <View style={styles.half}><Field label={translate("merchantStoreSettingsOpen")} value={form.opening_hours.open} onChangeText={(value) => updateHours("open", value)} theme={theme} /></View>
             <View style={styles.half}><Field label={translate("merchantStoreSettingsClose")} value={form.opening_hours.close} onChangeText={(value) => updateHours("close", value)} theme={theme} /></View>
+          </View>
+          <View style={styles.field}>
+            <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsClosedDays")}</Text>
+            <View style={styles.days}>
+              {weekdays.map((day) => {
+                const selected = form.opening_hours.closed_days.includes(day.value);
+                return <Pressable key={day.value} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
+                  <Text style={[styles.dayChipText, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(day.key)}</Text>
+                </Pressable>;
+              })}
+            </View>
           </View>
           <Field label={translate("merchantStoreSettingsInstagram")} value={form.instagram_url} onChangeText={(value) => update("instagram_url", value)} theme={theme} keyboardType="url" />
           <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" />
@@ -140,6 +166,9 @@ function createStyles(theme: AppTheme) {
     textarea: { minHeight: 92, paddingTop: 12 },
     row: { flexDirection: "row-reverse", gap: 10 },
     half: { flex: 1 },
+    days: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7 },
+    dayChip: { minHeight: 38, minWidth: 65, paddingHorizontal: 9, borderWidth: 1, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+    dayChipText: { fontSize: 10, fontWeight: "800" },
     error: { fontSize: 11, textAlign: "right" },
     success: { fontSize: 11, textAlign: "right", fontWeight: "800" },
     save: { minHeight: 49, borderRadius: 13, alignItems: "center", justifyContent: "center" },
