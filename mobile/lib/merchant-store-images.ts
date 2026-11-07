@@ -50,19 +50,20 @@ export async function uploadMerchantStoreImage(
   storeId: string,
   asset: ImagePickerAsset,
   kind: "logo" | "cover"
-): Promise<string> {
+): Promise<{ url: string; cleanupPending: boolean }> {
   const client = getSupabaseClient();
   const { data: auth, error: authError } = await client.auth.getUser();
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
 
   const { data: store, error: storeError } = await client.from("stores")
-    .select("id")
+    .select("id, logo_url, cover_url")
     .eq("id", storeId)
     .eq("owner_id", auth.user.id)
     .maybeSingle();
   if (storeError) throw storeError;
   if (!store) throw new Error("merchant_store_not_found");
+  const oldUrl = kind === "logo" ? store.logo_url : store.cover_url;
   if (!validateStoreImageAsset(asset)) throw new Error("invalid_store_image");
 
   const extension = getStoreImageExtension(asset);
@@ -98,5 +99,13 @@ export async function uploadMerchantStoreImage(
     throw new Error("merchant_store_not_updated");
   }
 
-  return publicUrl;
+  let cleanupPending = false;
+  if (oldUrl) {
+    const oldPath = getStoreImageStoragePath(oldUrl, auth.user.id);
+    if (oldPath) {
+      const { error: cleanupError } = await client.storage.from("store-media").remove([oldPath]);
+      cleanupPending = !!cleanupError;
+    }
+  }
+  return { url: publicUrl, cleanupPending };
 }
