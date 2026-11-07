@@ -1,10 +1,10 @@
 export type CartItem = {
   offerId: string;
-  productId: string;
-  name: string;
+  productId?: string;
+  name?: string;
   quantity: number;
   options: Record<string, string>;
-  price: number;
+  price?: number;
 };
 
 export type CartIssueKind = "missing" | "unavailable" | "outOfStock" | "overStock" | "priceChanged";
@@ -46,7 +46,7 @@ export function sanitizeCart(value: unknown): CartItem[] {
       offerId: row.offerId,
       productId: typeof row.productId === "string" ? row.productId : "",
       name: typeof row.name === "string" ? row.name : "",
-      price: typeof row.price === "number" && Number.isFinite(row.price) && row.price >= 0 ? row.price : 0,
+      price: typeof row.price === "number" && Number.isFinite(row.price) && row.price >= 0 ? row.price : undefined,
       quantity: Math.max(1, Math.min(MAX_CART_QUANTITY, Math.floor(Number(row.quantity)) || 1)),
       options: cleanOptions(row.options)
     };
@@ -58,7 +58,7 @@ export function sanitizeCart(value: unknown): CartItem[] {
 }
 
 export function addCartItem(items: CartItem[], incoming: CartItem): CartItem[] {
-  if (!incoming.offerId || !Number.isFinite(incoming.price) || incoming.price < 0) return items;
+  if (!incoming.offerId || typeof incoming.price !== "number" || !Number.isFinite(incoming.price) || incoming.price < 0) return items;
   const normalized = sanitizeCart([incoming])[0];
   if (!normalized) return items;
   const key = cartLineKey(normalized);
@@ -92,11 +92,11 @@ export function evaluateCart(items: CartItem[], offers: CartOffer[] | undefined)
       if (!offer.is_available) issues.push("unavailable");
       else if (offer.stock_quantity <= 0) issues.push("outOfStock");
       else if (offer.stock_quantity < (requestedByOffer.get(item.offerId) ?? item.quantity)) issues.push("overStock");
-      if (offer.price !== item.price) issues.push("priceChanged");
+      if (item.price != null && offer.price !== item.price) issues.push("priceChanged");
     }
     return { item, offer, issues };
   });
-  const subtotal = lines.reduce((sum, line) => sum + (line.offer?.price ?? 0) * line.item.quantity, 0);
+  const subtotal = lines.reduce((sum, line) => sum + (line.offer?.price ?? line.item.price ?? 0) * line.item.quantity, 0);
   const blockingCount = lines.filter((line) => line.issues.some((issue) => issue !== "priceChanged")).length;
   return { lines, subtotal, blockingCount, loaded };
 }
