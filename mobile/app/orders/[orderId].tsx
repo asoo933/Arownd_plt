@@ -136,7 +136,7 @@ export default function OrderDetailsScreen() {
       <Text style={styles.meta}>{translate("orderPerStoreHint")}</Text>
     </View>}
 
-    <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    {merchantOrders.length === 0 ? <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <Text style={styles.sectionTitle}>{translate("orderItemsTitle")}</Text>
       {order.items.map((item) => <View key={item.id} style={styles.itemRow}>
         <View style={styles.itemInfo}>
@@ -147,7 +147,7 @@ export default function OrderDetailsScreen() {
       </View>)}
       <View style={styles.totalRow}><Text style={styles.label}>{translate("orderSubtotal")}</Text><Text style={styles.label}>{formatDZD(order.subtotal)}</Text></View>
       <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(order.shipping_fee)}</Text></View>
-    </View>
+    </View> : null}
 
     {merchantOrders.map((merchantOrder) => {
       const tone = getOrderStatusTone(merchantOrder.status);
