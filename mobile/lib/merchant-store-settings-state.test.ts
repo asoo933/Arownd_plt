@@ -25,6 +25,19 @@ describe("MerchantStoreSettingsSchema", () => {
     }).success).toBe(false);
     expect(MerchantStoreSettingsSchema.safeParse({
       ...valid,
+      instagram_url: "https://"
+    }).success).toBe(false);
+    expect(MerchantStoreSettingsSchema.safeParse({
+      ...valid,
+      facebook_url: "http://facebook.com/example"
+    }).success).toBe(false);
+    expect(MerchantStoreSettingsSchema.safeParse({
+      ...valid,
+      instagram_url: "https://instagram.com/example",
+      facebook_url: "https://facebook.com/example"
+    }).success).toBe(true);
+    expect(MerchantStoreSettingsSchema.safeParse({
+      ...valid,
       opening_hours: { ...valid.opening_hours, open: "29:90" }
     }).success).toBe(false);
     expect(MerchantStoreSettingsSchema.safeParse({
