@@ -121,6 +121,17 @@ export const messages = {
     storeVerified: "متجر موثّق",
     storeUnverified: "متجر غير موثّق",
     storeRating: "التقييم",
+    favoriteTitleShort: "المفضلة",
+    favoritesTitle: "قائمة المفضلة",
+    favoritesSubtitle: "المنتجات والمتاجر التي حفظتها للعودة إليها لاحقًا.",
+    favoriteAdd: "أضف للمفضلة",
+    favoriteRemove: "إزالة من المفضلة",
+    favoriteSaved: "في المفضلة",
+    favoriteProducts: "المنتجات",
+    favoriteStores: "المتاجر",
+    favoriteProductsEmpty: "لم تحفظ أي منتجات بعد.",
+    favoriteStoresEmpty: "لم تحفظ أي متاجر بعد.",
+    favoritesEmptyHint: "اكتشف المنتجات والمتاجر وأضف ما يعجبك إلى قائمتك."
     detailNotFound: "لم نعثر على البيانات المطلوبة.",
   },
   en: {
@@ -245,6 +256,17 @@ export const messages = {
     storeVerified: "Verified store",
     storeUnverified: "Unverified store",
     storeRating: "Rating",
+    favoriteTitleShort: "Favorites",
+    favoritesTitle: "Your favorites",
+    favoritesSubtitle: "Products and stores you saved for later.",
+    favoriteAdd: "Add to favorites",
+    favoriteRemove: "Remove from favorites",
+    favoriteSaved: "Saved",
+    favoriteProducts: "Products",
+    favoriteStores: "Stores",
+    favoriteProductsEmpty: "You have not saved any products yet.",
+    favoriteStoresEmpty: "You have not saved any stores yet.",
+    favoritesEmptyHint: "Explore products and stores, then save the ones you like."
     detailNotFound: "We couldn't find the requested information.",
   }
 } as const;
