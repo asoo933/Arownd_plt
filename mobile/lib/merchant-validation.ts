@@ -18,14 +18,6 @@ export const merchantStoreSchema = z.object({
   category: z.string().trim().min(1, "merchantValidationCategory"),
   subcategories: z.array(z.string().min(1)).max(30, "merchantValidationSubcategories")
 }).superRefine((value, context) => {
-  if (value.close <= value.open) {
-    context.addIssue({
-      code: "custom",
-      path: ["close"],
-      message: "merchantValidationHoursRange"
-    });
-  }
-
   if (new Set(value.subcategories).size !== value.subcategories.length) {
     context.addIssue({
       code: "custom",
