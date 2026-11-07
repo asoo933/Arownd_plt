@@ -84,15 +84,16 @@ type FieldProps = TextInputProps & {
 };
 
 export function AuthField({ label, error, style, ...props }: FieldProps) {
+  const isEmail = props.keyboardType === "email-address";
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         {...props}
+        textAlign={isEmail ? "left" : "right"}
         style={[styles.input, error ? styles.inputError : undefined, style]}
         placeholderTextColor="#A3A3A3"
-        textAlign="right"
-        autoCapitalize={props.keyboardType === "email-address" ? "none" : props.autoCapitalize}
+        autoCapitalize={isEmail ? "none" : props.autoCapitalize}
       />
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
