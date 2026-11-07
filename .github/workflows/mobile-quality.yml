@@ -34,7 +34,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies (strict peer dependencies)
-        run: npm install --no-audit --no-fund --strict-peer-deps
+        run: npm install --no-audit --no-fund --omit=optional --strict-peer-deps
 
       - name: TypeScript
         run: npm run typecheck
