@@ -59,7 +59,7 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
   );
 }
 
-type FieldProps = TextInputProps & { label: string; error?: string };
+type FieldProps = TextInputProps & { label: string; error?: string | undefined };
 
 export function AuthField({ label, error, style, ...props }: FieldProps) {
   const theme = useAppTheme();
