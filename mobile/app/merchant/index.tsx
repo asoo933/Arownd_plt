@@ -301,6 +301,16 @@ export default function MerchantEntryScreen() {
             {translate("merchantManageOrders")}
           </Text>
         </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/merchant/products")}
+          style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
+        >
+          <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
+            {translate("merchantManageProducts")}
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
