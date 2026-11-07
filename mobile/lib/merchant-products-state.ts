@@ -99,6 +99,17 @@ export function validateMerchantOfferOptions(
   return { sizes, colors };
 }
 
+export function validatePromotionSalePrice(salePriceInput: string, regularPrice: number): number | null {
+  if (!Number.isSafeInteger(regularPrice) || regularPrice <= 0 || !salePriceInput.trim()) return null;
+  const salePrice = Number(salePriceInput);
+  return Number.isSafeInteger(salePrice) && salePrice > 0 && salePrice < regularPrice ? salePrice : null;
+}
+
+export function getPromotionDiscountPercent(regularPrice: number, salePrice: number): number | null {
+  if (!Number.isSafeInteger(regularPrice) || !Number.isSafeInteger(salePrice) || regularPrice <= 0 || salePrice <= 0 || salePrice >= regularPrice) return null;
+  return Math.round(((regularPrice - salePrice) / regularPrice) * 100);
+}
+
 export function validateMerchantOfferValues(
   priceInput: string,
   stockInput: string
