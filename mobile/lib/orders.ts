@@ -147,3 +147,17 @@ export function getOrderStatusTone(status: string): "pending" | "success" | "dan
   if (status === "pending" || status === "quoted") return "pending";
   return "muted";
 }
+
+/** Customer accepts or declines a merchant's shipping quote through the guarded RPC. */
+export async function respondToMerchantQuote(merchantOrderId: string, accept: boolean): Promise<void> {
+  const client = getSupabaseClient();
+  const call = client.rpc.bind(client) as unknown as (
+    functionName: string,
+    args: { _merchant_order_id: string; _accept: boolean }
+  ) => Promise<{ error: { message?: string } | null }>;
+  const { error } = await call("customer_respond_to_merchant_order", {
+    _merchant_order_id: merchantOrderId,
+    _accept: accept
+  });
+  if (error) throw new Error(error.message ?? "quote_response_failed");
+}
