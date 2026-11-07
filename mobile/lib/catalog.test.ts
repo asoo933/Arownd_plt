@@ -4,6 +4,7 @@ import {
   chooseBestProductOffer,
   formatDZD,
   getPrimaryImage,
+  getCategoryFilterIds,
   type HomeProduct,
   type ProductOffer
 } from "@/lib/catalog";
@@ -72,5 +73,16 @@ describe("chooseBestProductOffer", () => {
 
   it("returns null when there are no offers", () => {
     expect(chooseBestProductOffer([])).toBeNull();
+  });
+});
+
+describe("getCategoryFilterIds", () => {
+  it("includes child category identifiers for a main category", () => {
+    expect(getCategoryFilterIds("fashion")).toContain("shoes");
+    expect(getCategoryFilterIds("fashion")).toContain("bags");
+  });
+
+  it("keeps unknown category identifiers intact", () => {
+    expect(getCategoryFilterIds("custom-category")).toEqual(["custom-category"]);
   });
 });
