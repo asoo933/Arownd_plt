@@ -53,10 +53,10 @@ export default function CartScreen() {
   };
 
   return <CustomerScreen>
-    <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartItemsCount", { count: cart.data.reduce((sum, item) => sum + item.quantity, 0) })} />
+    <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)} />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
-    {evaluation.blockingCount > 0 ? <View style={styles.warning}><Text style={styles.warningText}>{translate("cartBlocked", { count: evaluation.blockingCount })}</Text></View> : null}
+    {evaluation.blockingCount > 0 ? <View style={styles.warning}><Text style={styles.warningText}>{translate("cartBlocked") + evaluation.blockingCount}</Text></View> : null}
     {[...groups.entries()].map(([offerId, group]) => <View key={offerId} style={[styles.group, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <Text style={styles.store}>{group.storeName}</Text>
       {group.items.map((item) => {
@@ -64,7 +64,7 @@ export default function CartScreen() {
         const offer = offerById.get(item.offerId);
         const line = evaluation.lines.find((entry) => cartLineKey(entry.item) === key);
         const image = offer ? getPrimaryImage(offer) : null;
-        const currentPrice = offer?.price ?? item.price;
+        const currentPrice = offer?.price ?? item.price ?? 0;
         const blocking = line?.issues.some((issue) => issue !== "priceChanged") ?? false;
         return <View key={key} style={styles.line}>
           <Pressable accessibilityRole="button" onPress={() => item.productId ? router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }) : undefined} style={styles.lineMain}>
@@ -89,9 +89,10 @@ export default function CartScreen() {
     <View style={[styles.summary, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={styles.total}>{formatDZD(evaluation.subtotal)}</Text></View>
       <Text style={styles.note}>{translate("cartDeliveryNote")}</Text>
-      <Pressable disabled={!evaluation.loaded || evaluation.blockingCount > 0 || offers.isPending || offers.isError} onPress={() => router.push("/checkout")} style={[styles.primary, (!evaluation.loaded || evaluation.blockingCount > 0 || offers.isPending || offers.isError) && styles.disabled]}>
+      <Pressable disabled style={[styles.primary, styles.disabled]}>
         <Text style={styles.primaryText}>{translate("cartCheckout")}</Text>
       </Pressable>
+      <Text style={styles.note}>{translate("cartCheckoutComing")}</Text>
     </View>
   </CustomerScreen>;
 }
