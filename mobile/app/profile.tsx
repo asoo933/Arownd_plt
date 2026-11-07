@@ -139,7 +139,7 @@ function MenuAction({ label, hint, onPress, colors }: {
         <Text style={[styles.menuTitle, { color: colors.text }]}>{label}</Text>
         <Text style={[styles.menuHint, { color: colors.muted }]}>{hint}</Text>
       </View>
-      <Text style={[styles.arrow, { color: theme.colors.muted }]}>‹</Text>
+      <Text style={[styles.arrow, { color: colors.muted }]}>‹</Text>
     </Pressable>
   );
 }
