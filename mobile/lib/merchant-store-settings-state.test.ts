@@ -18,7 +18,7 @@ describe("MerchantStoreSettingsSchema", () => {
     expect(MerchantStoreSettingsSchema.safeParse(valid).success).toBe(true);
   });
 
-  it("rejects unsafe social URLs and invalid opening times", () => {
+  it("rejects unsafe social URLs, invalid opening times and duplicate closing days", () => {
     expect(MerchantStoreSettingsSchema.safeParse({
       ...valid,
       instagram_url: "javascript:alert(1)"
@@ -26,6 +26,10 @@ describe("MerchantStoreSettingsSchema", () => {
     expect(MerchantStoreSettingsSchema.safeParse({
       ...valid,
       opening_hours: { ...valid.opening_hours, open: "29:90" }
+    }).success).toBe(false);
+    expect(MerchantStoreSettingsSchema.safeParse({
+      ...valid,
+      opening_hours: { ...valid.opening_hours, closed_days: [5, 5] }
     }).success).toBe(false);
   });
 });
