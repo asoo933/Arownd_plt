@@ -75,6 +75,7 @@ export function getProductImageStoragePath(
   const encodedPath = publicUrl
     .slice(markerIndex + marker.length)
     .split(/[?#]/, 1)[0];
+  if (!encodedPath) return null;
 
   let storagePath: string;
   try {
@@ -103,5 +104,8 @@ export function getNextPrimaryProductImageId(
   const removed = images.find((image) => image.id === removedImageId);
   if (!removed?.is_primary) return null;
 
-  return images.find((image) => image.id !== removedImageId)?.id ?? null;
+  const remaining = images.filter((image) => image.id !== removedImageId);
+  if (remaining.some((image) => image.is_primary)) return null;
+
+  return remaining[0]?.id ?? null;
 }
