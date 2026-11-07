@@ -59,7 +59,7 @@ export default function OrderDetailsScreen() {
       .on("postgres_changes", { event: "*", schema: "public", table: "shipments", filter: "order_id=eq." + orderId }, () => { void query.refetch(); })
       .subscribe();
     return () => { void client.removeChannel(channel); };
-  }, [orderId]);
+  }, [orderId, query.refetch]);
 
   if (query.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (query.isError) return <CustomerScreen>
