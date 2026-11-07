@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
 type OrderRow = {
@@ -72,7 +73,7 @@ function toRows(orders: CustomerOrder[]): OrderRow[] {
 }
 
 export default function OrdersScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const [tab, setTab] = useState<OrdersTab>("all");
   const auth = useQuery({
     queryKey: ["customer-orders-auth"],
@@ -124,8 +125,8 @@ export default function OrdersScreen() {
   return <CustomerScreen>
     <CustomerHeading title={translate("ordersTitle")} subtitle={translate("ordersSubtitle")} />
     <View style={styles.tabs}>
-      {TABS.map((item) => <Pressable key={item.id} onPress={() => setTab(item.id)} style={[styles.tab, tab === item.id && styles.tabActive]}>
-        <Text style={[styles.tabText, tab === item.id && styles.tabTextActive]}>{translate(item.key)}</Text>
+      {TABS.map((item) => <Pressable key={item.id} onPress={() => setTab(item.id)} style={[styles.tab, { borderColor: theme.colors.border }, tab === item.id && { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent }]}>
+        <Text style={[styles.tabText, { color: theme.colors.muted }, tab === item.id && { color: theme.colors.accentForeground }]}>{translate(item.key)}</Text>
       </Pressable>)}
     </View>
     {filtered.length === 0 ? <EmptyState title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
@@ -133,10 +134,10 @@ export default function OrdersScreen() {
       const orderCode = row.order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
       const tone = getOrderStatusTone(row.status);
       const total = row.status === "cancelled" || row.status === "rejected" ? 0 : row.subtotal + row.shippingFee;
-      return <Pressable key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} style={[styles.card, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+      return <Pressable key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
-            <Text style={[styles.orderCode, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("ordersCode")}: {orderCode}</Text>
+            <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</Text>
             <Text style={styles.date}>{dateLabel(row.order.created_at)}</Text>
           </View>
           <View style={[styles.status, tone === "success" ? styles.statusSuccess : tone === "danger" ? styles.statusDanger : tone === "pending" ? styles.statusPending : styles.statusMuted]}>
@@ -144,7 +145,7 @@ export default function OrdersScreen() {
           </View>
         </View>
         {row.storeName ? <Text style={styles.storeName}>{row.storeName}</Text> : null}
-        <Text style={[styles.meta, { color: dark ? "#A3A3A3" : "#737373" }]}>{row.itemCount} {translate("ordersItems")}</Text>
+        <Text style={[styles.meta, { color: theme.colors.muted }]}>{row.itemCount} {translate("ordersItems")}</Text>
         <View style={styles.cardFooter}>
           <Text style={styles.openLabel}>{translate("ordersViewDetails")}</Text>
           <Text style={styles.total}>{formatDZD(total)}</Text>
