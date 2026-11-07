@@ -70,6 +70,28 @@ export type FeaturedStore = z.infer<typeof FeaturedStoreSchema>;
 export type ProductSummary = z.infer<typeof ProductSummarySchema>;
 export type StoreDetails = z.infer<typeof StoreSummarySchema>;
 export type ProductOffer = z.infer<typeof ProductOfferSchema>;
+export type OfferVariantOptions = { sizes: string[]; colors: string[] };
+
+export function getOfferVariantOptions(offer: ProductOffer | null | undefined): OfferVariantOptions {
+  const raw = offer?.options;
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return { sizes: [], colors: [] };
+  const options = raw as Record<string, unknown>;
+  const toValues = (value: unknown): string[] => Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    : [];
+  return { sizes: toValues(options.sizes), colors: toValues(options.colors) };
+}
+
+export async function fetchOffersByIds(ids: string[]): Promise<ProductOffer[]> {
+  const uniqueIds = [...new Set(ids.filter((id) => id.length > 0))];
+  if (uniqueIds.length === 0) return [];
+  const { data, error } = await getSupabaseClient()
+    .from("store_offers")
+    .select("id, product_id, price, old_price, stock_quantity, is_available, last_confirmed_at, options, product:products!inner(id, name, description, category, brand), store:stores!inner(id, name, logo_url, commune, address_line, rating, is_verified), images:product_images(image_url, is_primary)")
+    .in("id", uniqueIds);
+  if (error) throw error;
+  return ProductOfferSchema.array().parse(data as unknown);
+}
 
 export async function fetchHomeProducts(): Promise<HomeProduct[]> {
   const { data, error } = await getSupabaseClient()
