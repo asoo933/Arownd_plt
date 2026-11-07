@@ -42,7 +42,9 @@ export default function SettingsScreen() {
         ? translate("passwordMin")
         : error.message === "passwordMismatch"
           ? translate("passwordMismatch")
-          : translate("settingsPasswordError"));
+          : error.message === "required"
+            ? translate("required")
+            : translate("settingsPasswordError"));
     }
   });
   const signOutMutation = useMutation({
