@@ -2,49 +2,91 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   EMPTY_FAVORITES,
+  getFavoritesStorageKey,
   parseFavorites,
   toggleFavoriteId,
   type FavoriteKind,
   type Favorites
 } from "@/lib/favorites-state";
+import { getSupabaseClient } from "@/lib/supabase";
 
-const STORAGE_KEY = "arownd:favorites";
-const LEGACY_STORAGE_KEY = "sooqy:favorites";
+const LEGACY_STORAGE_KEYS = ["arownd:favorites", "sooqy:favorites"] as const;
 
-let cachedFavorites: Favorites = EMPTY_FAVORITES;
-let initialized = false;
-let pendingWrite: Promise<void> = Promise.resolve();
+const cachedFavorites = new Map<string, Favorites>();
+const initialization = new Map<string, Promise<Favorites>>();
+const pendingWrites = new Map<string, Promise<void>>();
+
+async function getStorageScope(): Promise<string | null> {
+  const { data, error } = await getSupabaseClient().auth.getUser();
+  if (error) throw error;
+  return data.user?.id ?? null;
+}
+
+async function loadFavorites(userId: string | null): Promise<Favorites> {
+  const scope = userId ?? "anonymous";
+  const cached = cachedFavorites.get(scope);
+  if (cached) return cached;
+
+  const existingInitialization = initialization.get(scope);
+  if (existingInitialization) return existingInitialization;
+
+  const task = (async (): Promise<Favorites> => {
+    const storageKey = getFavoritesStorageKey(userId);
+    const current = await AsyncStorage.getItem(storageKey);
+    let raw = current;
+
+    // Old unscoped keys remain anonymous-only to avoid exposing one account's
+    // local favorites to another account on a shared device.
+    if (userId === null && raw === null) {
+      for (const legacyKey of LEGACY_STORAGE_KEYS) {
+        raw = await AsyncStorage.getItem(legacyKey);
+        if (raw !== null) break;
+      }
+    }
+
+    let favorites = EMPTY_FAVORITES;
+    if (raw !== null) {
+      try {
+        favorites = parseFavorites(JSON.parse(raw) as unknown);
+      } catch {
+        favorites = EMPTY_FAVORITES;
+      }
+    }
+
+    cachedFavorites.set(scope, favorites);
+    if (current === null && raw !== null) {
+      await AsyncStorage.setItem(storageKey, JSON.stringify(favorites));
+      if (userId === null) {
+        await Promise.all(LEGACY_STORAGE_KEYS.map((key) => AsyncStorage.removeItem(key)));
+      }
+    }
+    return favorites;
+  })();
+
+  initialization.set(scope, task);
+  try {
+    return await task;
+  } finally {
+    initialization.delete(scope);
+  }
+}
 
 export async function getFavorites(): Promise<Favorites> {
-  if (initialized) return cachedFavorites;
-
-  const current = await AsyncStorage.getItem(STORAGE_KEY);
-  const legacy = current === null ? await AsyncStorage.getItem(LEGACY_STORAGE_KEY) : null;
-  const raw = current ?? legacy;
-  if (raw) {
-    try {
-      cachedFavorites = parseFavorites(JSON.parse(raw) as unknown);
-    } catch {
-      cachedFavorites = EMPTY_FAVORITES;
-    }
-  } else {
-    cachedFavorites = EMPTY_FAVORITES;
-  }
-
-  if (current === null && legacy !== null) {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cachedFavorites));
-  }
-  initialized = true;
-  return cachedFavorites;
+  return loadFavorites(await getStorageScope());
 }
 
 export async function toggleFavorite(kind: FavoriteKind, id: string): Promise<Favorites> {
-  await getFavorites();
-  cachedFavorites = toggleFavoriteId(cachedFavorites, kind, id);
-  const snapshot = cachedFavorites;
-  pendingWrite = pendingWrite.catch(() => undefined).then(() =>
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot))
+  const userId = await getStorageScope();
+  const scope = userId ?? "anonymous";
+  const current = await loadFavorites(userId);
+  const next = toggleFavoriteId(current, kind, id);
+  cachedFavorites.set(scope, next);
+
+  const previousWrite = pendingWrites.get(scope) ?? Promise.resolve();
+  const nextWrite = previousWrite.catch(() => undefined).then(() =>
+    AsyncStorage.setItem(getFavoritesStorageKey(userId), JSON.stringify(next))
   );
-  await pendingWrite;
-  return snapshot;
+  pendingWrites.set(scope, nextWrite);
+  await nextWrite;
+  return next;
 }
