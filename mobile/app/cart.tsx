@@ -70,7 +70,7 @@ export default function CartScreen() {
         const line = evaluation.lines.find((entry) => cartLineKey(entry.item) === key);
         const image = offer ? getPrimaryImage(offer) : null;
         const currentPrice = offer?.price ?? item.price ?? 0;
-        const blocking = line?.issues.some((issue) => issue !== "priceChanged") ?? false;
+        const blocking = (line?.issues.length ?? 0) > 0;
         const totalRequestedForOffer = cart.data.filter((entry) => entry.offerId === item.offerId).reduce((sum, entry) => sum + entry.quantity, 0);
         return <View key={key} style={style.line}>
           <Pressable accessibilityRole="button" onPress={() => item.productId ? router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }) : undefined} style={style.lineMain}>
