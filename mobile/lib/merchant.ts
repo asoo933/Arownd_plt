@@ -392,3 +392,15 @@ export async function collectMerchantOrderCod(merchantOrderId: string): Promise<
 
   if (error) throw error;
 }
+
+export async function updateMerchantOrderStatus(
+  merchantOrderId: string,
+  status: "shipped"
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc("merchant_update_merchant_order_status", {
+    _merchant_order_id: merchantOrderId,
+    _status: status
+  });
+
+  if (error) throw error;
+}
