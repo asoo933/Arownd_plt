@@ -32,6 +32,10 @@ import {
   fetchMerchantCategories,
   type MerchantCategory
 } from "@/lib/merchant";
+import {
+  groupMerchantCategories
+} from "@/lib/merchant-category-state";
+import type { MerchantCategory } from "@/lib/merchant";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
@@ -82,6 +86,10 @@ export default function MerchantNewProductScreen() {
   });
 
   const storeId = access.data?.store?.id ?? null;
+  const categoryGroups = useMemo(
+    () => groupMerchantCategories(categories.data ?? []),
+    [categories.data]
+  );
   const selectedCategory = useMemo(
     () => categories.data?.find((item) => item.id === form.category) ?? null,
     [categories.data, form.category]
@@ -440,34 +448,87 @@ export default function MerchantNewProductScreen() {
               </Pressable>
             </View>
             <ScrollView contentContainerStyle={styles.categoryList}>
-              {categories.data.map((category: MerchantCategory) => (
-                <Pressable
-                  key={category.id}
-                  onPress={() => {
-                    update("category", category.id);
-                    setCategoryPickerOpen(false);
-                  }}
-                  style={[
-                    styles.categoryOption,
-                    {
-                      borderColor: form.category === category.id ? theme.colors.accentMuted : theme.colors.border,
-                      backgroundColor: form.category === category.id ? theme.colors.surfaceMuted : theme.colors.background
-                    }
-                  ]}
-                >
-                  <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
-                    {category.label}
-                  </Text>
-                  {form.category === category.id ? (
-                    <Text style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</Text>
-                  ) : null}
-                </Pressable>
+              {categoryGroups.map((group) => (
+                <View key={group.parent.id} style={styles.categoryGroup}>
+                  {group.children.length > 0 ? (
+                    <>
+                      <View style={styles.categoryGroupHeading}>
+                        <Text style={styles.categoryEmoji}>{group.parent.emoji}</Text>
+                        <Text style={[styles.categoryGroupTitle, { color: theme.colors.foreground }]}>
+                          {group.parent.label}
+                        </Text>
+                      </View>
+                      {group.children.map((category) => (
+                        <CategoryOption
+                          key={category.id}
+                          category={category}
+                          selected={form.category === category.id}
+                          theme={theme}
+                          onSelect={() => {
+                            update("category", category.id);
+                            setCategoryPickerOpen(false);
+                          }}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    <CategoryOption
+                      category={group.parent}
+                      selected={form.category === group.parent.id}
+                      theme={theme}
+                      onSelect={() => {
+                        update("category", group.parent.id);
+                        setCategoryPickerOpen(false);
+                      }}
+                    />
+                  )}
+                </View>
               ))}
             </ScrollView>
           </View>
         </View>
       </Modal>
     </SafeAreaView>
+  );
+}
+
+function CategoryOption({
+  category,
+  selected,
+  theme,
+  onSelect
+}: {
+  category: MerchantCategory;
+  selected: boolean;
+  theme: AppTheme;
+  onSelect: () => void;
+}) {
+  const styles = createStyles(theme);
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onSelect}
+      style={[
+        styles.categoryOption,
+        styles.categoryOptionChild,
+        {
+          borderColor: selected ? theme.colors.accentMuted : theme.colors.border,
+          backgroundColor: selected ? theme.colors.surfaceMuted : theme.colors.background
+        }
+      ]}
+    >
+      <View style={styles.categoryOptionContent}>
+        <Text style={styles.categoryEmojiSmall}>{category.emoji}</Text>
+        <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
+          {category.label}
+        </Text>
+      </View>
+      {selected ? (
+        <Text style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</Text>
+      ) : null}
+    </Pressable>
   );
 }
 
@@ -560,8 +621,15 @@ function createStyles(theme: AppTheme) {
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
     modalTitle: { fontSize: 15, fontWeight: "900" },
     modalClose: { fontSize: 11, fontWeight: "800" },
-    categoryList: { gap: 8, paddingBottom: 8 },
+    categoryList: { gap: 13, paddingBottom: 8 },
+    categoryGroup: { gap: 7 },
+    categoryGroupHeading: { minHeight: 35, flexDirection: "row-reverse", alignItems: "center", gap: 8, paddingHorizontal: 4 },
+    categoryEmoji: { fontSize: 17 },
+    categoryGroupTitle: { fontSize: 12, fontWeight: "900" },
     categoryOption: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    categoryOptionChild: { marginStart: 15 },
+    categoryOptionContent: { flexDirection: "row-reverse", alignItems: "center", gap: 9 },
+    categoryEmojiSmall: { fontSize: 15 },
     categoryLabel: { fontSize: 12, fontWeight: "800" },
     categorySelected: { fontSize: 17, fontWeight: "900" },
     message: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 14 },
