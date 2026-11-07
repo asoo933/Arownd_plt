@@ -79,6 +79,7 @@ export default function CartScreen() {
               <Text style={[style.name, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name}</Text>
               <Text style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Text>
               {line?.issues.map((issue) => <Text key={issue} style={[style.issue, issue === "priceChanged" && style.priceIssue]}>{issueLabels[issue]}</Text>)}
+              {offer?.old_price != null && offer.old_price > currentPrice ? <Text style={style.originalPrice}>{formatDZD(offer.old_price * item.quantity)}</Text> : null}
               <Text style={style.price}>{formatDZD(currentPrice * item.quantity)}</Text>
               {item.quantity > 1 ? <Text style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
             </View>
@@ -119,6 +120,7 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   options: { color: theme.colors.muted, fontSize: 11, textAlign: "right" },
   issue: { color: theme.colors.warning, fontSize: 11, fontWeight: "700", textAlign: "right" },
   priceIssue: { color: theme.colors.warning },
+  originalPrice: { color: theme.colors.muted, fontSize: 11, textDecorationLine: "line-through" },
   price: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   controls: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
   stepper: { width: 36, height: 36, borderRadius: 11, backgroundColor: theme.colors.surfaceMuted, alignItems: "center", justifyContent: "center" },
