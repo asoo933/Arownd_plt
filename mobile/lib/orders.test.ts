@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getOrderStatusTone, getOrderTrackingSteps } from "@/lib/orders";
+import { getOrderStatusTone, getOrderTrackingSteps } from "@/lib/orders-state";
 
 describe("customer order display", () => {
   it("maps order statuses to tracking steps", () => {
