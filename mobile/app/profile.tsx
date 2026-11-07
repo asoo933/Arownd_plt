@@ -46,6 +46,18 @@ export default function ProfileScreen() {
   if (user.isPending) {
     return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   }
+  if (user.isError) {
+    return (
+      <CustomerScreen>
+        <CustomerHeading title={translate("profileTitle")} />
+        <ErrorState
+          title={translate("profileLoadError")}
+          retryLabel={translate("retry")}
+          onRetry={() => void user.refetch()}
+        />
+      </CustomerScreen>
+    );
+  }
   if (!user.data) {
     return (
       <CustomerScreen>
