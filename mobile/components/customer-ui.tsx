@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
@@ -126,7 +127,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
         <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{commune || description || " "}</Text>
         {rating != null ? <Text style={[styles.storeRating, { color: theme.colors.warning }]}>★ {rating.toFixed(1)}</Text> : null}
       </View>
-      {verified ? <Text accessibilityLabel="Verified store" style={[styles.verified, { color: theme.colors.success }]}>✓</Text> : null}
+      {verified ? <Text accessibilityLabel={translate("storeVerified")} style={[styles.verified, { color: theme.colors.success }]}>✓</Text> : null}
     </Pressable>
   );
 }
