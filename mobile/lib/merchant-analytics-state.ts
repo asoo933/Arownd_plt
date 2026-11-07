@@ -10,7 +10,6 @@ export const MerchantAnalyticsSchema = z.object({
   product_count: z.coerce.number().int().nonnegative(),
   low_stock_count: z.coerce.number().int().nonnegative(),
   out_of_stock_count: z.coerce.number().int().nonnegative(),
-  store_rating: z.coerce.number().nullable(),
   daily_delivered: z.array(z.object({
     day: z.string(),
     amount: z.coerce.number().nonnegative()
