@@ -1,7 +1,8 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSupabaseClient } from "@/lib/supabase";
 import { useAppTheme } from "@/lib/theme";
 
 export default function RootLayout() {
@@ -18,6 +19,16 @@ export default function RootLayout() {
       })
   );
   const theme = useAppTheme();
+
+  useEffect(() => {
+    const { data } = getSupabaseClient().auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        queryClient.clear();
+      }
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
