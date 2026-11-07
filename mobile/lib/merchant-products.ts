@@ -1,11 +1,8 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
-import {
-  MerchantProductOfferSchema,
-  type MerchantOfferValues,
-  type MerchantProductOffer
-} from "@/lib/merchant-products-schema";
+import { MerchantProductOfferSchema } from "@/lib/merchant-products-schema";
+import type { MerchantOfferValues, MerchantProductOffer } from "@/lib/merchant-products-state";
 
 async function assertOwnedStore(storeId: string): Promise<void> {
   const client = getSupabaseClient();
