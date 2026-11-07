@@ -78,8 +78,8 @@ begin
   end if;
 
   if exists (
-    select 1 from jsonb_object_keys(_options) as option_key
-    where option_key not in ('sizes', 'colors')
+    select 1 from jsonb_object_keys(_options) as option_keys(option_key)
+    where option_keys.option_key not in ('sizes', 'colors')
   ) then
     raise exception 'invalid_merchant_product_options';
   end if;
