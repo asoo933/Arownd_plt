@@ -27,7 +27,8 @@ export const merchantStoreSchema = z.object({
   }
 });
 
-export type MerchantStoreFormValues = z.infer<typeof merchantStoreSchema>;
+export type MerchantStoreFormInput = z.input<typeof merchantStoreSchema>;
+export type MerchantStoreFormValues = z.output<typeof merchantStoreSchema>;
 
 export function createStoreSlug(storeName: string, suffix: string): string {
   const base = storeName
