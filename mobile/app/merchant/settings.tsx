@@ -33,6 +33,7 @@ export default function MerchantStoreSettingsScreen() {
   const [imageBusy, setImageBusy] = useState<"logo" | "cover" | null>(null);
   const [imageError, setImageError] = useState(false);
   const [imageSaved, setImageSaved] = useState(false);
+  const [imageCleanupPending, setImageCleanupPending] = useState(false);
   const mutation = useMutation({
     mutationFn: (values: MerchantStoreSettings) => updateMyMerchantStoreSettings(storeId ?? "", values),
     onSuccess: async () => {
@@ -91,6 +92,7 @@ export default function MerchantStoreSettingsScreen() {
     setImageBusy(kind);
     setImageError(false);
     setImageSaved(false);
+    setImageCleanupPending(false);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -113,7 +115,7 @@ export default function MerchantStoreSettingsScreen() {
       setForm((current) => current ? { ...current, [kind === "logo" ? "logo_url" : "cover_url"]: uploaded.url } : current);
       await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
       setImageSaved(true);
-      if (uploaded.cleanupPending) setImageError(true);
+      setImageCleanupPending(uploaded.cleanupPending);
     } catch {
       setImageError(true);
     } finally {
@@ -156,6 +158,7 @@ export default function MerchantStoreSettingsScreen() {
           </View>
           {imageError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</Text> : null}
           {imageSaved ? <Text style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreImageSaved")}</Text> : null}
+          {imageCleanupPending ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageCleanupPending")}</Text> : null}
           <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
           <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
