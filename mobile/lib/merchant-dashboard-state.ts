@@ -109,10 +109,14 @@ export function getNextMerchantTrackingStatus(
   completedStatuses: readonly string[]
 ): MerchantTrackingStep | null {
   const lastStatus = completedStatuses.at(-1);
+  if (lastStatus && !MERCHANT_TRACKING_SEQUENCE.includes(lastStatus as MerchantTrackingStep)) {
+    return null;
+  }
+
   const nextIndex = lastStatus
     ? MERCHANT_TRACKING_SEQUENCE.findIndex((status) => status === lastStatus) + 1
     : 0;
 
-  if (nextIndex < 0 || nextIndex >= MERCHANT_TRACKING_SEQUENCE.length) return null;
+  if (nextIndex >= MERCHANT_TRACKING_SEQUENCE.length) return null;
   return MERCHANT_TRACKING_SEQUENCE[nextIndex] ?? null;
 }
