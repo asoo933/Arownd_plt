@@ -16,7 +16,9 @@ export const MerchantProductOfferSchema = z.object({
   product: z.object({
     id: z.string().uuid(),
     name: z.string(),
-    brand: z.string().nullable().optional().default(null)
+    description: z.string().nullable().optional().default(null),
+    brand: z.string().nullable().optional().default(null),
+    category: z.string().optional().default("other")
   }).passthrough(),
   images: z.array(z.object({
     id: z.string().uuid(),
