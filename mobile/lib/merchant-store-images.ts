@@ -12,16 +12,19 @@ const MIME_EXTENSIONS: Readonly<Record<string, string>> = {
   "image/heif": "heif"
 };
 
-function getStoreImageExtension(asset: ImagePickerAsset): string | null {
+type StoreImageMetadata = Pick<ImagePickerAsset, "mimeType" | "fileName" | "fileSize">;
+
+function getStoreImageExtension(asset: StoreImageMetadata): string | null {
   const mime = asset.mimeType?.toLowerCase();
   if (mime) return MIME_EXTENSIONS[mime] ?? null;
   const extension = asset.fileName?.split(".").pop()?.toLowerCase();
   if (!extension) return null;
-  return ({ jpeg: "jpg", jpg: "jpg", png: "png", webp: "webp", heic: "heic", heif: "heif" } as const)[extension as "jpg" | "jpeg" | "png" | "webp" | "heic" | "heif"] ?? null;
+  const extensions: Readonly<Record<string, string>> = { jpeg: "jpg", jpg: "jpg", png: "png", webp: "webp", heic: "heic", heif: "heif" };
+  return extensions[extension] ?? null;
 }
 
-export function validateStoreImageAsset(asset: Pick<ImagePickerAsset, "mimeType" | "fileName" | "fileSize">): boolean {
-  const extension = getStoreImageExtension(asset as ImagePickerAsset);
+export function validateStoreImageAsset(asset: StoreImageMetadata): boolean {
+  const extension = getStoreImageExtension(asset);
   return Boolean(extension)
     && (asset.fileSize === null || asset.fileSize === undefined
       || (Number.isFinite(asset.fileSize) && asset.fileSize > 0 && asset.fileSize <= STORE_IMAGE_MAX_BYTES));
