@@ -7,7 +7,6 @@ import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState }
 import { formatDZD } from "@/lib/catalog";
 import { fetchCustomerOrderDetails, getOrderStatusTone, respondToMerchantQuote } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
-import { useQueryClient } from "@tanstack/react-query";
 import { translate } from "@/lib/i18n";
 
 const STEPS = [
