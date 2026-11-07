@@ -89,9 +89,10 @@ async function getOrCreateIdempotencyKey(userId: string, identity: string): Prom
   }
   const existing = entries[identity];
   if (existing) return existing;
-  const next = { ...entries, [identity]: createUuid() };
+  const idempotencyKey = createUuid();
+  const next = { ...entries, [identity]: idempotencyKey };
   await AsyncStorage.setItem(storageKey, JSON.stringify(next));
-  return next[identity];
+  return idempotencyKey;
 }
 
 async function removeIdempotencyKey(userId: string, identity: string): Promise<void> {
