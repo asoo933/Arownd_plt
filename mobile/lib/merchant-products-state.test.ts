@@ -21,7 +21,7 @@ function offer(overrides: Partial<MerchantProductOffer> = {}): MerchantProductOf
     is_available: true,
     is_merchant_hidden: false,
     created_at: "2026-11-07T10:00:00.000Z",
-    product: { id: "product-1", name: "قميص قطني", brand: "Arownd Basics" },
+    product: { id: "product-1", name: "قميص قطني", description: "قميص قطني مريح", brand: "Arownd Basics", category: "clothing" },
     images: [],
     ...overrides
   };
@@ -43,19 +43,19 @@ describe("filterMerchantProducts", () => {
       id: "offer-2",
       product_id: "product-2",
       stock_quantity: 2,
-      product: { id: "product-2", name: "حذاء رياضي", brand: "North" }
+      product: { id: "product-2", name: "حذاء رياضي", description: null, brand: "North", category: "shoes" }
     }),
     offer({
       id: "offer-3",
       product_id: "product-3",
       stock_quantity: 0,
-      product: { id: "product-3", name: "حقيبة", brand: null }
+      product: { id: "product-3", name: "حقيبة", description: null, brand: null, category: "bags" }
     }),
     offer({
       id: "offer-hidden",
       is_merchant_hidden: true,
       stock_quantity: 2,
-      product: { id: "product-hidden", name: "منتج مخفي", brand: null }
+      product: { id: "product-hidden", name: "منتج مخفي", description: null, brand: null, category: "other" }
     })
   ];
 
@@ -126,7 +126,9 @@ describe("MerchantProductOfferSchema", () => {
       product: {
         id: "00000000-0000-4000-8000-000000000003",
         name: "قميص",
-        brand: null
+        description: "وصف تجريبي",
+        brand: null,
+        category: "clothing"
       }
     });
 
@@ -134,6 +136,8 @@ describe("MerchantProductOfferSchema", () => {
     expect(parsed.stock_quantity).toBe(4);
     expect(parsed.options).toEqual({ sizes: [], colors: [] });
     expect(parsed.images).toEqual([]);
+    expect(parsed.product.description).toBe("وصف تجريبي");
+    expect(parsed.product.category).toBe("clothing");
   });
 });
 
