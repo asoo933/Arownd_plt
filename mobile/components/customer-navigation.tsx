@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { router, usePathname } from "expo-router";
 
 import { translate } from "@/lib/i18n";
 import { getCustomerTab, type CustomerTab } from "@/lib/customer-navigation-state";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 const tabs: { id: CustomerTab; label: "navHome" | "navExplore" | "navStores" | "favoriteTitleShort" | "navAccount"; icon: string; path: string }[] = [
   { id: "home", label: "navHome", icon: "⌂", path: "/home" },
@@ -14,13 +15,16 @@ const tabs: { id: CustomerTab; label: "navHome" | "navExplore" | "navStores" | "
 
 export function CustomerNavigation() {
   const pathname = usePathname();
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const activeTab = getCustomerTab(pathname);
 
   if (!activeTab) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: dark ? "#171717" : "#FFFFFF", borderTopColor: dark ? "#303030" : "#E8E8E8" }]} accessibilityRole="tablist">
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border }]}
+      accessibilityRole="tablist"
+    >
       {tabs.map((tab) => {
         const active = activeTab === tab.id;
         return (
@@ -34,8 +38,8 @@ export function CustomerNavigation() {
             }}
             style={styles.item}
           >
-            <Text style={[styles.icon, active && styles.active]}>{tab.icon}</Text>
-            <Text numberOfLines={1} style={[styles.label, active && styles.active]}>{translate(tab.label)}</Text>
+            <Text style={[styles.icon, { color: active ? theme.colors.accentMuted : theme.colors.muted }]}>{tab.icon}</Text>
+            <Text numberOfLines={1} style={[styles.label, { color: active ? theme.colors.accentMuted : theme.colors.muted }]}>{translate(tab.label)}</Text>
           </Pressable>
         );
       })}
@@ -49,8 +53,8 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-around",
-    paddingHorizontal: 8,
-    paddingTop: 6,
+    paddingHorizontal: designTokens.spacing.sm,
+    paddingTop: designTokens.spacing.xs + 2,
     borderTopWidth: StyleSheet.hairlineWidth
   },
   item: {
@@ -60,7 +64,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 3
   },
-  icon: { color: "#858585", fontSize: 21, fontWeight: "700" },
-  label: { color: "#858585", fontSize: 10, fontWeight: "700" },
-  active: { color: "#718B17" }
+  icon: { fontSize: 21, fontWeight: "700" },
+  label: { fontSize: 10, fontWeight: "700" }
 });
