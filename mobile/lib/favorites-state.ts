@@ -37,3 +37,7 @@ export function toggleFavoriteId(favorites: Favorites, kind: FavoriteKind, id: s
 export function hasFavorite(favorites: Favorites, kind: FavoriteKind, id: string): boolean {
   return favorites[kind].includes(id);
 }
+
+export function getFavoritesStorageKey(userId: string | null): string {
+  return userId ? `arownd:favorites:${userId}` : "arownd:favorites:anonymous";
+}
