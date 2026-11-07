@@ -145,3 +145,19 @@ export async function respondToMerchantQuote(merchantOrderId: string, accept: bo
   });
   if (error) throw new Error(error.message ?? "quote_response_failed");
 }
+
+/** Cancel a pending store suborder; authorization and stock restoration are server-side. */
+export async function cancelMyMerchantOrder(merchantOrderId: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc("cancel_my_merchant_order", {
+    _merchant_order_id: merchantOrderId
+  });
+  if (error) throw new Error(error.message ?? "merchant_order_cancel_failed");
+}
+
+/** Cancel a legacy single-store order while it is still pending. */
+export async function cancelMyOrder(orderId: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc("cancel_my_order", {
+    _order_id: orderId
+  });
+  if (error) throw new Error(error.message ?? "order_cancel_failed");
+}
