@@ -43,7 +43,6 @@ export default function MerchantAnalyticsScreen() {
     { label: translate("merchantAnalyticsProducts"), value: String(data.product_count), tone: theme.colors.foreground },
     { label: translate("merchantAnalyticsLowStock"), value: String(data.low_stock_count), tone: theme.colors.warning },
     { label: translate("merchantAnalyticsOutOfStock"), value: String(data.out_of_stock_count), tone: theme.colors.danger },
-    { label: translate("merchantAnalyticsRating"), value: data.store_rating === null ? "—" : data.store_rating.toFixed(1), tone: theme.colors.foreground }
   ];
 
   return (
