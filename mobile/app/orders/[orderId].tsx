@@ -7,6 +7,7 @@ import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState }
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
+import { readCartOptions } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
@@ -157,6 +158,7 @@ export default function OrderDetailsScreen() {
         <View style={styles.itemInfo}>
           <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
           <Text style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</Text>
+          {Object.entries(readCartOptions(item.options)).length > 0 ? <Text style={styles.meta}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</Text> : null}
         </View>
         <Text style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</Text>
       </View>)}
