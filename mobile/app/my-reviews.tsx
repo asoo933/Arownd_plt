@@ -5,13 +5,24 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { fetchMyReviews, getReviewTargetPath, type AppReview } from "@/lib/reviews";
 import { translate } from "@/lib/i18n";
+import { getSupabaseClient } from "@/lib/supabase";
 import { useAppTheme } from "@/lib/theme";
 
 export default function MyReviewsScreen() {
   const theme = useAppTheme();
+  const auth = useQuery({
+    queryKey: ["my-reviews-auth"],
+    queryFn: async () => {
+      const { data, error } = await getSupabaseClient().auth.getUser();
+      if (error) throw error;
+      return data.user;
+    },
+    retry: false
+  });
   const query = useQuery({
     queryKey: ["my-reviews"],
     queryFn: fetchMyReviews,
+    enabled: auth.isSuccess && Boolean(auth.data),
     retry: false
   });
 
@@ -21,9 +32,14 @@ export default function MyReviewsScreen() {
         <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>‹ {translate("back")}</Text>
       </Pressable>
       <CustomerHeading title={translate("myReviewsTitle")} subtitle={translate("myReviewsSubtitle")} />
-      {query.isPending ? <LoadingState label={translate("stateLoading")} /> : null}
-      {query.isError ? (
-        <ErrorState title={translate("myReviewsLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
+      {auth.isPending || (auth.data && query.isPending) ? <LoadingState label={translate("stateLoading")} /> : null}
+      {auth.isError || query.isError ? (
+        <ErrorState title={translate("myReviewsLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void query.refetch(); }} />
+      ) : null}
+      {auth.isSuccess && !auth.data ? (
+        <Pressable accessibilityRole="button" onPress={() => router.push("/login")} style={styles.loginButton}>
+          <Text style={[styles.loginText, { color: theme.colors.accentForeground }]}>{translate("profileLogin")}</Text>
+        </Pressable>
       ) : null}
       {query.isSuccess && query.data.length === 0 ? (
         <EmptyState title={translate("myReviewsEmpty")} hint={translate("myReviewsEmptyHint")} />
@@ -67,6 +83,8 @@ function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void
 
 const styles = StyleSheet.create({
   back: { minHeight: 40, justifyContent: "center", alignSelf: "flex-start" },
+  loginButton: { minHeight: 46, borderRadius: 13, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
+  loginText: { fontSize: 12, fontWeight: "900" },
   backText: { fontSize: 13, fontWeight: "900" },
   row: { borderWidth: 1, borderRadius: 16, padding: 14, gap: 9 },
   rowHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
