@@ -91,3 +91,28 @@ export function groupMerchantOrderRows(rows: MerchantOrderRow[]): MerchantOrderS
     quotedCount: orders.filter((order) => order.status === "quoted").length
   };
 }
+
+export type MerchantTrackingStep =
+  | "preparing"
+  | "ready_for_dispatch"
+  | "out_for_delivery"
+  | "delivered";
+
+const MERCHANT_TRACKING_SEQUENCE: readonly MerchantTrackingStep[] = [
+  "preparing",
+  "ready_for_dispatch",
+  "out_for_delivery",
+  "delivered"
+];
+
+export function getNextMerchantTrackingStatus(
+  completedStatuses: readonly string[]
+): MerchantTrackingStep | null {
+  const lastStatus = completedStatuses.at(-1);
+  const nextIndex = lastStatus
+    ? MERCHANT_TRACKING_SEQUENCE.findIndex((status) => status === lastStatus) + 1
+    : 0;
+
+  if (nextIndex < 0 || nextIndex >= MERCHANT_TRACKING_SEQUENCE.length) return null;
+  return MERCHANT_TRACKING_SEQUENCE[nextIndex] ?? null;
+}
