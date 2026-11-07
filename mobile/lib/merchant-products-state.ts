@@ -22,9 +22,15 @@ export type MerchantProductOffer = {
   }>;
 };
 
+export type MerchantProductOptions = {
+  sizes: string[];
+  colors: string[];
+};
+
 export type MerchantOfferValues = {
   price: number;
   stock_quantity: number;
+  options?: MerchantProductOptions;
 };
 
 export function getMerchantInventoryLevel(stock: number): MerchantInventoryLevel {
@@ -63,6 +69,23 @@ export function getMerchantInventorySummary(offers: MerchantProductOffer[]) {
     },
     { total: 0, low: 0, out: 0 }
   );
+}
+
+export function validateMerchantOfferOptions(
+  sizesInput: string,
+  colorsInput: string
+): MerchantProductOptions | null {
+  const parseList = (value: string): string[] | null => {
+    const entries = value.split(/[،,]/).map((entry) => entry.trim()).filter(Boolean);
+    const unique = [...new Set(entries)];
+    if (unique.length > 20 || unique.some((entry) => entry.length > 40)) return null;
+    return unique;
+  };
+
+  const sizes = parseList(sizesInput);
+  const colors = parseList(colorsInput);
+  if (sizes === null || colors === null) return null;
+  return { sizes, colors };
 }
 
 export function validateMerchantOfferValues(
