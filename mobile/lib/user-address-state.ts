@@ -12,6 +12,10 @@ export const UserAddressSchema = z.object({
 
 export type UserAddressInput = z.infer<typeof UserAddressSchema>;
 
+export function isValidAddressPhone(value: string): boolean {
+  return /^(?:0[567]\d{8}|\+213[567]\d{8}|00213[567]\d{8})$/.test(normalizeAddressPhone(value));
+}
+
 export function normalizeAddressPhone(value: string): string {
   return value.replace(/[\s()-]/g, "");
 }
