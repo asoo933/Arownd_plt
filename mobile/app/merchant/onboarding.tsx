@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -13,7 +13,9 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
+  type StyleProp,
+  type ViewStyle
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,7 +24,6 @@ import {
   createMerchantStore,
   fetchMerchantAccess,
   fetchMerchantCategories,
-  type MerchantCategory
 } from "@/lib/merchant";
 import {
   merchantStoreErrorKey,
@@ -609,8 +610,8 @@ function FormField({
   label: string;
   hint?: string;
   error?: string | null;
-  containerStyle?: object;
-  children: React.ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
+  children: ReactNode;
 }) {
   return (
     <View style={[stylesForScreen.field, containerStyle]}>
