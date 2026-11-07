@@ -301,6 +301,19 @@ export async function removeMerchantProductImage(
     primaryPromotionPending = !!primaryError || !promotedImage;
   }
 
+  const { data: remainingReferences, error: referencesError } = await client
+    .from("product_images")
+    .select("id")
+    .eq("image_url", removed.image_url)
+    .limit(1);
+
+  if (referencesError || (remainingReferences ?? []).length > 0) {
+    return {
+      storageCleanupPending: !!referencesError,
+      primaryPromotionPending
+    };
+  }
+
   const storagePath = getProductImageStoragePath(removed.image_url, userId);
   if (!storagePath) {
     return { storageCleanupPending: true, primaryPromotionPending };
