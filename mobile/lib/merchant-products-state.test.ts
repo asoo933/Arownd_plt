@@ -7,6 +7,7 @@ import {
   getMerchantInventorySummary,
   validateMerchantOfferOptions,
   validateMerchantOfferValues,
+  validateMerchantProductDetails,
   type MerchantProductOffer
 } from "@/lib/merchant-products-state";
 
@@ -181,5 +182,38 @@ describe("validateMerchantOfferOptions", () => {
       ""
     )).toBeNull();
     expect(validateMerchantOfferOptions("x".repeat(41), "")).toBeNull();
+  });
+});
+
+describe("validateMerchantProductDetails", () => {
+  it("trims and normalizes shared product metadata", () => {
+    expect(validateMerchantProductDetails(
+      "  قميص قطني  ",
+      "  وصف المنتج  ",
+      "  Arownd  ",
+      "clothes"
+    )).toEqual({
+      name: "قميص قطني",
+      description: "وصف المنتج",
+      brand: "Arownd",
+      category: "clothes"
+    });
+  });
+
+  it("allows empty optional text fields", () => {
+    expect(validateMerchantProductDetails("منتج", "", "", "clothes")).toEqual({
+      name: "منتج",
+      description: "",
+      brand: "",
+      category: "clothes"
+    });
+  });
+
+  it("rejects missing names/categories and values over database limits", () => {
+    expect(validateMerchantProductDetails("", "", "", "clothes")).toBeNull();
+    expect(validateMerchantProductDetails("منتج", "", "", "")).toBeNull();
+    expect(validateMerchantProductDetails("x".repeat(121), "", "", "clothes")).toBeNull();
+    expect(validateMerchantProductDetails("منتج", "x".repeat(3001), "", "clothes")).toBeNull();
+    expect(validateMerchantProductDetails("منتج", "", "x".repeat(81), "clothes")).toBeNull();
   });
 });
