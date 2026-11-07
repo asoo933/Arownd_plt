@@ -266,7 +266,7 @@ export default function MerchantEntryScreen() {
                 <View style={styles.orderMain}>
                   <View style={styles.orderTopLine}>
                     <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>
-                      {translate("merchantOrderNumber", { id: order.parentOrderId.slice(0, 8) })}
+                      {`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}`}
                     </Text>
                     <OrderStatus order={order} theme={theme} />
                   </View>
@@ -276,7 +276,7 @@ export default function MerchantEntryScreen() {
                   <Text style={[styles.orderItems, { color: theme.colors.muted }]} numberOfLines={2}>
                     {order.productNames.join("، ") || translate("merchantOrderItems")}
                     {" · "}
-                    {translate("merchantOrderQuantity", { count: order.totalQuantity })}
+                    {`${order.totalQuantity} ${translate("merchantOrderQuantity")}`}
                   </Text>
                 </View>
                 <Text style={[styles.orderAmount, { color: theme.colors.accentMuted }]}>
