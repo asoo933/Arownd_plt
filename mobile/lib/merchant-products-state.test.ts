@@ -172,6 +172,13 @@ describe("validateMerchantOfferOptions", () => {
     });
   });
 
+  it("deduplicates option values after trimming and case normalization", () => {
+    expect(validateMerchantOfferOptions(" M, m , L ", "Black, black, White")).toEqual({
+      sizes: ["M", "L"],
+      colors: ["Black", "White"]
+    });
+  });
+
   it("accepts empty option lists", () => {
     expect(validateMerchantOfferOptions("", "")).toEqual({ sizes: [], colors: [] });
   });
