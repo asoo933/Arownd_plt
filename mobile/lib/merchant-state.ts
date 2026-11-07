@@ -12,7 +12,7 @@ export type MerchantAccessInput = {
   hasOwnedStore: boolean;
 };
 
-export function resolveMerchantAccessStatus(input: MerchantAccessInput): MerchantAccessStatus {
+export function resolveMerchantAccessStatus(input: MerchantAccessInput): Exclude<MerchantAccessStatus, "signed_out"> {
   const hasMerchantRole = input.roles.includes("merchant");
   const hasDeliveryRole = input.roles.includes("delivery_company");
 
