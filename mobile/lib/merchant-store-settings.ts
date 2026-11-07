@@ -3,9 +3,22 @@ import { z } from "zod";
 import { getSupabaseClient } from "@/lib/supabase";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 
-const StoreSettingsRecordSchema = MerchantStoreSettingsSchema.extend({
+const StoreSettingsRecordSchema = z.object({
   id: z.string().uuid(),
-  owner_id: z.string().uuid()
+  owner_id: z.string().uuid(),
+  name: z.string(),
+  description: z.string().nullable(),
+  phone: z.string().nullable(),
+  whatsapp: z.string().nullable(),
+  commune: z.string().nullable(),
+  address_line: z.string().nullable(),
+  opening_hours: z.object({
+    open: z.string(),
+    close: z.string(),
+    closed_days: z.array(z.number())
+  }).passthrough(),
+  instagram_url: z.string().nullable(),
+  facebook_url: z.string().nullable()
 });
 
 export async function fetchMyMerchantStoreSettings(storeId: string): Promise<MerchantStoreSettings> {
@@ -21,9 +34,19 @@ export async function fetchMyMerchantStoreSettings(storeId: string): Promise<Mer
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new Error("merchant_store_not_found");
+
   const record = StoreSettingsRecordSchema.parse(data as unknown);
-  const { id: _id, owner_id: _ownerId, ...settings } = record;
-  return settings;
+  return MerchantStoreSettingsSchema.parse({
+    name: record.name,
+    description: record.description ?? "",
+    phone: record.phone ?? "",
+    whatsapp: record.whatsapp ?? "",
+    commune: record.commune ?? "",
+    address_line: record.address_line ?? "",
+    opening_hours: record.opening_hours,
+    instagram_url: record.instagram_url ?? "",
+    facebook_url: record.facebook_url ?? ""
+  });
 }
 
 export async function updateMyMerchantStoreSettings(
