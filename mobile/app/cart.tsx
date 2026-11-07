@@ -66,6 +66,7 @@ export default function CartScreen() {
         const image = offer ? getPrimaryImage(offer) : null;
         const currentPrice = offer?.price ?? item.price ?? 0;
         const blocking = line?.issues.some((issue) => issue !== "priceChanged") ?? false;
+        const totalRequestedForOffer = cart.data.filter((entry) => entry.offerId === item.offerId).reduce((sum, entry) => sum + entry.quantity, 0);
         return <View key={key} style={styles.line}>
           <Pressable accessibilityRole="button" onPress={() => item.productId ? router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }) : undefined} style={styles.lineMain}>
             <View style={styles.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageMark}>▧</Text>}</View>
@@ -79,7 +80,7 @@ export default function CartScreen() {
           <View style={styles.controls}>
             <Pressable accessibilityRole="button" accessibilityLabel={translate("cartDecrease")} disabled={item.quantity <= 1 || mutation.isPending} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity - 1 })} style={styles.stepper}><Text style={styles.stepperText}>−</Text></Pressable>
             <Text style={styles.quantity}>{item.quantity}</Text>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartIncrease")} disabled={item.quantity >= 10 || mutation.isPending || (offer ? item.quantity >= offer.stock_quantity : false)} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity + 1 })} style={styles.stepper}><Text style={styles.stepperText}>+</Text></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartIncrease")} disabled={item.quantity >= 10 || mutation.isPending || (offer ? totalRequestedForOffer >= offer.stock_quantity : false)} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity + 1 })} style={styles.stepper}><Text style={styles.stepperText}>+</Text></Pressable>
             <Pressable accessibilityRole="button" accessibilityLabel={translate("cartRemove")} disabled={mutation.isPending} onPress={() => mutation.mutate({ type: "remove", key })} style={styles.remove}><Text style={styles.removeText}>×</Text></Pressable>
           </View>
           {blocking ? <Text style={styles.blockedHint}>{translate("cartLineBlocked")}</Text> : null}
