@@ -22,6 +22,7 @@ import {
   addMerchantProductImage,
   fetchMerchantProductOffer,
   removeMerchantProductImage,
+  updateMerchantProductDetails,
   updateMerchantProductOffer
 } from "@/lib/merchant-products";
 import {
@@ -31,9 +32,11 @@ import {
 } from "@/lib/merchant-product-images";
 import {
   validateMerchantOfferOptions,
-  validateMerchantOfferValues
+  validateMerchantOfferValues,
+  validateMerchantProductDetails
 } from "@/lib/merchant-products-state";
 import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
+import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
@@ -44,6 +47,12 @@ export default function MerchantEditProductScreen() {
   const params = useLocalSearchParams<{ offerId: string | string[] }>();
   const offerId = Array.isArray(params.offerId) ? params.offerId[0] : params.offerId;
 
+  const [productName, setProductName] = useState("");
+  const [productDescription, setProductDescription] = useState("");
+  const [productBrand, setProductBrand] = useState("");
+  const [productCategory, setProductCategory] = useState("");
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
+  const [detailsSaving, setDetailsSaving] = useState(false);
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [sizes, setSizes] = useState("");
@@ -84,17 +93,32 @@ export default function MerchantEditProductScreen() {
     staleTime: 5 * 60 * 1000,
     retry: false
   });
-  const selectedCategory = categoriesQuery.data?.find(
-    (category) => category.id === offer?.product.category
+  const selectableCategories = getSelectableMerchantCategories(
+    groupMerchantCategories(categoriesQuery.data ?? [])
+  );
+  const selectedCategory = selectableCategories.find(
+    (category) => category.id === productCategory
   );
 
   useEffect(() => {
     if (!offer) return;
+    setProductName(offer.product.name);
+    setProductDescription(offer.product.description ?? "");
+    setProductBrand(offer.product.brand ?? "");
+    setProductCategory(offer.product.category);
     setPrice(String(offer.price));
     setStock(String(offer.stock_quantity));
     setSizes(offer.options.sizes.join(", "));
     setColors(offer.options.colors.join(", "));
-  }, [offer?.id, offer?.price, offer?.stock_quantity]);
+  }, [
+    offer?.id,
+    offer?.product.name,
+    offer?.product.description,
+    offer?.product.brand,
+    offer?.product.category,
+    offer?.price,
+    offer?.stock_quantity
+  ]);
 
   const refreshProductData = async (): Promise<void> => {
     if (!storeId || !offerId) return;
@@ -106,7 +130,7 @@ export default function MerchantEditProductScreen() {
   };
 
   const saveOffer = async (): Promise<void> => {
-    if (!storeId || !offerId || saving || imageBusy || removingImageId) return;
+    if (!storeId || !offerId || saving || detailsSaving || imageBusy || removingImageId) return;
 
     const values = validateMerchantOfferValues(price, stock);
     if (!values) {
@@ -139,8 +163,44 @@ export default function MerchantEditProductScreen() {
     }
   };
 
+  const saveProductDetails = async (): Promise<void> => {
+    if (!storeId || !offerId || saving || detailsSaving || imageBusy || removingImageId) return;
+
+    const values = validateMerchantProductDetails(
+      productName,
+      productDescription,
+      productBrand,
+      productCategory
+    );
+    if (!values) {
+      setNotice(null);
+      setWarning(null);
+      setActionError(translate("merchantProductDetailsValidation"));
+      return;
+    }
+
+    setDetailsSaving(true);
+    setNotice(null);
+    setWarning(null);
+    setActionError(null);
+    try {
+      await updateMerchantProductDetails(offerId, storeId, values);
+      await refreshProductData();
+      setNotice(translate("merchantProductDetailsSaved"));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "";
+      setActionError(
+        message.includes("merchant_product_shared")
+          ? translate("merchantProductDetailsSharedError")
+          : translate("merchantProductDetailsSaveError")
+      );
+    } finally {
+      setDetailsSaving(false);
+    }
+  };
+
   const chooseAndUploadImage = async (): Promise<void> => {
-    if (!storeId || !offerId || !offer || saving || imageBusy || removingImageId) return;
+    if (!storeId || !offerId || !offer || saving || detailsSaving || imageBusy || removingImageId) return;
     if (offer.images.length >= PRODUCT_IMAGE_MAX_COUNT) {
       setActionError(translate("merchantProductImagesLimit"));
       return;
@@ -201,7 +261,7 @@ export default function MerchantEditProductScreen() {
   };
 
   const confirmRemoveImage = async (): Promise<void> => {
-    if (!storeId || !offerId || !pendingRemoval || removingImageId || imageBusy || saving) return;
+    if (!storeId || !offerId || !pendingRemoval || removingImageId || imageBusy || saving || detailsSaving) return;
 
     const imageId = pendingRemoval.id;
     setPendingRemoval(null);
@@ -264,7 +324,7 @@ export default function MerchantEditProductScreen() {
     );
   }
 
-  const isBusy = saving || imageBusy || removingImageId !== null;
+  const isBusy = saving || detailsSaving || imageBusy || removingImageId !== null;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
@@ -307,27 +367,86 @@ export default function MerchantEditProductScreen() {
               <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductSharedDetailsTitle")}
               </Text>
-              <View style={styles.sharedDetailRow}>
-                <Text style={[styles.label, { color: theme.colors.muted }]}>
-                  {translate("merchantProductCategoryLabel")}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductNameLabel")}
                 </Text>
-                <Text style={[styles.sharedDetailValue, { color: theme.colors.foreground }]}>
-                  {selectedCategory
-                    ? `${selectedCategory.emoji} ${selectedCategory.label}`
-                    : translate("merchantProductCategoryUnknown")}
-                </Text>
+                <TextInput
+                  value={productName}
+                  onChangeText={setProductName}
+                  editable={!isBusy}
+                  maxLength={120}
+                  accessibilityLabel={translate("merchantProductNameLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
               </View>
-              <View style={styles.sharedDetailRow}>
-                <Text style={[styles.label, { color: theme.colors.muted }]}>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductBrandLabel")}
+                </Text>
+                <TextInput
+                  value={productBrand}
+                  onChangeText={setProductBrand}
+                  editable={!isBusy}
+                  maxLength={80}
+                  accessibilityLabel={translate("merchantProductBrandLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductDescriptionLabel")}
                 </Text>
-                <Text style={[styles.sharedDetailDescription, { color: theme.colors.foreground }]}>
-                  {offer.product.description?.trim() || translate("merchantProductDescriptionEmpty")}
+                <TextInput
+                  value={productDescription}
+                  onChangeText={setProductDescription}
+                  editable={!isBusy}
+                  maxLength={3000}
+                  multiline
+                  textAlignVertical="top"
+                  accessibilityLabel={translate("merchantProductDescriptionLabel")}
+                  style={[styles.input, styles.descriptionInput, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductCategoryLabel")}
                 </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
+                  onPress={() => setCategoryPickerOpen(true)}
+                  style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: theme.colors.border, opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
+                >
+                  <Text style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
+                    {selectedCategory
+                      ? `${selectedCategory.emoji} ${selectedCategory.label}`
+                      : translate("merchantProductCategoryUnknown")}
+                  </Text>
+                </Pressable>
+                {categoriesQuery.isError ? (
+                  <Text style={[styles.hint, { color: theme.colors.danger }]}>
+                    {translate("merchantProductCategoriesLoadError")}
+                  </Text>
+                ) : null}
               </View>
               <Text style={[styles.noteText, { color: theme.colors.muted }]}>
                 {translate("merchantProductEditSharedFieldsHint")}
               </Text>
+              <Pressable
+                accessibilityRole="button"
+                disabled={isBusy}
+                onPress={() => void saveProductDetails()}
+                style={[styles.primaryButton, { backgroundColor: theme.colors.accent, opacity: isBusy ? 0.55 : 1 }]}
+              >
+                {detailsSaving ? (
+                  <ActivityIndicator color={theme.colors.accentForeground} />
+                ) : (
+                  <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
+                    {translate("merchantProductDetailsSave")}
+                  </Text>
+                )}
+              </Pressable>
             </View>
 
             <View style={styles.field}>
@@ -507,6 +626,59 @@ export default function MerchantEditProductScreen() {
       </KeyboardAvoidingView>
 
       <Modal
+        visible={categoryPickerOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCategoryPickerOpen(false)}
+      >
+        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
+          <View style={[styles.confirmCard, styles.categoryModalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
+              {translate("merchantProductCategoryPickerTitle")}
+            </Text>
+            <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
+              {selectableCategories.map((category) => (
+                <Pressable
+                  key={category.id}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: productCategory === category.id }}
+                  onPress={() => {
+                    setProductCategory(category.id);
+                    setCategoryPickerOpen(false);
+                  }}
+                  style={[
+                    styles.categoryOption,
+                    {
+                      backgroundColor: productCategory === category.id ? theme.colors.surfaceMuted : theme.colors.background,
+                      borderColor: productCategory === category.id ? theme.colors.accent : theme.colors.border
+                    }
+                  ]}
+                >
+                  <Text style={[styles.categoryOptionText, { color: theme.colors.foreground }]}>
+                    {category.emoji} {category.label}
+                  </Text>
+                </Pressable>
+              ))}
+              {selectableCategories.length === 0 ? (
+                <Text style={[styles.confirmHint, { color: theme.colors.muted }]}>
+                  {translate("merchantProductCategoriesLoadError")}
+                </Text>
+              ) : null}
+            </ScrollView>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setCategoryPickerOpen(false)}
+              style={[styles.cancelButton, { borderColor: theme.colors.border }]}
+            >
+              <Text style={[styles.cancelText, { color: theme.colors.foreground }]}>
+                {translate("merchantProductCategoryClose")}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
         visible={pendingRemoval !== null}
         transparent
         animationType="fade"
@@ -598,9 +770,9 @@ function createStyles(theme: AppTheme) {
     productName: { width: "100%", fontSize: 16, lineHeight: 23, fontWeight: "900", textAlign: "right" },
     productBrand: { width: "100%", fontSize: 11, textAlign: "right" },
     sharedDetails: { borderRadius: 12, padding: 12, gap: 10 },
-    sharedDetailRow: { gap: 5 },
-    sharedDetailValue: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-    sharedDetailDescription: { fontSize: 12, lineHeight: 19, textAlign: "right" },
+    descriptionInput: { minHeight: 104, paddingTop: 12 },
+    categoryPicker: { minHeight: 48, borderWidth: 1, borderRadius: 12, justifyContent: "center", paddingHorizontal: 12 },
+    categoryPickerText: { fontSize: 13, fontWeight: "800", textAlign: "right" },
     field: { gap: 6 },
     optionsSection: { gap: 10, paddingTop: 2 },
     label: { fontSize: 11, fontWeight: "900", textAlign: "right" },
@@ -629,6 +801,10 @@ function createStyles(theme: AppTheme) {
     feedbackText: { fontSize: 11, lineHeight: 17, textAlign: "right", fontWeight: "800" },
     modalOverlay: { flex: 1, justifyContent: "center", padding: 18 },
     confirmCard: { borderWidth: 1, borderRadius: 18, padding: 16, gap: 12 },
+    categoryModalCard: { maxHeight: "80%" },
+    categoryList: { maxHeight: 420 },
+    categoryOption: { minHeight: 46, borderWidth: 1, borderRadius: 11, justifyContent: "center", paddingHorizontal: 12, marginBottom: 8 },
+    categoryOptionText: { fontSize: 12, fontWeight: "800", textAlign: "right" },
     confirmTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
     confirmHint: { fontSize: 11, lineHeight: 18, textAlign: "right" },
     confirmActions: { flexDirection: "row-reverse", gap: 8 },
