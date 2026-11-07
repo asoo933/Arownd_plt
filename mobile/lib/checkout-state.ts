@@ -1,4 +1,4 @@
-import type { CartItem } from "@/lib/cart-state";
+import { normalizeCartOptions, type CartItem } from "@/lib/cart-state";
 
 export type CheckoutIdentityInput = {
   items: CartItem[];
@@ -15,7 +15,7 @@ export function checkoutRequestIdentity(input: CheckoutIdentityInput): string {
     .map((item) => ({
       offerId: item.offerId,
       quantity: item.quantity,
-      options: Object.entries(item.options).sort(([a], [b]) => a.localeCompare(b))
+      options: Object.entries(normalizeCartOptions(item.options)).sort(([a], [b]) => a.localeCompare(b))
     }))
     .sort((a, b) => a.offerId.localeCompare(b.offerId) || JSON.stringify(a.options).localeCompare(JSON.stringify(b.options)));
   return JSON.stringify({
