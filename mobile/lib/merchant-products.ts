@@ -164,7 +164,7 @@ export async function updateMerchantProductOffer(
     }).optional()
   }).parse(values);
 
-  await updateOwnedOffer(offerId, storeId, parsed);
+  await updateOwnedOffer(offerId, storeId, { price: parsed.price, stock_quantity: parsed.stock_quantity, ...(parsed.options ? { options: parsed.options } : {}) });
 }
 
 export async function updateMerchantProductDetails(
