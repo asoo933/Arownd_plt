@@ -136,7 +136,7 @@ export async function searchCatalogProducts(query: string, category?: string): P
   const normalized = query.trim().replace(/[%,()]/g, " ");
   let request = getSupabaseClient()
     .from("store_offers")
-    .select("id, price, stock_quantity, is_available, product:products!inner(id, name, category, brand), store:stores!inner(id, name), images:product_images(image_url, is_primary)")
+    .select("id, price, old_price, stock_quantity, is_available, product:products!inner(id, name, category, brand), store:stores!inner(id, name), images:product_images(image_url, is_primary)")
     .eq("is_available", true)
     .gt("stock_quantity", 0);
 
@@ -187,7 +187,7 @@ export async function fetchStoreDetails(storeId: string): Promise<StoreDetails |
 export async function fetchStoreOffers(storeId: string): Promise<HomeProduct[]> {
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, price, stock_quantity, is_available, product:products!inner(id, name, category, brand), store:stores!inner(id, name), images:product_images(image_url, is_primary)")
+    .select("id, price, old_price, stock_quantity, is_available, product:products!inner(id, name, category, brand), store:stores!inner(id, name), images:product_images(image_url, is_primary)")
     .eq("store_id", storeId)
     .eq("is_available", true)
     .gt("stock_quantity", 0)
