@@ -1,18 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } from "@/components/customer-ui";
 import { FavoriteButton } from "@/components/favorite-button";
 import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 type StoreTab = "products" | "about";
 
 export default function StoreDetailsScreen() {
   const { storeId } = useLocalSearchParams<{ storeId: string }>();
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const [tab, setTab] = useState<StoreTab>("products");
   const store = useQuery({
     queryKey: ["customer-store", storeId],
@@ -45,7 +46,7 @@ export default function StoreDetailsScreen() {
           {details.logo_url ? <Image source={{ uri: details.logo_url }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.logoFallback}>⌂</Text>}
         </View>
         <View style={styles.storeTitleWrap}>
-          <Text style={[styles.storeName, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{details.name}</Text>
+          <Text style={[styles.storeName, { color: theme.colors.foreground }]}>{details.name}</Text>
           <FavoriteButton kind="stores" id={storeId} />
           <Text style={styles.metaText}>{details.commune || details.address_line || " "}</Text>
           <Text style={styles.verified}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</Text>
@@ -75,8 +76,8 @@ export default function StoreDetailsScreen() {
           </View>
         )
       ) : (
-        <View style={[styles.aboutCard, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-          <Text style={[styles.aboutTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("storeAboutTitle")}</Text>
+        <View style={[styles.aboutCard, { backgroundColor: theme.colors.surface }]}>
+          <Text style={[styles.aboutTitle, { color: theme.colors.foreground }]}>{translate("storeAboutTitle")}</Text>
           <Text style={styles.description}>{details.description || translate("storeNoDescription")}</Text>
           <Text style={styles.fieldTitle}>{translate("storeAddress")}</Text>
           <Text style={styles.description}>{[details.address_line, details.commune].filter(Boolean).join("، ") || translate("storeNoAddress")}</Text>
