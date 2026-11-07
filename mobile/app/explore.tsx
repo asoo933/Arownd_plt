@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 export default function ExploreScreen() {
+  const theme = useAppTheme();
   const params = useLocalSearchParams<{ q?: string; category?: string }>();
   const initialQuery = typeof params.q === "string" ? params.q : "";
   const category = typeof params.category === "string" ? params.category : undefined;
@@ -31,7 +33,7 @@ export default function ExploreScreen() {
 
   return (
     <CustomerScreen>
-      <Text onPress={() => router.back()} style={styles.back}>{translate("back")}</Text>
+      <Pressable accessibilityRole="button" accessibilityLabel={translate("back")} onPress={() => router.back()} style={styles.back}><Text style={{ color: theme.colors.accentMuted, fontWeight: "800", fontSize: 13 }}>{translate("back")}</Text></Pressable>
       <CustomerHeading title={translate("exploreTitle")} subtitle={translate("exploreSubtitle")} />
       <CustomerSearch value={query} onChangeText={setQuery} placeholder={translate("homeSearchPlaceholder")} />
       {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
@@ -45,13 +47,13 @@ export default function ExploreScreen() {
           ))}
         </View>
       )}
-      <Text style={styles.footer}>{translate("exploreFooter")}</Text>
+      <Text style={[styles.footer, { color: theme.colors.muted }]}>{translate("exploreFooter")}</Text>
     </CustomerScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  back: { color: "#647D13", fontWeight: "800", fontSize: 13, minHeight: 38, textAlignVertical: "center" },
+  back: { minHeight: 44, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 4 },
   grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
-  footer: { color: "#737373", fontSize: 11, textAlign: "center", padding: 14 }
+  footer: { fontSize: 11, textAlign: "center", padding: 14 }
 });
