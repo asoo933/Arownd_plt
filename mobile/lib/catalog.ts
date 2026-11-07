@@ -26,7 +26,7 @@ const FeaturedStoreSchema = z.object({
   description: z.string().nullable().optional(),
   logo_url: z.string().nullable().optional(),
   commune: z.string().nullable().optional(),
-  rating: z.union([z.number(), z.string().transform(Number)]).nullable().optional(),
+  rating: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional(),
   is_verified: z.boolean()
 });
 
