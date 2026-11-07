@@ -9,7 +9,7 @@ import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrd
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
 
 const STEPS = [
   { status: "pending", title: "orderStepPending" as const, hint: "orderStepPendingHint" as const },
@@ -48,6 +48,7 @@ function dateLabel(value: string | null | undefined): string {
 
 export default function OrderDetailsScreen() {
   const theme = useAppTheme();
+  const styles = createStyles(theme);
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const queryClient = useQueryClient();
   const [declineTarget, setDeclineTarget] = useState<string | null>(null);
@@ -199,7 +200,7 @@ export default function OrderDetailsScreen() {
               onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
               style={styles.acceptButton}
             >
-              {quoteMutation.isPending ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</Text>}
+              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</Text>}
             </Pressable>
             <Pressable
               disabled={quoteMutation.isPending}
@@ -261,7 +262,7 @@ export default function OrderDetailsScreen() {
               onPress={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
               style={styles.declineButton}
             >
-              {cancelMutation.isPending ? <ActivityIndicator color="#B42318" /> : <Text style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</Text>}
+              {cancelMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <Text style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</Text>}
             </Pressable>
             <Pressable disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
               <Text style={styles.acceptButtonText}>{translate("back")}</Text>
@@ -300,49 +301,50 @@ export default function OrderDetailsScreen() {
   </CustomerScreen>;
 }
 
-const styles = StyleSheet.create({
+function createStyles(theme: AppTheme) { return StyleSheet.create({
   back: { alignSelf: "flex-start", minHeight: 38, justifyContent: "center" },
-  backText: { color: "#647D13", fontSize: 13, fontWeight: "900" },
+  backText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   panel: { borderRadius: 18, padding: 14, gap: 12 },
-  sectionTitle: { color: "#647D13", fontSize: 14, fontWeight: "900", textAlign: "right" },
-  totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 9 },
-  label: { color: "#737373", fontSize: 12, fontWeight: "700" },
-  total: { color: "#647D13", fontSize: 18, fontWeight: "900" },
-  meta: { color: "#737373", fontSize: 11, lineHeight: 18, textAlign: "right" },
+  sectionTitle: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900", textAlign: "right" },
+  totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9 },
+  label: { color: theme.colors.muted, fontSize: 12, fontWeight: "700" },
+  total: { color: theme.colors.accentMuted, fontSize: 18, fontWeight: "900" },
+  meta: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
   step: { flexDirection: "row-reverse", gap: 11, alignItems: "flex-start" },
-  stepDot: { width: 29, height: 29, borderRadius: 15, borderWidth: 1, borderColor: "#D4D4D4", alignItems: "center", justifyContent: "center" },
-  stepDone: { backgroundColor: "#C6F135", borderColor: "#C6F135" },
-  stepNumber: { color: "#737373", fontSize: 11, fontWeight: "900" },
-  stepNumberDone: { color: "#0A0A0A" },
+  stepDot: { width: 29, height: 29, borderRadius: 15, borderWidth: 1, borderColor: theme.colors.border, alignItems: "center", justifyContent: "center" },
+  stepDone: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
+  stepNumber: { color: theme.colors.muted, fontSize: 11, fontWeight: "900" },
+  stepNumberDone: { color: theme.colors.foreground },
   stepContent: { flex: 1, gap: 3, alignItems: "flex-end" },
   stepTitle: { fontSize: 12, fontWeight: "900", textAlign: "right" },
-  cancelled: { color: "#B42318", fontSize: 13, fontWeight: "900", textAlign: "right" },
-  itemRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: "#E5E5E5" },
+  cancelled: { color: theme.colors.danger, fontSize: 13, fontWeight: "900", textAlign: "right" },
+  itemRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   itemInfo: { flex: 1, alignItems: "flex-end", gap: 3 },
   itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  itemPrice: { color: "#647D13", fontSize: 12, fontWeight: "900" },
+  itemPrice: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900" },
   merchantHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: 8 },
   status: { borderRadius: 9, paddingHorizontal: 9, paddingVertical: 6 },
-  statusSuccess: { backgroundColor: "#E8F5D0" },
-  statusDanger: { backgroundColor: "#FDE8E7" },
-  statusPending: { backgroundColor: "#FFF3D6" },
-  statusMuted: { backgroundColor: "#E5E5E5" },
-  statusText: { color: "#333333", fontSize: 10, fontWeight: "800" },
-  notice: { color: "#8A6412", fontSize: 11, textAlign: "right", lineHeight: 18 },
+  statusSuccess: { backgroundColor: theme.colors.successSurface },
+  statusDanger: { backgroundColor: theme.colors.dangerSurface },
+  statusPending: { backgroundColor: theme.colors.warningSurface },
+  statusMuted: { backgroundColor: theme.colors.border },
+  statusText: { color: theme.colors.foreground, fontSize: 10, fontWeight: "800" },
+  notice: { color: theme.colors.warning, fontSize: 11, textAlign: "right", lineHeight: 18 },
   recipient: { fontSize: 13, fontWeight: "900", textAlign: "right" },
-  shipment: { borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 9, gap: 5 },
-  trackingEvent: { borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 9, gap: 4 },
-  shipmentStatus: { color: "#647D13", fontSize: 12, fontWeight: "900", textAlign: "right" },
-  secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: "#D4D4D4", justifyContent: "center", alignItems: "center" },
-  secondaryText: { color: "#647D13", fontSize: 13, fontWeight: "900" },
+  shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 5 },
+  trackingEvent: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 4 },
+  shipmentStatus: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900", textAlign: "right" },
+  secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: theme.colors.border, justifyContent: "center", alignItems: "center" },
+  secondaryText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   quoteActions: { flexDirection: "row-reverse", gap: 8 },
-  acceptButton: { flex: 1, minHeight: 45, borderRadius: 12, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  acceptButtonText: { color: "#0A0A0A", fontSize: 12, fontWeight: "900" },
-  declineButton: { flex: 1, minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: "#B42318", alignItems: "center", justifyContent: "center" },
-  declineButtonText: { color: "#B42318", fontSize: 12, fontWeight: "900" },
-  cancelButton: { minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: "#B42318", justifyContent: "center", alignItems: "center" },
-  cancelButtonText: { color: "#B42318", fontSize: 12, fontWeight: "900" },
-  errorText: { color: "#B42318", fontSize: 11, textAlign: "right" },
+  acceptButton: { flex: 1, minHeight: 45, borderRadius: 12, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  acceptButtonText: { color: theme.colors.foreground, fontSize: 12, fontWeight: "900" },
+  declineButton: { flex: 1, minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
+  declineButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
+  cancelButton: { minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
+  cancelButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
+  errorText: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
   modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 20 },
   modalPanel: { borderRadius: 18, padding: 18, gap: 13 }
-});
+}); }
+
