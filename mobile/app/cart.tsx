@@ -39,10 +39,12 @@ export default function CartScreen() {
   const offerById = new Map((offers.data ?? []).map((offer) => [offer.id, offer]));
   const groups = new Map<string, { storeName: string; items: CartItem[] }>();
   for (const item of cart.data) {
-    const storeName = offerById.get(item.offerId)?.store.name ?? translate("cartUnknownStore");
-    const group = groups.get(item.offerId);
+    const currentOffer = offerById.get(item.offerId);
+    const storeName = currentOffer?.store.name ?? translate("cartUnknownStore");
+    const storeKey = currentOffer?.store.id ?? "missing:" + item.offerId;
+    const group = groups.get(storeKey);
     if (group) group.items.push(item);
-    else groups.set(item.offerId, { storeName, items: [item] });
+    else groups.set(storeKey, { storeName, items: [item] });
   }
   const issueLabels = {
     missing: translate("cartIssueMissing"),
@@ -74,7 +76,8 @@ export default function CartScreen() {
               <Text style={[styles.name, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{offer?.product.name ?? item.name}</Text>
               <Text style={styles.options}>{Object.entries(item.options).map(([optionName, value]) => optionName + ": " + value).join(" · ")}</Text>
               {line?.issues.map((issue) => <Text key={issue} style={[styles.issue, issue === "priceChanged" && styles.priceIssue]}>{issueLabels[issue]}</Text>)}
-              <Text style={styles.price}>{formatDZD(currentPrice)}</Text>
+              <Text style={styles.price}>{formatDZD(currentPrice * item.quantity)}</Text>
+              {item.quantity > 1 ? <Text style={styles.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
             </View>
           </Pressable>
           <View style={styles.controls}>
@@ -88,7 +91,7 @@ export default function CartScreen() {
       })}
     </View>)}
     <View style={[styles.summary, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-      <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={styles.total}>{formatDZD(evaluation.subtotal)}</Text></View>
+      <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={styles.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
       <Text style={styles.note}>{translate("cartDeliveryNote")}</Text>
       <Pressable disabled style={[styles.primary, styles.disabled]}>
         <Text style={styles.primaryText}>{translate("cartCheckout")}</Text>
