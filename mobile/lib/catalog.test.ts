@@ -4,6 +4,7 @@ import {
   chooseBestProductOffer,
   formatDZD,
   getPrimaryImage,
+  getOfferDiscountPercent,
   getOfferVariantOptions,
   getCategoryFilterIds,
   type HomeProduct,
@@ -48,6 +49,13 @@ describe("catalog presentation helpers", () => {
 
   it("returns null when no product image exists", () => {
     expect(getPrimaryImage({ ...product, images: [] })).toBeNull();
+  });
+
+  it("only calculates a promotion when the saved regular price is higher", () => {
+    expect(getOfferDiscountPercent(1000, 800)).toBe(20);
+    expect(getOfferDiscountPercent(null, 800)).toBeNull();
+    expect(getOfferDiscountPercent(800, 800)).toBeNull();
+    expect(getOfferDiscountPercent(700, 800)).toBeNull();
   });
 
   it("formats prices with the Algerian dinar currency", () => {
