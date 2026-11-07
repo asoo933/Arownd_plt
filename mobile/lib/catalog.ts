@@ -26,7 +26,7 @@ const FeaturedStoreSchema = z.object({
   description: z.string().nullable().optional(),
   logo_url: z.string().nullable().optional(),
   commune: z.string().nullable().optional(),
-  rating: z.coerce.number().nullable().optional(),
+  rating: z.union([z.number(), z.string().transform(Number)]).nullable().optional(),
   is_verified: z.boolean()
 });
 
@@ -58,7 +58,7 @@ export async function fetchFeaturedStores(): Promise<FeaturedStore[]> {
   return FeaturedStoreSchema.array().parse(data as unknown);
 }
 
-export async function searchCatalogProducts(query: string): Promise<HomeProduct[]> {
+export async function searchCatalogProducts(query: string, category?: string): Promise<HomeProduct[]> {
   const normalized = query.trim().replace(/[%,()]/g, " ");
   let request = getSupabaseClient()
     .from("store_offers")
