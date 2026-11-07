@@ -12,7 +12,11 @@ import {
   validateProductImageMetadata
 } from "@/lib/merchant-product-images";
 import { MerchantProductOfferSchema } from "@/lib/merchant-products-schema";
-import type { MerchantOfferValues, MerchantProductOffer } from "@/lib/merchant-products-state";
+import type {
+  MerchantOfferValues,
+  MerchantProductDetailsValues,
+  MerchantProductOffer
+} from "@/lib/merchant-products-state";
 
 const MerchantProductImageSchema = z.object({
   id: z.string().uuid(),
@@ -161,6 +165,32 @@ export async function updateMerchantProductOffer(
   }).parse(values);
 
   await updateOwnedOffer(offerId, storeId, parsed);
+}
+
+export async function updateMerchantProductDetails(
+  offerId: string,
+  storeId: string,
+  values: MerchantProductDetailsValues
+): Promise<string> {
+  const parsed = z.object({
+    name: z.string().trim().min(1).max(120),
+    description: z.string().trim().max(3000),
+    brand: z.string().trim().max(80),
+    category: z.string().trim().min(1)
+  }).parse(values);
+
+  await assertOwnedStore(storeId);
+  const { data, error } = await getSupabaseClient().rpc("update_merchant_product_details", {
+    _offer_id: offerId,
+    _store_id: storeId,
+    _name: parsed.name,
+    _description: parsed.description,
+    _brand: parsed.brand,
+    _category: parsed.category
+  });
+
+  if (error) throw error;
+  return z.string().uuid().parse(data as unknown);
 }
 
 export async function setMerchantProductVisibility(
