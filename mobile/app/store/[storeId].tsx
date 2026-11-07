@@ -7,6 +7,7 @@ import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } fro
 import { FavoriteButton } from "@/components/favorite-button";
 import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
+import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
 
 type StoreTab = "products" | "about";
@@ -85,6 +86,7 @@ export default function StoreDetailsScreen() {
           {details.whatsapp ? <><Text style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeWhatsApp")}</Text><Text style={[styles.description, { color: theme.colors.muted }]}>{details.whatsapp}</Text></> : null}
         </View>
       )}
+      <ReviewPanel targetType="store" targetId={storeId} />
     </CustomerScreen>
   );
 }
