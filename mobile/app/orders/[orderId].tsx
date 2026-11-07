@@ -68,7 +68,8 @@ export default function OrderDetailsScreen() {
   const query = useQuery({
     queryKey: ["customer-order-details", orderId],
     queryFn: () => fetchCustomerOrderDetails(orderId),
-    enabled: Boolean(orderId) && auth.isSuccess && auth.data !== null
+    enabled: Boolean(orderId) && auth.isSuccess && auth.data !== null,
+    refetchInterval: 45_000
   });
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function OrderDetailsScreen() {
     const client = getSupabaseClient();
     const channel = client.channel("native-customer-order-" + orderId)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: "id=eq." + orderId }, () => { void query.refetch(); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "merchant_orders" }, () => { void query.refetch(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "merchant_orders", filter: "order_id=eq." + orderId }, () => { void query.refetch(); })
       .on("postgres_changes", { event: "*", schema: "public", table: "shipments", filter: "order_id=eq." + orderId }, () => { void query.refetch(); })
       .subscribe();
     return () => { void client.removeChannel(channel); };
