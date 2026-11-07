@@ -1,17 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, router } from "expo-router";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 
-import { ActionButton, AuthField, AuthLayout, FormError, InlineLink, SuccessPanel } from "@/components/auth-ui";
+import { ActionButton, AuthField, AuthLayout, FormError, InlineLink } from "@/components/auth-ui";
 import { signIn } from "@/lib/auth-service";
 import { loginSchema, type LoginInput } from "@/lib/auth-validation";
 import { translate } from "@/lib/i18n";
 
 export default function LoginScreen() {
   const [serverError, setServerError] = useState<string | null>(null);
-  const [signedIn, setSignedIn] = useState(false);
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" }
@@ -21,7 +19,7 @@ export default function LoginScreen() {
     setServerError(null);
     try {
       await signIn(values);
-      setSignedIn(true);
+      router.replace("/home");
     } catch (error) {
       setServerError(error instanceof Error && error.message === "SUPABASE_CONFIG_MISSING"
         ? translate("configError")
@@ -31,10 +29,7 @@ export default function LoginScreen() {
 
   return (
     <AuthLayout title={translate("loginTitle")} subtitle={translate("loginSubtitle")}>
-      {signedIn ? (
-        <SuccessPanel title={translate("signedInTitle")} message={translate("signedInMessage")} />
-      ) : (
-        <View style={styles.form}>
+      <View style={styles.form}>
           <Controller
             control={control}
             name="email"
@@ -80,8 +75,7 @@ export default function LoginScreen() {
             <Text style={styles.secondaryText}>{translate("noAccount")}</Text>
             <Link href="/account-type" style={styles.link}>{translate("createAccount")}</Link>
           </View>
-        </View>
-      )}
+      </View>
     </AuthLayout>
   );
 }
