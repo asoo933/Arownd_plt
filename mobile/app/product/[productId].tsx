@@ -22,21 +22,18 @@ export default function ProductDetailsScreen() {
     enabled: Boolean(productId)
   });
 
-  if (product.isPending || offers.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
-  if (product.isError || offers.isError) {
-    return (
-      <CustomerScreen>
-        <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => { void product.refetch(); void offers.refetch(); }} />
-      </CustomerScreen>
-    );
+  if (product.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (product.isError) {
+    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void product.refetch()} /></CustomerScreen>;
   }
   if (!product.data) {
     return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("productNoDescription")} /></CustomerScreen>;
   }
 
-  const bestOffer = chooseBestProductOffer(offers.data);
-  const selectedOffer = offers.data.find((offer) => offer.id === selectedOfferId) ?? bestOffer;
-  const imageUrl = selectedOffer ? getPrimaryImage(selectedOffer) : offers.data.map(getPrimaryImage).find(Boolean) ?? null;
+  const productOffers = offers.data ?? [];
+  const bestOffer = chooseBestProductOffer(productOffers);
+  const selectedOffer = productOffers.find((offer) => offer.id === selectedOfferId) ?? bestOffer;
+  const imageUrl = selectedOffer ? getPrimaryImage(selectedOffer) : productOffers.map(getPrimaryImage).find(Boolean) ?? null;
 
   return (
     <CustomerScreen>
@@ -59,9 +56,11 @@ export default function ProductDetailsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("productOffersTitle")}</Text>
-        {offers.data.length === 0 ? (
+        {offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
+          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} />
+        ) : productOffers.length === 0 ? (
           <EmptyState title={translate("productNoOffers")} hint={translate("productNoDescription")} />
-        ) : offers.data.map((offer) => {
+        ) : productOffers.map((offer) => {
           const active = selectedOffer?.id === offer.id;
           const available = offer.is_available && offer.stock_quantity > 0;
           return (
