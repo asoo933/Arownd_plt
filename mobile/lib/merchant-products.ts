@@ -98,6 +98,7 @@ export async function createMerchantProductOffer(
   const userId = await assertOwnedStore(storeId);
   const client = getSupabaseClient();
   const uploadedPaths: string[] = [];
+  let rpcCommitted = false;
   const uploadedImages: { path: string; url: string }[] = [];
 
   try {
@@ -157,9 +158,10 @@ export async function createMerchantProductOffer(
     });
 
     if (error) throw error;
+    rpcCommitted = true;
     return z.string().uuid().parse(data as unknown);
   } catch (error) {
-    if (uploadedPaths.length > 0) {
+    if (!rpcCommitted && uploadedPaths.length > 0) {
       const { error: cleanupError } = await client.storage
         .from("product-media")
         .remove(uploadedPaths);
