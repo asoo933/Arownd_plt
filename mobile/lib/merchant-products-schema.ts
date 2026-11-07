@@ -9,7 +9,7 @@ export const MerchantProductOfferSchema = z.object({
   options: z.object({
     sizes: z.array(z.string()).default([]),
     colors: z.array(z.string()).default([])
-  }).passthrough().default({}),
+  }).passthrough().default({ sizes: [], colors: [] }),
   is_available: z.boolean(),
   is_merchant_hidden: z.boolean(),
   created_at: z.string(),
