@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getNextMerchantTrackingStatus,
   groupMerchantOrderRows,
   type MerchantOrderRow
 } from "@/lib/merchant-dashboard-state";
@@ -100,5 +101,22 @@ describe("groupMerchantOrderRows", () => {
     const result = groupMerchantOrderRows([row()]);
     expect(result.orders[0]).not.toHaveProperty("parentTotal");
     expect(result.orders[0]?.subtotal).toBe(2400);
+  });
+});
+
+describe("getNextMerchantTrackingStatus", () => {
+  it("starts with preparing when no tracking events exist", () => {
+    expect(getNextMerchantTrackingStatus([])).toBe("preparing");
+  });
+
+  it("returns only the next sequential tracking state", () => {
+    expect(getNextMerchantTrackingStatus(["preparing"])).toBe("ready_for_dispatch");
+    expect(getNextMerchantTrackingStatus(["preparing", "ready_for_dispatch"])).toBe("out_for_delivery");
+    expect(getNextMerchantTrackingStatus(["preparing", "ready_for_dispatch", "out_for_delivery"])).toBe("delivered");
+  });
+
+  it("returns null after delivery or when the stored state is unknown", () => {
+    expect(getNextMerchantTrackingStatus(["preparing", "ready_for_dispatch", "out_for_delivery", "delivered"])).toBeNull();
+    expect(getNextMerchantTrackingStatus(["unexpected"])).toBeNull();
   });
 });
