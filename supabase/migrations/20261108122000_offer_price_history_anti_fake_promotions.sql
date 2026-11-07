@@ -45,6 +45,10 @@ update public.store_offers
 set old_price = null
 where old_price is not null;
 
+alter table public.store_offers
+  add constraint store_offers_old_price_gt_price_check
+  check (old_price is null or old_price > price);
+
 insert into public.store_offer_price_history (offer_id, store_id, price, recorded_at)
 select id, store_id, price, now()
 from public.store_offers;
