@@ -116,3 +116,34 @@ export function validateMerchantOfferValues(
 
   return { price, stock_quantity: stock };
 }
+
+export type MerchantProductDetailsValues = {
+  name: string;
+  description: string;
+  brand: string;
+  category: string;
+};
+
+export function validateMerchantProductDetails(
+  nameInput: string,
+  descriptionInput: string,
+  brandInput: string,
+  categoryInput: string
+): MerchantProductDetailsValues | null {
+  const name = nameInput.trim();
+  const description = descriptionInput.trim();
+  const brand = brandInput.trim();
+  const category = categoryInput.trim();
+
+  if (
+    !name ||
+    name.length > 120 ||
+    description.length > 3000 ||
+    brand.length > 80 ||
+    !category
+  ) {
+    return null;
+  }
+
+  return { name, description, brand, category };
+}
