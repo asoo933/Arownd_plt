@@ -143,16 +143,16 @@ export default function MerchantEditProductScreen() {
         fileSize: asset.fileSize ?? null
       };
 
-      if (!validateProductImageMetadata(metadata)) {
-        setActionError(translate("merchantProductImageInvalid"));
-        return;
-      }
       if (
         asset.fileSize !== null &&
         asset.fileSize !== undefined &&
         asset.fileSize > PRODUCT_IMAGE_MAX_BYTES
       ) {
         setActionError(translate("merchantProductImageTooLarge"));
+        return;
+      }
+      if (!validateProductImageMetadata(metadata)) {
+        setActionError(translate("merchantProductImageInvalid"));
         return;
       }
 
