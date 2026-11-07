@@ -95,6 +95,11 @@ export default function DeliveryProfileScreen() {
       }))
     : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
+  const clearSaveFeedback = () => {
+    setFormError(null);
+    mutation.reset();
+  };
+
   const submit = () => {
     setFormError(null);
     const input: DeliveryProfileInput = {
@@ -116,9 +121,9 @@ export default function DeliveryProfileScreen() {
     <CustomerHeading title={translate("deliveryProfileTitle")} subtitle={translate("deliveryProfileSubtitle")} />
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
-      <TextInput value={fullName} onChangeText={setFullName} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
+      <TextInput value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
-      <TextInput value={phone} onChangeText={setPhone} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
+      <TextInput value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
       <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <Text style={[styles.pickerText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
@@ -126,7 +131,7 @@ export default function DeliveryProfileScreen() {
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutCommune")}</Text>
       <TextInput
         value={commune}
-        onChangeText={setCommune}
+        onChangeText={(value) => { setCommune(value); clearSaveFeedback(); }}
         editable={wilayaId !== null}
         maxLength={100}
         placeholder={translate("checkoutCommunePlaceholder")}
@@ -156,6 +161,7 @@ export default function DeliveryProfileScreen() {
               if (picker === "wilaya" && item.wilaya) {
                 setWilayaId(item.wilaya.id);
                 setCommune("");
+                clearSaveFeedback();
               } else if (picker === "commune") {
                 setCommune(item.label);
               }
