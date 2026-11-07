@@ -43,8 +43,8 @@ export default function FavoritesScreen() {
         Promise.all(ids.stores.map(async (id) => ({ id, store: await fetchStoreDetails(id) })))
       ]);
       return {
-        products: productResults.filter((item): item is NonNullable<typeof item> => item !== null),
-        stores: storeResults.filter((item) => item.store !== null)
+        products: productResults.flatMap((item) => item === null ? [] : [item]),
+        stores: storeResults.flatMap((item) => item.store === null ? [] : [item])
       };
     }
   });
