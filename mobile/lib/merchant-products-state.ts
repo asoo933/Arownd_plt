@@ -50,7 +50,9 @@ export function filterMerchantProducts(
   return offers.filter((offer) => {
     const level = getMerchantInventoryLevel(offer.stock_quantity);
     const matchesFilter = filter === "all"
-      || (filter === "hidden" ? offer.is_merchant_hidden : level === filter);
+      || (filter === "hidden"
+        ? offer.is_merchant_hidden
+        : !offer.is_merchant_hidden && level === filter);
     const searchableText = [offer.product.name, offer.product.brand ?? ""]
       .join(" ")
       .toLocaleLowerCase();
