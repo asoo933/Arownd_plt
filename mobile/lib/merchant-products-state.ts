@@ -1,4 +1,4 @@
-export type MerchantInventoryFilter = "all" | "low" | "out";
+export type MerchantInventoryFilter = "all" | "low" | "out" | "hidden";
 export type MerchantInventoryLevel = "in" | "low" | "out";
 
 export type MerchantProductOffer = {
@@ -49,7 +49,8 @@ export function filterMerchantProducts(
 
   return offers.filter((offer) => {
     const level = getMerchantInventoryLevel(offer.stock_quantity);
-    const matchesFilter = filter === "all" || level === filter;
+    const matchesFilter = filter === "all"
+      || (filter === "hidden" ? offer.is_merchant_hidden : level === filter);
     const searchableText = [offer.product.name, offer.product.brand ?? ""]
       .join(" ")
       .toLocaleLowerCase();
