@@ -1,0 +1,95 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
+import { getNotificationDestination } from "@/lib/notifications-state";
+import { getSupabaseClient } from "@/lib/supabase";
+import { translate } from "@/lib/i18n";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
+
+function typeLabel(type: AppNotification["type"]): string {
+  const labels: Record<AppNotification["type"], string> = {
+    order: translate("notificationsOrder"), offer: translate("notificationsOffer"),
+    reservation: translate("notificationsReservation"), system: translate("notificationsSystem"),
+    info: translate("notificationsInfo")
+  };
+  return labels[type];
+}
+
+function dateLabel(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("ar-DZ", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(date);
+}
+
+export default function NotificationsScreen() {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
+  const queryClient = useQueryClient();
+  const auth = useQuery({ queryKey: ["notifications-auth"], queryFn: async () => {
+    const { data, error } = await getSupabaseClient().auth.getUser();
+    if (error) throw error;
+    return data.user;
+  }, retry: false });
+  const notifications = useQuery({
+    queryKey: ["my-notifications", auth.data?.id], queryFn: fetchMyNotifications,
+    enabled: auth.isSuccess && Boolean(auth.data)
+  });
+  useEffect(() => {
+    const userId = auth.data?.id;
+    if (!userId) return;
+    const client = getSupabaseClient();
+    const channel = client.channel("native-notifications-" + userId).on("postgres_changes", {
+      event: "*", schema: "public", table: "notifications", filter: "user_id=eq." + userId
+    }, () => { void queryClient.invalidateQueries({ queryKey: ["my-notifications", userId] }); }).subscribe();
+    return () => { void client.removeChannel(channel); };
+  }, [auth.data?.id, queryClient]);
+  const markOne = useMutation({ mutationFn: markNotificationRead, onSuccess: () =>
+    queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] }) });
+  const markAll = useMutation({ mutationFn: markAllNotificationsRead, onSuccess: () =>
+    queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] }) });
+
+  if (auth.isPending || (auth.data && notifications.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (auth.isError || notifications.isError) return <CustomerScreen>
+    <CustomerHeading title={translate("notificationsTitle")} />
+    <ErrorState title={translate("notificationsLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void notifications.refetch(); }} />
+  </CustomerScreen>;
+  if (!auth.data) return <CustomerScreen>
+    <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("profileLoginHint")} />
+    <Pressable style={styles.action} onPress={() => router.push("/login")}><Text style={styles.actionText}>{translate("login")}</Text></Pressable>
+  </CustomerScreen>;
+  const rows = notifications.data ?? [];
+  const unreadCount = countUnreadNotifications(rows);
+  return <CustomerScreen>
+    <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("notificationsSubtitle")} />
+    {unreadCount > 0 ? <Pressable accessibilityRole="button" disabled={markAll.isPending} onPress={() => markAll.mutate()} style={[styles.markAll, { backgroundColor: theme.colors.accent, opacity: markAll.isPending ? 0.6 : 1 }]}><Text style={styles.markAllText}>{translate("notificationsMarkAll")} · {unreadCount}</Text></Pressable> : null}
+    {rows.length === 0 ? <EmptyState title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} /> : rows.map((item) => {
+      const destination = getNotificationDestination(item);
+      return <Pressable key={item.id} accessibilityRole="button" onPress={() => {
+        if (!item.read) markOne.mutate(item.id);
+        if (destination) router.push(destination as never);
+      }} style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1, opacity: item.read ? 0.78 : 1 }]}><View style={styles.cardHeader}>
+        <Text style={[styles.type, { color: theme.colors.accentMuted }]}>{typeLabel(item.type)}</Text>
+        <Text style={[styles.date, { color: theme.colors.muted }]}>{dateLabel(item.created_at)}</Text>
+      </View><Text style={[styles.title, { color: theme.colors.foreground }]}>{item.title}</Text>
+      {item.body ? <Text style={[styles.body, { color: theme.colors.muted }]}>{item.body}</Text> : null}
+      {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accent }]} /> : null}
+      </Pressable>;
+    })}
+  </CustomerScreen>;
+}
+
+function createStyles(theme: AppTheme) { return StyleSheet.create({
+  markAll: { minHeight: 44, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  markAllText: { color: theme.colors.accentForeground, fontSize: 12, fontWeight: "900" },
+  card: { borderRadius: 17, padding: 14, gap: 8 },
+  cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  type: { fontSize: 10, fontWeight: "900" }, date: { fontSize: 10 },
+  title: { fontSize: 14, fontWeight: "900", textAlign: "right" },
+  body: { fontSize: 12, lineHeight: 20, textAlign: "right" },
+  unreadDot: { position: "absolute", top: 14, start: 12, width: 8, height: 8, borderRadius: 4 },
+  action: { minHeight: 48, borderRadius: 14, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  actionText: { color: theme.colors.accentForeground, fontWeight: "900" }
+}); }
