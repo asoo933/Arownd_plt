@@ -23,7 +23,7 @@ import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import {
   createMerchantStore,
   fetchMerchantAccess,
-  fetchMerchantCategories,
+  fetchMerchantCategories
 } from "@/lib/merchant";
 import {
   merchantStoreErrorKey,
@@ -125,7 +125,7 @@ export default function MerchantOnboardingScreen() {
     );
   }
 
-  if (access.data === null) return <Redirect href="/login" />;
+  if (!access.data) return <Redirect href="/login" />;
   if (access.data.status === "merchant_ready") return <Redirect href="/merchant" />;
   if (!canStartOnboarding) return <Redirect href="/merchant" />;
 
