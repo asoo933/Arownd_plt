@@ -58,6 +58,7 @@ export default function CartScreen() {
     <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)} />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
+    {mutation.isError ? <Text style={styles.warningText}>{translate("genericError")}</Text> : null}
     {evaluation.blockingCount > 0 ? <View style={styles.warning}><Text style={styles.warningText}>{translate("cartBlocked") + evaluation.blockingCount}</Text></View> : null}
     {[...groups.entries()].map(([offerId, group]) => <View key={offerId} style={[styles.group, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <Text style={styles.store}>{group.storeName}</Text>
