@@ -6,7 +6,7 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, Text
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
-import { normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
+import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
@@ -103,7 +103,12 @@ export default function DeliveryProfileScreen() {
       wilaya_id: wilayaId ?? 0,
       commune: commune.trim()
     };
-    mutation.mutate(input);
+    const parsed = DeliveryProfileSchema.safeParse(input);
+    if (!parsed.success) {
+      setFormError(translate("deliveryProfileValidationError"));
+      return;
+    }
+    mutation.mutate(parsed.data);
   };
 
   return <CustomerScreen>
@@ -139,7 +144,7 @@ export default function DeliveryProfileScreen() {
       </Pressable>
       {mutation.isSuccess ? <Text style={styles.success}>{translate("deliveryProfileSaved")}</Text> : null}
     </View>
-    <Text style={styles.note}>{translate("deliveryProfileSingleAddressNote")}</Text>
+    <Text style={styles.note}>{translate("deliveryProfileDefaultAreaNote")}</Text>
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
