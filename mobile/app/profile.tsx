@@ -67,14 +67,14 @@ export default function ProfileScreen() {
       </CustomerScreen>
     );
   }
-  if (profile.isError || orders.isError || favorites.isError) {
+  if (profile.isError) {
     return (
       <CustomerScreen>
         <CustomerHeading title={translate("profileTitle")} />
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
-          onRetry={() => { void profile.refetch(); void orders.refetch(); void favorites.refetch(); }}
+          onRetry={() => void profile.refetch()}
         />
       </CustomerScreen>
     );
@@ -86,7 +86,7 @@ export default function ProfileScreen() {
   return (
     <CustomerScreen>
       <CustomerHeading title={translate("profileTitle")} subtitle={translate("profileSubtitle")} />
-      {(profile.isPending || orders.isPending || favorites.isPending) ? (
+      {profile.isPending ? (
         <LoadingState label={translate("stateLoading")} />
       ) : (
         <>
@@ -99,9 +99,16 @@ export default function ProfileScreen() {
             </View>
           </View>
           <View style={styles.stats}>
-            <StatCard label={translate("profileOrders")} value={String(orders.data?.length ?? 0)} colors={colors} />
-            <StatCard label={translate("profileFavorites")} value={String(favoriteCount)} colors={colors} />
+            <StatCard label={translate("profileOrders")} value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)} colors={colors} />
+            <StatCard label={translate("profileFavorites")} value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)} colors={colors} />
           </View>
+          {orders.isError || favorites.isError ? (
+            <ErrorState
+              title={translate("profileStatsLoadError")}
+              retryLabel={translate("retry")}
+              onRetry={() => { void orders.refetch(); void favorites.refetch(); }}
+            />
+          ) : null}
           <View style={styles.menu}>
             <MenuAction label={translate("profileEditDetails")} hint={translate("profileEditDetailsHint")} onPress={() => router.push("/delivery-profile")} colors={colors} />
             <MenuAction label={translate("profileAddresses")} hint={translate("profileAddressesHint")} onPress={() => router.push("/addresses")} colors={colors} />
