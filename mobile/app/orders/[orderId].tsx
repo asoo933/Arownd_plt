@@ -1,12 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { formatDZD } from "@/lib/catalog";
-import { fetchCustomerOrderDetails, getOrderStatusTone } from "@/lib/orders";
+import { fetchCustomerOrderDetails, getOrderStatusTone, respondToMerchantQuote } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
+import { useQueryClient } from "@tanstack/react-query";
 import { translate } from "@/lib/i18n";
 
 const STEPS = [
@@ -47,6 +48,16 @@ function dateLabel(value: string | null | undefined): string {
 export default function OrderDetailsScreen() {
   const dark = useColorScheme() === "dark";
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
+  const queryClient = useQueryClient();
+  const [declineTarget, setDeclineTarget] = useState<string | null>(null);
+  const quoteMutation = useMutation({
+    mutationFn: (input: { merchantOrderId: string; accept: boolean }) =>
+      respondToMerchantQuote(input.merchantOrderId, input.accept),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["customer-order-details", orderId] });
+      await queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
+    }
+  });
   const auth = useQuery({
     queryKey: ["customer-order-details-auth"],
     queryFn: async () => {
@@ -89,6 +100,32 @@ export default function OrderDetailsScreen() {
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <EmptyState title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
     <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
+    <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
+      <View style={styles.modalBackdrop}>
+        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+          <Text style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</Text>
+          <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
+          <View style={styles.quoteActions}>
+            <Pressable
+              disabled={quoteMutation.isPending}
+              onPress={() => {
+                if (declineTarget) {
+                  quoteMutation.mutate({ merchantOrderId: declineTarget, accept: false }, {
+                    onSuccess: () => setDeclineTarget(null)
+                  });
+                }
+              }}
+              style={styles.declineButton}
+            >
+              {quoteMutation.isPending ? <ActivityIndicator color="#B42318" /> : <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>}
+            </Pressable>
+            <Pressable disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
+              <Text style={styles.acceptButtonText}>{translate("cancel")}</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
   </CustomerScreen>;
 
   const merchantOrders = order.merchant_orders;
@@ -158,7 +195,26 @@ export default function OrderDetailsScreen() {
         <View style={styles.totalRow}><Text style={styles.label}>{translate("orderStoreSubtotal")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.subtotal)}</Text></View>
         {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</Text></View> : null}
         {!cancelled ? <View style={styles.totalRow}><Text style={styles.sectionTitle}>{translate("orderStoreTotal")}</Text><Text style={styles.total}>{formatDZD(subTotal)}</Text></View> : null}
-        {merchantOrder.status === "quoted" ? <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text> : null}
+        {merchantOrder.status === "quoted" ? <>
+          <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text>
+          <View style={styles.quoteActions}>
+            <Pressable
+              disabled={quoteMutation.isPending}
+              onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
+              style={styles.acceptButton}
+            >
+              {quoteMutation.isPending ? <ActivityIndicator color="#0A0A0A" /> : <Text style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</Text>}
+            </Pressable>
+            <Pressable
+              disabled={quoteMutation.isPending}
+              onPress={() => setDeclineTarget(merchantOrder.id)}
+              style={styles.declineButton}
+            >
+              <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>
+            </Pressable>
+          </View>
+          {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
+        </> : null}
         {(query.data.trackingEvents.find((entry) => entry.merchantOrderId === merchantOrder.id)?.events ?? []).map((event) => (
           <View key={event.id} style={styles.trackingEvent}>
             <Text style={styles.shipmentStatus}>{statusLabel(event.status)}</Text>
@@ -226,5 +282,13 @@ const styles = StyleSheet.create({
   trackingEvent: { borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 9, gap: 4 },
   shipmentStatus: { color: "#647D13", fontSize: 12, fontWeight: "900", textAlign: "right" },
   secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: "#D4D4D4", justifyContent: "center", alignItems: "center" },
-  secondaryText: { color: "#647D13", fontSize: 13, fontWeight: "900" }
+  secondaryText: { color: "#647D13", fontSize: 13, fontWeight: "900" },
+  quoteActions: { flexDirection: "row-reverse", gap: 8 },
+  acceptButton: { flex: 1, minHeight: 45, borderRadius: 12, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
+  acceptButtonText: { color: "#0A0A0A", fontSize: 12, fontWeight: "900" },
+  declineButton: { flex: 1, minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: "#B42318", alignItems: "center", justifyContent: "center" },
+  declineButtonText: { color: "#B42318", fontSize: 12, fontWeight: "900" },
+  errorText: { color: "#B42318", fontSize: 11, textAlign: "right" },
+  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 20 },
+  modalPanel: { borderRadius: 18, padding: 18, gap: 13 }
 });
