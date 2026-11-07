@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { createStoreSlug, merchantStoreSchema, type MerchantStoreFormValues } from "@/lib/merchant-validation";
 import {
   resolveMerchantAccessStatus,
   type MerchantAccessStatus
@@ -82,9 +83,8 @@ export async function fetchMerchantCategories(): Promise<MerchantCategory[]> {
 }
 
 export async function createMerchantStore(
-  input: import("@/lib/merchant-validation").MerchantStoreFormValues
+  input: MerchantStoreFormValues
 ): Promise<string> {
-  const { merchantStoreSchema, createStoreSlug } = await import("@/lib/merchant-validation");
   const values = merchantStoreSchema.parse(input);
   if (values.wilayaId === null) throw new Error("merchantValidationWilaya");
 
