@@ -53,13 +53,13 @@ async function loadFavorites(userId: string | null): Promise<Favorites> {
       }
     }
 
-    cachedFavorites.set(scope, favorites);
     if (current === null && raw !== null) {
       await AsyncStorage.setItem(storageKey, JSON.stringify(favorites));
       if (userId === null) {
         await Promise.all(LEGACY_STORAGE_KEYS.map((key) => AsyncStorage.removeItem(key)));
       }
     }
+    cachedFavorites.set(scope, favorites);
     return favorites;
   })();
 
