@@ -46,7 +46,7 @@ export function cartLineKey(item: Pick<CartItem, "offerId" | "options">): string
   return item.offerId + "::" + JSON.stringify(options);
 }
 
-function cleanOptions(value: unknown): Record<string, string> {
+export function readCartOptions(value: unknown): Record<string, string> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
   const entries: [string, string][] = Object.entries(value).flatMap(([key, item]): [string, string][] =>
     key.length > 0 && typeof item === "string" ? [[key, item]] : []
@@ -67,7 +67,7 @@ export function sanitizeCart(value: unknown): CartItem[] {
       name: typeof row.name === "string" ? row.name : "",
       ...(typeof row.price === "number" && Number.isFinite(row.price) && row.price >= 0 ? { price: row.price } : {}),
       quantity: Math.max(1, Math.min(MAX_CART_QUANTITY, Math.floor(Number(row.quantity)) || 1)),
-      options: cleanOptions(row.options)
+      options: readCartOptions(row.options)
     };
     const key = cartLineKey(item);
     const previous = lines.get(key);
