@@ -30,6 +30,13 @@ const MerchantOrderSchema = z.object({
   items: z.array(OrderItemSchema).default([])
 }).passthrough();
 
+const TrackingEventSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  note: z.string().nullable().optional(),
+  created_at: z.string()
+}).passthrough();
+
 const ShipmentSchema = z.object({
   id: z.string(),
   status: z.string(),
@@ -62,6 +69,7 @@ export type CustomerOrder = z.infer<typeof OrderSchema>;
 export type CustomerMerchantOrder = z.infer<typeof MerchantOrderSchema>;
 export type CustomerOrderItem = z.infer<typeof OrderItemSchema>;
 export type CustomerShipment = z.infer<typeof ShipmentSchema>;
+export type CustomerTrackingEvent = z.infer<typeof TrackingEventSchema>;
 
 const ORDER_SELECT = [
   "*,",
@@ -97,9 +105,27 @@ export async function fetchCustomerOrderDetails(orderId: string): Promise<{
   ]);
   if (orderError) throw orderError;
   if (shipmentError) throw shipmentError;
+  const parsedOrder = order ? OrderSchema.parse(order as unknown) : null;
+  const trackingEvents = parsedOrder
+    ? await Promise.all(parsedOrder.merchant_orders.map(async (merchantOrder) => {
+        const call = client.rpc.bind(client) as unknown as (
+          functionName: string,
+          args: { _merchant_order_id: string }
+        ) => Promise<{ data: unknown; error: { message?: string } | null }>;
+        const { data, error } = await call("fetch_merchant_order_tracking", {
+          _merchant_order_id: merchantOrder.id
+        });
+        if (error) throw new Error(error.message ?? "order_tracking_load_failed");
+        return {
+          merchantOrderId: merchantOrder.id,
+          events: TrackingEventSchema.array().parse(data as unknown)
+        };
+      }))
+    : [];
   return {
-    order: order ? OrderSchema.parse(order as unknown) : null,
-    shipments: ShipmentSchema.array().parse(shipments as unknown)
+    order: parsedOrder,
+    shipments: ShipmentSchema.array().parse(shipments as unknown),
+    trackingEvents
   };
 }
 
