@@ -1,18 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useColorScheme } from "react-native";
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 type Picker = "wilaya" | "commune" | null;
 
 export default function DeliveryProfileScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -73,16 +74,16 @@ export default function DeliveryProfileScreen() {
   const fieldStyle = [
     styles.input,
     {
-      backgroundColor: dark ? "#171717" : "#FFFFFF",
-      borderColor: dark ? "#383838" : "#E5E5E5",
-      color: dark ? "#FFFFFF" : "#0A0A0A"
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      color: theme.colors.foreground
     }
   ];
   const pickerStyle = [
     styles.picker,
     {
-      backgroundColor: dark ? "#171717" : "#FFFFFF",
-      borderColor: dark ? "#383838" : "#E5E5E5"
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border
     }
   ];
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
@@ -107,16 +108,16 @@ export default function DeliveryProfileScreen() {
   return <CustomerScreen>
     <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></Pressable>
     <CustomerHeading title={translate("deliveryProfileTitle")} subtitle={translate("deliveryProfileSubtitle")} />
-    <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-      <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("fullNamePlaceholder")}</Text>
+    <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
       <TextInput value={fullName} onChangeText={setFullName} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" />
-      <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("checkoutPhonePlaceholder")}</Text>
+      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
       <TextInput value={phone} onChangeText={setPhone} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" />
-      <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("checkoutWilaya")}</Text>
+      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
       <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
-        <Text style={[styles.pickerText, { color: selectedWilaya ? (dark ? "#FFFFFF" : "#0A0A0A") : "#888888" }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
+        <Text style={[styles.pickerText, { color: selectedWilaya ? (theme.colors.foreground) : "#888888" }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
       </Pressable>
-      <Text style={[styles.label, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate("checkoutCommune")}</Text>
+      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutCommune")}</Text>
       <TextInput
         value={commune}
         onChangeText={setCommune}
@@ -140,7 +141,7 @@ export default function DeliveryProfileScreen() {
     <Text style={styles.note}>{translate("deliveryProfileSingleAddressNote")}</Text>
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <Text style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</Text>
           {picker === "commune" && communes.isPending ? <ActivityIndicator color="#647D13" /> : null}
           {picker === "commune" && communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
@@ -154,7 +155,7 @@ export default function DeliveryProfileScreen() {
               }
               setPicker(null);
             }} style={styles.option}>
-              <Text style={[styles.optionText, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{item.label}</Text>
+              <Text style={[styles.optionText, { color: theme.colors.foreground }]}>{item.label}</Text>
             </Pressable>)}
           </ScrollView>
           <Pressable onPress={() => setPicker(null)} style={styles.closeButton}><Text style={styles.closeText}>{translate("back")}</Text></Pressable>
