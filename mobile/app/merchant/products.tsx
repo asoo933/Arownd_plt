@@ -165,6 +165,16 @@ export default function MerchantProductsScreen() {
           </Text>
         </View>
 
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/merchant/products/new")}
+          style={[styles.addButton, { backgroundColor: theme.colors.accent }]}
+        >
+          <Text style={[styles.addButtonText, { color: theme.colors.accentForeground }]}>
+            {translate("merchantProductCreateOpen")}
+          </Text>
+        </Pressable>
+
         <View style={styles.summaryGrid}>
           <SummaryCard label={translate("merchantProductsSummaryTotal")} value={summary.total} theme={theme} />
           <SummaryCard label={translate("merchantProductsSummaryLow")} value={summary.low} theme={theme} tone="warning" />
@@ -465,6 +475,8 @@ function createStyles(theme: AppTheme) {
     eyebrow: { fontSize: 10, fontWeight: "900" },
     title: { width: "100%", fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
     subtitle: { width: "100%", fontSize: 12, lineHeight: 20, textAlign: "right" },
+    addButton: { minHeight: 47, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+    addButtonText: { fontSize: 12, fontWeight: "900" },
     summaryGrid: { flexDirection: "row-reverse", gap: 8 },
     summaryCard: { flex: 1, minHeight: 75, borderWidth: 1, borderRadius: 15, padding: 11, gap: 5, alignItems: "flex-end" },
     summaryLabel: { fontSize: 10, fontWeight: "800", textAlign: "right" },
