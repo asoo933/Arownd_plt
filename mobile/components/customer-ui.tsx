@@ -77,10 +77,11 @@ export function SectionTitle({ title, action, onAction }: {
   );
 }
 
-export function ProductTile({ name, store, price, imageUrl, onPress }: {
+export function ProductTile({ name, store, price, oldPrice, imageUrl, onPress }: {
   name: string;
   store: string;
   price: string;
+  oldPrice?: string | null;
   imageUrl: string | null;
   onPress?: () => void;
 }) {
@@ -98,7 +99,10 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
       </View>
       <Text numberOfLines={2} style={[styles.productName, { color: theme.colors.foreground }]}>{name}</Text>
       <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{store}</Text>
-      <Text style={[styles.productPrice, { color: theme.colors.accentMuted }]}>{price}</Text>
+      <View style={{ alignItems: "flex-end", gap: 2 }}>
+        {oldPrice ? <Text style={{ color: theme.colors.muted, fontSize: 10, textDecorationLine: "line-through" }}>{oldPrice}</Text> : null}
+        <Text style={[styles.productPrice, { color: theme.colors.accentMuted }]}>{price}</Text>
+      </View>
     </Pressable>
   );
 }
