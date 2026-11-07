@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
 
+export { getOrderStatusTone, getOrderTrackingSteps } from "@/lib/orders-state";
+
 const OrderItemSchema = z.object({
   id: z.string(),
   product_name: z.string().nullable().optional(),
@@ -128,24 +130,6 @@ export async function fetchCustomerOrderDetails(orderId: string): Promise<{
     shipments: ShipmentSchema.array().parse(shipments as unknown),
     trackingEvents
   };
-}
-
-export function getOrderTrackingSteps(status: string): number {
-  switch (status) {
-    case "pending": return 0;
-    case "quoted": return 0;
-    case "confirmed": return 1;
-    case "shipped": return 2;
-    case "delivered": return 3;
-    default: return -1;
-  }
-}
-
-export function getOrderStatusTone(status: string): "pending" | "success" | "danger" | "muted" {
-  if (status === "delivered") return "success";
-  if (status === "cancelled" || status === "rejected" || status === "failed" || status === "returned") return "danger";
-  if (status === "pending" || status === "quoted") return "pending";
-  return "muted";
 }
 
 /** Customer accepts or declines a merchant's shipping quote through the guarded RPC. */
