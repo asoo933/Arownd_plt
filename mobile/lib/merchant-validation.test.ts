@@ -36,7 +36,7 @@ describe("merchantStoreSchema", () => {
     expect(merchantStoreSchema.safeParse({
       ...validStore,
       phone: "12",
-      close: "08:00"
+      close: "8am"
     }).success).toBe(false);
   });
 
