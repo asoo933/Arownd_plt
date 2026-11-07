@@ -10,27 +10,36 @@ const passwordSchema = z
   .string()
   .min(8, "passwordMin");
 
+const signupBaseSchema = z.object({
+  fullName: z.string().trim().min(2, "required"),
+  email: emailSchema,
+  password: passwordSchema,
+  confirmPassword: z.string().min(1, "required")
+});
+
+const matchingPasswords = {
+  path: ["confirmPassword"] as const,
+  message: "passwordMismatch"
+};
+
 export const loginSchema = z.object({
   email: emailSchema,
   password: z.string().min(1, "required")
 });
 
-export const personalSignupSchema = z
-  .object({
-    fullName: z.string().trim().min(2, "required"),
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, "required")
-  })
-  .refine((value) => value.password === value.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "passwordMismatch"
-  });
+export const personalSignupSchema = signupBaseSchema.refine(
+  (value) => value.password === value.confirmPassword,
+  matchingPasswords
+);
 
-export const businessSignupSchema = personalSignupSchema
+export const businessSignupSchema = signupBaseSchema
   .extend({
     businessName: z.string().trim().min(2, "businessNameRequired")
-  });
+  })
+  .refine(
+    (value) => value.password === value.confirmPassword,
+    matchingPasswords
+  );
 
 export const recoverySchema = z.object({
   email: emailSchema
