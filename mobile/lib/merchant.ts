@@ -215,3 +215,180 @@ export async function fetchMerchantDashboard(storeId: string): Promise<MerchantD
     quotedOrderCount: summary.quotedCount
   };
 }
+
+
+const MerchantOrderDetailSchema = z.object({
+  id: z.string().uuid(),
+  order_id: z.string().uuid(),
+  store_id: z.string().uuid(),
+  status: z.string(),
+  subtotal: z.coerce.number(),
+  shipping_fee: z.coerce.number(),
+  quoted_at: z.string().nullable(),
+  payment_status: z.string(),
+  paid_amount: z.coerce.number().nullable(),
+  paid_at: z.string().nullable(),
+  order: z.object({
+    id: z.string().uuid(),
+    status: z.string(),
+    full_name: z.string().nullable(),
+    phone: z.string().nullable(),
+    commune: z.string().nullable(),
+    address_line: z.string().nullable(),
+    delivery_type: z.string(),
+    payment_method: z.string().nullable(),
+    created_at: z.string(),
+    wilaya: z.object({ name_ar: z.string().nullable() }).nullable()
+  })
+}).passthrough();
+
+const MerchantOrderItemDetailSchema = z.object({
+  id: z.string().uuid(),
+  product_name: z.string().nullable(),
+  quantity: z.coerce.number(),
+  unit_price: z.coerce.number(),
+  options: z.unknown().optional()
+}).passthrough();
+
+const MerchantShipmentSchema = z.object({
+  id: z.string().uuid(),
+  status: z.string(),
+  company_id: z.string().uuid().nullable(),
+  fee: z.coerce.number().nullable().optional(),
+  updated_at: z.string().nullable().optional(),
+  notes: z.string().nullable().optional()
+}).passthrough();
+
+const MerchantTrackingEventSchema = z.object({
+  id: z.string().uuid(),
+  status: z.string(),
+  note: z.string().nullable(),
+  created_at: z.string()
+}).passthrough();
+
+export type MerchantOrderDetail = {
+  merchantOrder: z.infer<typeof MerchantOrderDetailSchema>;
+  items: z.infer<typeof MerchantOrderItemDetailSchema>[];
+  shipment: z.infer<typeof MerchantShipmentSchema> | null;
+};
+
+export type MerchantTrackingEvent = z.infer<typeof MerchantTrackingEventSchema>;
+export type MerchantTrackingStatus = "preparing" | "ready_for_dispatch" | "out_for_delivery" | "delivered";
+
+export async function fetchMerchantOrderDetails(
+  merchantOrderId: string,
+  storeId: string
+): Promise<MerchantOrderDetail> {
+  const client = getSupabaseClient();
+  const { data: authData, error: authError } = await client.auth.getUser();
+
+  if (authError) throw authError;
+  if (!authData.user) throw new Error("not_authenticated");
+
+  const { data: ownedStore, error: storeError } = await client
+    .from("stores")
+    .select("id")
+    .eq("id", storeId)
+    .eq("owner_id", authData.user.id)
+    .maybeSingle();
+
+  if (storeError) throw storeError;
+  if (!ownedStore) throw new Error("merchant_store_not_found");
+
+  const { data: merchantOrderData, error: merchantOrderError } = await client
+    .from("merchant_orders")
+    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(name_ar))")
+    .eq("id", merchantOrderId)
+    .eq("store_id", storeId)
+    .maybeSingle();
+
+  if (merchantOrderError) throw merchantOrderError;
+  if (!merchantOrderData) throw new Error("merchant_order_not_found");
+
+  const merchantOrder = MerchantOrderDetailSchema.parse(merchantOrderData as unknown);
+  const [itemsResult, shipmentResult] = await Promise.all([
+    client
+      .from("order_items")
+      .select("id, product_name, quantity, unit_price, options")
+      .eq("merchant_order_id", merchantOrderId)
+      .eq("store_id", storeId)
+      .is("merchant_archived_at", null)
+      .order("id", { ascending: true }),
+    client
+      .from("shipments")
+      .select("id, status, company_id, fee, updated_at, notes")
+      .eq("merchant_order_id", merchantOrderId)
+      .maybeSingle()
+  ]);
+
+  if (itemsResult.error) throw itemsResult.error;
+  if (shipmentResult.error) throw shipmentResult.error;
+
+  return {
+    merchantOrder,
+    items: MerchantOrderItemDetailSchema.array().parse(itemsResult.data as unknown),
+    shipment: shipmentResult.data
+      ? MerchantShipmentSchema.parse(shipmentResult.data as unknown)
+      : null
+  };
+}
+
+export async function submitMerchantOrderQuote(
+  merchantOrderId: string,
+  shippingFee: number
+): Promise<void> {
+  if (!Number.isInteger(shippingFee) || shippingFee < 0 || shippingFee > 1_000_000) {
+    throw new Error("invalid_shipping_fee");
+  }
+
+  const { error } = await getSupabaseClient().rpc("merchant_submit_order_quote", {
+    _merchant_order_id: merchantOrderId,
+    _shipping_fee: shippingFee
+  });
+
+  if (error) throw error;
+}
+
+export async function rejectMerchantOrder(
+  merchantOrderId: string,
+  reason: string | null = null
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc("merchant_reject_order", {
+    _merchant_order_id: merchantOrderId,
+    _reason: reason
+  });
+
+  if (error) throw error;
+}
+
+export async function fetchMerchantOrderTracking(
+  merchantOrderId: string
+): Promise<MerchantTrackingEvent[]> {
+  const { data, error } = await getSupabaseClient().rpc("fetch_merchant_order_tracking", {
+    _merchant_order_id: merchantOrderId
+  });
+
+  if (error) throw error;
+  return MerchantTrackingEventSchema.array().parse(data as unknown);
+}
+
+export async function updateMerchantOrderTracking(
+  merchantOrderId: string,
+  status: MerchantTrackingStatus
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc("merchant_update_order_tracking", {
+    _merchant_order_id: merchantOrderId,
+    _status: status,
+    _note: null
+  });
+
+  if (error) throw error;
+}
+
+export async function collectMerchantOrderCod(merchantOrderId: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc("collect_merchant_order_cod", {
+    _merchant_order_id: merchantOrderId
+  });
+
+  if (error) throw error;
+}
