@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { CartButton } from "@/components/cart-button";
@@ -9,10 +9,11 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 export default function ProductDetailsScreen() {
   const { productId } = useLocalSearchParams<{ productId: string }>();
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
@@ -59,14 +60,14 @@ export default function ProductDetailsScreen() {
         <Text style={styles.backText}>{translate("back")}</Text>
       </Pressable>
       <View style={styles.titleRow}>
-        <Text style={[styles.pageTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("detailProductTitle")}</Text>
+        <Text style={[styles.pageTitle, { color: theme.colors.foreground }]}>{translate("detailProductTitle")}</Text>
         <View style={styles.titleActions}><FavoriteButton kind="products" id={productId} /><CartButton /></View>
       </View>
       <View style={styles.heroImage}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
       </View>
-      <View style={[styles.infoCard, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-        <Text style={[styles.productName, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{product.data.name}</Text>
+      <View style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.productName, { color: theme.colors.foreground }]}>{product.data.name}</Text>
         {selectedOffer ? <Text style={styles.price}>{formatDZD(selectedOffer.price)}</Text> : null}
         <View style={styles.metadata}>
           {product.data.brand ? <Text style={styles.metaText}>{translate("productBrand")}: {product.data.brand}</Text> : null}
@@ -76,7 +77,7 @@ export default function ProductDetailsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("productOffersTitle")}</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("productOffersTitle")}</Text>
         {offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} />
         ) : productOffers.length === 0 ? (
@@ -90,10 +91,10 @@ export default function ProductDetailsScreen() {
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
               onPress={() => { setSelectedOfferId(offer.id); setSize(""); setColor(""); setQuantity(1); addMutation.reset(); }}
-              style={[styles.offerCard, { backgroundColor: dark ? "#171717" : "#FFFFFF", borderColor: active ? "#829E19" : dark ? "#333333" : "#E5E5E5" }]}
+              style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: active ? "#829E19" : theme.colors.border }]}
             >
               <View style={styles.offerInfo}>
-                <Text style={[styles.offerStore, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{offer.store.name}</Text>
+                <Text style={[styles.offerStore, { color: theme.colors.foreground }]}>{offer.store.name}</Text>
                 <Text style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</Text>
                 <Text style={[styles.stock, { color: available ? "#647D13" : "#B45309" }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
               </View>
@@ -104,14 +105,14 @@ export default function ProductDetailsScreen() {
       </View>
 
       {selectedOffer ? (
-        <View style={[styles.purchaseCard, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+        <View style={[styles.purchaseCard, { backgroundColor: theme.colors.surface }]}>
           {variants.colors.length > 0 ? <OptionPicker label={translate("productColorOption")} values={variants.colors} value={selectedColor} onSelect={setColor} dark={dark} /> : null}
           {variants.sizes.length > 0 ? <OptionPicker label={translate("productSizeOption")} values={variants.sizes} value={selectedSize} onSelect={setSize} dark={dark} /> : null}
           <View style={styles.quantityRow}>
-            <Text style={[styles.optionLabel, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{translate("productQuantity")}</Text>
+            <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{translate("productQuantity")}</Text>
             <View style={styles.quantityControls}>
               <Pressable accessibilityRole="button" disabled={quantity <= 1} onPress={() => setQuantity((value) => Math.max(1, value - 1))} style={styles.quantityButton}><Text style={styles.quantityButtonText}>−</Text></Pressable>
-              <Text style={[styles.quantityValue, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{quantity}</Text>
+              <Text style={[styles.quantityValue, { color: theme.colors.foreground }]}>{quantity}</Text>
               <Pressable accessibilityRole="button" disabled={quantity >= Math.min(10, selectedOffer.stock_quantity)} onPress={() => setQuantity((value) => Math.min(10, selectedOffer.stock_quantity, value + 1))} style={styles.quantityButton}><Text style={styles.quantityButtonText}>+</Text></Pressable>
             </View>
           </View>
@@ -149,7 +150,7 @@ export default function ProductDetailsScreen() {
 function OptionPicker({ label, values, value, onSelect, dark }: { label: string; values: string[]; value: string; onSelect: (value: string) => void; dark: boolean }) {
   return (
     <View style={styles.optionGroup}>
-      <Text style={[styles.optionLabel, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{label}</Text>
+      <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</Text>
       <View style={styles.optionValues}>
         {values.map((option) => <Pressable key={option} accessibilityRole="button" accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, value === option && styles.optionChipActive]}><Text style={[styles.optionChipText, value === option && styles.optionChipTextActive]}>{option}</Text></Pressable>)}
       </View>
