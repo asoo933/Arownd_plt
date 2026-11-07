@@ -32,6 +32,22 @@ describe("checkoutRequestIdentity", () => {
     expect(first).toBe(second);
   });
 
+  it("normalizes legacy localized option names before creating idempotency identity", () => {
+    const base = {
+      items: [item("offer-1", 1, { color: "Black", size: "M" })],
+      deliveryType: "desk" as const,
+      wilayaId: 9,
+      commune: "البليدة",
+      addressLine: "",
+      fullName: "أحمد",
+      phone: "0550000000"
+    };
+    expect(checkoutRequestIdentity(base)).toBe(checkoutRequestIdentity({
+      ...base,
+      items: [item("offer-1", 1, { "اللون": "Black", "المقاس": "M" })]
+    }));
+  });
+
   it("changes identity when delivery type or quantity changes", () => {
     const base = {
       items: [item("offer-1", 1, {})],
