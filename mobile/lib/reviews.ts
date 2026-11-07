@@ -34,6 +34,25 @@ export async function fetchMyReview(targetType: "product" | "store", targetId: s
   return data ? ReviewSchema.parse(data as unknown) : null;
 }
 
+export async function fetchMyReviews(): Promise<AppReview[]> {
+  const client = getSupabaseClient();
+  const { data: auth, error: authError } = await client.auth.getUser();
+  if (authError) throw authError;
+  if (!auth.user) return [];
+  const { data, error } = await client.from("reviews")
+    .select("id, target_type, target_id, rating, comment, status, created_at")
+    .eq("user_id", auth.user.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return ReviewSchema.array().parse(data as unknown);
+}
+
+export function getReviewTargetPath(review: Pick<AppReview, "target_type" | "target_id">): string {
+  const targetId = encodeURIComponent(review.target_id);
+  return review.target_type === "product" ? `/product/${targetId}` : `/store/${targetId}`;
+}
+
 export async function submitMyReview(targetType: "product" | "store", targetId: string, rating: number, comment: string): Promise<AppReview> {
   if (!isValidReviewRating(rating)) throw new Error("invalid_rating");
   const args: { _target_type: "product" | "store"; _target_id: string; _rating: number; _comment?: string } = {
