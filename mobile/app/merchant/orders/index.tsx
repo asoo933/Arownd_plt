@@ -161,7 +161,7 @@ export default function MerchantOrdersScreen() {
             <Text style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
               {filter === "all"
                 ? translate("merchantOrdersEmpty")
-                : translate("merchantOrdersFilterEmpty")}
+                : translate("merchantOrdersFilterEmptyHint")}
             </Text>
             <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
               {filter === "all" ? translate("merchantOrdersEmptyHint") : translate("merchantOrdersFilterEmpty")}
