@@ -76,6 +76,7 @@ describe("cart state", () => {
     expect(result.subtotal).toBe(4500);
     expect(result.lines[0]?.issues).toContain("overStock");
     expect(result.lines[0]?.issues).toContain("priceChanged");
+    expect(result.lines[1]?.issues).toContain("priceChanged");
   });
 
   it("waits for offers before reporting missing products", () => {
