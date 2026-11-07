@@ -6,6 +6,8 @@ import {
   getMerchantInventoryLevel,
   getMerchantInventorySummary,
   validateMerchantOfferOptions,
+  validatePromotionSalePrice,
+  getPromotionDiscountPercent,
   validateMerchantOfferValues,
   validateMerchantProductDetails,
   type MerchantProductOffer
@@ -222,5 +224,23 @@ describe("validateMerchantProductDetails", () => {
     expect(validateMerchantProductDetails("x".repeat(121), "", "", "clothes")).toBeNull();
     expect(validateMerchantProductDetails("منتج", "x".repeat(3001), "", "clothes")).toBeNull();
     expect(validateMerchantProductDetails("منتج", "", "x".repeat(81), "clothes")).toBeNull();
+  });
+});
+
+
+describe("promotion price validation", () => {
+  it("accepts only a positive sale price below the current regular price", () => {
+    expect(validatePromotionSalePrice("800", 1000)).toBe(800);
+    expect(validatePromotionSalePrice("1000", 1000)).toBeNull();
+    expect(validatePromotionSalePrice("1100", 1000)).toBeNull();
+    expect(validatePromotionSalePrice("0", 1000)).toBeNull();
+    expect(validatePromotionSalePrice("800.5", 1000)).toBeNull();
+    expect(validatePromotionSalePrice("", 1000)).toBeNull();
+  });
+
+  it("calculates a rounded discount percentage only for valid prices", () => {
+    expect(getPromotionDiscountPercent(1000, 799)).toBe(20);
+    expect(getPromotionDiscountPercent(1000, 1000)).toBeNull();
+    expect(getPromotionDiscountPercent(1000, 1100)).toBeNull();
   });
 });
