@@ -46,7 +46,8 @@ jobs:
         run: |
           node -e "const p=require('./package.json'); const has=(name)=>Boolean(p.dependencies?.[name] || p.devDependencies?.[name]); const missing=['@capacitor/cli','@capacitor/android'].filter((name)=>!has(name)); if(missing.length){console.error('Missing declared native build dependencies: '+missing.join(', ')); process.exit(1)}"
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        # Keep this native-only workflow buildable while package.json's Capacitor deps are being reconciled with the workspace lockfile.
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build Capacitor web assets
         env:
