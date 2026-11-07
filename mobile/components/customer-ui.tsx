@@ -105,10 +105,10 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
 
 export function StoreTile({ name, description, logoUrl, commune, rating, verified = false, onPress }: {
   name: string;
-  description?: string | null;
-  logoUrl?: string | null;
-  commune?: string | null;
-  rating?: number | null;
+  description?: string | null | undefined;
+  logoUrl?: string | null | undefined;
+  commune?: string | null | undefined;
+  rating?: number | null | undefined;
   verified?: boolean;
   onPress?: () => void;
 }) {
