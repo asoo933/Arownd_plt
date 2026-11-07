@@ -15,6 +15,7 @@ import {
 } from "@/components/customer-ui";
 import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
+import { CartButton } from "@/components/cart-button";
 
 const categories = [
   { id: "fashion", icon: "👗", label: "categoryFashion" },
@@ -37,6 +38,7 @@ export default function CustomerHomeScreen() {
         <View style={styles.brandWrap}>
           <View style={styles.brandMark}><Text style={styles.brandMarkText}>A</Text></View>
           <Text style={[styles.brand, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>arownd</Text>
+          <CartButton />
         </View>
         <Pressable accessibilityRole="button" style={styles.location} onPress={() => router.push("/stores")}>
           <Text style={styles.locationText}>{translate("homeLocation")}</Text>
