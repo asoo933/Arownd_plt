@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-import type { MerchantProductInput } from "@/lib/merchant-product-create-state";
-
 import { getSupabaseClient } from "@/lib/supabase";
+import type { MerchantProductInput } from "@/lib/merchant-product-create-state";
 import { MerchantProductOfferSchema } from "@/lib/merchant-products-schema";
 import type { MerchantOfferValues, MerchantProductOffer } from "@/lib/merchant-products-state";
 
