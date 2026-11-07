@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
+import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsset } from "@/lib/merchant-store-images";
 import { fetchMyMerchantStoreSettings, updateMyMerchantStoreSettings } from "@/lib/merchant-store-settings";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 import { translate } from "@/lib/i18n";
@@ -28,6 +30,9 @@ export default function MerchantStoreSettingsScreen() {
   const [form, setForm] = useState<MerchantStoreSettings | null>(null);
   const [formError, setFormError] = useState(false);
   const [wilayaPickerOpen, setWilayaPickerOpen] = useState(false);
+  const [imageBusy, setImageBusy] = useState<"logo" | "cover" | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageSaved, setImageSaved] = useState(false);
   const mutation = useMutation({
     mutationFn: (values: MerchantStoreSettings) => updateMyMerchantStoreSettings(storeId ?? "", values),
     onSuccess: async () => {
@@ -81,6 +86,39 @@ export default function MerchantStoreSettingsScreen() {
       : [...form.opening_hours.closed_days, day];
     update("opening_hours", { ...form.opening_hours, closed_days: closedDays });
   };
+  const chooseStoreImage = async (kind: "logo" | "cover") => {
+    if (!storeId || imageBusy || mutation.isPending) return;
+    setImageBusy(kind);
+    setImageError(false);
+    setImageSaved(false);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: false,
+        selectionLimit: 1,
+        quality: 0.85
+      });
+      if (result.canceled) return;
+      const asset = result.assets[0];
+      if (!asset) return;
+      if (asset.fileSize !== null && asset.fileSize !== undefined && asset.fileSize > STORE_IMAGE_MAX_BYTES) {
+        setImageError(true);
+        return;
+      }
+      if (!validateStoreImageAsset(asset)) {
+        setImageError(true);
+        return;
+      }
+      const url = await uploadMerchantStoreImage(storeId, asset, kind);
+      setForm((current) => current ? { ...current, [kind === "logo" ? "logo_url" : "cover_url"]: url } : current);
+      await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
+      setImageSaved(true);
+    } catch {
+      setImageError(true);
+    } finally {
+      setImageBusy(null);
+    }
+  };
   const submit = () => {
     const parsed = MerchantStoreSettingsSchema.safeParse(form);
     if (!parsed.success) {
@@ -99,6 +137,24 @@ export default function MerchantStoreSettingsScreen() {
         <Text style={[styles.title, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsTitle")}</Text>
         <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantStoreSettingsSubtitle")}</Text>
         <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <View style={styles.brandingRow}>
+            <View style={styles.brandingItem}>
+              <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreLogo")}</Text>
+              {form.logo_url ? <Image source={{ uri: form.logo_url }} style={styles.logoPreview} resizeMode="cover" /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Text style={{ color: theme.colors.muted }}>A</Text></View>}
+              <Pressable accessibilityRole="button" disabled={imageBusy !== null} onPress={() => void chooseStoreImage("logo")} style={[styles.imageButton, { borderColor: theme.colors.border, opacity: imageBusy ? 0.6 : 1 }]}>
+                {imageBusy === "logo" ? <ActivityIndicator color={theme.colors.accentMuted} /> : <Text style={[styles.imageButtonText, { color: theme.colors.accentMuted }]}>{translate("merchantStoreImageUpload")}</Text>}
+              </Pressable>
+            </View>
+            <View style={styles.brandingItem}>
+              <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreCover")}</Text>
+              {form.cover_url ? <Image source={{ uri: form.cover_url }} style={styles.coverPreview} resizeMode="cover" /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Text style={{ color: theme.colors.muted }}>A</Text></View>}
+              <Pressable accessibilityRole="button" disabled={imageBusy !== null} onPress={() => void chooseStoreImage("cover")} style={[styles.imageButton, { borderColor: theme.colors.border, opacity: imageBusy ? 0.6 : 1 }]}>
+                {imageBusy === "cover" ? <ActivityIndicator color={theme.colors.accentMuted} /> : <Text style={[styles.imageButtonText, { color: theme.colors.accentMuted }]}>{translate("merchantStoreImageUpload")}</Text>}
+              </Pressable>
+            </View>
+          </View>
+          {imageError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</Text> : null}
+          {imageSaved ? <Text style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreImageSaved")}</Text> : null}
           <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
           <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
@@ -196,6 +252,13 @@ function createStyles(theme: AppTheme) {
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     card: { borderWidth: 1, borderRadius: 18, padding: 15, gap: 13 },
     select: { justifyContent: "center" },
+    brandingRow: { flexDirection: "row-reverse", gap: 12 },
+    brandingItem: { flex: 1, gap: 8 },
+    logoPreview: { width: 76, height: 76, borderRadius: 14, alignSelf: "flex-end" },
+    coverPreview: { width: "100%", height: 76, borderRadius: 14 },
+    imagePlaceholder: { alignItems: "center", justifyContent: "center" },
+    imageButton: { minHeight: 40, borderWidth: 1, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+    imageButtonText: { fontSize: 11, fontWeight: "800" },
     modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 12 },
     modalCard: { maxHeight: "78%", borderWidth: 1, borderRadius: 18, padding: 15, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
