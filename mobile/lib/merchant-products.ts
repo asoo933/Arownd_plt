@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { MerchantProductInput } from "@/lib/merchant-product-create-state";
+
 import { getSupabaseClient } from "@/lib/supabase";
 import { MerchantProductOfferSchema } from "@/lib/merchant-products-schema";
 import type { MerchantOfferValues, MerchantProductOffer } from "@/lib/merchant-products-state";
@@ -79,8 +81,6 @@ export async function setMerchantProductVisibility(
     is_merchant_hidden: !isVisible
   });
 }
-
-import type { MerchantProductInput } from "@/lib/merchant-product-create-state";
 
 export async function createMerchantProductOffer(
   storeId: string,
