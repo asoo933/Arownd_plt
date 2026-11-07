@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { CustomerHeading, CustomerScreen } from "@/components/customer-ui";
@@ -17,6 +17,7 @@ export default function SettingsScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState(false);
+  const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
   const colors = {
     text: theme.colors.foreground,
     muted: theme.colors.muted,
@@ -109,11 +110,28 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
       <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <Pressable accessibilityRole="button" disabled={signOutMutation.isPending} onPress={() => { setSignOutError(false); signOutMutation.mutate(); }} style={styles.signOut}>
+        <Pressable accessibilityRole="button" disabled={signOutMutation.isPending} onPress={() => { setSignOutError(false); setSignOutConfirmOpen(true); }} style={styles.signOut}>
           <Text style={styles.signOutText}>{signOutMutation.isPending ? translate("settingsSigningOut") : translate("settingsSignOut")}</Text>
         </Pressable>
         {signOutError ? <Text accessibilityRole="alert" style={styles.error}>{translate("settingsSignOutError")}</Text> : null}
       </View>
+      <Modal visible={signOutConfirmOpen} transparent animationType="fade" onRequestClose={() => { if (!signOutMutation.isPending) setSignOutConfirmOpen(false); }}>
+        <View style={[styles.modalBackdrop, { backgroundColor: theme.colors.overlay }]}>
+          <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("settingsSignOutConfirmTitle")}</Text>
+            <Text style={[styles.hint, { color: theme.colors.muted }]}>{translate("settingsSignOutConfirmHint")}</Text>
+            {signOutError ? <Text accessibilityRole="alert" style={styles.error}>{translate("settingsSignOutError")}</Text> : null}
+            <View style={styles.modalActions}>
+              <Pressable accessibilityRole="button" disabled={signOutMutation.isPending} onPress={() => setSignOutConfirmOpen(false)} style={[styles.modalSecondary, { borderColor: theme.colors.border }]}>
+                <Text style={[styles.modalSecondaryText, { color: theme.colors.foreground }]}>{translate("back")}</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" disabled={signOutMutation.isPending} onPress={() => { setSignOutError(false); signOutMutation.mutate(); }} style={[styles.modalDanger, { backgroundColor: theme.colors.danger }]}>
+                <Text style={styles.modalDangerText}>{signOutMutation.isPending ? translate("settingsSigningOut") : translate("settingsSignOutConfirmAction")}</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </CustomerScreen>
   );
 }
@@ -132,5 +150,12 @@ const styles = StyleSheet.create({
   linkText: { fontSize: 13, fontWeight: "700" },
   arrow: { color: "#7A7A7A", fontSize: 22 },
   signOut: { minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: "#D94848", alignItems: "center", justifyContent: "center" },
-  signOutText: { color: "#D94848", fontWeight: "900" }
+  signOutText: { color: "#D94848", fontWeight: "900" },
+  modalBackdrop: { flex: 1, justifyContent: "center", padding: 22 },
+  modalPanel: { borderWidth: 1, borderRadius: 20, padding: 18, gap: 14 },
+  modalActions: { flexDirection: "row-reverse", gap: 9 },
+  modalSecondary: { flex: 1, minHeight: 46, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  modalSecondaryText: { fontSize: 13, fontWeight: "800" },
+  modalDanger: { flex: 1, minHeight: 46, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  modalDangerText: { color: "#FFFFFF", fontSize: 13, fontWeight: "900" }
 });
