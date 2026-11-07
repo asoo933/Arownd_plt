@@ -18,6 +18,12 @@ describe("cart state", () => {
     expect(addCartItem([base], other)).toHaveLength(2);
   });
 
+  it("uses option order-independent identity for the same variant", () => {
+    const reordered = { ...base, options: { Color: "Black", Size: "M" } };
+    expect(cartLineKey(base)).toBe(cartLineKey(reordered));
+    expect(addCartItem([base], reordered)).toHaveLength(1);
+  });
+
   it("merges identical variants and caps quantity at ten", () => {
     const result = addCartItem([{ ...base, quantity: 8 }], { ...base, quantity: 5 });
     expect(result).toHaveLength(1);
@@ -52,6 +58,7 @@ describe("cart state", () => {
   it("waits for offers before reporting missing products", () => {
     expect(evaluateCart([base], undefined).blockingCount).toBe(0);
     expect(evaluateCart([base], []).blockingCount).toBe(1);
+    expect(evaluateCart([base], []).subtotal).toBe(0);
     expect(EMPTY_CART).toEqual([]);
   });
 });
