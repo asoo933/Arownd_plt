@@ -185,6 +185,15 @@ export default function MerchantEntryScreen() {
               {translate("merchantPreviewStore")}
             </Text>
           </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push("/merchant/settings")}
+            style={[styles.secondaryButton, { borderColor: theme.colors.border, marginTop: 9 }]}
+          >
+            <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
+              {translate("merchantStoreSettingsTitle")}
+            </Text>
+          </Pressable>
         </View>
 
         <View style={styles.sectionHeading}>
