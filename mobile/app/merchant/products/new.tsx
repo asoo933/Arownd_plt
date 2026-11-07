@@ -1,8 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
+import type { ImagePickerAsset } from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -19,6 +22,11 @@ import {
   createMerchantProductOffer
 } from "@/lib/merchant-products";
 import { validateMerchantProductInput } from "@/lib/merchant-product-create-state";
+import {
+  PRODUCT_IMAGE_MAX_COUNT,
+  PRODUCT_IMAGE_MAX_BYTES,
+  validateProductImageMetadata
+} from "@/lib/merchant-product-images";
 import {
   fetchMerchantAccess,
   fetchMerchantCategories,
@@ -56,6 +64,9 @@ export default function MerchantNewProductScreen() {
   const [form, setForm] = useState<ProductForm>(INITIAL_FORM);
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>([]);
+  const [imagePickerBusy, setImagePickerBusy] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const access = useQuery({
@@ -80,6 +91,58 @@ export default function MerchantNewProductScreen() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  const pickProductImages = async (): Promise<void> => {
+    if (imagePickerBusy || submitting) return;
+    const remaining = PRODUCT_IMAGE_MAX_COUNT - selectedImages.length;
+    if (remaining <= 0) {
+      setImageError(translate("merchantProductImagesLimit"));
+      return;
+    }
+
+    setImagePickerBusy(true);
+    setImageError(null);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: true,
+        selectionLimit: remaining,
+        orderedSelection: true,
+        quality: 0.85
+      });
+
+      if (result.canceled) return;
+
+      const accepted: ImagePickerAsset[] = [];
+      for (const asset of result.assets) {
+        const metadata = {
+          mimeType: asset.mimeType ?? null,
+          fileName: asset.fileName ?? null,
+          fileSize: asset.fileSize ?? null
+        };
+        if (!validateProductImageMetadata(metadata)) {
+          setImageError(translate("merchantProductImageInvalid"));
+          continue;
+        }
+        if (asset.fileSize !== null && asset.fileSize !== undefined && asset.fileSize > PRODUCT_IMAGE_MAX_BYTES) {
+          setImageError(translate("merchantProductImageTooLarge"));
+          continue;
+        }
+        accepted.push(asset);
+      }
+
+      setSelectedImages((current) => [...current, ...accepted].slice(0, PRODUCT_IMAGE_MAX_COUNT));
+    } catch {
+      setImageError(translate("merchantProductImagePickerError"));
+    } finally {
+      setImagePickerBusy(false);
+    }
+  };
+
+  const removeProductImage = (uri: string): void => {
+    setSelectedImages((current) => current.filter((asset) => asset.uri !== uri));
+    setImageError(null);
+  };
+
   const submit = async (): Promise<void> => {
     if (!storeId || submitting) return;
 
@@ -93,7 +156,7 @@ export default function MerchantNewProductScreen() {
     setSubmitError(null);
 
     try {
-      await createMerchantProductOffer(storeId, values);
+      await createMerchantProductOffer(storeId, values, selectedImages);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["merchant-products", storeId] }),
         queryClient.invalidateQueries({ queryKey: ["merchant-dashboard", storeId] }),
@@ -274,10 +337,56 @@ export default function MerchantNewProductScreen() {
               />
             </FormField>
 
+            <FormField
+              label={translate("merchantProductImagesLabel")}
+              hint={translate("merchantProductImagesHint")}
+              theme={theme}
+            >
+              <Pressable
+                accessibilityRole="button"
+                disabled={imagePickerBusy || submitting || selectedImages.length >= PRODUCT_IMAGE_MAX_COUNT}
+                onPress={() => void pickProductImages()}
+                style={[styles.imagePickerButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background, opacity: imagePickerBusy ? 0.6 : 1 }]}
+              >
+                {imagePickerBusy ? (
+                  <ActivityIndicator color={theme.colors.accentMuted} />
+                ) : (
+                  <Text style={[styles.imagePickerText, { color: theme.colors.accentMuted }]}>
+                    {translate("merchantProductImagesChoose")}
+                  </Text>
+                )}
+              </Pressable>
+              {selectedImages.length > 0 ? (
+                <View style={styles.imageGrid}>
+                  {selectedImages.map((asset) => (
+                    <View key={asset.assetId ?? asset.uri} style={styles.imageItem}>
+                      <Image source={{ uri: asset.uri }} style={styles.imagePreview} />
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={translate("merchantProductImageRemove")}
+                        onPress={() => removeProductImage(asset.uri)}
+                        style={[styles.imageRemove, { backgroundColor: theme.colors.danger }]}
+                        hitSlop={8}
+                      >
+                        <Text style={styles.imageRemoveText}>×</Text>
+                      </Pressable>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text style={[styles.hint, { color: theme.colors.subtle }]}>
+                  {translate("merchantProductImagesEmpty")}
+                </Text>
+              )}
+            </FormField>
+
+            {imageError ? (
+              <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
+                <Text style={[styles.errorText, { color: theme.colors.danger }]}>{imageError}</Text>
+              </View>
+            ) : null}
+
             <View style={[styles.note, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
-                {translate("merchantProductImagesDeferred")}
-              </Text>
               <Text style={[styles.noteText, { color: theme.colors.muted }]}>
                 {translate("merchantProductVariantsStockHint")}
               </Text>
@@ -429,6 +538,13 @@ function createStyles(theme: AppTheme) {
     selectButton: { minHeight: 47, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, justifyContent: "center" },
     selectText: { fontSize: 12, textAlign: "right", fontWeight: "700" },
     note: { borderRadius: 12, padding: 12, gap: 6 },
+    imagePickerButton: { minHeight: 48, borderWidth: 1, borderStyle: "dashed", borderRadius: 12, alignItems: "center", justifyContent: "center" },
+    imagePickerText: { fontSize: 12, fontWeight: "900" },
+    imageGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
+    imageItem: { width: 88, height: 88, borderRadius: 12, overflow: "visible" },
+    imagePreview: { width: 88, height: 88, borderRadius: 12, backgroundColor: theme.colors.surfaceMuted },
+    imageRemove: { position: "absolute", top: -7, right: -7, width: 25, height: 25, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+    imageRemoveText: { color: "#FFFFFF", fontSize: 19, lineHeight: 22, fontWeight: "900" },
     noteText: { fontSize: 10, lineHeight: 16, textAlign: "right" },
     errorBox: { borderWidth: 1, borderRadius: 12, padding: 11 },
     errorText: { fontSize: 11, lineHeight: 17, textAlign: "right", fontWeight: "700" },
