@@ -517,12 +517,6 @@ export default function MerchantEditProductScreen() {
               </Text>
             </View>
 
-            <View style={[styles.note, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
-                {translate("merchantProductEditSharedFieldsHint")}
-              </Text>
-            </View>
-
             <Pressable
               accessibilityRole="button"
               disabled={isBusy}
