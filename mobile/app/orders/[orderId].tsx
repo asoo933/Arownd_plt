@@ -180,7 +180,7 @@ export default function OrderDetailsScreen() {
         {merchantOrder.items.map((item) => <View key={item.id} style={styles.itemRow}>
           <View style={styles.itemInfo}>
             <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
-            <Text style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</Text>
+            
           </View>
           <Text style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</Text>
         </View>)}
