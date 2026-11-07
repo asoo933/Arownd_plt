@@ -128,8 +128,8 @@ export default function ProductDetailsScreen() {
               price: selectedOffer.price,
               quantity,
               options: {
-                ...(selectedColor ? { [translate("productColorOption")]: selectedColor } : {}),
-                ...(selectedSize ? { [translate("productSizeOption")]: selectedSize } : {})
+                ...(selectedColor ? { color: selectedColor } : {}),
+                ...(selectedSize ? { size: selectedSize } : {})
               }
             })}
             style={[styles.addButton, (!canAdd || addMutation.isPending) && styles.disabledButton]}
