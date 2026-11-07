@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { formatDZD } from "@/lib/catalog";
@@ -9,6 +9,7 @@ import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrd
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 const STEPS = [
   { status: "pending", title: "orderStepPending" as const, hint: "orderStepPendingHint" as const },
@@ -46,7 +47,7 @@ function dateLabel(value: string | null | undefined): string {
 }
 
 export default function OrderDetailsScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const queryClient = useQueryClient();
   const [declineTarget, setDeclineTarget] = useState<string | null>(null);
@@ -126,34 +127,34 @@ export default function OrderDetailsScreen() {
     <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></Pressable>
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersCode") + ": " + orderCode} />
 
-    <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderSummary")}</Text>
       <View style={styles.totalRow}><Text style={styles.label}>{translate("orderTotal")}</Text><Text style={styles.total}>{formatDZD(order.total)}</Text></View>
       <Text style={styles.meta}>{dateLabel(order.created_at)}</Text>
     </View>
 
-    {showParentTimeline ? <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    {showParentTimeline ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderProgress")}</Text>
       {parentCancelled ? <Text style={styles.cancelled}>{statusLabel(order.status)}</Text> : STEPS.map((step, index) => {
         const complete = index <= activeStep;
         return <View key={step.status} style={styles.step}>
           <View style={[styles.stepDot, complete && styles.stepDone]}><Text style={[styles.stepNumber, complete && styles.stepNumberDone]}>{complete ? "✓" : String(index + 1)}</Text></View>
           <View style={styles.stepContent}>
-            <Text style={[styles.stepTitle, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{translate(step.title)}</Text>
+            <Text style={[styles.stepTitle, { color: theme.colors.foreground }]}>{translate(step.title)}</Text>
             <Text style={styles.meta}>{translate(step.hint)}</Text>
           </View>
         </View>;
       })}
-    </View> : <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    </View> : <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderPerStoreProgress")}</Text>
       <Text style={styles.meta}>{translate("orderPerStoreHint")}</Text>
     </View>}
 
-    {merchantOrders.length === 0 ? <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    {merchantOrders.length === 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderItemsTitle")}</Text>
       {order.items.map((item) => <View key={item.id} style={styles.itemRow}>
         <View style={styles.itemInfo}>
-          <Text style={[styles.itemName, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
+          <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
           <Text style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</Text>
         </View>
         <Text style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</Text>
@@ -166,7 +167,7 @@ export default function OrderDetailsScreen() {
       const tone = getOrderStatusTone(merchantOrder.status);
       const cancelled = merchantOrder.status === "cancelled" || merchantOrder.status === "rejected";
       const subTotal = cancelled ? 0 : merchantOrder.subtotal + merchantOrder.shipping_fee;
-      return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+      return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.merchantHeader}>
           <Text style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</Text>
           <View style={[styles.status, tone === "success" ? styles.statusSuccess : tone === "danger" ? styles.statusDanger : tone === "pending" ? styles.statusPending : styles.statusMuted]}>
@@ -175,7 +176,7 @@ export default function OrderDetailsScreen() {
         </View>
         {merchantOrder.items.map((item) => <View key={item.id} style={styles.itemRow}>
           <View style={styles.itemInfo}>
-            <Text style={[styles.itemName, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
+            <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
             <Text style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</Text>
           </View>
           <Text style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</Text>
@@ -221,9 +222,9 @@ export default function OrderDetailsScreen() {
       </View>;
     })}
 
-    <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderRecipientTitle")}</Text>
-      <Text style={[styles.recipient, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{order.full_name ?? ""}</Text>
+      <Text style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</Text>
       <Text style={styles.meta}>{order.wilaya?.name_ar ?? ""} · {order.commune ?? ""}</Text>
       {order.delivery_type === "home" && order.address_line ? <Text style={styles.meta}>{order.address_line}</Text> : null}
       <Text style={styles.meta}>{order.phone ?? ""}</Text>
@@ -231,7 +232,7 @@ export default function OrderDetailsScreen() {
       <Text style={styles.meta}>{translate("orderPayment")}: {order.payment_method === "cod" ? translate("checkoutCodNote") : order.payment_method ?? ""}</Text>
     </View>
 
-    {query.data.shipments.length > 0 ? <View style={[styles.panel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    {query.data.shipments.length > 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</Text>
       {query.data.shipments.map((shipment) => <View key={shipment.id} style={styles.shipment}>
         <Text style={styles.shipmentStatus}>{statusLabel(shipment.status)}</Text>
@@ -250,7 +251,7 @@ export default function OrderDetailsScreen() {
     <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
     <Modal visible={cancelTarget !== null} transparent animationType="fade" onRequestClose={() => setCancelTarget(null)}>
       <View style={styles.modalBackdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <Text style={styles.sectionTitle}>{translate("orderCancelConfirmTitle")}</Text>
           <Text style={styles.meta}>{translate("orderCancelConfirmHint")}</Text>
           {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
@@ -271,7 +272,7 @@ export default function OrderDetailsScreen() {
     </Modal>
     <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
       <View style={styles.modalBackdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <Text style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</Text>
           <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
           {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
