@@ -35,7 +35,6 @@ import {
 import {
   groupMerchantCategories
 } from "@/lib/merchant-category-state";
-import type { MerchantCategory } from "@/lib/merchant";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
@@ -462,6 +461,7 @@ export default function MerchantNewProductScreen() {
                         <CategoryOption
                           key={category.id}
                           category={category}
+                          nested
                           selected={form.category === category.id}
                           theme={theme}
                           onSelect={() => {
@@ -494,11 +494,13 @@ export default function MerchantNewProductScreen() {
 
 function CategoryOption({
   category,
+  nested = false,
   selected,
   theme,
   onSelect
 }: {
   category: MerchantCategory;
+  nested?: boolean;
   selected: boolean;
   theme: AppTheme;
   onSelect: () => void;
@@ -512,7 +514,7 @@ function CategoryOption({
       onPress={onSelect}
       style={[
         styles.categoryOption,
-        styles.categoryOptionChild,
+        ...(nested ? [styles.categoryOptionChild] : []),
         {
           borderColor: selected ? theme.colors.accentMuted : theme.colors.border,
           backgroundColor: selected ? theme.colors.surfaceMuted : theme.colors.background
