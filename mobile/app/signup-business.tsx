@@ -12,6 +12,7 @@ import { translate } from "@/lib/i18n";
 export default function BusinessSignupScreen() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<BusinessSignupInput>({
     resolver: zodResolver(businessSignupSchema),
     defaultValues: { fullName: "", businessName: "", email: "", password: "", confirmPassword: "" }
@@ -20,9 +21,9 @@ export default function BusinessSignupScreen() {
   const submit = handleSubmit(async (values) => {
     setServerError(null);
     try {
-      const hasSession = await signUpBusiness(values);
-      if (hasSession) router.replace("/" as never);
-      else setCreated(true);
+      const sessionCreated = await signUpBusiness(values);
+      setHasSession(sessionCreated);
+      setCreated(true);
     } catch (error) {
       setServerError(error instanceof Error && error.message === "SUPABASE_CONFIG_MISSING"
         ? translate("configError")
@@ -34,7 +35,10 @@ export default function BusinessSignupScreen() {
     <AuthLayout title={translate("businessSignupTitle")} subtitle={translate("businessSignupSubtitle")} showBack>
       {created ? (
         <View style={styles.form}>
-          <SuccessPanel title={translate("signupSuccessTitle")} message={translate("signupSuccess")} />
+          <SuccessPanel
+            title={translate(hasSession ? "accountCreatedTitle" : "signupSuccessTitle")}
+            message={translate(hasSession ? "accountCreatedMessage" : "signupSuccess")}
+          />
           <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/login")} />
         </View>
       ) : (
