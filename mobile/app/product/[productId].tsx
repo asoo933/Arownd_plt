@@ -63,7 +63,7 @@ export default function ProductDetailsScreen() {
         <Text style={[styles.pageTitle, { color: theme.colors.foreground }]}>{translate("detailProductTitle")}</Text>
         <View style={styles.titleActions}><FavoriteButton kind="products" id={productId} /><CartButton /></View>
       </View>
-      <View style={styles.heroImage}>
+      <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
       </View>
       <View style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
@@ -91,12 +91,12 @@ export default function ProductDetailsScreen() {
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
               onPress={() => { setSelectedOfferId(offer.id); setSize(""); setColor(""); setQuantity(1); addMutation.reset(); }}
-              style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: active ? "#829E19" : theme.colors.border }]}
+              style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: active ? theme.colors.accentMuted : theme.colors.border }]}
             >
               <View style={styles.offerInfo}>
                 <Text style={[styles.offerStore, { color: theme.colors.foreground }]}>{offer.store.name}</Text>
                 <Text style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</Text>
-                <Text style={[styles.stock, { color: available ? "#647D13" : "#B45309" }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
+                <Text style={[styles.stock, { color: available ? theme.colors.success : theme.colors.warning }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
               </View>
               <Text style={styles.offerPrice}>{formatDZD(offer.price)}</Text>
             </Pressable>
@@ -153,7 +153,7 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
     <View style={styles.optionGroup}>
       <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</Text>
       <View style={styles.optionValues}>
-        {values.map((option) => <Pressable key={option} accessibilityRole="button" accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, value === option && styles.optionChipActive]}><Text style={[styles.optionChipText, value === option && styles.optionChipTextActive]}>{option}</Text></Pressable>)}
+        {values.map((option) => <Pressable key={option} accessibilityRole="button" accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, { backgroundColor: value === option ? theme.colors.accent : theme.colors.surface, borderColor: value === option ? theme.colors.accentMuted : theme.colors.border }]}><Text style={[styles.optionChipText, { color: value === option ? theme.colors.accentForeground : theme.colors.foreground }]}>{option}</Text></Pressable>)}
       </View>
     </View>
   );
@@ -184,10 +184,8 @@ const styles = StyleSheet.create({
   optionGroup: { gap: 8 },
   optionLabel: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   optionValues: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 },
-  optionChip: { minWidth: 42, minHeight: 38, paddingHorizontal: 12, borderRadius: 11, borderWidth: 1, borderColor: "#D6D6D6", alignItems: "center", justifyContent: "center" },
-  optionChipActive: { backgroundColor: "#C6F135", borderColor: "#829E19" },
-  optionChipText: { color: "#555555", fontSize: 12, fontWeight: "700" },
-  optionChipTextActive: { color: "#0A0A0A" },
+  optionChip: { minWidth: 44, minHeight: 44, paddingHorizontal: 13, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  optionChipText: { fontSize: 12, fontWeight: "700" },
   quantityRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
   quantityControls: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
   quantityButton: { width: 36, height: 36, borderRadius: 11, backgroundColor: "#F0F2E8", alignItems: "center", justifyContent: "center" },
