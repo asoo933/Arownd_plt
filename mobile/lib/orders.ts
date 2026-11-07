@@ -94,6 +94,7 @@ export async function fetchMyOrders(): Promise<CustomerOrder[]> {
 export async function fetchCustomerOrderDetails(orderId: string): Promise<{
   order: CustomerOrder | null;
   shipments: CustomerShipment[];
+  trackingEvents: { merchantOrderId: string; events: CustomerTrackingEvent[] }[];
 }> {
   const { data: auth, error: authError } = await getSupabaseClient().auth.getUser();
   if (authError) throw authError;
