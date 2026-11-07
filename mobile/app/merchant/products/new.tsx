@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -18,10 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   createMerchantProductOffer
 } from "@/lib/merchant-products";
-import {
-  parseMerchantOptionList,
-  validateMerchantProductInput
-} from "@/lib/merchant-product-create-state";
+import { validateMerchantProductInput } from "@/lib/merchant-product-create-state";
 import {
   fetchMerchantAccess,
   fetchMerchantCategories,
@@ -369,7 +366,7 @@ function FormField({
   label: string;
   hint?: string;
   theme: AppTheme;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const styles = createStyles(theme);
   return (
