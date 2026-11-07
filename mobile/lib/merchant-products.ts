@@ -98,7 +98,7 @@ export async function fetchMerchantProducts(storeId: string): Promise<MerchantPr
 
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, brand), images:product_images(id, image_url, is_primary)")
+    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, description, brand, category), images:product_images(id, image_url, is_primary)")
     .eq("store_id", storeId)
     .order("created_at", { ascending: false });
 
@@ -114,7 +114,7 @@ export async function fetchMerchantProductOffer(
 
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, brand), images:product_images(id, image_url, is_primary)")
+    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, description, brand, category), images:product_images(id, image_url, is_primary)")
     .eq("store_id", storeId)
     .eq("id", offerId)
     .maybeSingle();
