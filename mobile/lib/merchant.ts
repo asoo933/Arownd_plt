@@ -55,7 +55,6 @@ export async function fetchMerchantAccess(): Promise<MerchantAccess | null> {
     hasOwnedStore: store !== null
   });
 
-  if (status === "signed_out") return null;
   return { userId, status, store };
 }
 
