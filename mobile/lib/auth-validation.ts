@@ -45,7 +45,18 @@ export const recoverySchema = z.object({
   email: emailSchema
 });
 
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "required")
+  })
+  .refine(
+    (value) => value.password === value.confirmPassword,
+    matchingPasswords
+  );
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type PersonalSignupInput = z.infer<typeof personalSignupSchema>;
 export type BusinessSignupInput = z.infer<typeof businessSignupSchema>;
 export type RecoveryInput = z.infer<typeof recoverySchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
