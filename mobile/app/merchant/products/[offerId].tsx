@@ -188,8 +188,11 @@ export default function MerchantEditProductScreen() {
       await refreshProductData();
       setPromotionPrice("");
       setNotice(translate("merchantPromotionStarted"));
-    } catch {
-      setActionError(translate("merchantPromotionError"));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "";
+      setActionError(message.includes("promotion_reference_price_unavailable")
+        ? translate("merchantPromotionReferenceUnavailable")
+        : translate("merchantPromotionError"));
     } finally {
       setPromotionBusy(false);
     }
