@@ -7,21 +7,29 @@ const base: CartItem = {
   productId: "product-1",
   name: "Product",
   quantity: 1,
-  options: { Size: "M", Color: "Black" },
+  options: { size: "M", color: "Black" },
   price: 1200
 };
 
 describe("cart state", () => {
   it("keeps different variants as separate lines", () => {
-    const other = { ...base, options: { Color: "Black", Size: "L" } };
+    const other = { ...base, options: { color: "Black", size: "L" } };
     expect(cartLineKey(base)).not.toBe(cartLineKey(other));
     expect(addCartItem([base], other)).toHaveLength(2);
   });
 
   it("uses option order-independent identity for the same variant", () => {
-    const reordered = { ...base, options: { Color: "Black", Size: "M" } };
+    const reordered = { ...base, options: { color: "Black", size: "M" } };
     expect(cartLineKey(base)).toBe(cartLineKey(reordered));
     expect(addCartItem([base], reordered)).toHaveLength(1);
+  });
+
+  it("normalizes legacy localized option labels to stable keys", () => {
+    const legacyArabic = { ...base, options: { "اللون": "أسود", "المقاس": "M" } };
+    const legacyEnglish = { ...base, options: { Color: "Black", Size: "M" } };
+    expect(cartLineKey(legacyArabic)).toBe(cartLineKey({ ...base, options: { color: "أسود", size: "M" } }));
+    expect(cartLineKey(legacyEnglish)).toBe(cartLineKey(base));
+    expect(sanitizeCart([legacyEnglish, { ...base, options: { color: "Black", size: "M" } }])).toHaveLength(1);
   });
 
   it("merges identical variants and caps quantity at ten", () => {
@@ -43,13 +51,13 @@ describe("cart state", () => {
   });
 
   it("updates and removes a specific variant only", () => {
-    const second = { ...base, options: { Size: "L", Color: "Black" } };
+    const second = { ...base, options: { size: "L", color: "Black" } };
     expect(setCartItemQuantity([base, second], cartLineKey(base), 4)[0]?.quantity).toBe(4);
     expect(removeCartItem([base, second], cartLineKey(base))).toEqual([second]);
   });
 
   it("checks stock across variants and uses the current server price", () => {
-    const second = { ...base, options: { Size: "L" }, quantity: 2 };
+    const second = { ...base, options: { size: "L" }, quantity: 2 };
     const result = evaluateCart([base, second], [{
       id: "offer-1", price: 1500, stock_quantity: 2, is_available: true,
       product: { id: "product-1", name: "Product" },
