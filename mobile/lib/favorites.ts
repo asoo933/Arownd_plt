@@ -42,7 +42,7 @@ export async function toggleFavorite(kind: FavoriteKind, id: string): Promise<Fa
   await getFavorites();
   cachedFavorites = toggleFavoriteId(cachedFavorites, kind, id);
   const snapshot = cachedFavorites;
-  pendingWrite = pendingWrite.then(() =>
+  pendingWrite = pendingWrite.catch(() => undefined).then(() =>
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot))
   );
   await pendingWrite;
