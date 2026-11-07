@@ -1,6 +1,5 @@
 -- Verified review submission for the Native and web clients.
--- A review is accepted only after a delivered order or a collected reservation
--- containing the selected product/store. No client-side eligibility checks are trusted.
+-- Eligibility is checked against delivered merchant suborders or collected reservations.
 
 create or replace function public.submit_review(
   _target_type public.review_target_type,
@@ -22,11 +21,9 @@ begin
   if actor_id is null then
     raise exception 'not_authenticated';
   end if;
-
   if _rating is null or _rating < 1 or _rating > 5 then
     raise exception 'invalid_rating';
   end if;
-
   if normalized_comment is not null and char_length(normalized_comment) > 1000 then
     raise exception 'review_comment_too_long';
   end if;
@@ -38,12 +35,21 @@ begin
 
     select exists (
       select 1
+      from public.merchant_orders mo
+      join public.order_items oi on oi.merchant_order_id = mo.id
+      join public.store_offers so on so.id = oi.offer_id
+      where mo.customer_id = actor_id
+        and mo.status = 'delivered'
+        and so.product_id = _target_id
+      union all
+      select 1
       from public.orders o
       join public.order_items oi on oi.order_id = o.id
       join public.store_offers so on so.id = oi.offer_id
       where o.user_id = actor_id
         and o.status = 'delivered'
         and so.product_id = _target_id
+        and not exists (select 1 from public.merchant_orders mo where mo.order_id = o.id)
       union all
       select 1
       from public.reservations r
@@ -59,11 +65,18 @@ begin
 
     select exists (
       select 1
+      from public.merchant_orders mo
+      where mo.customer_id = actor_id
+        and mo.status = 'delivered'
+        and mo.store_id = _target_id
+      union all
+      select 1
       from public.orders o
       join public.order_items oi on oi.order_id = o.id
       where o.user_id = actor_id
         and o.status = 'delivered'
         and oi.store_id = _target_id
+        and not exists (select 1 from public.merchant_orders mo where mo.order_id = o.id)
       union all
       select 1
       from public.reservations r
