@@ -106,7 +106,7 @@ export default function MerchantOrderDetailsScreen() {
 
   const trackingMutation = useMutation({
     mutationFn: async (status: MerchantTrackingStatus) => {
-      if (status === "out_for_delivery" && order.status === "confirmed") {
+      if (status === "out_for_delivery" && merchantOrder?.status === "confirmed") {
         await updateMerchantOrderStatus(orderId ?? "", "shipped");
       }
       await updateMerchantOrderTracking(orderId ?? "", status);
