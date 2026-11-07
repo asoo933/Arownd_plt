@@ -9,6 +9,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
 import { translate } from "@/lib/i18n";
+import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
 
 export default function ProductDetailsScreen() {
@@ -144,6 +145,7 @@ export default function ProductDetailsScreen() {
           <Text style={styles.storeButtonText}>{translate("productSelectedOffer")}: {selectedOffer.store.name}</Text>
         </Pressable>
       ) : null}
+      <ReviewPanel targetType="product" targetId={productId} />
     </CustomerScreen>
   );
 }
