@@ -36,6 +36,12 @@ describe("cart state", () => {
     expect(result[0]?.quantity).toBe(2);
   });
 
+  it("omits an invalid cached price instead of storing undefined", () => {
+    const [item] = sanitizeCart([{ ...base, price: Number.NaN }]);
+    expect(item).toBeDefined();
+    expect(item).not.toHaveProperty("price");
+  });
+
   it("updates and removes a specific variant only", () => {
     const second = { ...base, options: { Size: "L", Color: "Black" } };
     expect(setCartItemQuantity([base, second], cartLineKey(base), 4)[0]?.quantity).toBe(4);
