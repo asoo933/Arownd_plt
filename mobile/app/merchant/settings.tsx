@@ -109,10 +109,11 @@ export default function MerchantStoreSettingsScreen() {
         setImageError(true);
         return;
       }
-      const url = await uploadMerchantStoreImage(storeId, asset, kind);
-      setForm((current) => current ? { ...current, [kind === "logo" ? "logo_url" : "cover_url"]: url } : current);
+      const uploaded = await uploadMerchantStoreImage(storeId, asset, kind);
+      setForm((current) => current ? { ...current, [kind === "logo" ? "logo_url" : "cover_url"]: uploaded.url } : current);
       await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
       setImageSaved(true);
+      if (uploaded.cleanupPending) setImageError(true);
     } catch {
       setImageError(true);
     } finally {
