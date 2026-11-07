@@ -3,6 +3,7 @@ import { MerchantStoreSettingsSchema } from "@/lib/merchant-store-settings-state
 
 const valid = {
   name: "متجر الاختبار",
+  wilaya_id: 9,
   description: "",
   phone: "0550123456",
   whatsapp: "",
