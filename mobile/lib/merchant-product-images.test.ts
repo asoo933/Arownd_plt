@@ -70,5 +70,9 @@ describe("product image storage helpers", () => {
     expect(getNextPrimaryProductImageId(images, "image-1")).toBe("image-2");
     expect(getNextPrimaryProductImageId(images, "image-2")).toBeNull();
     expect(getNextPrimaryProductImageId(images, "missing")).toBeNull();
+    expect(getNextPrimaryProductImageId([
+      ...images,
+      { id: "image-3", image_url: "https://example.test/3", is_primary: true }
+    ], "image-1")).toBeNull();
   });
 });
