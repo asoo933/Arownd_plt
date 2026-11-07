@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  getNextMerchantTrackingStatus,
+  getNextMerchantOrderStatus,
   groupMerchantOrderRows,
   type MerchantOrderRow
 } from "@/lib/merchant-dashboard-state";
@@ -104,19 +104,20 @@ describe("groupMerchantOrderRows", () => {
   });
 });
 
-describe("getNextMerchantTrackingStatus", () => {
-  it("starts with preparing when no tracking events exist", () => {
-    expect(getNextMerchantTrackingStatus([])).toBe("preparing");
+describe("getNextMerchantOrderStatus", () => {
+  it("moves confirmed orders to shipped", () => {
+    expect(getNextMerchantOrderStatus("confirmed", "home")).toBe("shipped");
+    expect(getNextMerchantOrderStatus("confirmed", "desk")).toBe("shipped");
   });
 
-  it("returns only the next sequential tracking state", () => {
-    expect(getNextMerchantTrackingStatus(["preparing"])).toBe("ready_for_dispatch");
-    expect(getNextMerchantTrackingStatus(["preparing", "ready_for_dispatch"])).toBe("out_for_delivery");
-    expect(getNextMerchantTrackingStatus(["preparing", "ready_for_dispatch", "out_for_delivery"])).toBe("delivered");
+  it("allows the store to complete desk pickup only", () => {
+    expect(getNextMerchantOrderStatus("shipped", "desk")).toBe("delivered");
+    expect(getNextMerchantOrderStatus("shipped", "home")).toBeNull();
   });
 
-  it("returns null after delivery or when the stored state is unknown", () => {
-    expect(getNextMerchantTrackingStatus(["preparing", "ready_for_dispatch", "out_for_delivery", "delivered"])).toBeNull();
-    expect(getNextMerchantTrackingStatus(["unexpected"])).toBeNull();
+  it("does not offer transitions for terminal or unsupported states", () => {
+    expect(getNextMerchantOrderStatus("delivered", "desk")).toBeNull();
+    expect(getNextMerchantOrderStatus("cancelled", "home")).toBeNull();
+    expect(getNextMerchantOrderStatus("pending", "desk")).toBeNull();
   });
 });
