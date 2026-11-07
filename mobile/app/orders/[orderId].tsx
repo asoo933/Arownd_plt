@@ -5,7 +5,8 @@ import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View, useColorSc
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { formatDZD } from "@/lib/catalog";
-import { fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
+import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
+import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 
@@ -49,10 +50,22 @@ export default function OrderDetailsScreen() {
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const queryClient = useQueryClient();
   const [declineTarget, setDeclineTarget] = useState<string | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<{ type: "order" | "merchant"; id: string } | null>(null);
   const quoteMutation = useMutation({
     mutationFn: (input: { merchantOrderId: string; accept: boolean }) =>
       respondToMerchantQuote(input.merchantOrderId, input.accept),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["customer-order-details", orderId] });
+      await queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
+    }
+  });
+  const cancelMutation = useMutation({
+    mutationFn: async (target: { type: "order" | "merchant"; id: string }) => {
+      if (target.type === "merchant") await cancelMyMerchantOrder(target.id);
+      else await cancelMyOrder(target.id);
+    },
+    onSuccess: async () => {
+      setCancelTarget(null);
       await queryClient.invalidateQueries({ queryKey: ["customer-order-details", orderId] });
       await queryClient.invalidateQueries({ queryKey: ["customer-orders"] });
     }
@@ -170,6 +183,13 @@ export default function OrderDetailsScreen() {
         <View style={styles.totalRow}><Text style={styles.label}>{translate("orderStoreSubtotal")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.subtotal)}</Text></View>
         {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</Text></View> : null}
         {!cancelled ? <View style={styles.totalRow}><Text style={styles.sectionTitle}>{translate("orderStoreTotal")}</Text><Text style={styles.total}>{formatDZD(subTotal)}</Text></View> : null}
+        {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <Pressable
+          disabled={cancelMutation.isPending}
+          onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })}
+          style={styles.cancelButton}
+        >
+          <Text style={styles.cancelButtonText}>{translate("orderCancelStore")}</Text>
+        </Pressable> : null}
         {merchantOrder.status === "quoted" ? <>
           <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text>
           <View style={styles.quoteActions}>
@@ -219,7 +239,36 @@ export default function OrderDetailsScreen() {
         {shipment.notes ? <Text style={styles.meta}>{shipment.notes}</Text> : null}
       </View>)}
     </View> : null}
+    {canCancelLegacyOrder(order.status, merchantOrders.length > 0) ? <Pressable
+      disabled={cancelMutation.isPending}
+      onPress={() => setCancelTarget({ type: "order", id: order.id })}
+      style={styles.cancelButton}
+    >
+      <Text style={styles.cancelButtonText}>{translate("orderCancel")}</Text>
+    </Pressable> : null}
+    {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
     <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
+    <Modal visible={cancelTarget !== null} transparent animationType="fade" onRequestClose={() => setCancelTarget(null)}>
+      <View style={styles.modalBackdrop}>
+        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+          <Text style={styles.sectionTitle}>{translate("orderCancelConfirmTitle")}</Text>
+          <Text style={styles.meta}>{translate("orderCancelConfirmHint")}</Text>
+          {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
+          <View style={styles.quoteActions}>
+            <Pressable
+              disabled={cancelMutation.isPending}
+              onPress={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
+              style={styles.declineButton}
+            >
+              {cancelMutation.isPending ? <ActivityIndicator color="#B42318" /> : <Text style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</Text>}
+            </Pressable>
+            <Pressable disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
+              <Text style={styles.acceptButtonText}>{translate("back")}</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
     <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
@@ -290,6 +339,8 @@ const styles = StyleSheet.create({
   acceptButtonText: { color: "#0A0A0A", fontSize: 12, fontWeight: "900" },
   declineButton: { flex: 1, minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: "#B42318", alignItems: "center", justifyContent: "center" },
   declineButtonText: { color: "#B42318", fontSize: 12, fontWeight: "900" },
+  cancelButton: { minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: "#B42318", justifyContent: "center", alignItems: "center" },
+  cancelButtonText: { color: "#B42318", fontSize: 12, fontWeight: "900" },
   errorText: { color: "#B42318", fontSize: 11, textAlign: "right" },
   modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 20 },
   modalPanel: { borderRadius: 18, padding: 18, gap: 13 }
