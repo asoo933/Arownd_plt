@@ -39,6 +39,12 @@ create policy "Delivery cannot read offer price history"
 
 -- No authenticated INSERT/UPDATE/DELETE policies: only the trigger records prices.
 
+-- Legacy old_price values were merchant-writable before the column allowlist.
+-- They are not trusted as reference prices; clear them before enabling promotions.
+update public.store_offers
+set old_price = null
+where old_price is not null;
+
 insert into public.store_offer_price_history (offer_id, store_id, price, recorded_at)
 select id, store_id, price, now()
 from public.store_offers;
