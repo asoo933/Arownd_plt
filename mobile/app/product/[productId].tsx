@@ -6,7 +6,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
-import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
+import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferDiscountPercent, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
@@ -70,7 +70,10 @@ export default function ProductDetailsScreen() {
       </View>
       <View style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
         <Text style={[styles.productName, { color: theme.colors.foreground }]}>{productDetails.name}</Text>
-        {selectedOffer ? <Text style={styles.price}>{formatDZD(selectedOffer.price)}</Text> : null}
+        {selectedOffer ? <View style={styles.priceStack}>
+          {selectedOffer.old_price != null && selectedOffer.old_price > selectedOffer.price ? <Text style={styles.comparePrice}>{formatDZD(selectedOffer.old_price)}</Text> : null}
+          <Text style={styles.price}>{formatDZD(selectedOffer.price)}{getOfferDiscountPercent(selectedOffer.old_price, selectedOffer.price) !== null ? " · " + getOfferDiscountPercent(selectedOffer.old_price, selectedOffer.price) + "%" : ""}</Text>
+        </View> : null}
         <View style={styles.metadata}>
           {productDetails.brand ? <Text style={styles.metaText}>{translate("productBrand")}: {productDetails.brand}</Text> : null}
           {productDetails.category ? <Text style={styles.metaText}>{translate("productCategory")}: {productDetails.category}</Text> : null}
@@ -100,7 +103,10 @@ export default function ProductDetailsScreen() {
                 <Text style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</Text>
                 <Text style={[styles.stock, { color: available ? theme.colors.success : theme.colors.warning }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
               </View>
-              <Text style={styles.offerPrice}>{formatDZD(offer.price)}</Text>
+              <View style={styles.offerPriceStack}>
+                {offer.old_price != null && offer.old_price > offer.price ? <Text style={styles.comparePrice}>{formatDZD(offer.old_price)}</Text> : null}
+                <Text style={styles.offerPrice}>{formatDZD(offer.price)}{getOfferDiscountPercent(offer.old_price, offer.price) !== null ? " · " + getOfferDiscountPercent(offer.old_price, offer.price) + "%" : ""}</Text>
+              </View>
             </Pressable>
           );
         })}
@@ -172,6 +178,8 @@ const styles = StyleSheet.create({
   imageFallback: { color: "#8A9B55", fontSize: 46 },
   infoCard: { borderRadius: 18, padding: 16, gap: 10 },
   productName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
+  priceStack: { alignItems: "flex-end", gap: 2 },
+  comparePrice: { color: "#888888", fontSize: 11, textDecorationLine: "line-through", textAlign: "right" },
   price: { color: "#647D13", fontSize: 22, fontWeight: "900", textAlign: "right" },
   metadata: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 12 },
   metaText: { color: "#737373", fontSize: 12, textAlign: "right" },
@@ -182,6 +190,7 @@ const styles = StyleSheet.create({
   offerInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
   offerStore: { fontSize: 14, fontWeight: "800", textAlign: "right" },
   stock: { fontSize: 11, fontWeight: "800" },
+  offerPriceStack: { alignItems: "flex-end", gap: 2 },
   offerPrice: { color: "#647D13", fontSize: 14, fontWeight: "900" },
   purchaseCard: { borderRadius: 18, padding: 14, gap: 13 },
   optionGroup: { gap: 8 },
