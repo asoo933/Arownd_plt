@@ -1,0 +1,454 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Redirect, router } from "expo-router";
+import { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import {
+  createMerchantProductOffer
+} from "@/lib/merchant-products";
+import {
+  parseMerchantOptionList,
+  validateMerchantProductInput
+} from "@/lib/merchant-product-create-state";
+import {
+  fetchMerchantAccess,
+  fetchMerchantCategories,
+  type MerchantCategory
+} from "@/lib/merchant";
+import { translate } from "@/lib/i18n";
+import { useAppTheme, type AppTheme } from "@/lib/theme";
+
+type ProductForm = {
+  name: string;
+  price: string;
+  stock: string;
+  category: string;
+  brand: string;
+  description: string;
+  sizes: string;
+  colors: string;
+};
+
+const INITIAL_FORM: ProductForm = {
+  name: "",
+  price: "",
+  stock: "",
+  category: "",
+  brand: "",
+  description: "",
+  sizes: "",
+  colors: ""
+};
+
+export default function MerchantNewProductScreen() {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState<ProductForm>(INITIAL_FORM);
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const access = useQuery({
+    queryKey: ["merchant-access"],
+    queryFn: fetchMerchantAccess,
+    retry: false
+  });
+  const categories = useQuery({
+    queryKey: ["merchant-categories"],
+    queryFn: fetchMerchantCategories,
+    staleTime: 5 * 60 * 1000,
+    retry: false
+  });
+
+  const storeId = access.data?.store?.id ?? null;
+  const selectedCategory = useMemo(
+    () => categories.data?.find((item) => item.id === form.category) ?? null,
+    [categories.data, form.category]
+  );
+
+  const update = (key: keyof ProductForm, value: string): void => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const submit = async (): Promise<void> => {
+    if (!storeId || submitting) return;
+
+    const values = validateMerchantProductInput(form);
+    if (!values) {
+      setSubmitError(translate("merchantProductCreateValidation"));
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await createMerchantProductOffer(storeId, values);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["merchant-products", storeId] }),
+        queryClient.invalidateQueries({ queryKey: ["merchant-dashboard", storeId] }),
+        queryClient.invalidateQueries({ queryKey: ["near-stores"] })
+      ]);
+      router.replace("/merchant/products");
+    } catch {
+      setSubmitError(translate("merchantProductCreateError"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (access.isPending) {
+    return <MessageScreen theme={theme} label={translate("merchantLoading")} loading />;
+  }
+  if (access.isError) {
+    return (
+      <MessageScreen
+        theme={theme}
+        label={translate("merchantLoadError")}
+        actionLabel={translate("merchantRetry")}
+        onAction={() => void access.refetch()}
+      />
+    );
+  }
+  if (!access.data) return <Redirect href="/login" />;
+  if (access.data.status !== "merchant_ready" || !storeId) return <Redirect href="/merchant" />;
+
+  if (categories.isPending) {
+    return <MessageScreen theme={theme} label={translate("merchantProductCategoriesLoading")} loading />;
+  }
+  if (categories.isError || !categories.data?.length) {
+    return (
+      <MessageScreen
+        theme={theme}
+        label={translate("merchantProductCategoriesError")}
+        actionLabel={translate("merchantRetry")}
+        onAction={() => void categories.refetch()}
+      />
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
+              {translate("merchantProductCreateBack")}
+            </Text>
+          </Pressable>
+
+          <View style={styles.header}>
+            <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
+              {translate("merchantDashboardEyebrow")}
+            </Text>
+            <Text style={[styles.title, { color: theme.colors.foreground }]}>
+              {translate("merchantProductCreateTitle")}
+            </Text>
+            <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
+              {translate("merchantProductCreateSubtitle")}
+            </Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <FormField label={translate("merchantProductNameLabel")} theme={theme}>
+              <TextInput
+                value={form.name}
+                onChangeText={(value) => update("name", value)}
+                placeholder={translate("merchantProductNamePlaceholder")}
+                placeholderTextColor={theme.colors.placeholder}
+                maxLength={120}
+                textAlign="right"
+                style={styles.input}
+                returnKeyType="next"
+              />
+            </FormField>
+
+            <View style={styles.row}>
+              <View style={styles.half}>
+                <FormField label={translate("merchantProductPriceLabel")} theme={theme}>
+                  <TextInput
+                    value={form.price}
+                    onChangeText={(value) => update("price", value)}
+                    placeholder={translate("merchantProductPricePlaceholder")}
+                    placeholderTextColor={theme.colors.placeholder}
+                    keyboardType="number-pad"
+                    style={styles.input}
+                  />
+                </FormField>
+              </View>
+              <View style={styles.half}>
+                <FormField label={translate("merchantProductStockLabel")} theme={theme}>
+                  <TextInput
+                    value={form.stock}
+                    onChangeText={(value) => update("stock", value)}
+                    placeholder={translate("merchantProductStockPlaceholder")}
+                    placeholderTextColor={theme.colors.placeholder}
+                    keyboardType="number-pad"
+                    style={styles.input}
+                  />
+                </FormField>
+              </View>
+            </View>
+
+            <FormField label={translate("merchantProductCategoryLabel")} theme={theme}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setCategoryPickerOpen(true)}
+                style={[styles.selectButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+              >
+                <Text style={[styles.selectText, { color: selectedCategory ? theme.colors.foreground : theme.colors.placeholder }]}>
+                  {selectedCategory?.label ?? translate("merchantProductCategoryPlaceholder")}
+                </Text>
+              </Pressable>
+            </FormField>
+
+            <FormField label={translate("merchantProductBrandLabel")} theme={theme}>
+              <TextInput
+                value={form.brand}
+                onChangeText={(value) => update("brand", value)}
+                placeholder={translate("merchantProductBrandPlaceholder")}
+                placeholderTextColor={theme.colors.placeholder}
+                maxLength={80}
+                textAlign="right"
+                style={styles.input}
+              />
+            </FormField>
+
+            <FormField
+              label={translate("merchantProductSizesLabel")}
+              hint={translate("merchantProductOptionsHint")}
+              theme={theme}
+            >
+              <TextInput
+                value={form.sizes}
+                onChangeText={(value) => update("sizes", value)}
+                placeholder={translate("merchantProductSizesPlaceholder")}
+                placeholderTextColor={theme.colors.placeholder}
+                maxLength={850}
+                textAlign="right"
+                style={styles.input}
+              />
+            </FormField>
+
+            <FormField label={translate("merchantProductColorsLabel")} theme={theme}>
+              <TextInput
+                value={form.colors}
+                onChangeText={(value) => update("colors", value)}
+                placeholder={translate("merchantProductColorsPlaceholder")}
+                placeholderTextColor={theme.colors.placeholder}
+                maxLength={850}
+                textAlign="right"
+                style={styles.input}
+              />
+            </FormField>
+
+            <FormField label={translate("merchantProductDescriptionLabel")} theme={theme}>
+              <TextInput
+                value={form.description}
+                onChangeText={(value) => update("description", value)}
+                placeholder={translate("merchantProductDescriptionPlaceholder")}
+                placeholderTextColor={theme.colors.placeholder}
+                maxLength={3000}
+                multiline
+                numberOfLines={5}
+                textAlign="right"
+                textAlignVertical="top"
+                style={[styles.input, styles.textarea]}
+              />
+            </FormField>
+
+            <View style={[styles.note, { backgroundColor: theme.colors.surfaceMuted }]}>
+              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
+                {translate("merchantProductImagesDeferred")}
+              </Text>
+              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
+                {translate("merchantProductVariantsStockHint")}
+              </Text>
+            </View>
+
+            {submitError ? (
+              <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
+                <Text style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</Text>
+              </View>
+            ) : null}
+
+            <Pressable
+              accessibilityRole="button"
+              disabled={submitting}
+              onPress={() => void submit()}
+              style={[styles.submitButton, { backgroundColor: theme.colors.accent, opacity: submitting ? 0.6 : 1 }]}
+            >
+              {submitting ? (
+                <ActivityIndicator color={theme.colors.accentForeground} />
+              ) : (
+                <Text style={[styles.submitText, { color: theme.colors.accentForeground }]}>
+                  {translate("merchantProductCreateSubmit")}
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      <Modal
+        visible={categoryPickerOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCategoryPickerOpen(false)}
+      >
+        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
+          <View style={[styles.modalCard, { backgroundColor: theme.colors.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.colors.foreground }]}>
+                {translate("merchantProductChooseCategory")}
+              </Text>
+              <Pressable onPress={() => setCategoryPickerOpen(false)} hitSlop={10}>
+                <Text style={[styles.modalClose, { color: theme.colors.accentMuted }]}>
+                  {translate("merchantProductCategoryClose")}
+                </Text>
+              </Pressable>
+            </View>
+            <ScrollView contentContainerStyle={styles.categoryList}>
+              {categories.data.map((category: MerchantCategory) => (
+                <Pressable
+                  key={category.id}
+                  onPress={() => {
+                    update("category", category.id);
+                    setCategoryPickerOpen(false);
+                  }}
+                  style={[
+                    styles.categoryOption,
+                    {
+                      borderColor: form.category === category.id ? theme.colors.accentMuted : theme.colors.border,
+                      backgroundColor: form.category === category.id ? theme.colors.surfaceMuted : theme.colors.background
+                    }
+                  ]}
+                >
+                  <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
+                    {category.label}
+                  </Text>
+                  {form.category === category.id ? (
+                    <Text style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</Text>
+                  ) : null}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+function FormField({
+  label,
+  hint,
+  theme,
+  children
+}: {
+  label: string;
+  hint?: string;
+  theme: AppTheme;
+  children: React.ReactNode;
+}) {
+  const styles = createStyles(theme);
+  return (
+    <View style={styles.field}>
+      <Text style={[styles.label, { color: theme.colors.foreground }]}>{label}</Text>
+      {children}
+      {hint ? <Text style={[styles.hint, { color: theme.colors.subtle }]}>{hint}</Text> : null}
+    </View>
+  );
+}
+
+function MessageScreen({
+  theme,
+  label,
+  actionLabel,
+  onAction,
+  loading = false
+}: {
+  theme: AppTheme;
+  label: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  loading?: boolean;
+}) {
+  const styles = createStyles(theme);
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.message}>
+        {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
+        <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</Text>
+        {actionLabel && onAction ? (
+          <Pressable onPress={onAction} style={[styles.retryButton, { backgroundColor: theme.colors.accent }]}>
+            <Text style={[styles.retryText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
+          </Pressable>
+        ) : null}
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function createStyles(theme: AppTheme) {
+  return StyleSheet.create({
+    safe: { flex: 1 },
+    flex: { flex: 1 },
+    content: { padding: 16, paddingBottom: 34, gap: 15 },
+    backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center" },
+    backText: { fontSize: 12, fontWeight: "800" },
+    header: { alignItems: "flex-end", gap: 6 },
+    eyebrow: { fontSize: 10, fontWeight: "900" },
+    title: { width: "100%", fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
+    subtitle: { width: "100%", fontSize: 12, lineHeight: 20, textAlign: "right" },
+    card: { borderWidth: 1, borderRadius: 18, padding: 14, gap: 15 },
+    row: { flexDirection: "row-reverse", gap: 10 },
+    half: { flex: 1 },
+    field: { gap: 6 },
+    label: { fontSize: 11, fontWeight: "900", textAlign: "right" },
+    input: { minHeight: 47, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 12, backgroundColor: theme.colors.background, paddingHorizontal: 12, color: theme.colors.foreground, fontSize: 13, textAlign: "right" },
+    textarea: { minHeight: 112, paddingTop: 12 },
+    hint: { fontSize: 10, lineHeight: 15, textAlign: "right" },
+    selectButton: { minHeight: 47, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, justifyContent: "center" },
+    selectText: { fontSize: 12, textAlign: "right", fontWeight: "700" },
+    note: { borderRadius: 12, padding: 12, gap: 6 },
+    noteText: { fontSize: 10, lineHeight: 16, textAlign: "right" },
+    errorBox: { borderWidth: 1, borderRadius: 12, padding: 11 },
+    errorText: { fontSize: 11, lineHeight: 17, textAlign: "right", fontWeight: "700" },
+    submitButton: { minHeight: 49, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 2 },
+    submitText: { fontSize: 13, fontWeight: "900" },
+    modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 10 },
+    modalCard: { maxHeight: "78%", borderRadius: 20, padding: 15, gap: 12 },
+    modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    modalTitle: { fontSize: 15, fontWeight: "900" },
+    modalClose: { fontSize: 11, fontWeight: "800" },
+    categoryList: { gap: 8, paddingBottom: 8 },
+    categoryOption: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    categoryLabel: { fontSize: 12, fontWeight: "800" },
+    categorySelected: { fontSize: 17, fontWeight: "900" },
+    message: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 14 },
+    messageText: { fontSize: 13, textAlign: "center", lineHeight: 21 },
+    retryButton: { minHeight: 45, borderRadius: 12, paddingHorizontal: 20, justifyContent: "center" },
+    retryText: { fontSize: 12, fontWeight: "900" }
+  });
+}
