@@ -409,6 +409,7 @@ export const messages = {
     merchantOrderStatusQuoted: "بانتظار العميل",
     merchantOrderStatusConfirmed: "مؤكد",
     merchantOrderStatusShipped: "قيد التوصيل",
+    merchantOrderStatusPrepared: "جاهز للاستلام",
     merchantOrderStatusDelivered: "تم التسليم",
     merchantOrderStatusCancelled: "ملغى",
     merchantOrderStatusUnknown: "حالة غير معروفة",
