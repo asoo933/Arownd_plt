@@ -2,6 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
+import { checkoutRequestIdentity } from "@/lib/checkout-state";
+
+export { checkoutRequestIdentity } from "@/lib/checkout-state";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const WilayaSchema = z.object({ id: z.number(), name_ar: z.string() });
@@ -59,26 +62,6 @@ export type CheckoutInput = {
   fullName: string;
   phone: string;
 };
-
-export function checkoutRequestIdentity(input: Omit<CheckoutInput, "userId">): string {
-  const items = input.items
-    .map((item) => ({
-      offerId: item.offerId,
-      quantity: item.quantity,
-      options: Object.entries(item.options).sort(([a], [b]) => a.localeCompare(b))
-    }))
-    .sort((a, b) => a.offerId.localeCompare(b.offerId) || JSON.stringify(a.options).localeCompare(JSON.stringify(b.options)));
-  return JSON.stringify({
-    items,
-    deliveryType: input.deliveryType,
-    wilayaId: input.wilayaId,
-    commune: input.commune.trim(),
-    addressLine: input.addressLine.trim(),
-    fullName: input.fullName.trim(),
-    phone: input.phone.trim(),
-    paymentMethod: "cod"
-  });
-}
 
 function createUuid(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (token) => {
