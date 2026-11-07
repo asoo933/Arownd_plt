@@ -1,15 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, type CartItem } from "@/lib/cart-state";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 export default function CartScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
+  const style = styles(theme);
   const queryClient = useQueryClient();
   const cart = useQuery({ queryKey: CART_QUERY_KEY, queryFn: getCart });
   const ids = cart.data?.map((item) => item.offerId) ?? [];
@@ -32,7 +34,7 @@ export default function CartScreen() {
   if (cart.data.length === 0) return <CustomerScreen>
     <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartSubtitle")} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
-    <Pressable onPress={() => router.push("/explore")} style={styles.primary}><Text style={styles.primaryText}>{translate("cartBrowse")}</Text></Pressable>
+    <Pressable onPress={() => router.push("/explore")} style={style.primary}><Text style={style.primaryText}>{translate("cartBrowse")}</Text></Pressable>
   </CustomerScreen>;
 
   const evaluation = evaluateCart(cart.data, offers.data);
@@ -58,10 +60,10 @@ export default function CartScreen() {
     <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)} />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
-    {mutation.isError ? <Text style={styles.warningText}>{translate("genericError")}</Text> : null}
-    {evaluation.blockingCount > 0 ? <View style={styles.warning}><Text style={styles.warningText}>{translate("cartBlocked") + evaluation.blockingCount}</Text></View> : null}
-    {[...groups.entries()].map(([offerId, group]) => <View key={offerId} style={[styles.group, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-      <Text style={styles.store}>{group.storeName}</Text>
+    {mutation.isError ? <Text style={style.warningText}>{translate("genericError")}</Text> : null}
+    {evaluation.blockingCount > 0 ? <View style={style.warning}><Text style={style.warningText}>{translate("cartBlocked") + evaluation.blockingCount}</Text></View> : null}
+    {[...groups.entries()].map(([offerId, group]) => <View key={offerId} style={[style.group, { backgroundColor: theme.colors.surface }]}>
+      <Text style={style.store}>{group.storeName}</Text>
       {group.items.map((item) => {
         const key = cartLineKey(item);
         const offer = offerById.get(item.offerId);
@@ -70,69 +72,69 @@ export default function CartScreen() {
         const currentPrice = offer?.price ?? item.price ?? 0;
         const blocking = line?.issues.some((issue) => issue !== "priceChanged") ?? false;
         const totalRequestedForOffer = cart.data.filter((entry) => entry.offerId === item.offerId).reduce((sum, entry) => sum + entry.quantity, 0);
-        return <View key={key} style={styles.line}>
-          <Pressable accessibilityRole="button" onPress={() => item.productId ? router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }) : undefined} style={styles.lineMain}>
-            <View style={styles.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageMark}>▧</Text>}</View>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{offer?.product.name ?? item.name}</Text>
-              <Text style={styles.options}>{Object.entries(item.options).map(([optionName, value]) => optionName + ": " + value).join(" · ")}</Text>
-              {line?.issues.map((issue) => <Text key={issue} style={[styles.issue, issue === "priceChanged" && styles.priceIssue]}>{issueLabels[issue]}</Text>)}
-              <Text style={styles.price}>{formatDZD(currentPrice * item.quantity)}</Text>
-              {item.quantity > 1 ? <Text style={styles.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
+        return <View key={key} style={style.line}>
+          <Pressable accessibilityRole="button" onPress={() => item.productId ? router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }) : undefined} style={style.lineMain}>
+            <View style={style.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={style.imageMark}>▧</Text>}</View>
+            <View style={style.details}>
+              <Text style={[style.name, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name}</Text>
+              <Text style={style.options}>{Object.entries(item.options).map(([optionName, value]) => optionName + ": " + value).join(" · ")}</Text>
+              {line?.issues.map((issue) => <Text key={issue} style={[style.issue, issue === "priceChanged" && style.priceIssue]}>{issueLabels[issue]}</Text>)}
+              <Text style={style.price}>{formatDZD(currentPrice * item.quantity)}</Text>
+              {item.quantity > 1 ? <Text style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
             </View>
           </Pressable>
-          <View style={styles.controls}>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartDecrease")} disabled={item.quantity <= 1 || mutation.isPending} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity - 1 })} style={styles.stepper}><Text style={styles.stepperText}>−</Text></Pressable>
-            <Text style={styles.quantity}>{item.quantity}</Text>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartIncrease")} disabled={item.quantity >= 10 || mutation.isPending || (offer ? totalRequestedForOffer >= offer.stock_quantity : false)} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity + 1 })} style={styles.stepper}><Text style={styles.stepperText}>+</Text></Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartRemove")} disabled={mutation.isPending} onPress={() => mutation.mutate({ type: "remove", key })} style={styles.remove}><Text style={styles.removeText}>×</Text></Pressable>
+          <View style={style.controls}>
+            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartDecrease")} disabled={item.quantity <= 1 || mutation.isPending} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity - 1 })} style={style.stepper}><Text style={style.stepperText}>−</Text></Pressable>
+            <Text style={style.quantity}>{item.quantity}</Text>
+            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartIncrease")} disabled={item.quantity >= 10 || mutation.isPending || (offer ? totalRequestedForOffer >= offer.stock_quantity : false)} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity + 1 })} style={style.stepper}><Text style={style.stepperText}>+</Text></Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartRemove")} disabled={mutation.isPending} onPress={() => mutation.mutate({ type: "remove", key })} style={style.remove}><Text style={style.removeText}>×</Text></Pressable>
           </View>
-          {blocking ? <Text style={styles.blockedHint}>{translate("cartLineBlocked")}</Text> : null}
+          {blocking ? <Text style={style.blockedHint}>{translate("cartLineBlocked")}</Text> : null}
         </View>;
       })}
     </View>)}
-    <View style={[styles.summary, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-      <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={styles.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
-      <Text style={styles.note}>{translate("cartDeliveryNote")}</Text>
+    <View style={[style.summary, { backgroundColor: dark ? "#171717" : theme.colors.surface }]}>
+      <View style={style.summaryRow}><Text style={style.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={style.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
+      <Text style={style.note}>{translate("cartDeliveryNote")}</Text>
       <Pressable
         disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
         onPress={() => router.push("/checkout")}
-        style={[styles.primary, (offers.isPending || offers.isError || evaluation.blockingCount > 0) && styles.disabled]}
+        style={[style.primary, (offers.isPending || offers.isError || evaluation.blockingCount > 0) && style.disabled]}
       >
-        <Text style={styles.primaryText}>{translate("cartCheckout")}</Text>
+        <Text style={style.primaryText}>{translate("cartCheckout")}</Text>
       </Pressable>
     </View>
   </CustomerScreen>;
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   group: { borderRadius: 18, padding: 13, gap: 12 },
-  store: { color: "#647D13", fontSize: 13, fontWeight: "900", textAlign: "right" },
-  line: { borderTopWidth: 1, borderTopColor: "#E5E5E5", paddingTop: 12, gap: 8 },
+  store: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900", textAlign: "right" },
+  line: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 12, gap: 8 },
   lineMain: { flexDirection: "row-reverse", gap: 10 },
-  thumb: { width: 76, height: 76, borderRadius: 13, backgroundColor: "#ECEFE4", overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  imageMark: { color: "#829E19", fontSize: 28 },
+  thumb: { width: 76, height: 76, borderRadius: 13, backgroundColor: theme.colors.surfaceMuted, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  imageMark: { color: theme.colors.accentMuted, fontSize: 28 },
   details: { flex: 1, alignItems: "flex-end", gap: 4 },
   name: { fontSize: 13, fontWeight: "900", textAlign: "right" },
-  options: { color: "#737373", fontSize: 11, textAlign: "right" },
-  issue: { color: "#B45309", fontSize: 11, fontWeight: "700", textAlign: "right" },
-  priceIssue: { color: "#9A6700" },
-  price: { color: "#647D13", fontSize: 13, fontWeight: "900" },
+  options: { color: theme.colors.muted, fontSize: 11, textAlign: "right" },
+  issue: { color: theme.colors.warning, fontSize: 11, fontWeight: "700", textAlign: "right" },
+  priceIssue: { color: theme.colors.warning },
+  price: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   controls: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
-  stepper: { width: 36, height: 36, borderRadius: 11, backgroundColor: "#F0F2E8", alignItems: "center", justifyContent: "center" },
-  stepperText: { color: "#0A0A0A", fontSize: 20, fontWeight: "900" },
-  quantity: { minWidth: 25, textAlign: "center", color: "#0A0A0A", fontWeight: "900" },
+  stepper: { width: 36, height: 36, borderRadius: 11, backgroundColor: theme.colors.surfaceMuted, alignItems: "center", justifyContent: "center" },
+  stepperText: { color: theme.colors.foreground, fontSize: 20, fontWeight: "900" },
+  quantity: { minWidth: 25, textAlign: "center", color: theme.colors.foreground, fontWeight: "900" },
   remove: { marginStart: "auto", minWidth: 38, minHeight: 38, alignItems: "center", justifyContent: "center" },
-  removeText: { color: "#B42318", fontSize: 22, fontWeight: "800" },
-  blockedHint: { color: "#B42318", fontSize: 11, textAlign: "right" },
-  warning: { backgroundColor: "#FDECEC", borderRadius: 13, padding: 12 },
-  warningText: { color: "#B42318", fontSize: 12, fontWeight: "800", textAlign: "right" },
+  removeText: { color: theme.colors.danger, fontSize: 22, fontWeight: "800" },
+  blockedHint: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
+  warning: { backgroundColor: theme.colors.dangerSurface, borderRadius: 13, padding: 12 },
+  warningText: { color: theme.colors.danger, fontSize: 12, fontWeight: "800", textAlign: "right" },
   summary: { borderRadius: 18, padding: 15, gap: 12 },
   summaryRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-  summaryLabel: { color: "#737373", fontSize: 13, fontWeight: "700" },
-  total: { color: "#647D13", fontSize: 19, fontWeight: "900" },
-  note: { color: "#737373", fontSize: 11, lineHeight: 18, textAlign: "right" },
-  primary: { minHeight: 50, borderRadius: 14, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  primaryText: { color: "#0A0A0A", fontSize: 14, fontWeight: "900" },
+  summaryLabel: { color: theme.colors.muted, fontSize: 13, fontWeight: "700" },
+  total: { color: theme.colors.accentMuted, fontSize: 19, fontWeight: "900" },
+  note: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
+  primary: { minHeight: 50, borderRadius: 14, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  primaryText: { color: theme.colors.foreground, fontSize: 14, fontWeight: "900" },
   disabled: { opacity: 0.4 }
 });
