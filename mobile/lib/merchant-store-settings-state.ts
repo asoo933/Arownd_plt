@@ -10,7 +10,7 @@ export const MerchantStoreSettingsSchema = z.object({
   opening_hours: z.object({
     open: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
     close: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-    closed_days: z.array(z.number().int().min(0).max(6)).max(7)
+    closed_days: z.array(z.number().int().min(0).max(6)).max(7).refine((days) => new Set(days).size === days.length)
   }),
   instagram_url: z.string().trim().max(300).refine((value) => value === "" || /^https:\/\//i.test(value)),
   facebook_url: z.string().trim().max(300).refine((value) => value === "" || /^https:\/\//i.test(value))
