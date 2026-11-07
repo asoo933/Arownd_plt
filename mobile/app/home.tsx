@@ -98,28 +98,7 @@ export default function CustomerHomeScreen() {
         )}
       </View>
 
-      <View style={[styles.bottomNav, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-        <NavItem label={translate("navHome")} icon="⌂" active />
-        <NavItem label={translate("navExplore")} icon="⌕" onPress={() => router.push("/explore")} />
-        <NavItem label={translate("navStores")} icon="▦" onPress={() => router.push("/stores")} />
-        <NavItem label={translate("navAccount")} icon="◎" onPress={() => router.push("/profile")} />
-        <NavItem label={translate("ordersTitle")} icon="▤" onPress={() => router.push("/orders")} />
-      </View>
     </CustomerScreen>
-  );
-}
-
-function NavItem({ label, icon, active = false, onPress }: {
-  label: string;
-  icon: string;
-  active?: boolean;
-  onPress?: () => void;
-}) {
-  return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.navItem}>
-      <Text style={[styles.navIcon, active ? styles.navActive : undefined]}>{icon}</Text>
-      <Text style={[styles.navLabel, active ? styles.navActive : undefined]}>{label}</Text>
-    </Pressable>
   );
 }
 
@@ -144,9 +123,4 @@ const styles = StyleSheet.create({
   categoryLabel: { fontSize: 11, fontWeight: "800", textAlign: "center" },
   productRail: { flexDirection: "row-reverse", gap: 10 },
   storeList: { gap: 9 },
-  bottomNav: { minHeight: 66, borderRadius: 19, flexDirection: "row-reverse", justifyContent: "space-around", alignItems: "center", paddingHorizontal: 8 },
-  navItem: { minWidth: 58, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 3 },
-  navIcon: { color: "#858585", fontSize: 19, fontWeight: "800" },
-  navLabel: { color: "#858585", fontSize: 10, fontWeight: "700" },
-  navActive: { color: "#718B17" }
 });
