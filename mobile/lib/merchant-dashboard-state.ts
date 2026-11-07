@@ -92,31 +92,13 @@ export function groupMerchantOrderRows(rows: MerchantOrderRow[]): MerchantOrderS
   };
 }
 
-export type MerchantTrackingStep =
-  | "preparing"
-  | "ready_for_dispatch"
-  | "out_for_delivery"
-  | "delivered";
+export type MerchantOrderNextStatus = "shipped" | "delivered";
 
-const MERCHANT_TRACKING_SEQUENCE: readonly MerchantTrackingStep[] = [
-  "preparing",
-  "ready_for_dispatch",
-  "out_for_delivery",
-  "delivered"
-];
-
-export function getNextMerchantTrackingStatus(
-  completedStatuses: readonly string[]
-): MerchantTrackingStep | null {
-  const lastStatus = completedStatuses[completedStatuses.length - 1];
-  if (lastStatus && !MERCHANT_TRACKING_SEQUENCE.includes(lastStatus as MerchantTrackingStep)) {
-    return null;
-  }
-
-  const nextIndex = lastStatus
-    ? MERCHANT_TRACKING_SEQUENCE.findIndex((status) => status === lastStatus) + 1
-    : 0;
-
-  if (nextIndex >= MERCHANT_TRACKING_SEQUENCE.length) return null;
-  return MERCHANT_TRACKING_SEQUENCE[nextIndex] ?? null;
+export function getNextMerchantOrderStatus(
+  currentStatus: string,
+  deliveryType: string
+): MerchantOrderNextStatus | null {
+  if (currentStatus === "confirmed") return "shipped";
+  if (currentStatus === "shipped" && deliveryType === "desk") return "delivered";
+  return null;
 }
