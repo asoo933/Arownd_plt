@@ -108,7 +108,7 @@ const MERCHANT_TRACKING_SEQUENCE: readonly MerchantTrackingStep[] = [
 export function getNextMerchantTrackingStatus(
   completedStatuses: readonly string[]
 ): MerchantTrackingStep | null {
-  const lastStatus = completedStatuses.at(-1);
+  const lastStatus = completedStatuses[completedStatuses.length - 1];
   if (lastStatus && !MERCHANT_TRACKING_SEQUENCE.includes(lastStatus as MerchantTrackingStep)) {
     return null;
   }
