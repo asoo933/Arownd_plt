@@ -9,8 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
-  useColorScheme
+  View
 } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -29,6 +28,7 @@ import { CART_QUERY_KEY, clearCart, getCart } from "@/lib/cart";
 import { evaluateCart } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 type Picker = "wilaya" | "commune" | null;
 
@@ -38,7 +38,7 @@ function validAlgerianPhone(value: string): boolean {
 }
 
 export default function CheckoutScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [deliveryType, setDeliveryType] = useState<CheckoutDeliveryType>("home");
   const [fullName, setFullName] = useState("");
@@ -128,11 +128,11 @@ export default function CheckoutScreen() {
 
   if (createdOrderId) {
     return <CustomerScreen>
-      <View style={[styles.successPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+      <View style={[styles.successPanel, { backgroundColor: theme.colors.surface }]}>
         <Text style={styles.successMark}>✓</Text>
         <CustomerHeading title={translate("checkoutSuccessTitle")} subtitle={translate("checkoutSuccessMessage")} />
         <Text style={styles.orderLabel}>{translate("checkoutOrderNumber")}</Text>
-        <Text selectable style={[styles.orderId, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{createdOrderId}</Text>
+        <Text selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</Text>
         <Text style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</Text>
         <Pressable onPress={() => router.replace("/home")} style={styles.primary}>
           <Text style={styles.primaryText}>{translate("checkoutBackHome")}</Text>
@@ -188,7 +188,7 @@ export default function CheckoutScreen() {
     mutation.mutate(input);
   };
 
-  const fieldStyle = [styles.input, { backgroundColor: dark ? "#171717" : "#FFFFFF", borderColor: dark ? "#383838" : "#E5E5E5", color: dark ? "#FFFFFF" : "#0A0A0A" }];
+  const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.foreground }];
   const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune");
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
     ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + item.name_ar, wilaya: item }))
@@ -200,7 +200,7 @@ export default function CheckoutScreen() {
       <CustomerHeading title={translate("checkoutTitle")} subtitle={translate("checkoutSubtitle")} />
     </View>
 
-    <View style={[styles.section, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("checkoutContactTitle")}</Text>
       <Pressable onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
@@ -209,7 +209,7 @@ export default function CheckoutScreen() {
       <TextInput value={phone} onChangeText={setPhone} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
 
-    <View style={[styles.section, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</Text>
       <View style={styles.deliveryOptions}>
         <Pressable onPress={() => setDeliveryType("home")} style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}>
@@ -223,7 +223,7 @@ export default function CheckoutScreen() {
       </View>
 
       <Text style={styles.fieldLabel}>{translate("checkoutWilaya")}</Text>
-      <Pressable onPress={() => setPicker("wilaya")} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: dark ? "#0A0A0A" : "#F5F5F5" }]}>
+      <Pressable onPress={() => setPicker("wilaya")} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
         <Text style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</Text>
         {wilayas.isPending ? <ActivityIndicator size="small" /> : null}
       </Pressable>
@@ -231,7 +231,7 @@ export default function CheckoutScreen() {
 
       <Text style={styles.fieldLabel}>{translate("checkoutCommune")}</Text>
       {communes.data && communes.data.length > 0 ? (
-        <Pressable onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: dark ? "#0A0A0A" : "#F5F5F5" }]} disabled={!wilayaId}>
+        <Pressable onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]} disabled={!wilayaId}>
           <Text style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</Text>
         </Pressable>
       ) : (
@@ -245,13 +245,13 @@ export default function CheckoutScreen() {
       </> : <Text style={styles.fieldHint}>{translate("checkoutPickupNote")}</Text>}
     </View>
 
-    <View style={[styles.section, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("checkoutSummary")}</Text>
       {cart.data.map((item) => {
         const offer = offerById.get(item.offerId);
         return <View key={item.offerId + JSON.stringify(item.options)} style={styles.summaryRow}>
           <View style={styles.summaryInfo}>
-            <Text style={[styles.summaryName, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{offer?.product.name ?? item.name ?? translate("cartUnknownStore")}</Text>
+            <Text style={[styles.summaryName, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name ?? translate("cartUnknownStore")}</Text>
             <Text style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</Text>
           </View>
           <Text style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</Text>
@@ -275,9 +275,9 @@ export default function CheckoutScreen() {
 
     <Modal visible={picker !== null} transparent animationType="slide" onRequestClose={() => setPicker(null)}>
       <View style={styles.modalBackdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.modalHeader}>
-            <Text style={[styles.sectionTitle, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{modalTitle}</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{modalTitle}</Text>
             <Pressable onPress={() => setPicker(null)} hitSlop={10}><Text style={styles.back}>{translate("back")}</Text></Pressable>
           </View>
           {((picker === "wilaya" && wilayas.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
@@ -291,7 +291,7 @@ export default function CheckoutScreen() {
               }
               setPicker(null);
             }} style={styles.pickerItem}>
-              <Text style={[styles.pickerText, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{item.label}</Text>
+              <Text style={[styles.pickerText, { color: theme.colors.foreground }]}>{item.label}</Text>
             </Pressable>)}
             {picker === "commune" && pickerItems.length === 0 ? <Text style={styles.fieldHint}>{translate("checkoutNoCommunes")}</Text> : null}
           </ScrollView>
