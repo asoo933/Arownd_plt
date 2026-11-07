@@ -229,6 +229,10 @@ export default function MerchantProductsScreen() {
                 anyBusy={busyOfferId !== null}
                 onSave={(price, stock) => void saveOffer(offer, price, stock)}
                 onToggleVisibility={() => void toggleVisibility(offer)}
+                onEdit={() => router.push({
+                  pathname: "/merchant/products/[offerId]",
+                  params: { offerId: offer.id }
+                })}
               />
             ))}
           </View>
@@ -244,7 +248,8 @@ function MerchantOfferCard({
   busy,
   anyBusy,
   onSave,
-  onToggleVisibility
+  onToggleVisibility,
+  onEdit
 }: {
   offer: MerchantProductOffer;
   theme: AppTheme;
@@ -252,6 +257,7 @@ function MerchantOfferCard({
   anyBusy: boolean;
   onSave: (price: string, stock: string) => void;
   onToggleVisibility: () => void;
+  onEdit: () => void;
 }) {
   const styles = createStyles(theme);
   const [price, setPrice] = useState(String(offer.price));
@@ -376,6 +382,17 @@ function MerchantOfferCard({
           </Text>
         </Pressable>
       </View>
+
+      <Pressable
+        accessibilityRole="button"
+        disabled={anyBusy}
+        onPress={onEdit}
+        style={[styles.manageButton, { borderColor: theme.colors.border, opacity: anyBusy ? 0.55 : 1 }]}
+      >
+        <Text style={[styles.manageButtonText, { color: theme.colors.accentMuted }]}>
+          {translate("merchantProductEditOpen")}
+        </Text>
+      </Pressable>
 
       <Modal
         visible={galleryOpen}
@@ -564,6 +581,8 @@ function createStyles(theme: AppTheme) {
     stockHint: { fontSize: 9, lineHeight: 14, textAlign: "right" },
     valueInput: { minHeight: 46, borderWidth: 1, borderRadius: 12, paddingHorizontal: 11, textAlign: "right", fontSize: 14, fontWeight: "800" },
     actionsRow: { flexDirection: "row-reverse", gap: 8 },
+    manageButton: { minHeight: 41, borderWidth: 1, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+    manageButtonText: { fontSize: 11, fontWeight: "900" },
     saveButton: { flex: 1, minHeight: 46, borderRadius: 13, alignItems: "center", justifyContent: "center" },
     saveButtonText: { fontSize: 12, fontWeight: "900" },
     visibilityButton: { minWidth: 104, minHeight: 46, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center", paddingHorizontal: 12 },
