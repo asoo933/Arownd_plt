@@ -52,6 +52,7 @@ export default function MerchantEditProductScreen() {
     is_primary: boolean;
   } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const access = useQuery({
@@ -93,12 +94,14 @@ export default function MerchantEditProductScreen() {
     const values = validateMerchantOfferValues(price, stock);
     if (!values) {
       setNotice(null);
+      setWarning(null);
       setActionError(translate("merchantProductEditValidation"));
       return;
     }
 
     setSaving(true);
     setNotice(null);
+    setWarning(null);
     setActionError(null);
     try {
       await updateMerchantProductOffer(offerId, storeId, values);
@@ -120,6 +123,7 @@ export default function MerchantEditProductScreen() {
 
     setImageBusy(true);
     setNotice(null);
+    setWarning(null);
     setActionError(null);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -174,13 +178,14 @@ export default function MerchantEditProductScreen() {
     setPendingRemoval(null);
     setRemovingImageId(imageId);
     setNotice(null);
+    setWarning(null);
     setActionError(null);
 
     try {
       const result = await removeMerchantProductImage(storeId, offerId, imageId);
       await refreshProductData();
       if (result.storageCleanupPending || result.primaryPromotionPending) {
-        setNotice(translate("merchantProductImageCleanupPending"));
+        setWarning(translate("merchantProductImageCleanupPending"));
       } else {
         setNotice(translate("merchantProductImageRemoved"));
       }
@@ -393,6 +398,11 @@ export default function MerchantEditProductScreen() {
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
               <Text style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</Text>
+            </View>
+          ) : null}
+          {warning ? (
+            <View style={[styles.feedback, { backgroundColor: theme.colors.warningSurface, borderColor: theme.colors.warning }]}>
+              <Text style={[styles.feedbackText, { color: theme.colors.warning }]}>{warning}</Text>
             </View>
           ) : null}
           {actionError ? (
