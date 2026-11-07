@@ -19,6 +19,11 @@ describe("MerchantStoreSettingsSchema", () => {
     expect(MerchantStoreSettingsSchema.safeParse(valid).success).toBe(true);
   });
 
+  it("requires a valid wilaya identifier", () => {
+    expect(MerchantStoreSettingsSchema.safeParse({ ...valid, wilaya_id: 0 }).success).toBe(false);
+    expect(MerchantStoreSettingsSchema.safeParse({ ...valid, wilaya_id: 9 }).success).toBe(true);
+  });
+
   it("rejects unsafe social URLs, invalid opening times and duplicate closing days", () => {
     expect(MerchantStoreSettingsSchema.safeParse({
       ...valid,
