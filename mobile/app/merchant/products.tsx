@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -255,6 +256,7 @@ function MerchantOfferCard({
   const styles = createStyles(theme);
   const [price, setPrice] = useState(String(offer.price));
   const [stock, setStock] = useState(String(offer.stock_quantity));
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   useEffect(() => {
     setPrice(String(offer.price));
@@ -282,13 +284,19 @@ function MerchantOfferCard({
   return (
     <View style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <View style={styles.productHeader}>
-        <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
+        <Pressable
+          accessibilityRole={image ? "button" : undefined}
+          accessibilityLabel={translate("merchantProductImagesLabel")}
+          disabled={!image}
+          onPress={() => setGalleryOpen(true)}
+          style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}
+        >
           {image ? (
             <Image source={{ uri: image.image_url }} style={styles.image} resizeMode="cover" />
           ) : (
             <Text style={[styles.imageFallback, { color: theme.colors.muted }]}>A</Text>
           )}
-        </View>
+        </Pressable>
         <View style={styles.productInfo}>
           <Text style={[styles.productName, { color: theme.colors.foreground }]} numberOfLines={2}>
             {offer.product.name}
@@ -368,6 +376,46 @@ function MerchantOfferCard({
           </Text>
         </Pressable>
       </View>
+
+      <Modal
+        visible={galleryOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setGalleryOpen(false)}
+      >
+        <View style={[styles.galleryOverlay, { backgroundColor: theme.colors.overlay }]}>
+          <View style={[styles.galleryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <View style={styles.galleryHeader}>
+              <Text style={[styles.galleryTitle, { color: theme.colors.foreground }]}>
+                {translate("merchantProductImagesLabel")}
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setGalleryOpen(false)}
+                hitSlop={10}
+              >
+                <Text style={[styles.galleryClose, { color: theme.colors.accentMuted }]}>
+                  {translate("merchantProductCategoryClose")}
+                </Text>
+              </Pressable>
+            </View>
+            <ScrollView
+              horizontal
+              contentContainerStyle={styles.galleryImages}
+              showsHorizontalScrollIndicator={false}
+            >
+              {offer.images.map((item) => (
+                <Image
+                  key={item.id}
+                  source={{ uri: item.image_url }}
+                  style={styles.galleryImage}
+                  resizeMode="contain"
+                />
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -495,6 +543,13 @@ function createStyles(theme: AppTheme) {
     productHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: 11 },
     productImage: { width: 76, height: 76, borderRadius: 15, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     image: { width: "100%", height: "100%" },
+    galleryOverlay: { flex: 1, justifyContent: "center", padding: 16 },
+    galleryCard: { borderWidth: 1, borderRadius: 18, padding: 14, gap: 12 },
+    galleryHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    galleryTitle: { fontSize: 13, fontWeight: "900" },
+    galleryClose: { fontSize: 11, fontWeight: "800" },
+    galleryImages: { flexDirection: "row-reverse", gap: 10, paddingVertical: 4 },
+    galleryImage: { width: 260, height: 300, borderRadius: 12, backgroundColor: theme.colors.surfaceMuted },
     imageFallback: { fontSize: 24, fontWeight: "900" },
     productInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
     productName: { width: "100%", fontSize: 13, lineHeight: 19, fontWeight: "900", textAlign: "right" },
