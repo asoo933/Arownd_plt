@@ -96,7 +96,7 @@ export function evaluateCart(items: CartItem[], offers: CartOffer[] | undefined)
     }
     return { item, offer, issues };
   });
-  const subtotal = lines.reduce((sum, line) => sum + (line.offer?.price ?? line.item.price ?? 0) * line.item.quantity, 0);
+  const subtotal = lines.reduce((sum, line) => sum + (line.offer?.price ?? 0) * line.item.quantity, 0);
   const blockingCount = lines.filter((line) => line.issues.some((issue) => issue !== "priceChanged")).length;
   return { lines, subtotal, blockingCount, loaded };
 }
