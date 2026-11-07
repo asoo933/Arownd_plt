@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
@@ -28,6 +28,7 @@ export default function NotificationsScreen() {
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
+  const [actionError, setActionError] = useState(false);
   const auth = useQuery({ queryKey: ["notifications-auth"], queryFn: async () => {
     const { data, error } = await getSupabaseClient().auth.getUser();
     if (error) throw error;
@@ -46,10 +47,14 @@ export default function NotificationsScreen() {
     }, () => { void queryClient.invalidateQueries({ queryKey: ["my-notifications", userId] }); }).subscribe();
     return () => { void client.removeChannel(channel); };
   }, [auth.data?.id, queryClient]);
-  const markOne = useMutation({ mutationFn: markNotificationRead, onSuccess: () =>
-    queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] }) });
-  const markAll = useMutation({ mutationFn: markAllNotificationsRead, onSuccess: () =>
-    queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] }) });
+  const markOne = useMutation({ mutationFn: markNotificationRead, onSuccess: () => {
+    setActionError(false);
+    return queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] });
+  }, onError: () => setActionError(true) });
+  const markAll = useMutation({ mutationFn: markAllNotificationsRead, onSuccess: () => {
+    setActionError(false);
+    return queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] });
+  }, onError: () => setActionError(true) });
 
   if (auth.isPending || (auth.data && notifications.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (auth.isError || notifications.isError) return <CustomerScreen>
@@ -64,6 +69,7 @@ export default function NotificationsScreen() {
   const unreadCount = countUnreadNotifications(rows);
   return <CustomerScreen>
     <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("notificationsSubtitle")} />
+    {actionError ? <Text style={[styles.actionError, { color: theme.colors.danger }]}>{translate("notificationsMarkError")}</Text> : null}
     {unreadCount > 0 ? <Pressable accessibilityRole="button" disabled={markAll.isPending} onPress={() => markAll.mutate()} style={[styles.markAll, { backgroundColor: theme.colors.accent, opacity: markAll.isPending ? 0.6 : 1 }]}><Text style={styles.markAllText}>{translate("notificationsMarkAll")} · {unreadCount}</Text></Pressable> : null}
     {rows.length === 0 ? <EmptyState title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} /> : rows.map((item) => {
       const destination = getNotificationDestination(item);
@@ -91,5 +97,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   body: { fontSize: 12, lineHeight: 20, textAlign: "right" },
   unreadDot: { position: "absolute", top: 14, start: 12, width: 8, height: 8, borderRadius: 4 },
   action: { minHeight: 48, borderRadius: 14, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-  actionText: { color: theme.colors.accentForeground, fontWeight: "900" }
+  actionText: { color: theme.colors.accentForeground, fontWeight: "900" },
+  actionError: { fontSize: 12, textAlign: "right" }
 }); }
