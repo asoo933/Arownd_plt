@@ -7,6 +7,7 @@ export type MerchantProductOffer = {
   product_id: string;
   price: number;
   stock_quantity: number;
+  options: MerchantProductOptions;
   is_available: boolean;
   is_merchant_hidden: boolean;
   created_at: string;
