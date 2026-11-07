@@ -3,9 +3,9 @@ import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
 import { checkoutRequestIdentity } from "@/lib/checkout-state";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
-import { getSupabaseClient } from "@/lib/supabase";
 
 const WilayaSchema = z.object({ id: z.number(), name_ar: z.string() });
 export type Wilaya = z.infer<typeof WilayaSchema>;
@@ -101,7 +101,8 @@ async function removeIdempotencyKey(userId: string, identity: string): Promise<v
   try {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return;
-    const entries = Object.fromEntries(Object.entries(parsed).filter(
+    const record = parsed as Record<string, unknown>;
+    const entries = Object.fromEntries(Object.entries(record).filter(
       (entry): entry is [string, string] => typeof entry[1] === "string" && entry[0] !== identity
     ));
     if (Object.keys(entries).length === 0) await AsyncStorage.removeItem(storageKey);
