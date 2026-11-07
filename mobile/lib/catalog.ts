@@ -38,6 +38,7 @@ const ProductImageSchema = z.object({
 const HomeProductSchema = z.object({
   id: z.string(),
   price: z.coerce.number(),
+  old_price: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional(),
   stock_quantity: z.coerce.number(),
   is_available: z.boolean(),
   product: ProductSummarySchema,
@@ -55,7 +56,7 @@ const ProductOfferSchema = z.object({
   id: z.string(),
   product_id: z.string(),
   price: z.coerce.number(),
-  old_price: z.coerce.number().nullable().optional(),
+  old_price: z.preprocess((value: unknown) => value == null ? null : Number(value), z.number().nullable()).optional(),
   stock_quantity: z.coerce.number(),
   is_available: z.boolean(),
   last_confirmed_at: z.string().nullable().optional(),
@@ -96,7 +97,7 @@ export async function fetchOffersByIds(ids: string[]): Promise<ProductOffer[]> {
 export async function fetchHomeProducts(): Promise<HomeProduct[]> {
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, price, stock_quantity, is_available, product:products!inner(id, name, category, brand), store:stores!inner(id, name), images:product_images(image_url, is_primary)")
+    .select("id, price, old_price, stock_quantity, is_available, product:products!inner(id, name, category, brand), store:stores!inner(id, name), images:product_images(image_url, is_primary)")
     .eq("is_available", true)
     .gt("stock_quantity", 0)
     .order("created_at", { ascending: false })
@@ -200,6 +201,11 @@ export async function fetchStoreOffers(storeId: string): Promise<HomeProduct[]> 
 export function getPrimaryImage(product: HomeProduct | ProductOffer): string | null {
   const image = product.images.find((item) => item.is_primary) ?? product.images[0];
   return image?.image_url ?? null;
+}
+
+export function getOfferDiscountPercent(oldPrice: number | null | undefined, price: number): number | null {
+  if (oldPrice == null || !Number.isSafeInteger(oldPrice) || !Number.isSafeInteger(price) || oldPrice <= price || price <= 0) return null;
+  return Math.round(((oldPrice - price) / oldPrice) * 100);
 }
 
 export function formatDZD(amount: number): string {
