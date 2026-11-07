@@ -196,6 +196,7 @@ export default function MerchantProductsScreen() {
           <FilterButton value="all" selected={filter === "all"} label={translate("merchantProductsFilterAll")} theme={theme} onPress={setFilter} />
           <FilterButton value="low" selected={filter === "low"} label={translate("merchantProductsFilterLow")} theme={theme} onPress={setFilter} />
           <FilterButton value="out" selected={filter === "out"} label={translate("merchantProductsFilterOut")} theme={theme} onPress={setFilter} />
+          <FilterButton value="hidden" selected={filter === "hidden"} label={translate("merchantProductsHidden")} theme={theme} onPress={setFilter} />
         </View>
 
         {notice ? (
