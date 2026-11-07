@@ -35,7 +35,7 @@ create policy "Customers cannot read offer price history"
 create policy "Delivery cannot read offer price history"
   on public.store_offer_price_history
   for select to authenticated
-  using (public.has_role(auth.uid(), 'delivery') and false);
+  using (false);
 
 -- No authenticated INSERT/UPDATE/DELETE policies: only the trigger records prices.
 
