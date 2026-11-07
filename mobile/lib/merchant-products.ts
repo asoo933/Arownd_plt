@@ -199,12 +199,32 @@ export async function addMerchantProductImage(
   }
 
   const uploaded = await uploadProductImage(userId, asset, "edit");
+  const { data: latestImages, error: latestImagesError } = await client
+    .from("product_images")
+    .select("id, is_primary")
+    .eq("offer_id", offerId)
+    .limit(PRODUCT_IMAGE_MAX_COUNT);
+
+  if (latestImagesError || (latestImages ?? []).length >= PRODUCT_IMAGE_MAX_COUNT) {
+    const { error: cleanupError } = await client.storage
+      .from("product-media")
+      .remove([uploaded.path]);
+
+    if (cleanupError) {
+      throw new Error("product_image_upload_cleanup_required", {
+        cause: latestImagesError ?? new Error("product_image_limit_reached")
+      });
+    }
+    if (latestImagesError) throw latestImagesError;
+    throw new Error("product_image_limit_reached");
+  }
+
   const { data, error } = await client
     .from("product_images")
     .insert({
       offer_id: offerId,
       image_url: uploaded.url,
-      is_primary: !(currentImages ?? []).some((image) => image.is_primary)
+      is_primary: !(latestImages ?? []).some((image) => image.is_primary)
     })
     .select("id, image_url, is_primary")
     .single();
