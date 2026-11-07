@@ -38,9 +38,11 @@ export default function SettingsScreen() {
     },
     onError: (error: Error) => {
       setMessage(null);
-      setFormError(error.message === "passwordMin" || error.message === "passwordMismatch"
-        ? translate(error.message)
-        : translate("settingsPasswordError"));
+      setFormError(error.message === "passwordMin"
+        ? translate("passwordMin")
+        : error.message === "passwordMismatch"
+          ? translate("passwordMismatch")
+          : translate("settingsPasswordError"));
     }
   });
   const signOutMutation = useMutation({
