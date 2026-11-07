@@ -207,7 +207,7 @@ export default function CheckoutScreen() {
         <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
       </Pressable>
       <TextInput value={fullName} onChangeText={setFullName} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" maxLength={120} />
-      <TextInput value={phone} onChangeText={setPhone} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
+      <TextInput value={phone} onChangeText={setPhone} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
@@ -236,13 +236,13 @@ export default function CheckoutScreen() {
           <Text style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</Text>
         </Pressable>
       ) : (
-        <TextInput value={commune} onChangeText={setCommune} placeholder={translate("checkoutCommunePlaceholder")} placeholderTextColor="#888888" style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
+        <TextInput value={commune} onChangeText={setCommune} placeholder={translate("checkoutCommunePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
       )}
       {communes.isError ? <Text style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</Text> : null}
 
       {deliveryType === "home" ? <>
         <Text style={styles.fieldLabel}>{translate("checkoutAddress")}</Text>
-        <TextInput value={addressLine} onChangeText={setAddressLine} placeholder={translate("checkoutAddressPlaceholder")} placeholderTextColor="#888888" style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
+        <TextInput value={addressLine} onChangeText={setAddressLine} placeholder={translate("checkoutAddressPlaceholder")} placeholderTextColor={theme.colors.placeholder} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
       </> : <Text style={styles.fieldHint}>{translate("checkoutPickupNote")}</Text>}
     </View>
 
