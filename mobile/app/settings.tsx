@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View, useColorScheme } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { CustomerHeading, CustomerScreen } from "@/components/customer-ui";
 import { translate } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
+import { useAppTheme } from "@/lib/theme";
 
 export default function SettingsScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -17,11 +18,11 @@ export default function SettingsScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState(false);
   const colors = {
-    text: dark ? "#F5F5F5" : "#0A0A0A",
-    muted: "#737373",
-    card: dark ? "#171717" : "#FFFFFF",
-    border: dark ? "#333333" : "#E5E5E5",
-    input: dark ? "#101010" : "#FFFFFF"
+    text: theme.colors.foreground,
+    muted: theme.colors.muted,
+    card: theme.colors.surface,
+    border: theme.colors.border,
+    input: theme.colors.surface
   };
   const passwordMutation = useMutation({
     mutationFn: async () => {
@@ -122,14 +123,14 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
   hint: { fontSize: 12, lineHeight: 19, textAlign: "right" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, textAlign: "right", fontSize: 14 },
-  primary: { minHeight: 47, borderRadius: 13, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  primaryText: { color: "#0A0A0A", fontWeight: "900" },
+  primary: { minHeight: 47, borderRadius: 13, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  primaryText: { color: theme.colors.accentForeground, fontWeight: "900" },
   disabled: { opacity: 0.6 },
-  error: { color: "#D94848", fontSize: 12, textAlign: "right" },
-  success: { color: "#668414", fontSize: 12, textAlign: "right", fontWeight: "700" },
+  error: { color: theme.colors.danger, fontSize: 12, textAlign: "right" },
+  success: { color: theme.colors.success, fontSize: 12, textAlign: "right", fontWeight: "700" },
   linkRow: { minHeight: 45, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
   linkText: { fontSize: 13, fontWeight: "700" },
-  arrow: { color: "#7A7A7A", fontSize: 22 },
-  signOut: { minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: "#D94848", alignItems: "center", justifyContent: "center" },
+  arrow: { color: theme.colors.muted, fontSize: 22 },
+  signOut: { minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
   signOutText: { color: "#D94848", fontWeight: "900" }
 });
