@@ -151,6 +151,9 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
   });
   if (error) throw error;
   if (typeof data !== "string" || data.length === 0) throw new Error("order_confirmation_missing");
-  await removeIdempotencyKey(input.userId, identity);
   return data;
+}
+
+export async function completeCheckout(input: CheckoutInput): Promise<void> {
+  await removeIdempotencyKey(input.userId, checkoutRequestIdentity(input));
 }
