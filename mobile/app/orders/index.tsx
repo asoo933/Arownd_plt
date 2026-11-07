@@ -94,7 +94,6 @@ export default function OrdersScreen() {
     const client = getSupabaseClient();
     const channel = client.channel("native-customer-orders-" + userId)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: "user_id=eq." + userId }, () => {
-        void client.from("orders").select("id").eq("user_id", userId).limit(1);
         void orders.refetch();
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "merchant_orders", filter: "customer_id=eq." + userId }, () => {
@@ -102,7 +101,7 @@ export default function OrdersScreen() {
       })
       .subscribe();
     return () => { void client.removeChannel(channel); };
-  }, [auth.data?.id]);
+  }, [auth.data?.id, orders.refetch]);
 
   const rows = useMemo(() => toRows(orders.data ?? []), [orders.data]);
   const filtered = rows.filter((row) => {
