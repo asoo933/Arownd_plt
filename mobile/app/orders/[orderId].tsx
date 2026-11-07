@@ -239,7 +239,7 @@ export default function OrderDetailsScreen() {
         {shipment.notes ? <Text style={styles.meta}>{shipment.notes}</Text> : null}
       </View>)}
     </View> : null}
-    {canCancelLegacyOrder(order.status, merchantOrders.length > 0) ? <Pressable
+    {canCancelLegacyOrder(order.status, merchantOrders.length > 0, query.data.shipments.map((shipment) => shipment.status)) ? <Pressable
       disabled={cancelMutation.isPending}
       onPress={() => setCancelTarget({ type: "order", id: order.id })}
       style={styles.cancelButton}
