@@ -33,7 +33,7 @@ import {
   validateMerchantOfferOptions,
   validateMerchantOfferValues
 } from "@/lib/merchant-products-state";
-import { fetchMerchantAccess } from "@/lib/merchant";
+import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
@@ -77,6 +77,16 @@ export default function MerchantEditProductScreen() {
   });
 
   const offer = offerQuery.data;
+  const categoriesQuery = useQuery({
+    queryKey: ["merchant-categories"],
+    queryFn: fetchMerchantCategories,
+    enabled: ready,
+    staleTime: 5 * 60 * 1000,
+    retry: false
+  });
+  const selectedCategory = categoriesQuery.data?.find(
+    (category) => category.id === offer?.product.category
+  );
 
   useEffect(() => {
     if (!offer) return;
@@ -291,6 +301,33 @@ export default function MerchantEditProductScreen() {
               {offer.product.brand ? (
                 <Text style={[styles.productBrand, { color: theme.colors.muted }]}>{offer.product.brand}</Text>
               ) : null}
+            </View>
+
+            <View style={[styles.sharedDetails, { backgroundColor: theme.colors.surfaceMuted }]}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                {translate("merchantProductSharedDetailsTitle")}
+              </Text>
+              <View style={styles.sharedDetailRow}>
+                <Text style={[styles.label, { color: theme.colors.muted }]}>
+                  {translate("merchantProductCategoryLabel")}
+                </Text>
+                <Text style={[styles.sharedDetailValue, { color: theme.colors.foreground }]}>
+                  {selectedCategory
+                    ? `${selectedCategory.emoji} ${selectedCategory.label}`
+                    : translate("merchantProductCategoryUnknown")}
+                </Text>
+              </View>
+              <View style={styles.sharedDetailRow}>
+                <Text style={[styles.label, { color: theme.colors.muted }]}>
+                  {translate("merchantProductDescriptionLabel")}
+                </Text>
+                <Text style={[styles.sharedDetailDescription, { color: theme.colors.foreground }]}>
+                  {offer.product.description?.trim() || translate("merchantProductDescriptionEmpty")}
+                </Text>
+              </View>
+              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
+                {translate("merchantProductEditSharedFieldsHint")}
+              </Text>
             </View>
 
             <View style={styles.field}>
@@ -560,6 +597,10 @@ function createStyles(theme: AppTheme) {
     productHeading: { alignItems: "flex-end", gap: 4, paddingBottom: 3 },
     productName: { width: "100%", fontSize: 16, lineHeight: 23, fontWeight: "900", textAlign: "right" },
     productBrand: { width: "100%", fontSize: 11, textAlign: "right" },
+    sharedDetails: { borderRadius: 12, padding: 12, gap: 10 },
+    sharedDetailRow: { gap: 5 },
+    sharedDetailValue: { fontSize: 12, fontWeight: "800", textAlign: "right" },
+    sharedDetailDescription: { fontSize: 12, lineHeight: 19, textAlign: "right" },
     field: { gap: 6 },
     optionsSection: { gap: 10, paddingTop: 2 },
     label: { fontSize: 11, fontWeight: "900", textAlign: "right" },
