@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDZD, getPrimaryImage, type HomeProduct } from "@/lib/catalog";
+import {
+  chooseBestProductOffer,
+  formatDZD,
+  getPrimaryImage,
+  type HomeProduct,
+  type ProductOffer
+} from "@/lib/catalog";
 
 const product: HomeProduct = {
   id: "offer-1",
@@ -14,6 +20,19 @@ const product: HomeProduct = {
     { image_url: "https://cdn.example.com/primary.jpg", is_primary: true }
   ]
 };
+
+function makeOffer(id: string, price: number, isAvailable: boolean, stock: number): ProductOffer {
+  return {
+    id,
+    product_id: "product-1",
+    price,
+    stock_quantity: stock,
+    is_available: isAvailable,
+    product: { id: "product-1", name: "Test", description: null },
+    store: { id: "store-1", name: "Store" },
+    images: []
+  };
+}
 
 describe("catalog presentation helpers", () => {
   it("uses the primary product image", () => {
@@ -31,5 +50,27 @@ describe("catalog presentation helpers", () => {
 
   it("formats prices with the Algerian dinar currency", () => {
     expect(formatDZD(1250)).not.toBe("1250");
+  });
+});
+
+describe("chooseBestProductOffer", () => {
+  it("prefers an available offer over a cheaper unavailable offer", () => {
+    const result = chooseBestProductOffer([
+      makeOffer("unavailable", 500, false, 5),
+      makeOffer("available", 900, true, 2)
+    ]);
+    expect(result?.id).toBe("available");
+  });
+
+  it("chooses the cheapest offer when none is available", () => {
+    const result = chooseBestProductOffer([
+      makeOffer("expensive", 1200, false, 0),
+      makeOffer("cheap", 800, false, 0)
+    ]);
+    expect(result?.id).toBe("cheap");
+  });
+
+  it("returns null when there are no offers", () => {
+    expect(chooseBestProductOffer([])).toBeNull();
   });
 });
