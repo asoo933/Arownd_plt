@@ -289,7 +289,9 @@ export default function MerchantNewProductScreen() {
                 style={[styles.selectButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
               >
                 <Text style={[styles.selectText, { color: selectedCategory ? theme.colors.foreground : theme.colors.placeholder }]}>
-                  {selectedCategory?.label ?? translate("merchantProductCategoryPlaceholder")}
+                  {selectedCategory
+                    ? `${selectedCategory.emoji} ${selectedCategory.label}`
+                    : translate("merchantProductCategoryPlaceholder")}
                 </Text>
               </Pressable>
             </FormField>
