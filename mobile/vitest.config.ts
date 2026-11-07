@@ -1,13 +1,13 @@
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { defineConfig } from "vitest/config";
 
-const mobileRoot = fileURLToPath(new URL(".", import.meta.url));
+const mobileRoot = process.cwd();
 
 export default defineConfig({
   resolve: {
     alias: {
       "@": mobileRoot,
-      "react-native": fileURLToPath(new URL("./test/react-native.ts", import.meta.url))
+      "react-native": resolve(mobileRoot, "test/react-native.ts")
     }
   },
   test: {
