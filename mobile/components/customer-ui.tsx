@@ -8,17 +8,16 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
-  useColorScheme
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const muted = "#737373";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: dark ? "#0A0A0A" : "#F5F5F5" }]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
@@ -28,11 +27,11 @@ export function CustomerScreen({ children }: { children: ReactNode }) {
 }
 
 export function CustomerHeading({ title, subtitle }: { title: string; subtitle?: string }) {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   return (
     <View style={styles.heading}>
-      <Text style={[styles.headingTitle, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <Text style={[styles.headingTitle, { color: theme.colors.foreground }]}>{title}</Text>
+      {subtitle ? <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{subtitle}</Text> : null}
     </View>
   );
 }
@@ -42,16 +41,16 @@ export function CustomerSearch({ value, onChangeText, placeholder }: {
   onChangeText: (value: string) => void;
   placeholder: string;
 }) {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   return (
-    <View style={[styles.search, { backgroundColor: dark ? "#171717" : "#FFFFFF", borderColor: dark ? "#333333" : "#E5E5E5" }]}>
-      <Text style={styles.searchIcon}>⌕</Text>
+    <View style={[styles.search, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+      <Text style={[styles.searchIcon, { color: theme.colors.muted }]}>⌕</Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={muted}
-        style={[styles.searchInput, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}
+        placeholderTextColor={theme.colors.placeholder}
+        style={[styles.searchInput, { color: theme.colors.foreground }]}
         textAlign="right"
         returnKeyType="search"
       />
@@ -64,11 +63,15 @@ export function SectionTitle({ title, action, onAction }: {
   action?: string;
   onAction?: () => void;
 }) {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   return (
     <View style={styles.sectionTitle}>
-      <Text style={[styles.sectionText, { color: dark ? "#F5F5F5" : "#0A0A0A" }]}>{title}</Text>
-      {action && onAction ? <Pressable onPress={onAction} hitSlop={8}><Text style={styles.sectionAction}>{action}</Text></Pressable> : null}
+      <Text style={[styles.sectionText, { color: theme.colors.foreground }]}>{title}</Text>
+      {action && onAction ? (
+        <Pressable accessibilityRole="button" onPress={onAction} hitSlop={8}>
+          <Text style={[styles.sectionAction, { color: theme.colors.accentMuted }]}>{action}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -80,49 +83,73 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
   imageUrl: string | null;
   onPress?: () => void;
 }) {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} disabled={!onPress} style={[styles.productTile, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-      <View style={styles.productImage}>
-        {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
+      style={[styles.productTile, { backgroundColor: theme.colors.surface }]}
+    >
+      <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
+        {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
       </View>
-      <Text numberOfLines={2} style={[styles.productName, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{name}</Text>
-      <Text numberOfLines={1} style={styles.productStore}>{store}</Text>
-      <Text style={styles.productPrice}>{price}</Text>
+      <Text numberOfLines={2} style={[styles.productName, { color: theme.colors.foreground }]}>{name}</Text>
+      <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{store}</Text>
+      <Text style={[styles.productPrice, { color: theme.colors.accentMuted }]}>{price}</Text>
     </Pressable>
   );
 }
 
-export function StoreTile({ name, description, logoUrl, commune, rating, onPress }: {
+export function StoreTile({ name, description, logoUrl, commune, rating, verified = false, onPress }: {
   name: string;
   description?: string | null;
   logoUrl?: string | null;
   commune?: string | null;
   rating?: number | null;
+  verified?: boolean;
   onPress?: () => void;
 }) {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} disabled={!onPress} style={[styles.storeTile, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-      <View style={styles.storeLogo}>
-        {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>⌂</Text>}
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      disabled={!onPress}
+      style={[styles.storeTile, { backgroundColor: theme.colors.surface }]}
+    >
+      <View style={[styles.storeLogo, { backgroundColor: theme.colors.surfaceMuted }]}>
+        {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>⌂</Text>}
       </View>
       <View style={styles.storeInfo}>
-        <Text numberOfLines={1} style={[styles.storeName, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{name}</Text>
-        <Text numberOfLines={1} style={styles.productStore}>{commune || description || " "}</Text>
-        {rating != null ? <Text style={styles.storeRating}>★ {rating.toFixed(1)}</Text> : null}
+        <Text numberOfLines={1} style={[styles.storeName, { color: theme.colors.foreground }]}>{name}</Text>
+        <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{commune || description || " "}</Text>
+        {rating != null ? <Text style={[styles.storeRating, { color: theme.colors.warning }]}>★ {rating.toFixed(1)}</Text> : null}
       </View>
-      <Text style={styles.verified}>✓</Text>
+      {verified ? <Text accessibilityLabel="Verified store" style={[styles.verified, { color: theme.colors.success }]}>✓</Text> : null}
     </Pressable>
   );
 }
 
 export function LoadingState({ label }: { label: string }) {
-  return <View style={styles.state}><ActivityIndicator color="#829E19" /><Text style={styles.stateText}>{label}</Text></View>;
+  const theme = useAppTheme();
+  return (
+    <View style={styles.state}>
+      <ActivityIndicator color={theme.colors.accentMuted} />
+      <Text style={[styles.stateText, { color: theme.colors.muted }]}>{label}</Text>
+    </View>
+  );
 }
 
 export function EmptyState({ title, hint }: { title: string; hint: string }) {
-  return <View style={styles.state}><Text style={styles.emptyMark}>⌕</Text><Text style={styles.stateTitle}>{title}</Text><Text style={styles.stateText}>{hint}</Text></View>;
+  const theme = useAppTheme();
+  return (
+    <View style={styles.state}>
+      <Text style={[styles.emptyMark, { color: theme.colors.accentMuted }]}>⌕</Text>
+      <Text style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</Text>
+      <Text style={[styles.stateText, { color: theme.colors.muted }]}>{hint}</Text>
+    </View>
+  );
 }
 
 export function ErrorState({ title, retryLabel, onRetry }: {
@@ -130,10 +157,13 @@ export function ErrorState({ title, retryLabel, onRetry }: {
   retryLabel: string;
   onRetry: () => void;
 }) {
+  const theme = useAppTheme();
   return (
     <View style={styles.state}>
-      <Text style={styles.stateTitle}>{title}</Text>
-      <Pressable onPress={onRetry} style={styles.retry}><Text style={styles.retryText}>{retryLabel}</Text></Pressable>
+      <Text style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</Text>
+      <Pressable accessibilityRole="button" onPress={onRetry} style={[styles.retry, { backgroundColor: theme.colors.accent }]}>
+        <Text style={[styles.retryText, { color: theme.colors.accentForeground }]}>{retryLabel}</Text>
+      </Pressable>
     </View>
   );
 }
@@ -141,32 +171,32 @@ export function ErrorState({ title, retryLabel, onRetry }: {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: 18, paddingTop: 10, paddingBottom: 28, gap: 22 },
-  heading: { gap: 5, alignItems: "flex-end" },
-  headingTitle: { fontSize: 22, fontWeight: "900", textAlign: "right" },
-  subtitle: { color: muted, fontSize: 12, textAlign: "right", lineHeight: 19 },
-  search: { minHeight: 50, borderRadius: 16, borderWidth: 1, flexDirection: "row-reverse", alignItems: "center", paddingHorizontal: 13, gap: 8 },
-  searchIcon: { fontSize: 24, color: muted },
-  searchInput: { flex: 1, minHeight: 48, fontSize: 14 },
-  sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: 12 },
-  sectionText: { fontSize: 16, fontWeight: "900", textAlign: "right" },
-  sectionAction: { color: "#647D13", fontSize: 12, fontWeight: "800" },
-  productTile: { width: 158, borderRadius: 18, padding: 9, gap: 5 },
-  productImage: { height: 132, borderRadius: 13, backgroundColor: "#ECEFE4", overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  imageFallback: { fontSize: 35, color: "#8A9B55" },
+  content: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.xxl },
+  heading: { gap: designTokens.spacing.xs, alignItems: "flex-end" },
+  headingTitle: { fontSize: designTokens.typography.title, fontWeight: "900", textAlign: "right" },
+  subtitle: { fontSize: designTokens.typography.caption + 1, textAlign: "right", lineHeight: 19 },
+  search: { minHeight: 50, borderRadius: designTokens.radius.lg, borderWidth: 1, flexDirection: "row-reverse", alignItems: "center", paddingHorizontal: designTokens.spacing.md, gap: designTokens.spacing.sm },
+  searchIcon: { fontSize: 24 },
+  searchInput: { flex: 1, minHeight: 48, fontSize: designTokens.typography.body },
+  sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
+  sectionText: { fontSize: designTokens.typography.subtitle, fontWeight: "900", textAlign: "right" },
+  sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
+  productTile: { width: 158, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
+  productImage: { height: 132, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  imageFallback: { fontSize: 35 },
   productName: { minHeight: 38, fontSize: 13, fontWeight: "800", textAlign: "right" },
-  productStore: { color: muted, fontSize: 11, textAlign: "right" },
-  productPrice: { color: "#647D13", fontSize: 14, fontWeight: "900", textAlign: "right" },
-  storeTile: { minHeight: 82, borderRadius: 17, padding: 11, flexDirection: "row-reverse", alignItems: "center", gap: 11 },
-  storeLogo: { width: 54, height: 54, borderRadius: 16, overflow: "hidden", backgroundColor: "#ECEFE4", alignItems: "center", justifyContent: "center" },
-  storeInfo: { flex: 1, gap: 4, alignItems: "flex-end" },
-  storeName: { fontSize: 14, fontWeight: "800" },
-  storeRating: { color: "#A07812", fontSize: 11, fontWeight: "700" },
-  verified: { color: "#647D13", fontSize: 16, fontWeight: "900" },
-  state: { minHeight: 135, alignItems: "center", justifyContent: "center", gap: 9, padding: 20 },
-  stateText: { color: muted, fontSize: 12, textAlign: "center" },
-  stateTitle: { color: "#737373", fontSize: 14, fontWeight: "800", textAlign: "center" },
-  emptyMark: { fontSize: 30, color: "#94A86A" },
-  retry: { minHeight: 40, justifyContent: "center", paddingHorizontal: 18, borderRadius: 12, backgroundColor: "#C6F135" },
-  retryText: { color: "#0A0A0A", fontSize: 12, fontWeight: "800" }
+  productStore: { fontSize: designTokens.typography.caption, textAlign: "right" },
+  productPrice: { fontSize: designTokens.typography.body, fontWeight: "900", textAlign: "right" },
+  storeTile: { minHeight: 82, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md - 1 },
+  storeLogo: { width: 54, height: 54, borderRadius: designTokens.radius.md + 2, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  storeInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-end" },
+  storeName: { fontSize: designTokens.typography.body, fontWeight: "800" },
+  storeRating: { fontSize: designTokens.typography.caption, fontWeight: "700" },
+  verified: { fontSize: 16, fontWeight: "900" },
+  state: { minHeight: 135, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl },
+  stateText: { fontSize: designTokens.typography.caption + 1, textAlign: "center" },
+  stateTitle: { fontSize: designTokens.typography.body, fontWeight: "800", textAlign: "center" },
+  emptyMark: { fontSize: 30 },
+  retry: { minHeight: 44, justifyContent: "center", paddingHorizontal: designTokens.spacing.xl, borderRadius: designTokens.radius.md },
+  retryText: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" }
 });
