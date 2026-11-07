@@ -103,6 +103,7 @@ export default function CheckoutScreen() {
 
   const applySavedAddress = (address: UserAddress) => {
     setSelectedAddressId(address.id);
+    setProfileApplied(true);
     setFullName(address.recipient_name);
     setPhone(address.phone);
     setWilayaId(address.wilaya_id);
