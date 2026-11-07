@@ -441,7 +441,7 @@ export const messages = {
     merchantAnalyticsLowStock: "Low stock",
     merchantAnalyticsOutOfStock: "Out of stock",
     merchantAnalyticsRating: "Store rating",
-    merchantAnalyticsLastSevenDays: "Delivered orders in the last 7 days",
+    merchantAnalyticsLastSevenDays: "Delivered product value in the last 7 days",
     merchantAnalyticsNoSales: "No delivered orders during this period.",
     merchantAnalyticsRevenueNote: "Calculated from product subtotals of delivered orders; excludes delivery fees and net profit.",
     merchantDashboardTitle: "نظرة عامة على متجرك",
