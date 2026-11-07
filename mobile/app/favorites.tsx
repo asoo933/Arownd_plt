@@ -57,6 +57,9 @@ export default function FavoritesScreen() {
   }
 
   const count = tab === "products" ? favorites.data.products.length : favorites.data.stores.length;
+  const visibleCount = content.data
+    ? tab === "products" ? content.data.products.length : content.data.stores.length
+    : count;
   return (
     <CustomerScreen>
       <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
@@ -64,13 +67,13 @@ export default function FavoritesScreen() {
       </Pressable>
       <CustomerHeading title={translate("favoritesTitle")} subtitle={translate("favoritesSubtitle")} />
       <View style={[styles.tabs, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-        <TabButton label={translate("favoriteProductsCount", { count: favorites.data.products.length })} active={tab === "products"} onPress={() => setTab("products")} />
-        <TabButton label={translate("favoriteStoresCount", { count: favorites.data.stores.length })} active={tab === "stores"} onPress={() => setTab("stores")} />
+        <TabButton label={`${translate("favoriteProducts")} (${favorites.data.products.length})`} active={tab === "products"} onPress={() => setTab("products")} />
+        <TabButton label={`${translate("favoriteStores")} (${favorites.data.stores.length})`} active={tab === "stores"} onPress={() => setTab("stores")} />
       </View>
 
       {content.isPending ? <LoadingState label={translate("stateLoading")} /> : content.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void content.refetch()} />
-      ) : count === 0 ? (
+      ) : visibleCount === 0 ? (
         <EmptyState
           title={translate(tab === "products" ? "favoriteProductsEmpty" : "favoriteStoresEmpty")}
           hint={translate("favoritesEmptyHint")}
