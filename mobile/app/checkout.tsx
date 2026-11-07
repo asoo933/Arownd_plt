@@ -25,7 +25,7 @@ import {
   type Wilaya
 } from "@/lib/checkout";
 import { CART_QUERY_KEY, clearCart, getCart } from "@/lib/cart";
-import { evaluateCart } from "@/lib/cart-state";
+import { evaluateCart, normalizeCartOptions } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
@@ -299,6 +299,7 @@ export default function CheckoutScreen() {
           <View style={styles.summaryInfo}>
             <Text style={[styles.summaryName, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name ?? translate("cartUnknownStore")}</Text>
             <Text style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</Text>
+            <Text style={styles.fieldHint}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Text>
           </View>
           <Text style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</Text>
         </View>;
