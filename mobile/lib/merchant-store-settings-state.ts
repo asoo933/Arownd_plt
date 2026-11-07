@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+function isHttpsUrl(value: string): boolean {
+  if (!value) return true;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const MerchantStoreSettingsSchema = z.object({
   name: z.string().trim().min(2).max(100),
   description: z.string().trim().max(2000),
@@ -12,8 +21,8 @@ export const MerchantStoreSettingsSchema = z.object({
     close: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
     closed_days: z.array(z.number().int().min(0).max(6)).max(7).refine((days) => new Set(days).size === days.length)
   }),
-  instagram_url: z.string().trim().max(300).refine((value) => value === "" || /^https:\/\//i.test(value)),
-  facebook_url: z.string().trim().max(300).refine((value) => value === "" || /^https:\/\//i.test(value))
+  instagram_url: z.string().trim().max(300).refine(isHttpsUrl),
+  facebook_url: z.string().trim().max(300).refine(isHttpsUrl)
 });
 
 export type MerchantStoreSettings = z.infer<typeof MerchantStoreSettingsSchema>;
