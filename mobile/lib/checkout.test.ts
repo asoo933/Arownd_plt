@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { checkoutRequestIdentity } from "@/lib/checkout";
+import { checkoutRequestIdentity } from "@/lib/checkout-state";
 import type { CartItem } from "@/lib/cart-state";
 
 const item = (offerId: string, quantity: number, options: Record<string, string>): CartItem => ({
