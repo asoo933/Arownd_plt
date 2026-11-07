@@ -29,13 +29,10 @@ import { evaluateCart } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
+import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
 
 type Picker = "wilaya" | "commune" | null;
-
-function validAlgerianPhone(value: string): boolean {
-  const normalized = value.replace(/[\\s()-]/g, "");
-  return /^(?:0[567]\\d{8}|\\+213[567]\\d{8}|00213[567]\\d{8})$/.test(normalized);
-}
 
 export default function CheckoutScreen() {
   const theme = useAppTheme();
@@ -51,6 +48,8 @@ export default function CheckoutScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [profileApplied, setProfileApplied] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [addressesApplied, setAddressesApplied] = useState(false);
 
   const auth = useQuery({
     queryKey: ["checkout-auth"],
@@ -83,6 +82,11 @@ export default function CheckoutScreen() {
     queryFn: fetchCheckoutProfile,
     enabled: auth.data !== undefined && auth.data !== null
   });
+  const savedAddresses = useQuery({
+    queryKey: ["my-addresses"],
+    queryFn: fetchMyAddresses,
+    enabled: auth.data !== undefined && auth.data !== null
+  });
 
   useEffect(() => {
     if (auth.data === null) {
@@ -96,6 +100,22 @@ export default function CheckoutScreen() {
     setCommune(profile.data?.commune ?? "");
     setProfileApplied(true);
   }, [profile.data, profile.isSuccess, profileApplied, auth.data]);
+
+  const applySavedAddress = (address: UserAddress) => {
+    setSelectedAddressId(address.id);
+    setFullName(address.recipient_name);
+    setPhone(address.phone);
+    setWilayaId(address.wilaya_id);
+    setCommune(address.commune);
+    setAddressLine(address.address_line);
+  };
+
+  useEffect(() => {
+    if (!savedAddresses.isSuccess || addressesApplied) return;
+    const preferred = savedAddresses.data.find((address) => address.is_default) ?? savedAddresses.data[0];
+    if (preferred) applySavedAddress(preferred);
+    setAddressesApplied(true);
+  }, [savedAddresses.data, savedAddresses.isSuccess, addressesApplied]);
 
   const selectedWilaya = useMemo(
     () => wilayas.data?.find((item) => item.id === wilayaId) ?? null,
@@ -164,7 +184,7 @@ export default function CheckoutScreen() {
       setFormError(translate("checkoutNameInvalid"));
       return;
     }
-    if (!validAlgerianPhone(phone)) {
+    if (!isValidAddressPhone(phone)) {
       setFormError(translate("checkoutPhoneInvalid"));
       return;
     }
@@ -184,7 +204,7 @@ export default function CheckoutScreen() {
       commune: commune.trim(),
       addressLine: deliveryType === "home" ? addressLine.trim() : "",
       fullName: fullName.trim(),
-      phone: phone.trim()
+      phone: normalizeAddressPhone(phone)
     };
     mutation.mutate(input);
   };
@@ -206,12 +226,36 @@ export default function CheckoutScreen() {
       <Pressable onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
       </Pressable>
-      <TextInput value={fullName} onChangeText={setFullName} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" maxLength={120} />
-      <TextInput value={phone} onChangeText={setPhone} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
+      <TextInput value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" maxLength={120} />
+      <TextInput value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</Text>
+      {savedAddresses.isError ? (
+        <Pressable onPress={() => void savedAddresses.refetch()}><Text style={styles.retryText}>{translate("checkoutSavedAddressesError")}</Text></Pressable>
+      ) : savedAddresses.data && savedAddresses.data.length > 0 ? (
+        <View style={styles.savedAddresses}>
+          <View style={styles.savedHeader}>
+            <Text style={styles.fieldLabel}>{translate("checkoutSavedAddresses")}</Text>
+            <Pressable onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutManageAddresses")}</Text></Pressable>
+          </View>
+          {savedAddresses.data.map((address) => (
+            <Pressable key={address.id} onPress={() => applySavedAddress(address)} style={[styles.savedAddress, selectedAddressId === address.id && styles.savedAddressSelected]}>
+              <View style={styles.savedAddressTop}>
+                <Text style={styles.savedAddressName}>{address.recipient_name}</Text>
+                <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
+              </View>
+              <Text style={styles.fieldHint}>{address.phone}</Text>
+              <Text style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}</Text>
+              <Text style={styles.fieldHint}>{address.address_line}</Text>
+              {address.is_default ? <Text style={styles.savedDefault}>{translate("addressesDefault")}</Text> : null}
+            </Pressable>
+          ))}
+        </View>
+      ) : (
+        <Pressable onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutAddSavedAddress")}</Text></Pressable>
+      )}
       <View style={styles.deliveryOptions}>
         <Pressable onPress={() => setDeliveryType("home")} style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}>
           <Text style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</Text>
@@ -224,7 +268,7 @@ export default function CheckoutScreen() {
       </View>
 
       <Text style={styles.fieldLabel}>{translate("checkoutWilaya")}</Text>
-      <Pressable onPress={() => setPicker("wilaya")} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
+      <Pressable onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
         <Text style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</Text>
         {wilayas.isPending ? <ActivityIndicator size="small" /> : null}
       </Pressable>
@@ -236,13 +280,13 @@ export default function CheckoutScreen() {
           <Text style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</Text>
         </Pressable>
       ) : (
-        <TextInput value={commune} onChangeText={setCommune} placeholder={translate("checkoutCommunePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
+        <TextInput value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
       )}
       {communes.isError ? <Text style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</Text> : null}
 
       {deliveryType === "home" ? <>
         <Text style={styles.fieldLabel}>{translate("checkoutAddress")}</Text>
-        <TextInput value={addressLine} onChangeText={setAddressLine} placeholder={translate("checkoutAddressPlaceholder")} placeholderTextColor={theme.colors.placeholder} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
+        <TextInput value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} placeholderTextColor={theme.colors.placeholder} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
       </> : <Text style={styles.fieldHint}>{translate("checkoutPickupNote")}</Text>}
     </View>
 
@@ -315,6 +359,15 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   placeholder: { color: theme.colors.placeholder },
   fieldHint: { color: theme.colors.muted, fontSize: 11, lineHeight: 17, textAlign: "right" },
   retryText: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "800", textAlign: "right" },
+  savedAddresses: { gap: 8 },
+  savedHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
+  savedAddress: { borderWidth: 1, borderColor: theme.colors.border, borderRadius: 12, padding: 11, gap: 4 },
+  savedAddressSelected: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
+  savedAddressTop: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
+  savedAddressName: { color: theme.colors.foreground, fontSize: 12, fontWeight: "900" },
+  savedDefault: { color: theme.colors.accentMuted, fontSize: 10, fontWeight: "900", textAlign: "right" },
+  radio: { width: 17, height: 17, borderRadius: 9, borderWidth: 1.5, borderColor: theme.colors.muted },
+  radioSelected: { borderWidth: 5, borderColor: theme.colors.accentMuted },
   deliveryOptions: { flexDirection: "row-reverse", gap: 8 },
   deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 14, padding: 10, gap: 7 },
   deliverySelected: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
