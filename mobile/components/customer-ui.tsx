@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const muted = "#737373";
 
-export function CustomerScreen({ children }: { children: React.ReactNode }) {
+export function CustomerScreen({ children }: { children: ReactNode }) {
   const dark = useColorScheme() === "dark";
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: dark ? "#0A0A0A" : "#F5F5F5" }]}>
