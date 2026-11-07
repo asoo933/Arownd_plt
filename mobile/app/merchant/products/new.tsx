@@ -163,8 +163,13 @@ export default function MerchantNewProductScreen() {
         queryClient.invalidateQueries({ queryKey: ["near-stores"] })
       ]);
       router.replace("/merchant/products");
-    } catch {
-      setSubmitError(translate("merchantProductCreateError"));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "";
+      setSubmitError(
+        errorMessage.endsWith("cleanup_required")
+          ? translate("merchantProductCreateCleanupPending")
+          : translate("merchantProductCreateError")
+      );
     } finally {
       setSubmitting(false);
     }
