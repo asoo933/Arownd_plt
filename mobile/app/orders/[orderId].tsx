@@ -225,6 +225,7 @@ export default function OrderDetailsScreen() {
         <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
           <Text style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</Text>
           <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
+          {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
           <View style={styles.quoteActions}>
             <Pressable
               disabled={quoteMutation.isPending}
