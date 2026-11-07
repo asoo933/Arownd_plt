@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } from "@/components/customer-ui";
+import { FavoriteButton } from "@/components/favorite-button";
 import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 
@@ -45,6 +46,7 @@ export default function StoreDetailsScreen() {
         </View>
         <View style={styles.storeTitleWrap}>
           <Text style={[styles.storeName, { color: dark ? "#FFFFFF" : "#0A0A0A" }]}>{details.name}</Text>
+          <FavoriteButton kind="stores" id={storeId} />
           <Text style={styles.metaText}>{details.commune || details.address_line || " "}</Text>
           <Text style={styles.verified}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</Text>
           {details.rating != null ? <Text style={styles.rating}>★ {translate("storeRating")}: {details.rating.toFixed(1)}</Text> : null}
