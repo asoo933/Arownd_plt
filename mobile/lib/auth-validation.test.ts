@@ -4,7 +4,8 @@ import {
   businessSignupSchema,
   loginSchema,
   personalSignupSchema,
-  recoverySchema
+  recoverySchema,
+  resetPasswordSchema
 } from "./auth-validation";
 
 describe("auth validation", () => {
@@ -42,5 +43,12 @@ describe("auth validation", () => {
 
   it("validates password recovery email", () => {
     expect(recoverySchema.safeParse({ email: "person@example.com" }).success).toBe(true);
+  });
+
+  it("validates a password reset confirmation", () => {
+    expect(resetPasswordSchema.safeParse({
+      password: "newpassword123",
+      confirmPassword: "newpassword123"
+    }).success).toBe(true);
   });
 });
