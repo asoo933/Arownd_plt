@@ -5,6 +5,7 @@ import {
   filterMerchantProducts,
   getMerchantInventoryLevel,
   getMerchantInventorySummary,
+  validateMerchantOfferOptions,
   validateMerchantOfferValues,
   type MerchantProductOffer
 } from "@/lib/merchant-products-state";
@@ -118,5 +119,27 @@ describe("MerchantProductOfferSchema", () => {
     expect(parsed.price).toBe(1500);
     expect(parsed.stock_quantity).toBe(4);
     expect(parsed.images).toEqual([]);
+  });
+});
+
+
+describe("validateMerchantOfferOptions", () => {
+  it("normalizes comma-separated sizes and colors and removes duplicates", () => {
+    expect(validateMerchantOfferOptions("S, M، L, M", "أحمر, أزرق، أحمر")).toEqual({
+      sizes: ["S", "M", "L"],
+      colors: ["أحمر", "أزرق"]
+    });
+  });
+
+  it("accepts empty option lists", () => {
+    expect(validateMerchantOfferOptions("", "")).toEqual({ sizes: [], colors: [] });
+  });
+
+  it("rejects more than twenty options or values longer than forty characters", () => {
+    expect(validateMerchantOfferOptions(
+      Array.from({ length: 21 }, (_, index) => `size-${index}`).join(","),
+      ""
+    )).toBeNull();
+    expect(validateMerchantOfferOptions("x".repeat(41), "")).toBeNull();
   });
 });
