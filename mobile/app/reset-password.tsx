@@ -24,20 +24,21 @@ export default function ResetPasswordScreen() {
   useEffect(() => {
     let active = true;
 
-    if (!code) {
-      setState("invalid");
-      return () => {
-        active = false;
-      };
-    }
+    const exchangeCode = async (): Promise<void> => {
+      if (!code) {
+        setState("invalid");
+        return;
+      }
 
-    void getSupabaseClient().auth.exchangeCodeForSession(code)
-      .then(({ error }) => {
+      try {
+        const { error } = await getSupabaseClient().auth.exchangeCodeForSession(code);
         if (active) setState(error ? "invalid" : "ready");
-      })
-      .catch(() => {
+      } catch {
         if (active) setState("invalid");
-      });
+      }
+    };
+
+    void exchangeCode();
 
     return () => {
       active = false;
