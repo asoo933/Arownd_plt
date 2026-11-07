@@ -100,32 +100,7 @@ export default function OrderDetailsScreen() {
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <EmptyState title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
     <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
-    <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
-      <View style={styles.modalBackdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
-          <Text style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</Text>
-          <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
-          <View style={styles.quoteActions}>
-            <Pressable
-              disabled={quoteMutation.isPending}
-              onPress={() => {
-                if (declineTarget) {
-                  quoteMutation.mutate({ merchantOrderId: declineTarget, accept: false }, {
-                    onSuccess: () => setDeclineTarget(null)
-                  });
-                }
-              }}
-              style={styles.declineButton}
-            >
-              {quoteMutation.isPending ? <ActivityIndicator color="#B42318" /> : <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>}
-            </Pressable>
-            <Pressable disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
-              <Text style={styles.acceptButtonText}>{translate("back")}</Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    </Modal>
+
   </CustomerScreen>;
 
   const merchantOrders = order.merchant_orders;
@@ -245,6 +220,32 @@ export default function OrderDetailsScreen() {
       </View>)}
     </View> : null}
     <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
+    <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
+      <View style={styles.modalBackdrop}>
+        <View style={[styles.modalPanel, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+          <Text style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</Text>
+          <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
+          <View style={styles.quoteActions}>
+            <Pressable
+              disabled={quoteMutation.isPending}
+              onPress={() => {
+                if (declineTarget) {
+                  quoteMutation.mutate({ merchantOrderId: declineTarget, accept: false }, {
+                    onSuccess: () => setDeclineTarget(null)
+                  });
+                }
+              }}
+              style={styles.declineButton}
+            >
+              {quoteMutation.isPending ? <ActivityIndicator color="#B42318" /> : <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>}
+            </Pressable>
+            <Pressable disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
+              <Text style={styles.acceptButtonText}>{translate("back")}</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
   </CustomerScreen>;
 }
 
