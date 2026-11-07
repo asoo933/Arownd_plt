@@ -1,3 +1,11 @@
+export function canCancelMerchantOrder(status: string, quotedAt: string | null | undefined): boolean {
+  return status === "pending" && !quotedAt;
+}
+
+export function canCancelLegacyOrder(status: string, hasMerchantOrders: boolean): boolean {
+  return !hasMerchantOrders && status === "pending";
+}
+
 export function getOrderTrackingSteps(status: string): number {
   switch (status) {
     case "pending": return 0;
