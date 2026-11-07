@@ -23,6 +23,8 @@ import {
   fetchMerchantProductOffer,
   removeMerchantProductImage,
   updateMerchantProductDetails,
+  startMerchantOfferPromotion,
+  endMerchantOfferPromotion,
   updateMerchantProductOffer
 } from "@/lib/merchant-products";
 import {
@@ -33,6 +35,8 @@ import {
 import {
   validateMerchantOfferOptions,
   validateMerchantOfferValues,
+  validatePromotionSalePrice,
+  getPromotionDiscountPercent,
   validateMerchantProductDetails
 } from "@/lib/merchant-products-state";
 import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
@@ -54,6 +58,8 @@ export default function MerchantEditProductScreen() {
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [detailsSaving, setDetailsSaving] = useState(false);
   const [price, setPrice] = useState("");
+  const [promotionPrice, setPromotionPrice] = useState("");
+  const [promotionBusy, setPromotionBusy] = useState(false);
   const [stock, setStock] = useState("");
   const [sizes, setSizes] = useState("");
   const [colors, setColors] = useState("");
@@ -107,6 +113,7 @@ export default function MerchantEditProductScreen() {
     setProductBrand(offer.product.brand ?? "");
     setProductCategory(offer.product.category);
     setPrice(String(offer.price));
+    setPromotionPrice("");
     setStock(String(offer.stock_quantity));
     setSizes(offer.options.sizes.join(", "));
     setColors(offer.options.colors.join(", "));
@@ -117,6 +124,7 @@ export default function MerchantEditProductScreen() {
     offer?.product.brand,
     offer?.product.category,
     offer?.price,
+    offer?.old_price,
     offer?.stock_quantity
   ]);
 
@@ -160,6 +168,46 @@ export default function MerchantEditProductScreen() {
       setActionError(translate("merchantProductEditError"));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const savePromotion = async (): Promise<void> => {
+    if (!storeId || !offerId || !offer || promotionBusy || isBusy) return;
+    const salePrice = validatePromotionSalePrice(promotionPrice, offer.price);
+    if (salePrice === null) {
+      setActionError(translate("merchantPromotionInvalidPrice"));
+      setNotice(null);
+      setWarning(null);
+      return;
+    }
+    setPromotionBusy(true);
+    setActionError(null);
+    setNotice(null);
+    try {
+      await startMerchantOfferPromotion(offerId, storeId, salePrice);
+      await refreshProductData();
+      setPromotionPrice("");
+      setNotice(translate("merchantPromotionStarted"));
+    } catch {
+      setActionError(translate("merchantPromotionError"));
+    } finally {
+      setPromotionBusy(false);
+    }
+  };
+
+  const stopPromotion = async (): Promise<void> => {
+    if (!storeId || !offerId || !offer || promotionBusy || isBusy) return;
+    setPromotionBusy(true);
+    setActionError(null);
+    setNotice(null);
+    try {
+      await endMerchantOfferPromotion(offerId, storeId);
+      await refreshProductData();
+      setNotice(translate("merchantPromotionEnded"));
+    } catch {
+      setActionError(translate("merchantPromotionError"));
+    } finally {
+      setPromotionBusy(false);
     }
   };
 
@@ -324,7 +372,7 @@ export default function MerchantEditProductScreen() {
     );
   }
 
-  const isBusy = saving || detailsSaving || imageBusy || removingImageId !== null;
+  const isBusy = saving || detailsSaving || imageBusy || removingImageId !== null || promotionBusy;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
@@ -461,6 +509,40 @@ export default function MerchantEditProductScreen() {
                 accessibilityLabel={translate("merchantProductPriceLabel")}
                 style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
               />
+            </View>
+
+            <View style={[styles.field, { backgroundColor: theme.colors.surfaceMuted, borderRadius: 14, padding: 12 }]}>
+              <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                {translate("merchantPromotionTitle")}
+              </Text>
+              {offer.old_price !== null && offer.old_price !== undefined ? (
+                <>
+                  <Text style={[styles.hint, { color: theme.colors.accentMuted }]}>
+                    {translate("merchantPromotionActive")}: {offer.old_price.toLocaleString("ar-DZ")} ← {offer.price.toLocaleString("ar-DZ")} دج
+                    {getPromotionDiscountPercent(offer.old_price, offer.price) !== null ? " · " + getPromotionDiscountPercent(offer.old_price, offer.price) + "%" : ""}
+                  </Text>
+                  <Pressable accessibilityRole="button" disabled={isBusy} onPress={() => void stopPromotion()} style={[styles.primaryButton, { backgroundColor: theme.colors.accent, opacity: isBusy ? 0.55 : 1 }]}>
+                    {promotionBusy ? <ActivityIndicator color={theme.colors.accentForeground} /> : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate("merchantPromotionEnd")}</Text>}
+                  </Pressable>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.hint, { color: theme.colors.muted }]}>{translate("merchantPromotionHint")}</Text>
+                  <TextInput
+                    value={promotionPrice}
+                    onChangeText={setPromotionPrice}
+                    editable={!isBusy}
+                    keyboardType="number-pad"
+                    placeholder={translate("merchantPromotionPricePlaceholder")}
+                    placeholderTextColor={theme.colors.placeholder}
+                    accessibilityLabel={translate("merchantPromotionTitle")}
+                    style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                  />
+                  <Pressable accessibilityRole="button" disabled={isBusy} onPress={() => void savePromotion()} style={[styles.primaryButton, { backgroundColor: theme.colors.accent, opacity: isBusy ? 0.55 : 1 }]}>
+                    {promotionBusy ? <ActivityIndicator color={theme.colors.accentForeground} /> : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate("merchantPromotionStart")}</Text>}
+                  </Pressable>
+                </>
+              )}
             </View>
 
             <View style={styles.field}>
