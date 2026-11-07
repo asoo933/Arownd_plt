@@ -19,7 +19,7 @@ export default function StoresScreen() {
       ) : (
         <View style={styles.list}>
           {stores.data.map((store) => (
-            <StoreTile key={store.id} name={store.name} description={store.description} logoUrl={store.logo_url} commune={store.commune} rating={store.rating} />
+            <StoreTile key={store.id} name={store.name} description={store.description} logoUrl={store.logo_url} commune={store.commune} rating={store.rating} onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: store.id } })} />
           ))}
         </View>
       )}
