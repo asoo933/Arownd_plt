@@ -29,7 +29,10 @@ import {
   PRODUCT_IMAGE_MAX_COUNT,
   validateProductImageMetadata
 } from "@/lib/merchant-product-images";
-import { validateMerchantOfferValues } from "@/lib/merchant-products-state";
+import {
+  validateMerchantOfferOptions,
+  validateMerchantOfferValues
+} from "@/lib/merchant-products-state";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
@@ -43,6 +46,8 @@ export default function MerchantEditProductScreen() {
 
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [sizes, setSizes] = useState("");
+  const [colors, setColors] = useState("");
   const [saving, setSaving] = useState(false);
   const [imageBusy, setImageBusy] = useState(false);
   const [removingImageId, setRemovingImageId] = useState<string | null>(null);
@@ -77,6 +82,8 @@ export default function MerchantEditProductScreen() {
     if (!offer) return;
     setPrice(String(offer.price));
     setStock(String(offer.stock_quantity));
+    setSizes(offer.options.sizes.join(", "));
+    setColors(offer.options.colors.join(", "));
   }, [offer?.id, offer?.price, offer?.stock_quantity]);
 
   const refreshProductData = async (): Promise<void> => {
@@ -92,7 +99,8 @@ export default function MerchantEditProductScreen() {
     if (!storeId || !offerId || saving || imageBusy || removingImageId) return;
 
     const values = validateMerchantOfferValues(price, stock);
-    if (!values) {
+    const options = validateMerchantOfferOptions(sizes, colors);
+    if (!values || !options) {
       setNotice(null);
       setWarning(null);
       setActionError(translate("merchantProductEditValidation"));
@@ -104,7 +112,7 @@ export default function MerchantEditProductScreen() {
     setWarning(null);
     setActionError(null);
     try {
-      await updateMerchantProductOffer(offerId, storeId, values);
+      await updateMerchantProductOffer(offerId, storeId, { ...values, options });
       await refreshProductData();
       setNotice(translate("merchantProductEditSaved"));
     } catch {
@@ -309,6 +317,43 @@ export default function MerchantEditProductScreen() {
               </Text>
             </View>
 
+            <View style={styles.optionsSection}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                {translate("merchantProductOptionsTitle")}
+              </Text>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductSizesLabel")}
+                </Text>
+                <TextInput
+                  value={sizes}
+                  onChangeText={setSizes}
+                  editable={!isBusy}
+                  placeholder={translate("merchantProductOptionsPlaceholder")}
+                  placeholderTextColor={theme.colors.placeholder}
+                  accessibilityLabel={translate("merchantProductSizesLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductColorsLabel")}
+                </Text>
+                <TextInput
+                  value={colors}
+                  onChangeText={setColors}
+                  editable={!isBusy}
+                  placeholder={translate("merchantProductOptionsPlaceholder")}
+                  placeholderTextColor={theme.colors.placeholder}
+                  accessibilityLabel={translate("merchantProductColorsLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <Text style={[styles.hint, { color: theme.colors.subtle }]}>
+                {translate("merchantProductOptionsHint")}
+              </Text>
+            </View>
+
             <View style={[styles.note, { backgroundColor: theme.colors.surfaceMuted }]}>
               <Text style={[styles.noteText, { color: theme.colors.muted }]}>
                 {translate("merchantProductEditSharedFieldsHint")}
@@ -509,6 +554,7 @@ function createStyles(theme: AppTheme) {
     productName: { width: "100%", fontSize: 16, lineHeight: 23, fontWeight: "900", textAlign: "right" },
     productBrand: { width: "100%", fontSize: 11, textAlign: "right" },
     field: { gap: 6 },
+    optionsSection: { gap: 10, paddingTop: 2 },
     label: { fontSize: 11, fontWeight: "900", textAlign: "right" },
     input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, textAlign: "right", fontSize: 14, fontWeight: "800" },
     hint: { fontSize: 10, lineHeight: 16, textAlign: "right" },
