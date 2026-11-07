@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeAddressPhone, UserAddressSchema } from "@/lib/user-address-state";
+import { isValidAddressPhone, normalizeAddressPhone, UserAddressSchema } from "@/lib/user-address-state";
 
 const validAddress = {
   label: "home" as const,
@@ -24,6 +24,12 @@ describe("user address validation", () => {
       commune: "",
       wilaya_id: 0
     }).success).toBe(false);
+  });
+
+  it("validates formatted Algerian phone numbers after normalization", () => {
+    expect(isValidAddressPhone("0550 123 456")).toBe(true);
+    expect(isValidAddressPhone("+213 550-123-456")).toBe(true);
+    expect(isValidAddressPhone("123")).toBe(false);
   });
 
   it("normalizes common phone formatting", () => {
