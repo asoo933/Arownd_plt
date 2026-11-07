@@ -21,13 +21,21 @@ export default function RootLayout() {
   const theme = useAppTheme();
 
   useEffect(() => {
-    const { data } = getSupabaseClient().auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-        queryClient.clear();
+    let unsubscribe: (() => void) | null = null;
+    try {
+      const { data } = getSupabaseClient().auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+          queryClient.clear();
+        }
+      });
+      unsubscribe = () => data.subscription.unsubscribe();
+    } catch (error) {
+      if (!(error instanceof Error) || error.message !== "SUPABASE_CONFIG_MISSING") {
+        throw error;
       }
-    });
+    }
 
-    return () => data.subscription.unsubscribe();
+    return () => unsubscribe?.();
   }, [queryClient]);
 
   return (
