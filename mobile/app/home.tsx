@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from "react-native";
 
+import { CartButton } from "@/components/cart-button";
 import {
   CustomerScreen,
   CustomerSearch,
@@ -15,7 +16,6 @@ import {
 } from "@/components/customer-ui";
 import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
-import { CartButton } from "@/components/cart-button";
 
 const categories = [
   { id: "fashion", icon: "👗", label: "categoryFashion" },
