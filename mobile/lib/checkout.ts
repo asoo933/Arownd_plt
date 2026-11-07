@@ -95,7 +95,8 @@ async function getOrCreateIdempotencyKey(userId: string, identity: string): Prom
     try {
       const parsed: unknown = JSON.parse(raw);
       if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
-        entries = Object.fromEntries(Object.entries(parsed).filter(
+        const record = parsed as Record<string, unknown>;
+        entries = Object.fromEntries(Object.entries(record).filter(
           (entry): entry is [string, string] => typeof entry[1] === "string"
         ));
       }
