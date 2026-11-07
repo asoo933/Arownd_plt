@@ -122,7 +122,7 @@ export default function ProductDetailsScreen() {
             onPress={() => addMutation.mutate({
               offerId: selectedOffer.id,
               productId: selectedOffer.product_id,
-              name: product.data.name,
+              name: product.data?.name ?? selectedOffer.product.name,
               price: selectedOffer.price,
               quantity,
               options: {
