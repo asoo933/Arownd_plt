@@ -252,7 +252,7 @@ export default function MerchantOrderDetailsScreen() {
           </View>
         ) : null}
 
-        {order.status === "confirmed" && merchantManaged ? (
+        {(order.status === "confirmed" || order.status === "shipped") && merchantManaged ? (
           <View style={styles.card}>
             <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantTrackingTitle")}</Text>
             {tracking.isPending ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
