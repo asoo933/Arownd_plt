@@ -94,10 +94,13 @@ export default function CartScreen() {
     <View style={[styles.summary, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <View style={styles.summaryRow}><Text style={styles.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={styles.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
       <Text style={styles.note}>{translate("cartDeliveryNote")}</Text>
-      <Pressable disabled style={[styles.primary, styles.disabled]}>
+      <Pressable
+        disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
+        onPress={() => router.push("/checkout")}
+        style={[styles.primary, (offers.isPending || offers.isError || evaluation.blockingCount > 0) && styles.disabled]}
+      >
         <Text style={styles.primaryText}>{translate("cartCheckout")}</Text>
       </Pressable>
-      <Text style={styles.note}>{translate("cartCheckoutComing")}</Text>
     </View>
   </CustomerScreen>;
 }
