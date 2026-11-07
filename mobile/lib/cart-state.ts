@@ -32,7 +32,7 @@ export function cartLineKey(item: Pick<CartItem, "offerId" | "options">): string
 
 function cleanOptions(value: unknown): Record<string, string> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
-  const entries: [string, string][] = Object.entries(value).flatMap(([key, item]) =>
+  const entries: [string, string][] = Object.entries(value).flatMap(([key, item]): [string, string][] =>
     key.length > 0 && typeof item === "string" ? [[key, item]] : []
   );
   return Object.fromEntries(entries);
