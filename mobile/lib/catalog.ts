@@ -96,6 +96,19 @@ export async function fetchFeaturedStores(): Promise<FeaturedStore[]> {
   return FeaturedStoreSchema.array().parse(data as unknown);
 }
 
+const CATEGORY_FILTERS: Record<string, readonly string[]> = {
+  fashion: ["fashion", "clothes", "shoes", "bags"],
+  electronics: ["electronics", "phones", "computers", "gadgets", "phone-accessories"],
+  beauty: ["beauty", "perfumes", "makeup", "skincare"],
+  home: ["home", "furniture", "home-tools", "decor", "kitchenware"],
+  kids: ["kids", "kids-clothes", "toys", "kids-essentials"],
+  food: ["food", "sweets", "groceries", "home-food"]
+};
+
+export function getCategoryFilterIds(category: string): readonly string[] {
+  return CATEGORY_FILTERS[category] ?? [category];
+}
+
 export async function searchCatalogProducts(query: string, category?: string): Promise<HomeProduct[]> {
   const normalized = query.trim().replace(/[%,()]/g, " ");
   let request = getSupabaseClient()
@@ -105,7 +118,7 @@ export async function searchCatalogProducts(query: string, category?: string): P
     .gt("stock_quantity", 0);
 
   if (normalized) request = request.ilike("product.name", "%" + normalized + "%");
-  if (category) request = request.eq("product.category", category);
+  if (category) request = request.in("product.category", [...getCategoryFilterIds(category)]);
 
   const { data, error } = await request
     .order("created_at", { ascending: false })
