@@ -78,6 +78,9 @@ export default function OrderDetailsScreen() {
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersLoginHint")} />
     <Pressable onPress={() => router.push("/login")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("login")}</Text></Pressable>
   </CustomerScreen>;
+  if (!query.data) return <CustomerScreen>
+    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
+  </CustomerScreen>;
   const order = query.data.order;
   if (!order) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
