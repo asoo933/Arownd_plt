@@ -54,9 +54,6 @@ export default function MerchantOrderDetailsScreen() {
 
   const merchantOrder = detail.data?.merchantOrder;
   const deliveryType = merchantOrder?.order.delivery_type;
-  const carrierManaged = deliveryType === "home" && !!detail.data?.shipment?.company_id;
-  const merchantManaged = deliveryType === "desk" || (deliveryType === "home" && !carrierManaged);
-
   const refresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["merchant-order-detail", storeId, orderId] }),
