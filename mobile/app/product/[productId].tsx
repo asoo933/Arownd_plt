@@ -45,6 +45,7 @@ export default function ProductDetailsScreen() {
     return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("productNoDescription")} /></CustomerScreen>;
   }
 
+  const productDetails = product.data;
   const productOffers = offers.data ?? [];
   const bestOffer = chooseBestProductOffer(productOffers);
   const selectedOffer = productOffers.find((offer) => offer.id === selectedOfferId) ?? bestOffer;
@@ -67,13 +68,13 @@ export default function ProductDetailsScreen() {
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
       </View>
       <View style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.productName, { color: theme.colors.foreground }]}>{product.data.name}</Text>
+        <Text style={[styles.productName, { color: theme.colors.foreground }]}>{productDetails.name}</Text>
         {selectedOffer ? <Text style={styles.price}>{formatDZD(selectedOffer.price)}</Text> : null}
         <View style={styles.metadata}>
-          {product.data.brand ? <Text style={styles.metaText}>{translate("productBrand")}: {product.data.brand}</Text> : null}
-          {product.data.category ? <Text style={styles.metaText}>{translate("productCategory")}: {product.data.category}</Text> : null}
+          {productDetails.brand ? <Text style={styles.metaText}>{translate("productBrand")}: {productDetails.brand}</Text> : null}
+          {productDetails.category ? <Text style={styles.metaText}>{translate("productCategory")}: {productDetails.category}</Text> : null}
         </View>
-        <Text style={styles.description}>{product.data.description || translate("productNoDescription")}</Text>
+        <Text style={styles.description}>{productDetails.description || translate("productNoDescription")}</Text>
       </View>
 
       <View style={styles.section}>
