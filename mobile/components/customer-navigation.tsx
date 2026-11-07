@@ -30,7 +30,7 @@ export function CustomerNavigation() {
             accessibilityLabel={translate(tab.label)}
             accessibilityState={{ selected: active }}
             onPress={() => {
-              if (!active) router.replace(tab.path);
+              if (pathname !== tab.path) router.replace(tab.path);
             }}
             style={styles.item}
           >
