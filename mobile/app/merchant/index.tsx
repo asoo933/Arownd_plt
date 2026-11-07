@@ -70,12 +70,21 @@ export default function MerchantEntryScreen() {
               ) : null}
             </View>
           )}
+          {status === "personal" || status === "merchant_setup_required" ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push("/merchant/onboarding")}
+              style={[styles.action, { backgroundColor: theme.colors.accent }]}
+            >
+              <Text style={[styles.actionText, { color: theme.colors.accentForeground }]}>{translate("merchantStartOnboarding")}</Text>
+            </Pressable>
+          ) : null}
           <Pressable
             accessibilityRole="button"
             onPress={() => router.replace("/profile")}
-            style={[styles.action, { backgroundColor: theme.colors.accent }]}
+            style={[styles.action, { backgroundColor: theme.colors.surfaceMuted, borderWidth: 1, borderColor: theme.colors.border }]}
           >
-            <Text style={[styles.actionText, { color: theme.colors.accentForeground }]}>{translate("merchantBackToProfile")}</Text>
+            <Text style={[styles.actionText, { color: theme.colors.foreground }]}>{translate("merchantBackToProfile")}</Text>
           </Pressable>
         </View>
       </ScrollView>
