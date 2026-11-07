@@ -106,8 +106,8 @@ export default function ProductDetailsScreen() {
 
       {selectedOffer ? (
         <View style={[styles.purchaseCard, { backgroundColor: theme.colors.surface }]}>
-          {variants.colors.length > 0 ? <OptionPicker label={translate("productColorOption")} values={variants.colors} value={selectedColor} onSelect={setColor} dark={dark} /> : null}
-          {variants.sizes.length > 0 ? <OptionPicker label={translate("productSizeOption")} values={variants.sizes} value={selectedSize} onSelect={setSize} dark={dark} /> : null}
+          {variants.colors.length > 0 ? <OptionPicker label={translate("productColorOption")} values={variants.colors} value={selectedColor} onSelect={setColor} /> : null}
+          {variants.sizes.length > 0 ? <OptionPicker label={translate("productSizeOption")} values={variants.sizes} value={selectedSize} onSelect={setSize} /> : null}
           <View style={styles.quantityRow}>
             <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{translate("productQuantity")}</Text>
             <View style={styles.quantityControls}>
@@ -147,7 +147,8 @@ export default function ProductDetailsScreen() {
   );
 }
 
-function OptionPicker({ label, values, value, onSelect, dark }: { label: string; values: string[]; value: string; onSelect: (value: string) => void; dark: boolean }) {
+function OptionPicker({ label, values, value, onSelect }: { label: string; values: string[]; value: string; onSelect: (value: string) => void }) {
+  const theme = useAppTheme();
   return (
     <View style={styles.optionGroup}>
       <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</Text>
