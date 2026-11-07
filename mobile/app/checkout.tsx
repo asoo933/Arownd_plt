@@ -93,13 +93,13 @@ export default function CheckoutScreen() {
       router.replace("/login");
       return;
     }
-    if (!profile.isSuccess || profileApplied) return;
+    if (!profile.isSuccess || profileApplied || selectedAddressId !== null) return;
     setFullName(profile.data?.full_name ?? auth.data?.user_metadata?.["full_name"] ?? "");
     setPhone(profile.data?.phone ?? auth.data?.phone ?? "");
     setWilayaId(profile.data?.wilaya_id ?? null);
     setCommune(profile.data?.commune ?? "");
     setProfileApplied(true);
-  }, [profile.data, profile.isSuccess, profileApplied, auth.data]);
+  }, [profile.data, profile.isSuccess, profileApplied, auth.data, selectedAddressId]);
 
   const applySavedAddress = (address: UserAddress) => {
     setSelectedAddressId(address.id);
