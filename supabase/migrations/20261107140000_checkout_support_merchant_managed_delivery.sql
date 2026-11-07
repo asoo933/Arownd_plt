@@ -35,7 +35,7 @@ begin
     raise exception 'idempotency_key_required';
   end if;
 
-  if _delivery_type not in ('home', 'desk') then
+  if _delivery_type is null or _delivery_type not in ('home', 'desk') then
     raise exception 'invalid_delivery_type';
   end if;
 
