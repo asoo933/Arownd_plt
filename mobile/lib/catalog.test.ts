@@ -4,6 +4,7 @@ import {
   chooseBestProductOffer,
   formatDZD,
   getPrimaryImage,
+  getOfferVariantOptions,
   getCategoryFilterIds,
   type HomeProduct,
   type ProductOffer
@@ -73,6 +74,17 @@ describe("chooseBestProductOffer", () => {
 
   it("returns null when there are no offers", () => {
     expect(chooseBestProductOffer([])).toBeNull();
+  });
+});
+
+describe("getOfferVariantOptions", () => {
+  it("extracts valid size and color choices from offer metadata", () => {
+    const offer = { ...makeOffer("variant-offer", 900, true, 4), options: { sizes: ["S", "M", 4], colors: ["Black", "White"] } };
+    expect(getOfferVariantOptions(offer)).toEqual({ sizes: ["S", "M"], colors: ["Black", "White"] });
+  });
+
+  it("returns empty choices for malformed metadata", () => {
+    expect(getOfferVariantOptions({ ...makeOffer("plain-offer", 900, true, 4), options: null })).toEqual({ sizes: [], colors: [] });
   });
 });
 
