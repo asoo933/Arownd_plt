@@ -144,7 +144,7 @@ export default function MerchantNewProductScreen() {
   };
 
   const submit = async (): Promise<void> => {
-    if (!storeId || submitting) return;
+    if (!storeId || submitting || imagePickerBusy) return;
 
     const values = validateMerchantProductInput(form);
     if (!values) {
@@ -400,9 +400,9 @@ export default function MerchantNewProductScreen() {
 
             <Pressable
               accessibilityRole="button"
-              disabled={submitting}
+              disabled={submitting || imagePickerBusy}
               onPress={() => void submit()}
-              style={[styles.submitButton, { backgroundColor: theme.colors.accent, opacity: submitting ? 0.6 : 1 }]}
+              style={[styles.submitButton, { backgroundColor: theme.colors.accent, opacity: submitting || imagePickerBusy ? 0.6 : 1 }]}
             >
               {submitting ? (
                 <ActivityIndicator color={theme.colors.accentForeground} />
