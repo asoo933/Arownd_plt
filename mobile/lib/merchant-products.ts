@@ -9,8 +9,7 @@ import {
   getProductImageStoragePath,
   PRODUCT_IMAGE_MAX_BYTES,
   PRODUCT_IMAGE_MAX_COUNT,
-  validateProductImageMetadata,
-  type MerchantProductImageReference
+  validateProductImageMetadata
 } from "@/lib/merchant-product-images";
 import { MerchantProductOfferSchema } from "@/lib/merchant-products-schema";
 import type { MerchantOfferValues, MerchantProductOffer } from "@/lib/merchant-products-state";
@@ -266,7 +265,7 @@ export async function removeMerchantProductImage(
 
   let primaryPromotionPending = false;
   const nextPrimaryId = getNextPrimaryProductImageId(
-    imageReferences as MerchantProductImageReference[],
+    imageReferences,
     imageId
   );
 
