@@ -128,8 +128,11 @@ export default function MerchantOrderDetailsScreen() {
   const customerOrder = order.order;
   const total = order.subtotal + order.shipping_fee;
   const trackingEvents = tracking.data ?? [];
+  const visibleTrackingSteps = deliveryType === "desk"
+    ? TRACKING_STEPS
+    : TRACKING_STEPS.filter((step) => step.status !== "delivered");
   const nextTrackingStatus = getNextMerchantTrackingStatus(trackingEvents.map((event) => event.status));
-  const nextTrackingStep = TRACKING_STEPS.find((step) => step.status === nextTrackingStatus);
+  const nextTrackingStep = visibleTrackingSteps.find((step) => step.status === nextTrackingStatus);
   const canCollectCod = deliveryType === "desk" && order.status === "delivered" && order.payment_status !== "paid";
   const canQuote = order.status === "pending" && !order.quoted_at;
   const canReject = canQuote;
@@ -246,7 +249,7 @@ export default function MerchantOrderDetailsScreen() {
                 <Text style={[styles.mutedText, { color: theme.colors.danger }]}>{translate("merchantTrackingError")}</Text>
               </Pressable>
             ) : null}
-            {TRACKING_STEPS.map((step) => {
+            {visibleTrackingSteps.map((step) => {
               const event = trackingEvents.find((item) => item.status === step.status);
               return (
                 <View key={step.status} style={styles.trackingRow}>
@@ -258,6 +261,11 @@ export default function MerchantOrderDetailsScreen() {
                 </View>
               );
             })}
+            {deliveryType === "home" && trackingEvents.some((event) => event.status === "out_for_delivery") ? (
+              <Text style={[styles.mutedText, { color: theme.colors.muted }]}>
+                {translate("merchantTrackingCarrierCompletesDelivery")}
+              </Text>
+            ) : null}
             {nextTrackingStep && !tracking.isError ? (
               <Pressable
                 accessibilityRole="button"
