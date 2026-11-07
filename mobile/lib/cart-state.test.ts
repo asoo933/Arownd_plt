@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addCartItem, cartLineKey, EMPTY_CART, evaluateCart, removeCartItem, sanitizeCart, setCartItemQuantity, type CartItem } from "@/lib/cart-state";
+import { addCartItem, cartLineKey, EMPTY_CART, evaluateCart, readCartOptions, removeCartItem, sanitizeCart, setCartItemQuantity, type CartItem } from "@/lib/cart-state";
 
 const base: CartItem = {
   offerId: "offer-1",
@@ -30,6 +30,15 @@ describe("cart state", () => {
     expect(cartLineKey(legacyArabic)).toBe(cartLineKey({ ...base, options: { color: "أسود", size: "M" } }));
     expect(cartLineKey(legacyEnglish)).toBe(cartLineKey(base));
     expect(sanitizeCart([legacyEnglish, { ...base, options: { color: "Black", size: "M" } }])).toHaveLength(1);
+  });
+
+  it("reads persisted order options defensively", () => {
+    expect(readCartOptions({ "اللون": " أسود ", "المقاس": " M ", ignored: 12 })).toEqual({
+      color: "أسود",
+      size: "M"
+    });
+    expect(readCartOptions(null)).toEqual({});
+    expect(readCartOptions(["M"])).toEqual({});
   });
 
   it("merges identical variants and caps quantity at ten", () => {
