@@ -256,8 +256,10 @@ export default function MerchantEntryScreen() {
         ) : (
           <View style={[styles.ordersCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             {recentOrders.map((order, index) => (
-              <View
+              <Pressable
                 key={order.id}
+                accessibilityRole="button"
+                onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
                 style={[
                   styles.orderRow,
                   index < recentOrders.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
@@ -282,7 +284,10 @@ export default function MerchantEntryScreen() {
                 <Text style={[styles.orderAmount, { color: theme.colors.accentMuted }]}>
                   {formatDZD(order.subtotal + order.shippingFee)}
                 </Text>
-              </View>
+                <Text style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
+                  {translate("merchantOrderDetailTitle")} ←
+                </Text>
+              </Pressable>
             ))}
           </View>
         )}
