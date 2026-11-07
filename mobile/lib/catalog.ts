@@ -117,7 +117,7 @@ export async function searchCatalogProducts(query: string, category?: string): P
     .eq("is_available", true)
     .gt("stock_quantity", 0);
 
-  if (normalized) request = request.ilike("product.name", "%" + normalized + "%");
+  if (normalized) request = request.or("name.ilike.%" + normalized + "%,brand.ilike.%" + normalized + "%", { referencedTable: "products" });
   if (category) request = request.in("product.category", [...getCategoryFilterIds(category)]);
 
   const { data, error } = await request
