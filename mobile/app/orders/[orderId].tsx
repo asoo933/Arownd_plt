@@ -120,7 +120,7 @@ export default function OrderDetailsScreen() {
               {quoteMutation.isPending ? <ActivityIndicator color="#B42318" /> : <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>}
             </Pressable>
             <Pressable disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
-              <Text style={styles.acceptButtonText}>{translate("cancel")}</Text>
+              <Text style={styles.acceptButtonText}>{translate("back")}</Text>
             </Pressable>
           </View>
         </View>
