@@ -99,11 +99,18 @@ export default function MerchantEditProductScreen() {
     if (!storeId || !offerId || saving || imageBusy || removingImageId) return;
 
     const values = validateMerchantOfferValues(price, stock);
-    const options = validateMerchantOfferOptions(sizes, colors);
-    if (!values || !options) {
+    if (!values) {
       setNotice(null);
       setWarning(null);
       setActionError(translate("merchantProductEditValidation"));
+      return;
+    }
+
+    const options = validateMerchantOfferOptions(sizes, colors);
+    if (!options) {
+      setNotice(null);
+      setWarning(null);
+      setActionError(translate("merchantProductOptionsInvalid"));
       return;
     }
 
