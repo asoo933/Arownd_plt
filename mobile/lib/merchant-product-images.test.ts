@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getNextPrimaryProductImageId,
   getProductImageExtension,
+  getProductImageStoragePath,
   PRODUCT_IMAGE_MAX_BYTES,
   validateProductImageMetadata
 } from "@/lib/merchant-product-images";
@@ -29,5 +31,44 @@ describe("merchant product image metadata", () => {
 
   it("accepts files up to the application upload limit", () => {
     expect(validateProductImageMetadata({ mimeType: "image/png", fileName: "x.png", fileSize: PRODUCT_IMAGE_MAX_BYTES })).toBe(true);
+  });
+});
+
+
+describe("product image storage helpers", () => {
+  const userId = "00000000-0000-4000-8000-000000000001";
+
+  it("extracts only a storage path inside the signed-in user's product folder", () => {
+    expect(getProductImageStoragePath(
+      `https://cdn.example.test/storage/v1/object/public/product-media/${userId}/products/photo.webp`,
+      userId
+    )).toBe(`${userId}/products/photo.webp`);
+  });
+
+  it("rejects other buckets, other users, malformed URLs, and traversal paths", () => {
+    expect(getProductImageStoragePath(
+      `https://cdn.example.test/storage/v1/object/public/avatars/${userId}/products/photo.webp`,
+      userId
+    )).toBeNull();
+    expect(getProductImageStoragePath(
+      "https://cdn.example.test/storage/v1/object/public/product-media/another-user/products/photo.webp",
+      userId
+    )).toBeNull();
+    expect(getProductImageStoragePath(
+      `https://cdn.example.test/storage/v1/object/public/product-media/${userId}/products/../photo.webp`,
+      userId
+    )).toBeNull();
+    expect(getProductImageStoragePath("not-a-url", userId)).toBeNull();
+  });
+
+  it("selects a replacement only when the removed image was primary", () => {
+    const images = [
+      { id: "image-1", image_url: "https://example.test/1", is_primary: true },
+      { id: "image-2", image_url: "https://example.test/2", is_primary: false }
+    ];
+
+    expect(getNextPrimaryProductImageId(images, "image-1")).toBe("image-2");
+    expect(getNextPrimaryProductImageId(images, "image-2")).toBeNull();
+    expect(getNextPrimaryProductImageId(images, "missing")).toBeNull();
   });
 });
