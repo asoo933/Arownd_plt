@@ -30,6 +30,8 @@ describe("customer order display", () => {
   it("allows legacy parent cancellation only for pending orders without suborders", () => {
     expect(canCancelLegacyOrder("pending", false)).toBe(true);
     expect(canCancelLegacyOrder("pending", true)).toBe(false);
+    expect(canCancelLegacyOrder("pending", false, ["pending"])).toBe(true);
+    expect(canCancelLegacyOrder("pending", false, ["accepted"])).toBe(false);
     expect(canCancelLegacyOrder("confirmed", false)).toBe(false);
     expect(canCancelLegacyOrder("cancelled", false)).toBe(false);
   });
