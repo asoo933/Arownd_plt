@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { fetchMerchantAccess } from "@/lib/merchant";
+import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyMerchantStoreSettings, updateMyMerchantStoreSettings } from "@/lib/merchant-store-settings";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 import { translate } from "@/lib/i18n";
@@ -17,6 +18,7 @@ export default function MerchantStoreSettingsScreen() {
   const access = useQuery({ queryKey: ["merchant-access"], queryFn: fetchMerchantAccess, retry: false });
   const storeId = access.data?.store?.id ?? null;
   const ready = access.data?.status === "merchant_ready" && Boolean(storeId);
+  const wilayas = useQuery({ queryKey: ["merchant-wilayas"], queryFn: fetchCheckoutWilayas, staleTime: Infinity });
   const settings = useQuery({
     queryKey: ["merchant-store-settings", storeId],
     queryFn: () => fetchMyMerchantStoreSettings(storeId ?? ""),
@@ -25,6 +27,7 @@ export default function MerchantStoreSettingsScreen() {
   });
   const [form, setForm] = useState<MerchantStoreSettings | null>(null);
   const [formError, setFormError] = useState(false);
+  const [wilayaPickerOpen, setWilayaPickerOpen] = useState(false);
   const mutation = useMutation({
     mutationFn: (values: MerchantStoreSettings) => updateMyMerchantStoreSettings(storeId ?? "", values),
     onSuccess: async () => {
@@ -39,15 +42,22 @@ export default function MerchantStoreSettingsScreen() {
     if (settings.data) setForm(settings.data);
   }, [settings.data]);
 
-  if (access.isPending || (ready && settings.isPending)) {
+  if (access.isPending || wilayas.isPending || (ready && settings.isPending)) {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
   }
-  if (access.isError || settings.isError) {
-    return <Message theme={theme} label={translate("merchantStoreSettingsSaveError")} actionLabel={translate("merchantRetry")} onAction={() => { void access.refetch(); void settings.refetch(); }} />;
+  if (access.isError || wilayas.isError || settings.isError) {
+    return <Message theme={theme} label={translate("merchantStoreSettingsSaveError")} actionLabel={translate("merchantRetry")} onAction={() => { void access.refetch(); void wilayas.refetch(); void settings.refetch(); }} />;
   }
   if (!access.data) return <Redirect href="/login" />;
   if (!ready || !form) return <Redirect href="/merchant" />;
 
+  const selectedWilaya = wilayas.data?.find((item) => item.id === form.wilaya_id);
+  const selectWilaya = (wilaya: Wilaya) => {
+    setForm((current) => current ? { ...current, wilaya_id: wilaya.id, commune: "" } : current);
+    setWilayaPickerOpen(false);
+    setFormError(false);
+    mutation.reset();
+  };
   const update = <K extends keyof MerchantStoreSettings>(key: K, value: MerchantStoreSettings[K]) => {
     setForm((current) => current ? { ...current, [key]: value } : current);
     setFormError(false);
@@ -93,6 +103,12 @@ export default function MerchantStoreSettingsScreen() {
           <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
           <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} />
+          <View style={styles.field}>
+            <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</Text>
+            <Pressable accessibilityRole="button" onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+              <Text style={{ color: theme.colors.foreground, fontSize: 13, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</Text>
+            </Pressable>
+          </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} />
           <View style={styles.row}>
@@ -119,6 +135,25 @@ export default function MerchantStoreSettingsScreen() {
           </Pressable>
         </View>
       </ScrollView>
+      <Modal visible={wilayaPickerOpen} transparent animationType="slide" onRequestClose={() => setWilayaPickerOpen(false)}>
+        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
+          <View style={[styles.modalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
+                <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</Text>
+              </Pressable>
+            </View>
+            <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
+              {(wilayas.data ?? []).map((wilaya) => (
+                <Pressable key={wilaya.id} accessibilityRole="button" accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
+                  <Text style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -160,6 +195,14 @@ function createStyles(theme: AppTheme) {
     title: { fontSize: 24, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     card: { borderWidth: 1, borderRadius: 18, padding: 15, gap: 13 },
+    select: { justifyContent: "center" },
+    modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 12 },
+    modalCard: { maxHeight: "78%", borderWidth: 1, borderRadius: 18, padding: 15, gap: 12 },
+    modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    sectionTitle: { fontSize: 14, fontWeight: "900" },
+    wilayaList: { maxHeight: 480 },
+    wilayaOption: { minHeight: 48, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth, paddingHorizontal: 8 },
+    wilayaText: { textAlign: "right", fontSize: 13, fontWeight: "700" },
     field: { gap: 6, flex: 1 },
     label: { fontSize: 11, fontWeight: "800", textAlign: "right" },
     input: { minHeight: 47, borderWidth: 1, borderRadius: 11, paddingHorizontal: 12, fontSize: 13 },
