@@ -170,7 +170,12 @@ export default function MerchantOrdersScreen() {
         ) : (
           <View style={styles.orderList}>
             {visibleOrders.map((order) => (
-              <OrderCard key={order.id} order={order} theme={theme} />
+              <OrderCard
+                key={order.id}
+                order={order}
+                theme={theme}
+                onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
+              />
             ))}
           </View>
         )}
@@ -183,7 +188,7 @@ export default function MerchantOrdersScreen() {
   );
 }
 
-function OrderCard({ order, theme }: { order: MerchantDashboardOrder; theme: AppTheme }) {
+function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; theme: AppTheme; onPress: () => void }) {
   const style = createStyles(theme);
   const itemNames = order.productNames.length > 0
     ? order.productNames.slice(0, 3).join("، ")
@@ -191,7 +196,11 @@ function OrderCard({ order, theme }: { order: MerchantDashboardOrder; theme: App
   const location = [order.commune, order.wilayaName].filter(Boolean).join("، ");
 
   return (
-    <View style={[style.orderCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={[style.orderCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+    >
       <View style={style.orderHeader}>
         <Text style={[style.orderCode, { color: theme.colors.foreground }]}>
           {translate("merchantOrderNumber")} {order.parentOrderId.slice(0, 8)}
@@ -217,7 +226,10 @@ function OrderCard({ order, theme }: { order: MerchantDashboardOrder; theme: App
             : translate("checkoutHomeDelivery")}
         </Text>
       </View>
-    </View>
+      <Text style={{ color: theme.colors.accentMuted, fontSize: 10, fontWeight: "900", textAlign: "right" }}>
+        {translate("merchantOrderDetailTitle")} ←
+      </Text>
+    </Pressable>
   );
 }
 
