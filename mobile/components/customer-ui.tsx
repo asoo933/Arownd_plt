@@ -70,7 +70,7 @@ export function SectionTitle({ title, action, onAction }: {
   );
 }
 
-export function ProductTile({ name, store, price, imageUrl }: {
+export function ProductTile({ name, store, price, imageUrl, onPress }: {
   name: string;
   store: string;
   price: string;
@@ -78,7 +78,7 @@ export function ProductTile({ name, store, price, imageUrl }: {
 }) {
   const dark = useColorScheme() === "dark";
   return (
-    <View style={[styles.productTile, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} disabled={!onPress} style={[styles.productTile, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <View style={styles.productImage}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
       </View>
@@ -89,7 +89,7 @@ export function ProductTile({ name, store, price, imageUrl }: {
   );
 }
 
-export function StoreTile({ name, description, logoUrl, commune, rating }: {
+export function StoreTile({ name, description, logoUrl, commune, rating, onPress }: {
   name: string;
   description?: string | null;
   logoUrl?: string | null;
@@ -98,7 +98,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating }: {
 }) {
   const dark = useColorScheme() === "dark";
   return (
-    <View style={[styles.storeTile, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} disabled={!onPress} style={[styles.storeTile, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
       <View style={styles.storeLogo}>
         {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>⌂</Text>}
       </View>
