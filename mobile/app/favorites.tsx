@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { FavoriteButton, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
 import {
@@ -17,11 +17,12 @@ import { fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } fro
 import { getFavorites } from "@/lib/favorites";
 import type { FavoriteKind } from "@/lib/favorites-state";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 type FavoriteTab = FavoriteKind;
 
 export default function FavoritesScreen() {
-  const dark = useColorScheme() === "dark";
+  const theme = useAppTheme();
   const [tab, setTab] = useState<FavoriteTab>("products");
   const favorites = useQuery({ queryKey: FAVORITES_QUERY_KEY, queryFn: getFavorites });
   const content = useQuery({
@@ -66,7 +67,7 @@ export default function FavoritesScreen() {
         <Text style={styles.backText}>{translate("back")}</Text>
       </Pressable>
       <CustomerHeading title={translate("favoritesTitle")} subtitle={translate("favoritesSubtitle")} />
-      <View style={[styles.tabs, { backgroundColor: dark ? "#171717" : "#FFFFFF" }]}>
+      <View style={[styles.tabs, { backgroundColor: theme.colors.surface }]}>
         <TabButton label={`${translate("favoriteProducts")} (${favorites.data.products.length})`} active={tab === "products"} onPress={() => setTab("products")} />
         <TabButton label={`${translate("favoriteStores")} (${favorites.data.stores.length})`} active={tab === "stores"} onPress={() => setTab("stores")} />
       </View>
