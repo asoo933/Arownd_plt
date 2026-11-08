@@ -1,6 +1,0 @@
-{
-  "appId": "com.arownd.app",
-  "appName": "Arownd",
-  "webDir": "dist/client",
-  "loggingBehavior": "none"
-}
