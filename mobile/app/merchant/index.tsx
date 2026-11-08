@@ -2,10 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,7 +16,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { AppHeader, Button, MerchantMetricCard, PressableSurface, StatusBadge } from "@/components/ui";
+import { AppHeader, Button, Card, Image as UiImage, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
@@ -63,15 +61,15 @@ export default function MerchantEntryScreen() {
         <ScrollView contentContainerStyle={styles.entryContent}>
           <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />
           <View style={[styles.entryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("businessTitle")}</Text>
-            <Text style={[styles.title, { color: theme.colors.foreground }]}>
+            <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("businessTitle")}</UiText>
+            <UiText style={[styles.title, { color: theme.colors.foreground }]}>
               {translate("merchantEntryTitle")}
-            </Text>
-            <Text style={[styles.body, { color: theme.colors.muted }]}>
+            </UiText>
+            <UiText style={[styles.body, { color: theme.colors.muted }]}>
               {access.data.status === "personal"
                 ? translate("merchantStatusPersonalHint")
                 : translate("merchantStatusSetupHint")}
-            </Text>
+            </UiText>
             <Button label={translate("merchantStartOnboarding")} onPress={() => router.push("/merchant/onboarding")} fullWidth />
           </View>
         </ScrollView>
@@ -119,30 +117,30 @@ export default function MerchantEntryScreen() {
           title={translate("merchantDashboardTitle")}
           leading={<Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />}
         />
-        <Text style={[styles.body, { color: theme.colors.muted }]}>{translate("merchantDashboardSubtitle")}</Text>
+        <UiText style={[styles.body, { color: theme.colors.muted }]}>{translate("merchantDashboardSubtitle")}</UiText>
 
-        <View style={[styles.storeCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.storeCard}>
           <View style={styles.storeHeader}>
             <View style={[styles.storeAvatar, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
               {data.store.logo_url ? (
-                <Image source={{ uri: data.store.logo_url }} style={styles.storeImage} resizeMode="cover" />
+                <UiImage uri={data.store.logo_url} accessibilityLabel={data.store.name} aspectRatio={1} style={styles.storeImage} />
               ) : (
-                <Text style={[styles.storeAvatarText, { color: theme.colors.accentMuted }]}>A</Text>
+                <UiText style={[styles.storeAvatarText, { color: theme.colors.accentMuted }]}>A</UiText>
               )}
             </View>
             <View style={styles.storeInfo}>
-              <Text style={[styles.storeName, { color: theme.colors.foreground }]} numberOfLines={2}>
+              <UiText style={[styles.storeName, { color: theme.colors.foreground }]} numberOfLines={2}>
                 {data.store.name}
-              </Text>
-              <Text style={[styles.storeMeta, { color: theme.colors.muted }]} numberOfLines={1}>
+              </UiText>
+              <UiText style={[styles.storeMeta, { color: theme.colors.muted }]} numberOfLines={1}>
                 {data.store.commune || translate("merchantStoreLocationMissing")}
-              </Text>
+              </UiText>
               <View style={styles.storeBadges}>
-                <StatusBadge label={data.store.is_verified ? translate("merchantStoreVerified") : translate("merchantStoreNotVerified")} tone={data.store.is_verified ? "success" : "warning"} />
+                <MerchantStatusBadge label={data.store.is_verified ? translate("merchantStoreVerified") : translate("merchantStoreNotVerified")} tone={data.store.is_verified ? "success" : "warning"} />
                 <View style={[styles.statusPill, { backgroundColor: theme.colors.surfaceMuted }]}>
-                  <Text style={[styles.statusPillText, { color: theme.colors.muted }]}>
+                  <UiText style={[styles.statusPillText, { color: theme.colors.muted }]}>
                     {translate("merchantStoreRating")}: {data.store.rating == null ? "—" : data.store.rating.toFixed(1)}
-                  </Text>
+                  </UiText>
                 </View>
               </View>
             </View>
@@ -151,15 +149,15 @@ export default function MerchantEntryScreen() {
           <Button label={translate("merchantProductsTitle")} onPress={() => router.push("/merchant/products")} variant="outline" fullWidth style={{marginTop: 9}} />
           <Button label={translate("merchantStoreSettingsTitle")} onPress={() => router.push("/merchant/settings")} variant="outline" fullWidth style={{marginTop: 9}} />
           <Button label={translate("merchantAnalyticsTitle")} onPress={() => router.push("/merchant/analytics")} variant="outline" fullWidth style={{marginTop: 9}} />
-        </View>
+        </Card>
 
         <View style={styles.sectionHeading}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
             {translate("merchantOverviewTitle")}
-          </Text>
-          <Text style={[styles.sectionHint, { color: theme.colors.muted }]}>
+          </UiText>
+          <UiText style={[styles.sectionHint, { color: theme.colors.muted }]}>
             {translate("merchantOverviewHint")}
-          </Text>
+          </UiText>
         </View>
 
         <View style={styles.metricsGrid}>
@@ -171,27 +169,27 @@ export default function MerchantEntryScreen() {
 
         <View style={styles.sectionHeading}>
           <View style={styles.sectionHeadingText}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantRecentOrdersTitle")}
-            </Text>
-            <Text style={[styles.sectionHint, { color: theme.colors.muted }]}>
+            </UiText>
+            <UiText style={[styles.sectionHint, { color: theme.colors.muted }]}>
               {translate("merchantRecentOrdersHint")}
-            </Text>
+            </UiText>
           </View>
           <Button label={translate("merchantViewAllOrders")} onPress={() => router.push("/merchant/orders")} variant="ghost" size="sm" />
         </View>
 
         {recentOrders.length === 0 ? (
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
+            <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
               {translate("merchantOrdersEmpty")}
-            </Text>
-            <Text style={[styles.body, { color: theme.colors.muted }]}>
+            </UiText>
+            <UiText style={[styles.body, { color: theme.colors.muted }]}>
               {translate("merchantOrdersEmptyHint")}
-            </Text>
+            </UiText>
           </View>
         ) : (
-          <View style={[styles.ordersCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.ordersCard}>
             {recentOrders.map((order, index) => (
               <PressableSurface
                 key={order.id}
@@ -204,29 +202,27 @@ export default function MerchantEntryScreen() {
               >
                 <View style={styles.orderMain}>
                   <View style={styles.orderTopLine}>
-                    <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>
+                    <UiText style={[styles.orderCode, { color: theme.colors.foreground }]}>
                       {`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}`}
-                    </Text>
+                    </UiText>
                     <OrderStatus order={order} />
                   </View>
-                  <Text style={[styles.orderCustomer, { color: theme.colors.muted }]} numberOfLines={1}>
+                  <UiText style={[styles.orderCustomer, { color: theme.colors.muted }]} numberOfLines={1}>
                     {order.customerName || translate("merchantCustomerUnknown")}
-                  </Text>
-                  <Text style={[styles.orderItems, { color: theme.colors.muted }]} numberOfLines={2}>
+                  </UiText>
+                  <UiText style={[styles.orderItems, { color: theme.colors.muted }]} numberOfLines={2}>
                     {order.productNames.join("، ") || translate("merchantOrderItems")}
                     {" · "}
                     {`${order.totalQuantity} ${translate("merchantOrderQuantity")}`}
-                  </Text>
+                  </UiText>
                 </View>
-                <Text style={[styles.orderAmount, { color: theme.colors.accentMuted }]}>
-                  {formatDZD(order.subtotal + order.shippingFee)}
-                </Text>
-                <Text style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
+                <PriceDisplay value={formatDZD(order.subtotal + order.shippingFee)} />
+                <UiText style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
                   {translate("merchantOrderDetailTitle")} ←
-                </Text>
+                </UiText>
               </PressableSurface>
             ))}
-          </View>
+          </Card>
         )}
 
         <Button label={translate("merchantManageOrders")} onPress={() => router.push("/merchant/orders")} fullWidth />
@@ -257,7 +253,7 @@ function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
     ? "merchantOrderStatusPrepared"
     : labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
 
-  return <StatusBadge label={translate(key)} tone={tone} />;
+  return <MerchantStatusBadge label={translate(key)} tone={tone} />;
 }
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
@@ -265,7 +261,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <ActivityIndicator color={theme.colors.accentMuted} />
-        <Text style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</Text>
+        <UiText style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</UiText>
       </View>
     </SafeAreaView>
   );
@@ -285,7 +281,7 @@ function MessageScreen({
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
+        <UiText style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</UiText>
         <Button label={actionLabel} onPress={onAction} />
       </View>
     </SafeAreaView>
