@@ -1,6 +1,38 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type TextStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { getQuantityStepState } from "./form-controls-state";
+
+
+type TextFieldProps = Omit<TextInputProps, "style"> & {
+  label?: string;
+  error?: string;
+  style?: StyleProp<TextStyle>;
+};
+
+export function TextField({ label, error, style, accessibilityLabel, ...props }: TextFieldProps) {
+  const theme = useAppTheme();
+
+  return (
+    <View style={styles.field}>
+      {label ? <Text style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</Text> : null}
+      <TextInput
+        {...props}
+        accessibilityLabel={accessibilityLabel ?? label}
+        placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
+        style={[
+          styles.textInput,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: error ? theme.colors.danger : theme.colors.border,
+            color: theme.colors.foreground
+          },
+          style
+        ]}
+      />
+      {error ? <Text accessibilityRole="alert" style={[styles.fieldError, { color: theme.colors.danger }]}>{error}</Text> : null}
+    </View>
+  );
+}
 
 type CheckboxProps = {
   label: string;
@@ -95,6 +127,10 @@ export function QuantityStepper({
 }
 
 const styles = StyleSheet.create({
+  field: { gap: designTokens.spacing.xs },
+  fieldLabel: { fontSize: 13, fontWeight: "700", textAlign: "right" },
+  textInput: { minHeight: 50, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
+  fieldError: { fontSize: 12, textAlign: "right" },
   checkboxRow: { minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
   checkbox: { width: 22, height: 22, borderWidth: 1.5, borderRadius: designTokens.radius.sm - 4, alignItems: "center", justifyContent: "center" },
   checkmark: { fontSize: 15, lineHeight: 18, fontWeight: "900" },
