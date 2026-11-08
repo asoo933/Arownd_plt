@@ -65,6 +65,7 @@ export default function MerchantOrderDetailsScreen() {
   const deliveryType = merchantOrder?.order.delivery_type;
   const trackingEvents = detail.data?.trackingEvents ?? [];
   const latestTrackingStatus = trackingEvents[trackingEvents.length - 1]?.status ?? "confirmed";
+  const isCarrierManaged = deliveryType === "home" && !!detail.data?.shipment?.company_id;
   const refresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["merchant-order-detail", storeId, orderId] }),
@@ -118,7 +119,7 @@ export default function MerchantOrderDetailsScreen() {
   const order = detail.data.merchantOrder;
   const customerOrder = order.order;
   const total = order.subtotal + order.shipping_fee;
-  const nextStatus = getNextMerchantTrackingStatus(latestTrackingStatus, deliveryType ?? "");
+  const nextStatus = isCarrierManaged ? null : getNextMerchantTrackingStatus(latestTrackingStatus, deliveryType ?? "");
   const nextStatusLabel = nextStatus ? trackingTranslationKeys[nextStatus] : null;
   const canCollectCod = deliveryType === "desk" && order.status === "delivered" && order.payment_status !== "paid";
   const canQuote = order.status === "pending" && !order.quoted_at;
@@ -225,6 +226,14 @@ export default function MerchantOrderDetailsScreen() {
         {order.status === "quoted" ? (
           <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
             <Text style={[styles.noticeText, { color: theme.colors.warning }]}>{translate("merchantQuoteAwaitingCustomer")}</Text>
+          </View>
+        ) : null}
+
+        {isCarrierManaged ? (
+          <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
+            <Text style={[styles.noticeText, { color: theme.colors.warning }]}>
+              {translate("merchantTrackingCarrierCompletesDelivery")}
+            </Text>
           </View>
         ) : null}
 
