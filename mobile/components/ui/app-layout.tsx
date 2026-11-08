@@ -5,7 +5,6 @@ import {
   RefreshControl,
   ScrollView,
   View,
-  type RefreshControlProps,
   type StyleProp,
   type ViewStyle
 } from "react-native";
@@ -28,7 +27,6 @@ export function Section({ children, style }: { children: ReactNode; style?: Styl
 }
 
 export function SectionHeader({ title, action, style }: { title: ReactNode; action?: ReactNode; style?: StyleProp<ViewStyle> }) {
-  const theme = useAppTheme();
   return <View style={[{ minHeight: 36, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }, style]}><View style={{ flex: 1 }}>{title}</View>{action}</View>;
 }
 
@@ -57,6 +55,5 @@ export function RefreshContainer({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
-  const refreshControl: React.ReactElement<RefreshControlProps> = <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accentMuted} colors={[theme.colors.accentMuted]} />;
-  return <ScrollView style={style} refreshControl={refreshControl} keyboardShouldPersistTaps="handled">{children}</ScrollView>;
+  return <ScrollView style={style} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accentMuted} colors={[theme.colors.accentMuted]} />} keyboardShouldPersistTaps="handled">{children}</ScrollView>;
 }
