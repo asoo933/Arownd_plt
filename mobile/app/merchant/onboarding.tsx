@@ -481,14 +481,7 @@ export default function MerchantOnboardingScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <Modal
-        visible={wilayaPickerOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setWilayaPickerOpen(false)}
-      >
-        <View style={[styles.modalBackdrop, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
+      <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
             <View style={styles.modalHeader}>
               <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantStoreChooseWilaya")}
@@ -517,9 +510,8 @@ export default function MerchantOnboardingScreen() {
                 />
               ))}
             </ScrollView>
-          </View>
-        </View>
-      </Modal>
+
+      </BottomSheet>
     </SafeAreaView>
   );
 }
