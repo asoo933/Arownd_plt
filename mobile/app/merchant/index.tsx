@@ -3,7 +3,6 @@ import { Redirect, router } from "expo-router";
 import {
   ActivityIndicator,
   Image,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
