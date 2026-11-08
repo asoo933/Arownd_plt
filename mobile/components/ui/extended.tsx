@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import { useAppTheme } from "@/lib/theme";
+import { Icon } from "./icon";
 
 export type SearchFieldProps = Pick<TextInputProps, "autoCapitalize" | "autoCorrect" | "onSubmitEditing" | "returnKeyType"> & {
   value: string;
@@ -47,9 +48,7 @@ export function SearchField({
         style
       ]}
     >
-      <Text accessibilityElementsHidden importantForAccessibility="no" style={{ color: theme.colors.muted, fontSize: 20 }}>
-        ⌕
-      </Text>
+      <Icon name="search" size={20} color={theme.colors.muted} accessibilityHidden />
       <TextInput
         accessibilityLabel={accessibilityLabel}
         value={value}
