@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CartButton } from "@/components/cart-button";
-import { AppHeader, Button, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import {
   CustomerScreen,
   CustomerSearch,
@@ -45,16 +45,16 @@ export default function CustomerHomeScreen() {
             onPress={() => router.push("/stores")}
             style={styles.location}
           >
-            <Text style={styles.locationText}>{translate("homeLocation")}</Text>
-            <Text style={styles.locationIcon}>⌖</Text>
+            <UiText style={styles.locationText}>{translate("homeLocation")}</UiText>
+            <Icon name="map-pin" size={17} color="#0A0A0A" />
           </PressableSurface>
         }
       />
 
       <View style={styles.hero}>
-        <Text style={styles.heroEyebrow}>{translate("homeEyebrow")}</Text>
-        <Text style={styles.heroTitle}>{translate("homeTitle")}</Text>
-        <Text style={styles.heroSubtitle}>{translate("homeSubtitle")}</Text>
+        <UiText style={styles.heroEyebrow}>{translate("homeEyebrow")}</UiText>
+        <UiText style={styles.heroTitle}>{translate("homeTitle")}</UiText>
+        <UiText style={styles.heroSubtitle}>{translate("homeSubtitle")}</UiText>
         <CustomerSearch value={search} onChangeText={setSearch} placeholder={translate("homeSearchPlaceholder")} />
         <Button
           label={translate("homeSearchAction")}
@@ -76,8 +76,8 @@ export default function CustomerHomeScreen() {
               onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })}
               style={[styles.category, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}
             >
-              <Text style={styles.categoryIcon}>{category.icon}</Text>
-              <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</Text>
+              <UiText style={styles.categoryIcon}>{category.icon}</UiText>
+              <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</UiText>
             </PressableSurface>
           ))}
         </ScrollView>
@@ -120,7 +120,6 @@ export default function CustomerHomeScreen() {
 const styles = StyleSheet.create({
   location: { flexDirection: "row-reverse", alignItems: "center", gap: 7, backgroundColor: "#C6F135", borderRadius: 12, paddingHorizontal: 11, minHeight: 40 },
   locationText: { color: "#0A0A0A", fontSize: 11, fontWeight: "800" },
-  locationIcon: { color: "#0A0A0A", fontSize: 17 },
   hero: { backgroundColor: "#111A0A", borderRadius: 24, padding: 19, gap: 10 },
   heroEyebrow: { color: "#C6F135", fontSize: 11, fontWeight: "800", textAlign: "right" },
   heroTitle: { color: "#FFFFFF", fontSize: 24, lineHeight: 35, fontWeight: "900", textAlign: "right" },
