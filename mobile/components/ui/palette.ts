@@ -1,3 +1,4 @@
+import { brandColors } from "@/lib/design-system";
 import type { AppTheme } from "@/lib/theme";
 
 export type ButtonVariant = "primary" | "outline" | "ghost" | "danger";
@@ -29,7 +30,7 @@ export function getButtonPalette(theme: AppTheme, variant: ButtonVariant): Butto
     case "danger":
       return {
         backgroundColor: theme.colors.danger,
-        foregroundColor: "#FFFFFF"
+        foregroundColor: brandColors.white
       };
   }
 }
