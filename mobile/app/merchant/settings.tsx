@@ -268,7 +268,6 @@ function createStyles(theme: AppTheme) {
     logoPreview: { width: 76, height: 76, borderRadius: 14, alignSelf: "flex-end" },
     coverPreview: { width: "100%", height: 76, borderRadius: 14 },
     imagePlaceholder: { alignItems: "center", justifyContent: "center" },
-    imageButton: { minHeight: 40, borderWidth: 1, borderRadius: 10, alignItems: "center", justifyContent: "center" },
     modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 12 },
     modalCard: { maxHeight: "78%", borderWidth: 1, borderRadius: 18, padding: 15, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
@@ -287,8 +286,6 @@ function createStyles(theme: AppTheme) {
     dayChipText: { fontSize: 10, fontWeight: "800" },
     error: { fontSize: 11, textAlign: "right" },
     success: { fontSize: 11, textAlign: "right", fontWeight: "800" },
-    save: { minHeight: 49, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-    saveText: { fontSize: 13, fontWeight: "900", color: theme.colors.foreground },
     message: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, gap: 14 }
   });
 }
