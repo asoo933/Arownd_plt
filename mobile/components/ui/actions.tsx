@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
+import { Text as UiText } from "./typography";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 
@@ -40,7 +41,7 @@ export function ButtonGroup({
               { minHeight: 44, minWidth: 48, paddingHorizontal: designTokens.spacing.md, alignItems: "center", justifyContent: "center", backgroundColor: selected ? theme.colors.accent : theme.colors.surface, borderStartWidth: index === 0 ? 0 : 1, borderStartColor: theme.colors.border, opacity: option.disabled ? 0.45 : pressed ? 0.72 : 1 }
             ]}
           >
-            <Text style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{option.label}</Text>
+            <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{option.label}</UiText>
           </Pressable>
         );
       })}
@@ -107,7 +108,7 @@ export function LinkButton({
       hitSlop={6}
       style={({ pressed }) => [style, { minHeight: 44, justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.7 : 1 }]}
     >
-      <Text style={{ color: theme.colors.accentMuted, fontSize: theme.typography.body, fontWeight: "700", textDecorationLine: "underline" }}>{label}</Text>
+      <UiText style={{ color: theme.colors.accentMuted, fontSize: theme.typography.body, fontWeight: "700", textDecorationLine: "underline" }}>{label}</UiText>
     </Pressable>
   );
 }
