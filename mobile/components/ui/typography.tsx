@@ -13,6 +13,7 @@ export type TextComponentProps = TextProps & {
   tone?: ThemeTone;
   weight?: TextStyle["fontWeight"];
   align?: TextStyle["textAlign"];
+  fontFamily?: TextStyle["fontFamily"];
   style?: StyleProp<TextStyle>;
 };
 
@@ -21,6 +22,7 @@ export function Text({
   tone = "foreground",
   weight,
   align = "right",
+  fontFamily,
   style,
   ...props
 }: TextComponentProps) {
@@ -34,6 +36,7 @@ export function Text({
           color: theme.colors[tone],
           fontSize: theme.typography.body,
           fontWeight: weight ?? theme.fontWeights.regular,
+          fontFamily: fontFamily ?? theme.fontFamilies.arabic,
           textAlign: align,
           includeFontPadding: false
         },
@@ -108,6 +111,7 @@ export function PriceText({
           color: theme.colors[tone],
           fontSize: theme.typography.title,
           fontWeight: weight ?? theme.fontWeights.extrabold,
+          fontFamily: theme.fontFamilies.latin,
           fontVariant: ["tabular-nums"],
           textAlign: align,
           includeFontPadding: false
@@ -163,6 +167,7 @@ export function BadgeText({
           color: palette.color,
           fontSize: theme.typography.caption,
           fontWeight: weight ?? theme.fontWeights.bold,
+          fontFamily: theme.fontFamilies.arabic,
           textAlign: align,
           includeFontPadding: false
         },
