@@ -44,7 +44,7 @@ export default function ExploreScreen() {
       ) : (
         <View style={styles.grid}>
           {products.data.map((item) => (
-            <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} />
+            <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} style={{ width: "48%" }} />
           ))}
         </View>
       )}
