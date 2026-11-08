@@ -13,7 +13,7 @@ import { Icon } from "./icon";
 
 export type AvatarProps = {
   name: string;
-  imageUri?: string;
+  imageUri?: string | undefined;
   size?: number;
   verified?: boolean;
   online?: boolean;
