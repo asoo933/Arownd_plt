@@ -26,11 +26,16 @@ describe("getButtonPalette", () => {
     });
   });
 
-  it("uses the semantic danger color for destructive actions", () => {
-    const theme = getAppTheme("dark");
-    expect(getButtonPalette(theme, "danger")).toEqual({
-      backgroundColor: theme.colors.danger,
+  it("uses contrasting foregrounds for destructive actions in both themes", () => {
+    const lightTheme = getAppTheme("light");
+    const darkTheme = getAppTheme("dark");
+    expect(getButtonPalette(lightTheme, "danger")).toEqual({
+      backgroundColor: lightTheme.colors.danger,
       foregroundColor: brandColors.white
+    });
+    expect(getButtonPalette(darkTheme, "danger")).toEqual({
+      backgroundColor: darkTheme.colors.danger,
+      foregroundColor: brandColors.black
     });
   });
 });
