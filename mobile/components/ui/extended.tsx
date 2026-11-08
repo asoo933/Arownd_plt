@@ -35,7 +35,7 @@ export function SearchField({
     <View
       style={[
         {
-          minHeight: 48,
+          minHeight: theme.dimensions.controlHeight.lg,
           flexDirection: "row",
           alignItems: "center",
           gap: theme.spacing.sm,
@@ -48,7 +48,7 @@ export function SearchField({
         style
       ]}
     >
-      <Icon name="search" size={20} color={theme.colors.muted} accessibilityHidden />
+      <Icon name="search" size={theme.dimensions.iconSize.md} color={theme.colors.muted} accessibilityHidden />
       <TextInput
         accessibilityLabel={accessibilityLabel}
         value={value}
@@ -61,7 +61,7 @@ export function SearchField({
         returnKeyType={returnKeyType}
         style={{
           flex: 1,
-          minHeight: 46,
+          minHeight: theme.dimensions.controlHeight.lg,
           color: theme.colors.foreground,
           fontSize: theme.typography.body,
           textAlign: "right"
@@ -101,7 +101,7 @@ export function StatusBadge({
         backgroundColor: colors.backgroundColor
       }}
     >
-      <UiText style={{ color: colors.color, fontSize: theme.typography.caption, fontWeight: "700" }}>
+      <UiText style={{ color: colors.color, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold }}>
         {label}
       </UiText>
     </View>
