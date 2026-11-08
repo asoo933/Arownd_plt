@@ -118,13 +118,13 @@ export default function CustomerHomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  location: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: 11, minHeight: 40 },
+  location: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, minHeight: designTokens.dimensions.controlHeight.sm },
   locationText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   hero: { borderRadius: designTokens.radius.xl, padding: designTokens.spacing.xl, gap: designTokens.spacing.md },
   heroEyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
   heroTitle: { lineHeight: 35, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
   heroSubtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 21, textAlign: "right" },
-  searchButton: { minHeight: 48, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
+  searchButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
   searchButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
   categoryRail: { flexDirection: "row-reverse", gap: designTokens.spacing.sm, paddingBottom: 3 },
   category: { width: 93, minHeight: 94, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
