@@ -6,7 +6,7 @@ import { StyleSheet, View } from "react-native";
 
 import { ActionButton, AuthField, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
 import { Text as UiText } from "@/components/ui";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 import { signUpPersonal } from "@/lib/auth-service";
 import { personalSignupSchema, type PersonalSignupInput } from "@/lib/auth-validation";
 import { translate } from "@/lib/i18n";
@@ -71,8 +71,8 @@ export default function PersonalSignupScreen() {
 }
 
 const styles = StyleSheet.create({
-  form: { gap: 16 },
-  loginRow: { flexDirection: "row-reverse", justifyContent: "center", gap: 6, marginTop: 2 },
-  secondaryText: { fontSize: 13 },
-  link: { fontSize: 13, fontWeight: "800" }
+  form: { gap: designTokens.spacing.lg },
+  loginRow: { flexDirection: "row-reverse", justifyContent: "center", gap: designTokens.spacing.xs, marginTop: 2 },
+  secondaryText: { fontSize: designTokens.typography.body - 1 },
+  link: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
 });
