@@ -1,0 +1,169 @@
+import {
+  Text as NativeText,
+  type StyleProp,
+  type TextProps,
+  type TextStyle
+} from "react-native";
+
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+
+type ThemeTone = keyof Pick<AppTheme["colors"], "foreground" | "muted" | "subtle" | "accentMuted" | "success" | "warning" | "danger">;
+
+export type TextComponentProps = TextProps & {
+  tone?: ThemeTone;
+  weight?: TextStyle["fontWeight"];
+  align?: TextStyle["textAlign"];
+  style?: StyleProp<TextStyle>;
+};
+
+export function Text({
+  children,
+  tone = "foreground",
+  weight = "400",
+  align = "right",
+  style,
+  ...props
+}: TextComponentProps) {
+  const theme = useAppTheme();
+
+  return (
+    <NativeText
+      {...props}
+      style={[
+        {
+          color: theme.colors[tone],
+          fontSize: theme.typography.body,
+          fontWeight: weight,
+          textAlign: align,
+          includeFontPadding: false
+        },
+        style
+      ]}
+    >
+      {children}
+    </NativeText>
+  );
+}
+
+export type HeadingProps = Omit<TextComponentProps, "weight"> & {
+  level?: 1 | 2 | 3;
+};
+
+export function Heading({ level = 2, style, ...props }: HeadingProps) {
+  const theme = useAppTheme();
+  const sizes = {
+    1: theme.typography.display,
+    2: theme.typography.title,
+    3: theme.typography.subtitle
+  } satisfies Record<1 | 2 | 3, number>;
+
+  return (
+    <Text
+      {...props}
+      accessibilityRole="header"
+      weight="800"
+      style={[{ fontSize: sizes[level] }, style]}
+    />
+  );
+}
+
+export function Label(props: TextComponentProps) {
+  const theme = useAppTheme();
+  return (
+    <Text
+      {...props}
+      weight={props.weight ?? "700"}
+      style={[{ fontSize: theme.typography.caption + 2 }, props.style]}
+    />
+  );
+}
+
+export function Caption(props: TextComponentProps) {
+  const theme = useAppTheme();
+  return (
+    <Text
+      {...props}
+      tone={props.tone ?? "muted"}
+      style={[{ fontSize: theme.typography.caption }, props.style]}
+    />
+  );
+}
+
+export function PriceText({
+  value,
+  previousValue,
+  style,
+  ...props
+}: TextComponentProps & { value: string; previousValue?: string }) {
+  const theme = useAppTheme();
+
+  return (
+    <NativeText
+      {...props}
+      style={[
+        {
+          color: theme.colors.foreground,
+          fontSize: theme.typography.title,
+          fontWeight: "800",
+          fontVariant: ["tabular-nums"],
+          textAlign: "right",
+          includeFontPadding: false
+        },
+        style
+      ]}
+    >
+      {value}
+      {previousValue ? (
+        <NativeText
+          style={{
+            color: theme.colors.muted,
+            fontSize: theme.typography.caption,
+            fontWeight: "400",
+            textDecorationLine: "line-through"
+          }}
+        >
+          {" "}{previousValue}
+        </NativeText>
+      ) : null}
+    </NativeText>
+  );
+}
+
+export function BadgeText({
+  children,
+  style,
+  tone = "accent",
+  ...props
+}: TextComponentProps & { tone?: "accent" | "success" | "warning" | "danger" }) {
+  const theme = useAppTheme();
+  const colors = {
+    accent: { backgroundColor: theme.colors.accent, color: theme.colors.accentForeground },
+    success: { backgroundColor: theme.colors.successSurface, color: theme.colors.success },
+    warning: { backgroundColor: theme.colors.warningSurface, color: theme.colors.warning },
+    danger: { backgroundColor: theme.colors.dangerSurface, color: theme.colors.danger }
+  } satisfies Record<typeof tone, { backgroundColor: string; color: string }>;
+  const palette = colors[tone];
+
+  return (
+    <NativeText
+      {...props}
+      style={[
+        {
+          alignSelf: "flex-start",
+          overflow: "hidden",
+          paddingHorizontal: designTokens.spacing.sm,
+          paddingVertical: designTokens.spacing.xs,
+          borderRadius: theme.radius.pill,
+          backgroundColor: palette.backgroundColor,
+          color: palette.color,
+          fontSize: theme.typography.caption,
+          fontWeight: "700",
+          includeFontPadding: false
+        },
+        style
+      ]}
+    >
+      {children}
+    </NativeText>
+  );
+}
