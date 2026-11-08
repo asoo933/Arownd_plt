@@ -6,7 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 import { AppHeader, Icon, IconButton, Text as UiText } from "@/components/ui";
 
 export default function ExploreScreen() {
@@ -57,7 +57,7 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  subtitle: { fontSize: 12, lineHeight: 19, textAlign: "right" },
-  grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
-  footer: { fontSize: 11, textAlign: "center", padding: 14 }
+  subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "right" },
+  grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
+  footer: { fontSize: designTokens.typography.caption, textAlign: "center", padding: designTokens.spacing.lg }
 });
