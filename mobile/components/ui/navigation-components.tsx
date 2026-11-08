@@ -71,7 +71,7 @@ export function BottomNavigation({
             accessibilityState={{ selected, disabled: item.disabled }}
             disabled={item.disabled}
             onPress={() => onChange(item.key)}
-            style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: theme.dimensions.controlHeight.lg, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: 3, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
+            style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: theme.dimensions.controlHeight.lg, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.xs, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
           >
             {item.icon}
             <UiText numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular }}>{item.label}</UiText>
