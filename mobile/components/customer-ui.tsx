@@ -124,9 +124,9 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
         {logoUrl ? <UiImage uri={logoUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="store" size={28} color={theme.colors.subtle} accessibilityHidden />}
       </View>
       <View style={styles.storeInfo}>
-        <UiText numberOfLines={1} weight="800" style={styles.storeName}>{name}</UiText>
+        <UiText numberOfLines={1} weight="800" >{name}</UiText>
         <Caption numberOfLines={1}>{commune || description || " "}</Caption>
-        {rating != null ? <UiText tone="warning" weight="700" style={styles.storeRating}>★ {rating.toFixed(1)}</UiText> : null}
+        {rating != null ? <UiText tone="warning" weight="700" >★ {rating.toFixed(1)}</UiText> : null}
       </View>
       {verified ? <Icon name="check" size={18} color={theme.colors.success} accessibilityLabel={translate("storeVerified")} /> : null}
     </PressableSurface>
@@ -147,6 +147,4 @@ const styles = StyleSheet.create({
   storeTile: { minHeight: 82, borderWidth: 1, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md - 1 },
   storeLogo: { width: 54, height: 54, borderRadius: designTokens.radius.md + 2, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   storeInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-end" },
-  storeName: {},
-  storeRating: {},
 });
