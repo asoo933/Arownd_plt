@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button, IconButton, TextField } from "@/components/ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
@@ -117,26 +118,25 @@ export default function DeliveryProfileScreen() {
   };
 
   return <CustomerScreen>
-    <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></Pressable>
+    <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
     <CustomerHeading title={translate("deliveryProfileTitle")} subtitle={translate("deliveryProfileSubtitle")} />
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
-      <TextInput value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
+      <TextField value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
-      <TextInput value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" />
+      <TextField value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
       <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <Text style={[styles.pickerText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
       </Pressable>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutCommune")}</Text>
-      <TextInput
+      <TextField
         value={commune}
         onChangeText={(value) => { setCommune(value); clearSaveFeedback(); }}
         editable={wilayaId !== null}
         maxLength={100}
         placeholder={translate("checkoutCommunePlaceholder")}
-        placeholderTextColor={theme.colors.placeholder}
-        style={[fieldStyle, wilayaId === null && styles.disabled]}
+        style={[...fieldStyle, wilayaId === null && styles.disabled]}
         textAlign="right"
       />
       {(communes.data?.length ?? 0) > 0 ? <Pressable onPress={() => setPicker("commune")} style={styles.suggestionButton}>
@@ -144,9 +144,7 @@ export default function DeliveryProfileScreen() {
       </Pressable> : null}
       {communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
       {formError ? <Text style={styles.error}>{formError}</Text> : null}
-      <Pressable disabled={mutation.isPending} onPress={submit} style={[styles.saveButton, mutation.isPending && styles.disabled]}>
-        {mutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.saveText}>{translate("deliveryProfileSave")}</Text>}
-      </Pressable>
+      <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} fullWidth />
       {mutation.isSuccess ? <Text style={styles.success}>{translate("deliveryProfileSaved")}</Text> : null}
     </View>
     <Text style={styles.note}>{translate("deliveryProfileDefaultAreaNote")}</Text>
@@ -178,8 +176,6 @@ export default function DeliveryProfileScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  back: { minHeight: 40, justifyContent: "center", alignSelf: "flex-start" },
-  backText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   panel: { borderRadius: 18, padding: 16, gap: 10 },
   label: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, fontSize: 13 },
@@ -187,8 +183,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   pickerText: { textAlign: "right", fontSize: 13 },
   suggestionButton: { alignSelf: "flex-start", minHeight: 34, justifyContent: "center" },
   suggestionText: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "800" },
-  saveButton: { minHeight: 49, borderRadius: 13, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center", marginTop: 5 },
-  saveText: { color: theme.colors.foreground, fontSize: 13, fontWeight: "900" },
   error: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
   success: { color: theme.colors.accentMuted, fontSize: 12, textAlign: "right", fontWeight: "800" },
   note: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
