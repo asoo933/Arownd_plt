@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
   type TextInputProps
 } from "react-native";
@@ -15,7 +14,7 @@ import { router } from "expo-router";
 
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button } from "@/components/ui";
+import { Button, TextField } from "@/components/ui";
 
 type AuthLayoutProps = {
   title: string;
@@ -62,28 +61,16 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
 type FieldProps = TextInputProps & { label: string; error?: string | undefined };
 
 export function AuthField({ label, error, style, ...props }: FieldProps) {
-  const theme = useAppTheme();
   const isEmail = props.keyboardType === "email-address";
   return (
-    <View style={styles.fieldGroup}>
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{label}</Text>
-      <TextInput
-        {...props}
-        textAlign={isEmail ? "left" : "right"}
-        style={[
-          styles.input,
-          {
-            backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.danger : theme.colors.border,
-            color: theme.colors.foreground
-          },
-          style
-        ]}
-        placeholderTextColor={theme.colors.placeholder}
-        autoCapitalize={isEmail ? "none" : props.autoCapitalize}
-      />
-      {error ? <Text style={[styles.errorText, { color: theme.colors.danger }]}>{error}</Text> : null}
-    </View>
+    <TextField
+      {...props}
+      label={label}
+      error={error}
+      textAlign={isEmail ? "left" : "right"}
+      autoCapitalize={isEmail ? "none" : props.autoCapitalize}
+      style={style}
+    />
   );
 }
 
