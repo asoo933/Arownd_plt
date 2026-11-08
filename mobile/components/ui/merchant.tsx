@@ -13,12 +13,14 @@ export function MerchantMetricCard({
   value,
   trend,
   valueTone = "default",
+  hint,
   style
 }: {
   label: string;
   value: string;
   trend?: MetricTrend;
   valueTone?: "default" | "success" | "warning" | "danger" | "accent";
+  hint?: string;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
@@ -42,6 +44,11 @@ export function MerchantMetricCard({
       >
         {value}
       </Text>
+      {hint ? (
+        <Text style={{ color: theme.colors.subtle, fontSize: theme.typography.caption, textAlign: "right" }}>
+          {hint}
+        </Text>
+      ) : null}
       {trend ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.xs }}>
           <Text style={{ color: trend.positive ? theme.colors.success : theme.colors.danger, fontSize: theme.typography.caption, fontWeight: "700" }}>
