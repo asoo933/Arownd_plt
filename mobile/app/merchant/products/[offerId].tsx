@@ -36,7 +36,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, ConfirmDialog, Image as UiImage, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -509,7 +509,7 @@ export default function MerchantEditProductScreen() {
               <View style={styles.imageGrid}>
                 {offer.images.map((image) => (
                   <View key={image.id} style={styles.imageItem}>
-                    <Image source={{ uri: image.image_url }} style={styles.imagePreview} />
+                    <UiImage uri={image.image_url} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.imagePreview} />
                     {image.is_primary ? (
                       <View style={[styles.primaryBadge, { backgroundColor: theme.colors.accent }]}>
                         <UiText style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
@@ -629,43 +629,17 @@ export default function MerchantEditProductScreen() {
         </View>
       </Modal>
 
-      <Modal
+      <ConfirmDialog
         visible={pendingRemoval !== null}
-        transparent
-        animationType="fade"
         onRequestClose={() => setPendingRemoval(null)}
-      >
-        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.confirmCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <UiText style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
-              {translate("merchantProductImageRemoveConfirmTitle")}
-            </UiText>
-            <UiText style={[styles.confirmHint, { color: theme.colors.muted }]}>
-              {translate("merchantProductImageRemoveConfirmHint")}
-            </UiText>
-            <View style={styles.confirmActions}>
-              <PressableSurface
-                accessibilityRole="button"
-                onPress={() => setPendingRemoval(null)}
-                style={[styles.cancelButton, { borderColor: theme.colors.border }]}
-              >
-                <UiText style={[styles.cancelText, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductCategoryClose")}
-                </UiText>
-              </PressableSurface>
-              <PressableSurface
-                accessibilityRole="button"
-                onPress={() => void confirmRemoveImage()}
-                style={[styles.removeConfirmButton, { backgroundColor: theme.colors.danger }]}
-              >
-                <UiText style={styles.removeConfirmText}>
-                  {translate("merchantProductImageRemoveConfirmAction")}
-                </UiText>
-              </PressableSurface>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        onConfirm={() => void confirmRemoveImage()}
+        title={translate("merchantProductImageRemoveConfirmTitle")}
+        description={translate("merchantProductImageRemoveConfirmHint")}
+        cancelLabel={translate("merchantProductCategoryClose")}
+        confirmLabel={translate("merchantProductImageRemoveConfirmAction")}
+        busy={removingImageId !== null}
+        destructive
+      />
     </SafeAreaView>
   );
 }
