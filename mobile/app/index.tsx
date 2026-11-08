@@ -3,10 +3,12 @@ import { ActivityIndicator, View } from "react-native";
 import { Redirect } from "expo-router";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { useAppTheme } from "@/lib/theme";
 
 type Destination = "/login" | "/home";
 
 export default function IndexRoute() {
+  const theme = useAppTheme();
   const [destination, setDestination] = useState<Destination | null>(null);
 
   useEffect(() => {
@@ -27,8 +29,8 @@ export default function IndexRoute() {
   if (destination) return <Redirect href={destination} />;
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#F5F5F5" }}>
-      <ActivityIndicator color="#829E19" />
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.background }}>
+      <ActivityIndicator color={theme.colors.accentMuted} />
     </View>
   );
 }
