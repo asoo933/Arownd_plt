@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   View
@@ -17,7 +16,7 @@ import {
 import { translate, type TranslationKey } from "@/lib/i18n";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, FilterBar, FilterChip, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
 
 type OrderFilter = "all" | "pending" | "quoted" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -115,7 +114,7 @@ export default function MerchantOrdersScreen() {
         </View>
 
         {visibleOrders.length === 0 ? (
-          <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.emptyCard}>
             <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
               {filter === "all"
                 ? translate("merchantOrdersEmpty")
@@ -124,7 +123,7 @@ export default function MerchantOrdersScreen() {
             <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
               {filter === "all" ? translate("merchantOrdersEmptyHint") : translate("merchantOrdersFilterEmpty")}
             </UiText>
-          </View>
+          </Card>
         ) : (
           <View style={styles.orderList}>
             {visibleOrders.map((order) => (
@@ -212,8 +211,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <ActivityIndicator color={theme.colors.accentMuted} />
-        <UiText style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</UiText>
+        <LoadingState label={label} />
       </View>
     </SafeAreaView>
   );
@@ -233,8 +231,7 @@ function MessageScreen({
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <UiText style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</UiText>
-        <Button label={actionLabel} onPress={onAction} />
+        <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
     </SafeAreaView>
   );
@@ -267,7 +264,7 @@ function createStyles(theme: AppTheme) {
     orderFooter: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
     orderPrice: { alignSelf: "flex-start" },
     deliveryType: { fontSize: 10, fontWeight: "700" },
-    emptyCard: { borderWidth: 1, borderRadius: 17, padding: 18, gap: 7, alignItems: "flex-end" },
+    emptyCard: { padding: 18, gap: 7, alignItems: "flex-end" },
     emptyTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
     limitHint: { fontSize: 10, lineHeight: 16, textAlign: "right", paddingHorizontal: 3 }
   });
