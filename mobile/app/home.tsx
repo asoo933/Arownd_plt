@@ -27,10 +27,10 @@ export default function CustomerHomeScreen() {
       <AppHeader
         title="arownd"
         leading={
-          <View
+          <PressableSurface
             accessibilityRole="button"
             accessibilityLabel={translate("notificationsTitle")}
-            accessibilityState={{ disabled: true }}
+            onPress={() => router.push("/notifications")}
             style={[
               styles.notificationButton,
               {
@@ -40,7 +40,7 @@ export default function CustomerHomeScreen() {
             ]}
           >
             <Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />
-          </View>
+          </PressableSurface>
         }
         trailing={
           <PressableSurface
