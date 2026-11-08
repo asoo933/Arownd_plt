@@ -11,7 +11,7 @@ import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state
 import { readCartOptions } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 const STEPS = [
   { status: "pending", title: "orderStepPending" as const, hint: "orderStepPendingHint" as const },
@@ -141,7 +141,7 @@ export default function OrderDetailsScreen() {
 
   return <CustomerScreen>
     <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
-    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersCode") + ": " + orderCode}</UiText>
+    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "right" }}>{translate("ordersCode") + ": " + orderCode}</UiText>
 
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderSummary")}</UiText>
@@ -292,31 +292,31 @@ export default function OrderDetailsScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  panel: { borderRadius: 18, padding: 14, gap: 12 },
-  sectionTitle: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900", textAlign: "right" },
-  totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9 },
-  label: { color: theme.colors.muted, fontSize: 12, fontWeight: "700" },
-  total: { color: theme.colors.accentMuted, fontSize: 18, fontWeight: "900" },
+  panel: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  sectionTitle: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm },
+  label: { color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.bold },
+  total: { color: theme.colors.accentMuted, fontSize: designTokens.typography.subtitle + 2, fontWeight: designTokens.fontWeights.extrabold },
   priceDisplay: { justifyContent: "flex-start" },
   itemPriceDisplay: { justifyContent: "flex-start" },
-  meta: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
-  itemRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
-  itemInfo: { flex: 1, alignItems: "flex-end", gap: 3 },
-  itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  merchantHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: 8 },
-  notice: { color: theme.colors.warning, fontSize: 11, textAlign: "right", lineHeight: 18 },
-  recipient: { fontSize: 13, fontWeight: "900", textAlign: "right" },
-  shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 5 },
-  trackingEvent: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 4 },
-  secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: theme.colors.border, justifyContent: "center", alignItems: "center" },
-  secondaryText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
-  quoteActions: { flexDirection: "row-reverse", gap: 8 },
-  acceptButton: { flex: 1, minHeight: 48, borderRadius: 12, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-  acceptButtonText: { color: theme.colors.foreground, fontSize: 12, fontWeight: "900" },
-  declineButton: { flex: 1, minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
-  declineButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
-  cancelButton: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
-  cancelButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
-  errorText: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
+  meta: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" },
+  itemRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
+  itemInfo: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+  itemName: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  merchantHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: designTokens.spacing.sm },
+  notice: { color: theme.colors.warning, fontSize: designTokens.typography.caption, textAlign: "right", lineHeight: 18 },
+  recipient: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
+  trackingEvent: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
+  secondary: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.md, borderWidth: 1, borderColor: theme.colors.border, justifyContent: "center", alignItems: "center" },
+  secondaryText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
+  quoteActions: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+  acceptButton: { flex: 1, minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  acceptButtonText: { color: theme.colors.foreground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+  declineButton: { flex: 1, minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
+  declineButtonText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+  cancelButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
+  cancelButtonText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+  errorText: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "right" },
 }); }
 
