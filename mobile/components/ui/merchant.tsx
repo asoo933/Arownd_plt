@@ -1,4 +1,5 @@
-import { Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { View, type StyleProp, type ViewStyle } from "react-native";
+import { Text as UiText } from "./typography";
 
 import { useAppTheme } from "@/lib/theme";
 import { Surface } from "./primitives";
@@ -35,27 +36,27 @@ export function MerchantMetricCard({
 
   return (
     <Surface style={[{ flex: 1, gap: theme.spacing.sm }, style]}>
-      <Text style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}>
+      <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}>
         {label}
-      </Text>
-      <Text
+      </UiText>
+      <UiText
         numberOfLines={1}
         adjustsFontSizeToFit
         style={{ color: valueColor, fontSize: theme.typography.title, fontWeight: "800", textAlign: "right" }}
       >
         {value}
-      </Text>
+      </UiText>
       {hint ? (
-        <Text style={{ color: theme.colors.subtle, fontSize: theme.typography.caption, textAlign: "right" }}>
+        <UiText style={{ color: theme.colors.subtle, fontSize: theme.typography.caption, textAlign: "right" }}>
           {hint}
-        </Text>
+        </UiText>
       ) : null}
       {trend ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.xs }}>
           <Icon name={trend.positive ? "arrow-up" : "arrow-down"} size={14} color={trend.positive ? theme.colors.success : theme.colors.danger} accessibilityHidden />
-          <Text style={{ color: trend.positive ? theme.colors.success : theme.colors.danger, fontSize: theme.typography.caption }}>
+          <UiText style={{ color: trend.positive ? theme.colors.success : theme.colors.danger, fontSize: theme.typography.caption }}>
             {trend.label}
-          </Text>
+          </UiText>
         </View>
       ) : null}
     </Surface>
