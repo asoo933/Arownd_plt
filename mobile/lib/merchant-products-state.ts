@@ -6,7 +6,6 @@ export type MerchantProductOffer = {
   store_id: string;
   product_id: string;
   price: number;
-  old_price?: number | null;
   stock_quantity: number;
   options: MerchantProductOptions;
   is_available: boolean;
@@ -98,17 +97,6 @@ export function validateMerchantOfferOptions(
   const colors = parseList(colorsInput);
   if (sizes === null || colors === null) return null;
   return { sizes, colors };
-}
-
-export function validatePromotionSalePrice(salePriceInput: string, regularPrice: number): number | null {
-  if (!Number.isSafeInteger(regularPrice) || regularPrice <= 0 || !salePriceInput.trim()) return null;
-  const salePrice = Number(salePriceInput);
-  return Number.isSafeInteger(salePrice) && salePrice > 0 && salePrice < regularPrice ? salePrice : null;
-}
-
-export function getPromotionDiscountPercent(regularPrice: number, salePrice: number): number | null {
-  if (!Number.isSafeInteger(regularPrice) || !Number.isSafeInteger(salePrice) || regularPrice <= 0 || salePrice <= 0 || salePrice >= regularPrice) return null;
-  return Math.round(((regularPrice - salePrice) / regularPrice) * 100);
 }
 
 export function validateMerchantOfferValues(
