@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import {
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   View
@@ -16,7 +15,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { AppHeader, Button, Card, Image as UiImage, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
@@ -180,14 +179,14 @@ export default function MerchantEntryScreen() {
         </View>
 
         {recentOrders.length === 0 ? (
-          <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.emptyCard}>
             <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
               {translate("merchantOrdersEmpty")}
             </UiText>
             <UiText style={[styles.body, { color: theme.colors.muted }]}>
               {translate("merchantOrdersEmptyHint")}
             </UiText>
-          </View>
+          </Card>
         ) : (
           <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.ordersCard}>
             {recentOrders.map((order, index) => (
@@ -260,8 +259,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <ActivityIndicator color={theme.colors.accentMuted} />
-        <UiText style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</UiText>
+        <LoadingState label={label} />
       </View>
     </SafeAreaView>
   );
@@ -281,8 +279,7 @@ function MessageScreen({
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <UiText style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</UiText>
-        <Button label={actionLabel} onPress={onAction} />
+        <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
     </SafeAreaView>
   );
