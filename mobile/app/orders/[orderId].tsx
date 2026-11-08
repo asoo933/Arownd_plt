@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, StyleSheet, View } from "react-native";
+import { Modal, StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TrackingTimeline } from "@/components/ui";
+import { AppHeader, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, Text as UiText, TrackingTimeline } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
@@ -209,7 +209,7 @@ export default function OrderDetailsScreen() {
               onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
               style={styles.acceptButton}
             >
-              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
+              {quoteMutation.isPending ? <Spinner color={theme.colors.foreground} size="small" /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
             </PressableSurface>
             <PressableSurface
               disabled={quoteMutation.isPending}
@@ -271,7 +271,7 @@ export default function OrderDetailsScreen() {
               onPress={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
               style={styles.declineButton}
             >
-              {cancelMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <UiText style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</UiText>}
+              {cancelMutation.isPending ? <Spinner color={theme.colors.danger} size="small" /> : <UiText style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</UiText>}
             </PressableSurface>
             <PressableSurface accessibilityRole="button" disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
               <UiText style={styles.acceptButtonText}>{translate("back")}</UiText>
