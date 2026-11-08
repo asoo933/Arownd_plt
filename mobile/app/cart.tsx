@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button, IconButton, QuantityStepper } from "@/components/ui";
 import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem } from "@/lib/cart-state";
@@ -34,7 +35,7 @@ export default function CartScreen() {
   if (cart.data.length === 0) return <CustomerScreen>
     <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartSubtitle")} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
-    <Pressable onPress={() => router.push("/explore")} style={style.primary}><Text style={style.primaryText}>{translate("cartBrowse")}</Text></Pressable>
+    <Button label={translate("cartBrowse")} onPress={() => router.push("/explore")} fullWidth />
   </CustomerScreen>;
 
   const evaluation = evaluateCart(cart.data, offers.data);
@@ -84,10 +85,21 @@ export default function CartScreen() {
             </View>
           </Pressable>
           <View style={style.controls}>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartDecrease")} disabled={item.quantity <= 1 || mutation.isPending} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity - 1 })} style={style.stepper}><Text style={style.stepperText}>−</Text></Pressable>
-            <Text style={style.quantity}>{item.quantity}</Text>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartIncrease")} disabled={item.quantity >= 10 || mutation.isPending || (offer ? totalRequestedForOffer >= offer.stock_quantity : false)} onPress={() => mutation.mutate({ type: "quantity", key, quantity: item.quantity + 1 })} style={style.stepper}><Text style={style.stepperText}>+</Text></Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel={translate("cartRemove")} disabled={mutation.isPending} onPress={() => mutation.mutate({ type: "remove", key })} style={style.remove}><Text style={style.removeText}>×</Text></Pressable>
+            <QuantityStepper
+              value={item.quantity}
+              max={Math.min(10, offer ? Math.max(item.quantity, offer.stock_quantity - (totalRequestedForOffer - item.quantity)) : 10)}
+              onChange={(quantity) => mutation.mutate({ type: "quantity", key, quantity })}
+              decreaseLabel={translate("cartDecrease")}
+              increaseLabel={translate("cartIncrease")}
+              disabled={mutation.isPending}
+            />
+            <IconButton
+              accessibilityLabel={translate("cartRemove")}
+              onPress={() => mutation.mutate({ type: "remove", key })}
+              disabled={mutation.isPending}
+              variant="ghost"
+              icon={<Text style={style.removeText}>×</Text>}
+            />
           </View>
           {blocking ? <Text style={style.blockedHint}>{translate("cartLineBlocked")}</Text> : null}
         </View>;
@@ -96,13 +108,12 @@ export default function CartScreen() {
     <View style={[style.summary, { backgroundColor: theme.colors.surface }]}>
       <View style={style.summaryRow}><Text style={style.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={style.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
       <Text style={style.note}>{translate("cartDeliveryNote")}</Text>
-      <Pressable
-        disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
+      <Button
+        label={translate("cartCheckout")}
         onPress={() => router.push("/checkout")}
-        style={[style.primary, (offers.isPending || offers.isError || evaluation.blockingCount > 0) && style.disabled]}
-      >
-        <Text style={style.primaryText}>{translate("cartCheckout")}</Text>
-      </Pressable>
+        disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
+        fullWidth
+      />
     </View>
   </CustomerScreen>;
 }
@@ -120,11 +131,7 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   issue: { color: theme.colors.warning, fontSize: 11, fontWeight: "700", textAlign: "right" },
   priceIssue: { color: theme.colors.warning },
   price: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
-  controls: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
-  stepper: { width: 36, height: 36, borderRadius: 11, backgroundColor: theme.colors.surfaceMuted, alignItems: "center", justifyContent: "center" },
-  stepperText: { color: theme.colors.foreground, fontSize: 20, fontWeight: "900" },
-  quantity: { minWidth: 25, textAlign: "center", color: theme.colors.foreground, fontWeight: "900" },
-  remove: { marginStart: "auto", minWidth: 38, minHeight: 38, alignItems: "center", justifyContent: "center" },
+  controls: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
   removeText: { color: theme.colors.danger, fontSize: 22, fontWeight: "800" },
   blockedHint: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
   warning: { backgroundColor: theme.colors.dangerSurface, borderRadius: 13, padding: 12 },
@@ -134,7 +141,4 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   summaryLabel: { color: theme.colors.muted, fontSize: 13, fontWeight: "700" },
   total: { color: theme.colors.accentMuted, fontSize: 19, fontWeight: "900" },
   note: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
-  primary: { minHeight: 50, borderRadius: 14, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-  primaryText: { color: theme.colors.foreground, fontSize: 14, fontWeight: "900" },
-  disabled: { opacity: 0.4 }
 });
