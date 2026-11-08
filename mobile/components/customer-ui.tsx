@@ -96,7 +96,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
       }
       contentStyle={styles.productContent}
     >
-      <UiText numberOfLines={2} weight="800" style={styles.productName}>{name}</UiText>
+      <UiText numberOfLines={2} weight="700" style={styles.productName}>{name}</UiText>
       <Caption numberOfLines={1}>{store}</Caption>
       <PriceDisplay value={price} />
     </ProductCard>
@@ -125,7 +125,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
         {logoUrl ? <UiImage uri={logoUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="store" size={28} color={theme.colors.subtle} accessibilityHidden />}
       </View>
       <View style={styles.storeInfo}>
-        <UiText numberOfLines={1} weight="800" >{name}</UiText>
+        <UiText numberOfLines={1} weight="700" >{name}</UiText>
         <Caption numberOfLines={1}>{commune || description || translate("storeNoDescription")}</Caption>
         {rating != null ? <RatingStars value={rating} size={14} showValue /> : null}
       </View>
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.xxl },
   heading: { gap: designTokens.spacing.xs, alignItems: "flex-end" },
   sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
-  sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
+  sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "700" },
   productTile: { width: 158 },
   productContent: { padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
   productImage: { height: 132, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
