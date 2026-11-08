@@ -7,13 +7,12 @@ import { useAppTheme } from "@/lib/theme";
 
 const tabs: {
   id: Exclude<CustomerTab, "none">;
-  label: "navHome" | "navExplore" | "favoriteTitleShort" | "navAccount";
-  icon: "home" | "search" | "heart" | "user";
+  label: "navHome" | "navExplore" | "navAccount";
+  icon: "home" | "search" | "user";
   path: string;
 }[] = [
   { id: "home", label: "navHome", icon: "home", path: "/home" },
   { id: "explore", label: "navExplore", icon: "search", path: "/explore" },
-  { id: "favorites", label: "favoriteTitleShort", icon: "heart", path: "/favorites" },
   { id: "profile", label: "navAccount", icon: "user", path: "/profile" }
 ];
 
