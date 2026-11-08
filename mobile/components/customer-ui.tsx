@@ -1,10 +1,8 @@
 import type { ReactNode } from "react";
 import { CustomerNavigation } from "@/components/customer-navigation";
 import {
-  Image,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle
@@ -13,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, PressableSurface, SearchField } from "@/components/ui";
+import { Button, Caption, Heading, Icon, Image as UiImage, PriceText, PressableSurface, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
@@ -32,8 +30,8 @@ export function CustomerHeading({ title, subtitle }: { title: string; subtitle?:
   const theme = useAppTheme();
   return (
     <View style={styles.heading}>
-      <Text style={[styles.headingTitle, { color: theme.colors.foreground }]}>{title}</Text>
-      {subtitle ? <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{subtitle}</Text> : null}
+      <Heading level={2}>{title}</Heading>
+      {subtitle ? <Caption>{subtitle}</Caption> : null}
     </View>
   );
 }
@@ -62,7 +60,7 @@ export function SectionTitle({ title, action, onAction }: {
   const theme = useAppTheme();
   return (
     <View style={styles.sectionTitle}>
-      <Text style={[styles.sectionText, { color: theme.colors.foreground }]}>{title}</Text>
+      <Heading level={3}>{title}</Heading>
       {action && onAction ? (
         <Button
           label={action}
@@ -95,11 +93,11 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
       style={[styles.productTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }, style]}
     >
       <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
+        {imageUrl ? <UiImage uri={imageUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={32} color={theme.colors.subtle} accessibilityHidden />}
       </View>
-      <Text numberOfLines={2} style={[styles.productName, { color: theme.colors.foreground }]}>{name}</Text>
-      <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{store}</Text>
-      <Text style={[styles.productPrice, { color: theme.colors.accentMuted }]}>{price}</Text>
+      <UiText numberOfLines={2} weight="800" style={styles.productName}>{name}</UiText>
+      <Caption numberOfLines={1}>{store}</Caption>
+      <PriceText value={price} />
     </PressableSurface>
   );
 }
@@ -123,14 +121,14 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
       style={[styles.storeTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
     >
       <View style={[styles.storeLogo, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {logoUrl ? <Image source={{ uri: logoUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>⌂</Text>}
+        {logoUrl ? <UiImage uri={logoUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="store" size={28} color={theme.colors.subtle} accessibilityHidden />}
       </View>
       <View style={styles.storeInfo}>
-        <Text numberOfLines={1} style={[styles.storeName, { color: theme.colors.foreground }]}>{name}</Text>
-        <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{commune || description || " "}</Text>
-        {rating != null ? <Text style={[styles.storeRating, { color: theme.colors.warning }]}>★ {rating.toFixed(1)}</Text> : null}
+        <UiText numberOfLines={1} weight="800" style={styles.storeName}>{name}</UiText>
+        <Caption numberOfLines={1}>{commune || description || " "}</Caption>
+        {rating != null ? <UiText tone="warning" weight="700" style={styles.storeRating}>★ {rating.toFixed(1)}</UiText> : null}
       </View>
-      {verified ? <Text accessibilityLabel={translate("storeVerified")} style={[styles.verified, { color: theme.colors.success }]}>✓</Text> : null}
+      {verified ? <Icon name="check" size={18} color={theme.colors.success} accessibilityLabel={translate("storeVerified")} /> : null}
     </PressableSurface>
   );
 }
@@ -141,21 +139,14 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.xxl },
   heading: { gap: designTokens.spacing.xs, alignItems: "flex-end" },
-  headingTitle: { fontSize: designTokens.typography.title, fontWeight: "900", textAlign: "right" },
-  subtitle: { fontSize: designTokens.typography.caption + 1, textAlign: "right", lineHeight: 19 },
   sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
-  sectionText: { fontSize: designTokens.typography.subtitle, fontWeight: "900", textAlign: "right" },
   sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
   productTile: { width: 158, borderRadius: designTokens.radius.lg, borderWidth: 1, padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
   productImage: { height: 132, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  imageFallback: { fontSize: 35 },
-  productName: { minHeight: 38, fontSize: 13, fontWeight: "800", textAlign: "right" },
-  productStore: { fontSize: designTokens.typography.caption, textAlign: "right" },
-  productPrice: { fontSize: designTokens.typography.body, fontWeight: "900", textAlign: "right" },
+  productName: { minHeight: 38 },
   storeTile: { minHeight: 82, borderWidth: 1, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md - 1 },
   storeLogo: { width: 54, height: 54, borderRadius: designTokens.radius.md + 2, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   storeInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-end" },
-  storeName: { fontSize: designTokens.typography.body, fontWeight: "800" },
-  storeRating: { fontSize: designTokens.typography.caption, fontWeight: "700" },
-  verified: { fontSize: 16, fontWeight: "900" }
+  storeName: {},
+  storeRating: {},
 });
