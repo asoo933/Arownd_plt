@@ -7,14 +7,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button } from "@/components/ui";
+import { Button, TextField } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
   const theme = useAppTheme();
@@ -47,14 +46,14 @@ export function CustomerSearch({ value, onChangeText, placeholder }: {
   return (
     <View style={[styles.search, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <Text style={[styles.searchIcon, { color: theme.colors.muted }]}>⌕</Text>
-      <TextInput
+      <TextField
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.placeholder}
-        style={[styles.searchInput, { color: theme.colors.foreground }]}
+        style={styles.searchInput}
         textAlign="right"
         returnKeyType="search"
+        accessibilityLabel={placeholder}
       />
     </View>
   );
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: designTokens.typography.caption + 1, textAlign: "right", lineHeight: 19 },
   search: { minHeight: 50, borderRadius: designTokens.radius.lg, borderWidth: 1, flexDirection: "row-reverse", alignItems: "center", paddingHorizontal: designTokens.spacing.md, gap: designTokens.spacing.sm },
   searchIcon: { fontSize: 24 },
-  searchInput: { flex: 1, minHeight: 48, fontSize: designTokens.typography.body },
+  searchInput: { flex: 1, minHeight: 48, borderWidth: 0, borderRadius: 0, paddingHorizontal: 0, backgroundColor: "transparent", fontSize: designTokens.typography.body },
   sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
   sectionText: { fontSize: designTokens.typography.subtitle, fontWeight: "900", textAlign: "right" },
   sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
