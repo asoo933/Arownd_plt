@@ -12,8 +12,6 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Text as UiText } from "./typography";
-import { SearchField } from "./extended";
 import { Icon } from "./icon";
 
 export function Image({
@@ -74,23 +72,6 @@ export function ImagePreview({
   return <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}><Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onRequestClose} style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.md, backgroundColor: theme.colors.overlay }}><NativeImage source={{ uri }} resizeMode="contain" style={{ width: "100%", height: "80%" }} /></Pressable></Modal>;
 }
 
-export function ImageUploader({
-  children,
-  onPress,
-  accessibilityLabel,
-  disabled = false,
-  style
-}: {
-  children: ReactNode;
-  onPress: () => void;
-  accessibilityLabel: string;
-  disabled?: boolean;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: 112, alignItems: "center", justifyContent: "center", padding: designTokens.spacing.lg, borderWidth: 1.5, borderStyle: "dashed", borderColor: theme.colors.border, borderRadius: theme.radius.xl, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }, style]}>{children}</Pressable>;
-}
-
 export function CameraButton({
   children,
   onPress,
@@ -103,46 +84,6 @@ export function CameraButton({
   disabled?: boolean;
 }) {
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.72 : 1 })}>{children}</Pressable>;
-}
-
-export function FileUploader({
-  children,
-  progress,
-  onCancel,
-  cancelLabel,
-  style
-}: {
-  children: ReactNode;
-  progress?: number;
-  onCancel?: () => void;
-  cancelLabel?: string;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-  const safeProgress = progress === undefined ? undefined : Math.min(100, Math.max(0, progress));
-  return (
-    <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border, gap: designTokens.spacing.sm }, style]}>
-      {children}
-      {safeProgress !== undefined ? <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: safeProgress }} style={{ height: 6, borderRadius: theme.radius.pill, backgroundColor: theme.colors.border, overflow: "hidden" }}><View style={{ width: `${safeProgress}%`, height: "100%", backgroundColor: theme.colors.accentMuted }} /></View> : null}
-      {onCancel && cancelLabel ? <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} onPress={onCancel} hitSlop={8}><UiText style={{ color: theme.colors.danger, textAlign: "right" }}>{cancelLabel}</UiText></Pressable> : null}
-    </View>
-  );
-}
-
-export function ImageSearch({
-  value,
-  onChangeText,
-  placeholder,
-  accessibilityLabel,
-  style
-}: {
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder: string;
-  accessibilityLabel: string;
-  style?: StyleProp<ViewStyle>;
-}) {
-  return <SearchField value={value} onChangeText={onChangeText} placeholder={placeholder} accessibilityLabel={accessibilityLabel} style={style} />;
 }
 
 export function MediaViewer({
