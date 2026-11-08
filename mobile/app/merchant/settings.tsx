@@ -2,10 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, IconButton, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, IconButton, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsset } from "@/lib/merchant-store-images";
@@ -137,14 +137,14 @@ export default function MerchantStoreSettingsScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <AppHeader
           title={translate("merchantStoreSettingsTitle")}
-          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<UiText style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</UiText>} />}
         />
-        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantStoreSettingsSubtitle")}</Text>
-        <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantStoreSettingsSubtitle")}</UiText>
+        <Card contentStyle={styles.card}>
           <View style={styles.brandingRow}>
             <View style={styles.brandingItem}>
-              <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreLogo")}</Text>
-              {form.logo_url ? <Image source={{ uri: form.logo_url }} style={styles.logoPreview} resizeMode="cover" /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Text style={{ color: theme.colors.muted }}>A</Text></View>}
+              <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreLogo")}</UiText>
+              {form.logo_url ? <UiImage uri={form.logo_url} accessibilityLabel={translate("merchantStoreLogo")} aspectRatio={1} style={styles.logoPreview} /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><UiText style={{ color: theme.colors.muted }}>A</UiText></View>}
               <Button
                 label={translate("merchantStoreImageUpload")}
                 onPress={() => void chooseStoreImage("logo")}
@@ -156,8 +156,8 @@ export default function MerchantStoreSettingsScreen() {
               />
             </View>
             <View style={styles.brandingItem}>
-              <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreCover")}</Text>
-              {form.cover_url ? <Image source={{ uri: form.cover_url }} style={styles.coverPreview} resizeMode="cover" /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Text style={{ color: theme.colors.muted }}>A</Text></View>}
+              <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreCover")}</UiText>
+              {form.cover_url ? <UiImage uri={form.cover_url} accessibilityLabel={translate("merchantStoreCover")} aspectRatio={16 / 5} style={styles.coverPreview} /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><UiText style={{ color: theme.colors.muted }}>A</UiText></View>}
               <Button
                 label={translate("merchantStoreImageUpload")}
                 onPress={() => void chooseStoreImage("cover")}
@@ -169,17 +169,17 @@ export default function MerchantStoreSettingsScreen() {
               />
             </View>
           </View>
-          {imageError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</Text> : null}
-          {imageSaved ? <Text style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreImageSaved")}</Text> : null}
-          {imageCleanupPending ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageCleanupPending")}</Text> : null}
+          {imageError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</UiText> : null}
+          {imageSaved ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreImageSaved")}</UiText> : null}
+          {imageCleanupPending ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageCleanupPending")}</UiText> : null}
           <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
           <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} />
           <View style={styles.field}>
-            <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</Text>
+            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
             <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
-              <Text style={{ color: theme.colors.foreground, fontSize: 13, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</Text>
+              <UiText style={{ color: theme.colors.foreground, fontSize: 13, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
@@ -189,36 +189,36 @@ export default function MerchantStoreSettingsScreen() {
             <View style={styles.half}><Field label={translate("merchantStoreSettingsClose")} value={form.opening_hours.close} onChangeText={(value) => updateHours("close", value)} theme={theme} /></View>
           </View>
           <View style={styles.field}>
-            <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsClosedDays")}</Text>
+            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsClosedDays")}</UiText>
             <View style={styles.days}>
               {weekdays.map((day) => {
                 const selected = form.opening_hours.closed_days.includes(day.value);
                 return <PressableSurface key={day.value} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
-                  <Text style={[styles.dayChipText, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(day.key)}</Text>
+                  <UiText style={[styles.dayChipText, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(day.key)}</UiText>
                 </PressableSurface>;
               })}
             </View>
           </View>
           <Field label={translate("merchantStoreSettingsInstagram")} value={form.instagram_url} onChangeText={(value) => update("instagram_url", value)} theme={theme} keyboardType="url" />
           <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" />
-          {formError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</Text> : null}
-          {mutation.isSuccess ? <Text style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreSettingsSaved")}</Text> : null}
+          {formError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</UiText> : null}
+          {mutation.isSuccess ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreSettingsSaved")}</UiText> : null}
           <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} fullWidth />
-        </View>
+        </Card>
       </ScrollView>
       <Modal visible={wilayaPickerOpen} transparent animationType="slide" onRequestClose={() => setWilayaPickerOpen(false)}>
         <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
           <View style={[styles.modalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <View style={styles.modalHeader}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</Text>
+              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
               <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
-                <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</Text>
+                <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</UiText>
               </PressableSurface>
             </View>
             <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
               {(wilayas.data ?? []).map((wilaya) => (
                 <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
-                  <Text style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}</Text>
+                  <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}</UiText>
                 </PressableSurface>
               ))}
             </ScrollView>
@@ -239,7 +239,7 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
 }) {
   const styles = createStyles(theme);
   return <View style={styles.field}>
-    <Text style={[styles.label, { color: theme.colors.foreground }]}>{label}</Text>
+    <UiText style={[styles.label, { color: theme.colors.foreground }]}>{label}</UiText>
     <TextField value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={multiline ? 2000 : 300} textAlign="right" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
   </View>;
 }
@@ -248,13 +248,19 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
   theme: AppTheme; label: string; loading?: boolean; actionLabel?: string; onAction?: () => void;
 }) {
   const styles = createStyles(theme);
-  return <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-    <View style={styles.message}>
-      {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-      <Text style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</Text>
-      {actionLabel && onAction ? <Button label={actionLabel} onPress={onAction} fullWidth /> : null}
-    </View>
-  </SafeAreaView>;
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.message}>
+        {loading ? (
+          <LoadingState label={label} />
+        ) : actionLabel && onAction ? (
+          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+        ) : (
+          <UiText style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</UiText>
+        )}
+      </View>
+    </SafeAreaView>
+  );
 }
 
 function createStyles(theme: AppTheme) {
@@ -262,7 +268,6 @@ function createStyles(theme: AppTheme) {
     safe: { flex: 1 },
     content: { padding: 16, paddingBottom: 36, gap: 12 },
     backText: { fontSize: 12, fontWeight: "800" },
-    title: { fontSize: 24, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     card: { borderWidth: 1, borderRadius: 18, padding: 15, gap: 13 },
     select: { justifyContent: "center" },
