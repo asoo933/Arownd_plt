@@ -76,17 +76,11 @@ export function ProductCard(props: ComposedCardProps) {
   return <ComposedCard {...props} />;
 }
 
-export function ProductListCard(props: ComposedCardProps) {
-  return <ComposedCard {...props} compact />;
-}
 
 export function StoreCard(props: ComposedCardProps) {
   return <ComposedCard {...props} />;
 }
 
-export function StoreMiniCard(props: ComposedCardProps) {
-  return <ComposedCard {...props} compact />;
-}
 
 export function OfferCard(props: ComposedCardProps) {
   return <ComposedCard {...props} />;
@@ -120,6 +114,3 @@ export function NotificationCard(props: ComposedCardProps) {
   return <ComposedCard {...props} compact />;
 }
 
-export function MetricCard(props: ComposedCardProps) {
-  return <ComposedCard {...props} compact />;
-}
