@@ -5,7 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  type StyleProp,
+  type ViewStyle
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -82,12 +84,13 @@ export function SectionTitle({ title, action, onAction }: {
   );
 }
 
-export function ProductTile({ name, store, price, imageUrl, onPress }: {
+export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
   name: string;
   store: string;
   price: string;
   imageUrl: string | null;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
   return (
@@ -96,7 +99,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
       accessibilityLabel={`${name}، ${store}، ${price}`}
       onPress={onPress}
       disabled={!onPress}
-      style={[styles.productTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+      style={[styles.productTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }, style]}
     >
       <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
