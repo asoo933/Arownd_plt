@@ -8,7 +8,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 import { AppHeader, Card, Icon, IconButton, Image as UiImage, RatingStars, SegmentedControl, Text as UiText } from "@/components/ui";
 
 type StoreTab = "products" | "about";
@@ -98,17 +98,17 @@ export default function StoreDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  cover: { height: 150, borderRadius: 20, overflow: "hidden" },
-  storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 13, marginTop: -2 },
-  logo: { width: 76, height: 76, borderRadius: 20, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  storeTitleWrap: { flex: 1, alignItems: "flex-end", gap: 4 },
-  storeName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
-  metaText: { fontSize: 12, textAlign: "right" },
-  verified: { fontSize: 11, fontWeight: "800" },
+  cover: { height: 150, borderRadius: designTokens.radius.lg, overflow: "hidden" },
+  storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, marginTop: -2 },
+  logo: { width: 76, height: 76, borderRadius: designTokens.radius.lg, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  storeTitleWrap: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+  storeName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "right" },
+  verified: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   tabs: { width: "100%" },
-  productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
-  aboutCard: { padding: 16, gap: 11 },
-  aboutTitle: { fontSize: 17, fontWeight: "900", textAlign: "right" },
-  fieldTitle: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  description: { fontSize: 13, lineHeight: 22, textAlign: "right" }
+  productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
+  aboutCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  aboutTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  fieldTitle: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "right" }
 });
