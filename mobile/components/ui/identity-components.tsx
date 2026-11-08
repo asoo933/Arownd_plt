@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
+import { Text as UiText } from "./typography";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Avatar, type AvatarProps } from "./identity";
@@ -27,7 +28,7 @@ export function AvatarGroup({
       ))}
       {remaining > 0 ? (
         <View style={{ width: size, height: size, marginStart: -size * 0.22, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surfaceMuted, borderWidth: 2, borderColor: theme.colors.surface }}>
-          <Text style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, fontWeight: "700" }}>+{remaining}</Text>
+          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, fontWeight: "700" }}>+{remaining}</UiText>
         </View>
       ) : null}
     </View>
@@ -66,7 +67,7 @@ export function RatingStars({
       {Array.from({ length: count }, (_, index) => (
         <Icon key={index} name="star" size={size} color={index < Math.round(normalized) ? theme.colors.warning : theme.colors.border} fill={index < Math.round(normalized) ? theme.colors.warning : "none"} accessibilityHidden />
       ))}
-      {showValue ? <Text style={{ marginStart: designTokens.spacing.xs, color: theme.colors.muted, fontSize: theme.typography.caption }}>{value.toFixed(1)}</Text> : null}
+      {showValue ? <UiText style={{ marginStart: designTokens.spacing.xs, color: theme.colors.muted, fontSize: theme.typography.caption }}>{value.toFixed(1)}</UiText> : null}
     </View>
   );
 }
