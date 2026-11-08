@@ -99,7 +99,7 @@ export function FilterChip({
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: 40, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accentMuted : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }]}>
+    <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: theme.dimensions.controlHeight.sm, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accentMuted : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }]}>
       {leading}
       <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>{label}</UiText>
     </Pressable>
