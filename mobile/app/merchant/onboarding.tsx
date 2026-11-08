@@ -13,7 +13,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
   type StyleProp,
   type ViewStyle
@@ -34,6 +33,7 @@ import {
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { Button, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
   const theme = useAppTheme();
@@ -164,15 +164,7 @@ export default function MerchantOnboardingScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.back()}
-              style={styles.backButton}
-            >
-              <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-                {translate("merchantOnboardingBack")}
-              </Text>
-            </Pressable>
+            <Button label={translate("merchantOnboardingBack")} onPress={() => router.back()} variant="ghost" size="sm" />
             <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
               {translate("businessTitle")}
             </Text>
@@ -198,7 +190,7 @@ export default function MerchantOnboardingScreen() {
                   label={translate("merchantStoreNameLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextInput
+                  <TextField
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
@@ -223,7 +215,7 @@ export default function MerchantOnboardingScreen() {
                   label={translate("merchantStorePhoneLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextInput
+                  <TextField
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
@@ -248,7 +240,7 @@ export default function MerchantOnboardingScreen() {
                   hint={translate("merchantStoreWhatsAppHint")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextInput
+                  <TextField
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
@@ -303,7 +295,7 @@ export default function MerchantOnboardingScreen() {
                   label={translate("merchantStoreCommuneLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextInput
+                  <TextField
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
@@ -326,7 +318,7 @@ export default function MerchantOnboardingScreen() {
                   label={translate("merchantStoreAddressLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextInput
+                  <TextField
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
@@ -452,7 +444,7 @@ export default function MerchantOnboardingScreen() {
                     error={fieldError(fieldState.error?.message)}
                     containerStyle={styles.halfField}
                   >
-                    <TextInput
+                    <TextField
                       value={field.value}
                       onChangeText={field.onChange}
                       onBlur={field.onBlur}
@@ -474,7 +466,7 @@ export default function MerchantOnboardingScreen() {
                     error={fieldError(fieldState.error?.message)}
                     containerStyle={styles.halfField}
                   >
-                    <TextInput
+                    <TextField
                       value={field.value}
                       onChangeText={field.onChange}
                       onBlur={field.onBlur}
@@ -498,24 +490,7 @@ export default function MerchantOnboardingScreen() {
             </View>
           ) : null}
 
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void submit()}
-            disabled={isSubmitting || mainCategories.length === 0}
-            style={[
-              styles.submitButton,
-              { backgroundColor: theme.colors.accent },
-              (isSubmitting || mainCategories.length === 0) && styles.disabled
-            ]}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color={theme.colors.accentForeground} />
-            ) : (
-              <Text style={[styles.submitText, { color: theme.colors.accentForeground }]}>
-                {translate("merchantStoreSubmit")}
-              </Text>
-            )}
-          </Pressable>
+          <Button label={translate("merchantStoreSubmit")} onPress={() => void submit()} loading={isSubmitting} disabled={mainCategories.length === 0} fullWidth />
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -588,13 +563,7 @@ function MessageScreen({
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onAction}
-          style={[stylesForScreen.action, { backgroundColor: theme.colors.accent }]}
-        >
-          <Text style={[stylesForScreen.actionText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
-        </Pressable>
+        <Button label={actionLabel} onPress={onAction} fullWidth />
       </View>
     </SafeAreaView>
   );
