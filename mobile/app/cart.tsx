@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, PressableSurface, QuantityStepper } from "@/components/ui";
+import { AppHeader, Button, Icon, IconButton, Image as UiImage, PressableSurface, QuantityStepper, Text as UiText } from "@/components/ui";
 import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem } from "@/lib/cart-state";
@@ -58,13 +58,13 @@ export default function CartScreen() {
   };
 
   return <CustomerScreen>
-    <AppHeader title={translate("cartTitle")} trailing={<Text style={{ color: theme.colors.muted, fontSize: 12 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</Text>} />
+    <AppHeader title={translate("cartTitle")} trailing={<UiText tone="muted" style={{ fontSize: 12 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</UiText>} />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
-    {mutation.isError ? <Text style={style.warningText}>{translate("genericError")}</Text> : null}
-    {evaluation.blockingCount > 0 ? <View style={style.warning}><Text style={style.warningText}>{translate("cartBlocked") + evaluation.blockingCount}</Text></View> : null}
+    {mutation.isError ? <UiText tone="danger" style={style.warningText}>{translate("genericError")}</UiText> : null}
+    {evaluation.blockingCount > 0 ? <View style={style.warning}><UiText tone="danger" style={style.warningText}>{translate("cartBlocked") + evaluation.blockingCount}</UiText></View> : null}
     {[...groups.entries()].map(([offerId, group]) => <View key={offerId} style={[style.group, { backgroundColor: theme.colors.surface }]}>
-      <Text style={style.store}>{group.storeName}</Text>
+      <UiText tone="accentMuted" style={style.store}>{group.storeName}</UiText>
       {group.items.map((item) => {
         const key = cartLineKey(item);
         const offer = offerById.get(item.offerId);
@@ -80,13 +80,13 @@ export default function CartScreen() {
             onPress={() => { if (item.productId) router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }); }}
             style={style.lineMain}
           >
-            <View style={style.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={style.imageMark}>▧</Text>}</View>
+            <View style={style.thumb}>{image ? <UiImage uri={image} accessibilityLabel={offer?.product.name ?? item.name ?? ""} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={28} color={theme.colors.subtle} accessibilityHidden />}</View>
             <View style={style.details}>
-              <Text style={[style.name, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name}</Text>
-              <Text style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Text>
-              {line?.issues.map((issue) => <Text key={issue} style={[style.issue, issue === "priceChanged" && style.priceIssue]}>{issueLabels[issue]}</Text>)}
-              <Text style={style.price}>{formatDZD(currentPrice * item.quantity)}</Text>
-              {item.quantity > 1 ? <Text style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
+              <UiText weight="800" style={style.name}>{offer?.product.name ?? item.name}</UiText>
+              <UiText tone="muted" style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</UiText>
+              {line?.issues.map((issue) => <UiText key={issue} tone="warning" style={[style.issue, issue === "priceChanged" && style.priceIssue]}>{issueLabels[issue]}</UiText>)}
+              <UiText tone="accentMuted" weight="900" style={style.price}>{formatDZD(currentPrice * item.quantity)}</UiText>
+              {item.quantity > 1 ? <UiText tone="muted" style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</UiText> : null}
             </View>
           </PressableSurface>
           <View style={style.controls}>
@@ -103,16 +103,16 @@ export default function CartScreen() {
               onPress={() => mutation.mutate({ type: "remove", key })}
               disabled={mutation.isPending}
               variant="ghost"
-              icon={<Text style={style.removeText}>×</Text>}
+              icon={<Icon name="trash-2" size={19} color={theme.colors.danger} accessibilityHidden />}
             />
           </View>
-          {blocking ? <Text style={style.blockedHint}>{translate("cartLineBlocked")}</Text> : null}
+          {blocking ? <UiText tone="danger" style={style.blockedHint}>{translate("cartLineBlocked")}</UiText> : null}
         </View>;
       })}
     </View>)}
     <View style={[style.summary, { backgroundColor: theme.colors.surface }]}>
-      <View style={style.summaryRow}><Text style={style.summaryLabel}>{translate("cartSubtotal")}</Text><Text style={style.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</Text></View>
-      <Text style={style.note}>{translate("cartDeliveryNote")}</Text>
+      <View style={style.summaryRow}><UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText><UiText tone="accentMuted" weight="900" style={style.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</UiText></View>
+      <UiText tone="muted" style={style.note}>{translate("cartDeliveryNote")}</UiText>
       <Button
         label={translate("cartCheckout")}
         onPress={() => router.push("/checkout")}
@@ -129,7 +129,6 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   line: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 12, gap: 8 },
   lineMain: { flexDirection: "row-reverse", gap: 10 },
   thumb: { width: 76, height: 76, borderRadius: 13, backgroundColor: theme.colors.surfaceMuted, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  imageMark: { color: theme.colors.accentMuted, fontSize: 28 },
   details: { flex: 1, alignItems: "flex-end", gap: 4 },
   name: { fontSize: 13, fontWeight: "900", textAlign: "right" },
   options: { color: theme.colors.muted, fontSize: 11, textAlign: "right" },
@@ -137,7 +136,6 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   priceIssue: { color: theme.colors.warning },
   price: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   controls: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  removeText: { color: theme.colors.danger, fontSize: 22, fontWeight: "800" },
   blockedHint: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
   warning: { backgroundColor: theme.colors.dangerSurface, borderRadius: 13, padding: 12 },
   warningText: { color: theme.colors.danger, fontSize: 12, fontWeight: "800", textAlign: "right" },
