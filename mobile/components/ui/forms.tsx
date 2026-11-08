@@ -15,6 +15,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { getCalendarDays, normalizeOtp } from "./forms-state";
 
 export type TextAreaProps = Omit<TextInputProps, "multiline" | "style"> & {
   style?: StyleProp<TextStyle>;
@@ -366,7 +367,7 @@ export function FormField({
   label?: string;
   hint?: string;
   error?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
@@ -436,11 +437,7 @@ export function DatePicker({
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(initial.getFullYear(), initial.getMonth(), 1));
   const year = visibleMonth.getFullYear();
   const month = visibleMonth.getMonth();
-  const days = useMemo(() => {
-    const firstWeekday = new Date(year, month, 1).getDay();
-    const count = new Date(year, month + 1, 0).getDate();
-    return [...Array.from({ length: firstWeekday }, () => null), ...Array.from({ length: count }, (_, index) => index + 1)];
-  }, [month, year]);
+  const days = useMemo(() => getCalendarDays(year, month), [month, year]);
 
   return (
     <View accessibilityLabel={accessibilityLabel} style={[{ gap: designTokens.spacing.md }, style]}>
