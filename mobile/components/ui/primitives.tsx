@@ -37,6 +37,7 @@ export function Surface({
 
   return (
     <View
+      accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       testID={testID}
@@ -88,7 +89,7 @@ export function Divider({
 }
 
 
-type PressableSurfaceProps = Pick<PressableProps, "accessibilityLabel" | "accessibilityRole" | "accessibilityState" | "onPress" | "testID"> & {
+type PressableSurfaceProps = Pick<PressableProps, "accessibilityHint" | "accessibilityLabel" | "accessibilityRole" | "accessibilityState" | "hitSlop" | "onPress" | "testID"> & {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
@@ -96,11 +97,13 @@ type PressableSurfaceProps = Pick<PressableProps, "accessibilityLabel" | "access
 
 export function PressableSurface({
   children,
+  accessibilityHint,
   accessibilityLabel,
   accessibilityRole = "button",
   accessibilityState,
   onPress,
   testID,
+  hitSlop,
   style,
   disabled = false
 }: PressableSurfaceProps) {
@@ -111,6 +114,7 @@ export function PressableSurface({
       accessibilityState={{ ...accessibilityState, disabled }}
       onPress={onPress}
       testID={testID}
+      hitSlop={hitSlop}
       disabled={disabled || !onPress}
       style={({ pressed }) => [style, { opacity: disabled ? 0.5 : pressed ? 0.82 : 1 }]}
     >
