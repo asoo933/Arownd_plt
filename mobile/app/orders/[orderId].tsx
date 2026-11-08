@@ -120,7 +120,7 @@ export default function OrderDetailsScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersLoginHint")} />
-    <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("login")}</UiText></PressableSurface>
+    <PressableSurface accessibilityRole="button" accessibilityLabel={translate("login")} onPress={() => router.push("/login")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
   if (!query.data) return <CustomerScreen>
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
@@ -129,7 +129,7 @@ export default function OrderDetailsScreen() {
   if (!order) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <EmptyState title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
-    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
+    <PressableSurface accessibilityRole="button" accessibilityLabel={translate("ordersTitle")} onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
 
   </CustomerScreen>;
 
@@ -195,8 +195,9 @@ export default function OrderDetailsScreen() {
         {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</UiText></View> : null}
         {!cancelled ? <View style={styles.totalRow}><UiText style={styles.sectionTitle}>{translate("orderStoreTotal")}</UiText><UiText style={styles.total}>{formatDZD(subTotal)}</UiText></View> : null}
         {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <PressableSurface
+          accessibilityLabel={translate("orderCancelStore")}
           disabled={cancelMutation.isPending}
-          onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })}
+          onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })
           style={styles.cancelButton}
         >
           <UiText style={styles.cancelButtonText}>{translate("orderCancelStore")}</UiText>
@@ -205,15 +206,17 @@ export default function OrderDetailsScreen() {
           <UiText style={styles.notice}>{translate("orderQuoteAwaiting")}</UiText>
           <View style={styles.quoteActions}>
             <PressableSurface
+              accessibilityLabel={translate("orderQuoteAccept")}
               disabled={quoteMutation.isPending}
-              onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
+              onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })
               style={styles.acceptButton}
             >
               {quoteMutation.isPending ? <Spinner color={theme.colors.foreground} size="small" /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
             </PressableSurface>
             <PressableSurface
+              accessibilityLabel={translate("orderQuoteDecline")}
               disabled={quoteMutation.isPending}
-              onPress={() => setDeclineTarget(merchantOrder.id)}
+              onPress={() => setDeclineTarget(merchantOrder.id)
               style={styles.declineButton}
             >
               <UiText style={styles.declineButtonText}>{translate("orderQuoteDecline")}</UiText>
@@ -251,8 +254,9 @@ export default function OrderDetailsScreen() {
       </View>)}
     </View> : null}
     {canCancelLegacyOrder(order.status, merchantOrders.length > 0, query.data.shipments.map((shipment) => shipment.status)) ? <PressableSurface
+      accessibilityLabel={translate("orderCancel")}
       disabled={cancelMutation.isPending}
-      onPress={() => setCancelTarget({ type: "order", id: order.id })}
+      onPress={() => setCancelTarget({ type: "order", id: order.id })
       style={styles.cancelButton}
     >
       <UiText style={styles.cancelButtonText}>{translate("orderCancel")}</UiText>
