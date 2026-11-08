@@ -1,0 +1,204 @@
+import type { ReactNode } from "react";
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  Text as NativeText,
+  View,
+  type StyleProp,
+  type ViewStyle
+} from "react-native";
+
+import { designTokens, useAppTheme } from "@/lib/theme";
+
+export type FeedbackTone = "info" | "success" | "warning" | "danger";
+
+export function Alert({
+  title,
+  description,
+  tone = "info",
+  style
+}: {
+  title?: string;
+  description: string;
+  tone?: FeedbackTone;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+  const palette = {
+    info: { foreground: theme.colors.accentMuted, background: theme.colors.surfaceMuted, border: theme.colors.border },
+    success: { foreground: theme.colors.success, background: theme.colors.successSurface, border: theme.colors.successBorder },
+    warning: { foreground: theme.colors.warning, background: theme.colors.warningSurface, border: theme.colors.warningBorder },
+    danger: { foreground: theme.colors.danger, background: theme.colors.dangerSurface, border: theme.colors.dangerBorder }
+  } satisfies Record<FeedbackTone, { foreground: string; background: string; border: string }>;
+  const colors = palette[tone];
+
+  return (
+    <View accessibilityRole="alert" style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, gap: designTokens.spacing.xs }, style]}>
+      {title ? <NativeText style={{ color: colors.foreground, fontWeight: "700", fontSize: theme.typography.body, textAlign: "right" }}>{title}</NativeText> : null}
+      <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{description}</NativeText>
+    </View>
+  );
+}
+
+export function Banner({
+  children,
+  action,
+  style
+}: {
+  children: ReactNode;
+  action?: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+  return (
+    <View style={[{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.accent }, style]}>
+      <View style={{ flex: 1 }}>{children}</View>
+      {action}
+    </View>
+  );
+}
+
+export function ProgressBar({
+  value,
+  max = 100,
+  accessibilityLabel,
+  style
+}: {
+  value: number;
+  max?: number;
+  accessibilityLabel: string;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+  const progress = max > 0 ? Math.min(1, Math.max(0, value / max)) : 0;
+
+  return (
+    <View
+      accessibilityRole="progressbar"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityValue={{ min: 0, max, now: Math.min(max, Math.max(0, value)) }}
+      style={[{ height: 8, overflow: "hidden", borderRadius: theme.radius.pill, backgroundColor: theme.colors.border }, style]}
+    >
+      <View style={{ width: `${progress * 100}%`, height: "100%", borderRadius: theme.radius.pill, backgroundColor: theme.colors.accentMuted }} />
+    </View>
+  );
+}
+
+export function Spinner({ size = "small", color }: { size?: "small" | "large"; color?: string }) {
+  const theme = useAppTheme();
+  return <ActivityIndicator size={size} color={color ?? theme.colors.accentMuted} />;
+}
+
+export function Skeleton({
+  width = "100%",
+  height = 16,
+  radius,
+  style
+}: {
+  width?: ViewStyle["width"];
+  height?: number;
+  radius?: number;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+  return <View accessibilityElementsHidden style={[{ width, height, borderRadius: radius ?? theme.radius.sm, backgroundColor: theme.colors.surfaceMuted }, style]} />;
+}
+
+export function SuccessState({
+  title,
+  description,
+  action
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
+  const theme = useAppTheme();
+  return (
+    <View style={{ minHeight: 144, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl }}>
+      <View style={{ width: 48, height: 48, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.successSurface }}>
+        <NativeText style={{ color: theme.colors.success, fontSize: 24, fontWeight: "800" }}>✓</NativeText>
+      </View>
+      <NativeText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "center" }}>{title}</NativeText>
+      {description ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "center" }}>{description}</NativeText> : null}
+      {action}
+    </View>
+  );
+}
+
+export function Dialog({
+  visible,
+  onRequestClose,
+  title,
+  description,
+  children
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  title?: string;
+  description?: string;
+  children?: ReactNode;
+}) {
+  const theme = useAppTheme();
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
+      <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, backgroundColor: theme.colors.overlay }}>
+        <Pressable onPress={() => undefined} style={{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
+          {title ? <NativeText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "right" }}>{title}</NativeText> : null}
+          {description ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "right" }}>{description}</NativeText> : null}
+          {children}
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+export function BottomSheet({
+  visible,
+  onRequestClose,
+  children,
+  maxHeight = "85%"
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  children: ReactNode;
+  maxHeight?: ViewStyle["maxHeight"];
+}) {
+  const theme = useAppTheme();
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onRequestClose}>
+      <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "flex-end", backgroundColor: theme.colors.overlay }}>
+        <Pressable onPress={() => undefined} style={{ maxHeight, padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.xxl, borderTopLeftRadius: theme.radius.xl, borderTopRightRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
+          <View style={{ width: 40, height: 4, borderRadius: theme.radius.pill, backgroundColor: theme.colors.border, alignSelf: "center" }} />
+          {children}
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+export function Toast({
+  visible,
+  message,
+  onDismiss,
+  action
+}: {
+  visible: boolean;
+  message: string;
+  onDismiss?: () => void;
+  action?: ReactNode;
+}) {
+  const theme = useAppTheme();
+  if (!visible) return null;
+
+  return (
+    <View accessibilityRole="alert" pointerEvents="box-none" style={{ position: "absolute", start: designTokens.spacing.md, end: designTokens.spacing.md, bottom: designTokens.spacing.xl, alignItems: "center" }}>
+      <View style={{ minHeight: 48, maxWidth: "100%", flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
+        <NativeText style={{ color: theme.colors.surface, flex: 1, textAlign: "right" }}>{message}</NativeText>
+        {action}
+        {onDismiss ? <Pressable accessibilityRole="button" accessibilityLabel="Dismiss" onPress={onDismiss} hitSlop={8}><NativeText style={{ color: theme.colors.surface }}>×</NativeText></Pressable> : null}
+      </View>
+    </View>
+  );
+}
