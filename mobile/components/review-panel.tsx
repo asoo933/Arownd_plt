@@ -107,13 +107,13 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     panel: { borderWidth: 1, borderRadius: 18, padding: 14, gap: 10 },
-    heading: { fontSize: 17, fontWeight: "900", textAlign: "right" },
+    heading: { fontSize: 17, fontWeight: "700", textAlign: "right" },
     subtitle: { fontSize: 11, textAlign: "right" },
     form: { gap: 10 },
     input: { minHeight: 88, borderWidth: 1, borderRadius: 13, padding: 12, textAlignVertical: "top", fontSize: 13 },
     error: { fontSize: 11, textAlign: "right" },
     ownReview: { borderRadius: 13, padding: 12, gap: 6 },
-    ownTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
+    ownTitle: { fontSize: 13, fontWeight: "700", textAlign: "right" },
     body: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     caption: { fontSize: 10 },
     review: { borderTopWidth: 1, paddingTop: 10, gap: 6 },
