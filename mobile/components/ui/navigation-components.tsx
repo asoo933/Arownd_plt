@@ -3,13 +3,13 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Text,
   View,
   type StyleProp,
   type ViewStyle
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { AppHeader } from "./navigation";
 
 export type NavigationItem = {
@@ -36,7 +36,7 @@ export function PageHeader({
   return (
     <View style={[{ gap: designTokens.spacing.xs }, style]}>
       <AppHeader title={title} leading={leading} trailing={trailing} />
-      {subtitle ? <Text style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}>{subtitle}</Text> : null}
+      {subtitle ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}>{subtitle}</UiText> : null}
     </View>
   );
 }
@@ -99,7 +99,7 @@ export function BottomNavigation({
             style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: 52, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: 3, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
           >
             {item.icon}
-            <Text numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? "700" : "400" }}>{item.label}</Text>
+            <UiText numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? "700" : "400" }}>{item.label}</UiText>
           </Pressable>
         );
       })}
@@ -135,7 +135,7 @@ export function TabBar({
             onPress={() => onChange(item.key)}
             style={({ pressed }) => [{ flex: 1, minHeight: 46, alignItems: "center", justifyContent: "center", borderBottomWidth: selected ? 3 : 0, borderBottomColor: theme.colors.accentMuted, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
           >
-            <Text style={{ color: selected ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{item.label}</Text>
+            <UiText style={{ color: selected ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{item.label}</UiText>
           </Pressable>
         );
       })}
@@ -160,9 +160,9 @@ export function Breadcrumb({
         return (
           <View key={item.key} style={{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs }}>
             <Pressable disabled={!item.onPress || current} onPress={item.onPress} accessibilityRole={item.onPress ? "link" : "text"}>
-              <Text style={{ color: current ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.caption + 1, fontWeight: current ? "700" : "400" }}>{item.label}</Text>
+              <UiText style={{ color: current ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.caption + 1, fontWeight: current ? "700" : "400" }}>{item.label}</UiText>
             </Pressable>
-            {!current ? separator ?? <Text style={{ color: theme.colors.muted }}>‹</Text> : null}
+            {!current ? separator ?? <UiText style={{ color: theme.colors.muted }}>‹</UiText> : null}
           </View>
         );
       })}
@@ -197,7 +197,7 @@ export function NavigationMenu({
             style={({ pressed }) => [{ minHeight: 48, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.md, backgroundColor: selected ? theme.colors.surfaceMuted : "transparent", opacity: item.disabled ? 0.45 : pressed ? 0.72 : 1 }]}
           >
             {item.icon}
-            <Text style={{ flex: 1, color: selected ? theme.colors.foreground : theme.colors.muted, textAlign: "right", fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{item.label}</Text>
+            <UiText style={{ flex: 1, color: selected ? theme.colors.foreground : theme.colors.muted, textAlign: "right", fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{item.label}</UiText>
           </Pressable>
         );
       })}
