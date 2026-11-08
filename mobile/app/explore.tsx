@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile, SectionTitle } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { AppHeader, Icon, IconButton, PressableSurface, Text as UiText } from "@/components/ui";
+import { Icon, IconButton, PressableSurface, Text as UiText } from "@/components/ui";
 
 const categories = [
   { id: "fashion", icon: "shirt", label: "categoryFashion" },
@@ -45,16 +45,26 @@ export default function ExploreScreen() {
 
   return (
     <CustomerScreen>
-      <AppHeader
-        title={translate("exploreTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />}
-      />
+      <View style={styles.header}>
+        <View style={styles.search}>
+          <CustomerSearch value={query} onChangeText={setQuery} placeholder={translate("homeSearchPlaceholder")} />
+        </View>
+        <IconButton
+          accessibilityLabel={translate("notificationsTitle")}
+          onPress={() => undefined}
+          disabled
+          icon={<Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />}
+        />
+      </View>
       <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("exploreSubtitle")}</UiText>
-      <CustomerSearch value={query} onChangeText={setQuery} placeholder={translate("homeSearchPlaceholder")} />
 
       <View>
         <SectionTitle title={translate("homeCategories")} />
-        <View style={styles.categoryGrid}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryRail}
+        >
           {categories.map((item) => {
             const selected = category === item.id;
             return (
@@ -77,7 +87,7 @@ export default function ExploreScreen() {
               </PressableSurface>
             );
           })}
-        </View>
+        </ScrollView>
       </View>
 
       {hasActiveFilter ? (
@@ -102,9 +112,11 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
+  header: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
+  search: { flex: 1 },
   subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "right" },
-  categoryGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", rowGap: designTokens.spacing.sm },
-  category: { width: "31.5%", minHeight: 104, borderWidth: 1, borderRadius: designTokens.radius.lg, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
+  categoryRail: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+  category: { width: 112, minHeight: 88, borderWidth: 1, borderRadius: designTokens.radius.lg, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
   categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
   footer: { fontSize: designTokens.typography.caption, textAlign: "center", padding: designTokens.spacing.lg }
