@@ -8,7 +8,6 @@ import {
   AppHeader,
   Button,
   Caption,
-  Icon,
   NotificationCard,
   StatusBadge,
   Text as UiText
@@ -151,9 +150,7 @@ export default function NotificationsScreen() {
               <UiText weight="800">{item.title}</UiText>
               {item.body ? <UiText tone="muted">{item.body}</UiText> : null}
               {!item.read ? (
-                <View style={styles.unreadDot}>
-                  <Icon name="circle-check" size={12} color="transparent" accessibilityHidden />
-                </View>
+                <View style={styles.unreadDot} />
               ) : null}
             </NotificationCard>
           </View>
