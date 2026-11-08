@@ -2,6 +2,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Button } from "./primitives";
+import { Icon } from "./icon";
 
 export function LoadingState({ label }: { label: string }) {
   const theme = useAppTheme();
@@ -17,7 +18,7 @@ export function EmptyState({ title, hint }: { title: string; hint: string }) {
   const theme = useAppTheme();
   return (
     <View style={styles.state}>
-      <Text style={[styles.emptyMark, { color: theme.colors.accentMuted }]}>⌕</Text>
+      <Icon name="search" size={30} color={theme.colors.accentMuted} accessibilityHidden />
       <Text style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</Text>
       <Text style={[styles.stateText, { color: theme.colors.muted }]}>{hint}</Text>
     </View>
@@ -41,6 +42,5 @@ export function ErrorState({ title, retryLabel, onRetry }: {
 const styles = StyleSheet.create({
   state: { minHeight: 135, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl },
   stateText: { fontSize: designTokens.typography.caption + 1, textAlign: "center" },
-  stateTitle: { fontSize: designTokens.typography.body, fontWeight: "800", textAlign: "center" },
-  emptyMark: { fontSize: 30 }
+  stateTitle: { fontSize: designTokens.typography.body, fontWeight: "800", textAlign: "center" }
 });
