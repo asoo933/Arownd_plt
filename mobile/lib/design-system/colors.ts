@@ -36,7 +36,7 @@ export const themeColors = {
     surfaceTertiary: "#E5E5E5",
     foreground: "#0A0A0A",
     foregroundSecondary: "#525252",
-    foregroundMuted: "#737373",
+    foregroundMuted: "#6F6F6F",
     border: "#E5E5E5",
     input: "#F5F5F5"
   },
@@ -56,8 +56,8 @@ export const themeColors = {
 export const extendedThemeColors = {
   light: {
     surfaceMuted: "#ECEFE4",
-    subtle: "#8A8A8A",
-    accentMuted: "#647D13",
+    subtle: "#6F6F6F",
+    accentMuted: "#5B7012",
     danger: "#B42318",
     dangerSurface: "#FEECEB",
     dangerBorder: "#F7C8C4",
@@ -67,7 +67,7 @@ export const extendedThemeColors = {
     warning: "#9A6700",
     warningSurface: "#FFF7E0",
     warningBorder: "#F0D99A",
-    placeholder: "#A3A3A3",
+    placeholder: "#6F6F6F",
     overlay: "rgba(0,0,0,0.42)"
   },
   dark: {
@@ -83,7 +83,7 @@ export const extendedThemeColors = {
     warning: "#FBBF24",
     warningSurface: "#302510",
     warningBorder: "#70551D",
-    placeholder: "#737373",
+    placeholder: "#A3A3A3",
     overlay: "rgba(0,0,0,0.72)"
   }
 } as const;
