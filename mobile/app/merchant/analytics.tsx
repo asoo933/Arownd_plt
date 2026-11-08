@@ -8,6 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { Button } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const theme = useAppTheme();
@@ -48,9 +49,7 @@ export default function MerchantAnalyticsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Pressable onPress={() => router.back()} style={styles.back}>
-          <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("back")}</Text>
-        </Pressable>
+        <Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />
         <Text style={[styles.title, { color: theme.colors.foreground }]}>{translate("merchantAnalyticsTitle")}</Text>
         <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantAnalyticsSubtitle")}</Text>
         <View style={styles.grid}>
@@ -89,7 +88,7 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
     <View style={styles.message}>
       {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
       <Text style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</Text>
-      {actionLabel && onAction ? <Pressable onPress={onAction} style={[styles.back, { backgroundColor: theme.colors.accent }]}><Text style={styles.retry}>{actionLabel}</Text></Pressable> : null}
+      {actionLabel && onAction ? <Button label={actionLabel} onPress={onAction} /> : null}
     </View>
   </SafeAreaView>;
 }
@@ -98,9 +97,6 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 16, paddingBottom: 36, gap: 12 },
-    back: { minHeight: 42, justifyContent: "center", alignSelf: "flex-start", paddingHorizontal: 10, borderRadius: 10 },
-    backText: { fontSize: 12, fontWeight: "800" },
-    retry: { color: theme.colors.accentForeground, fontSize: 12, fontWeight: "900" },
     title: { fontSize: 24, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     grid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
