@@ -55,7 +55,7 @@ export default function CustomerHomeScreen() {
       />
 
       <View>
-        <SectionTitle title={translate("homeNewArrivals")} action={translate("homeSeeAll")} onAction={() => router.push("/explore")} />
+        <SectionTitle title={translate("homeNewArrivals")} />
         {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void products.refetch()} />
         ) : products.data.length === 0 ? (
@@ -71,7 +71,7 @@ export default function CustomerHomeScreen() {
 
 
       <View>
-        <SectionTitle title={translate("homeFeaturedStores")} action={translate("homeSeeAll")} onAction={() => router.push("/stores")} />
+        <SectionTitle title={translate("homeFeaturedStores")} />
         {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void stores.refetch()} />
         ) : stores.data.length === 0 ? (
