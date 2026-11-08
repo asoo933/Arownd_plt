@@ -6,14 +6,13 @@ import { getCustomerTab, type CustomerTab } from "@/lib/customer-navigation-stat
 import { useAppTheme } from "@/lib/theme";
 
 const tabs: {
-  id: CustomerTab;
-  label: "navHome" | "navExplore" | "navStores" | "favoriteTitleShort" | "navAccount";
-  icon: "home" | "search" | "store" | "heart" | "user";
+  id: Exclude<CustomerTab, "none">;
+  label: "navHome" | "navExplore" | "favoriteTitleShort" | "navAccount";
+  icon: "home" | "search" | "heart" | "user";
   path: string;
 }[] = [
   { id: "home", label: "navHome", icon: "home", path: "/home" },
   { id: "explore", label: "navExplore", icon: "search", path: "/explore" },
-  { id: "stores", label: "navStores", icon: "store", path: "/stores" },
   { id: "favorites", label: "favoriteTitleShort", icon: "heart", path: "/favorites" },
   { id: "profile", label: "navAccount", icon: "user", path: "/profile" }
 ];
@@ -28,7 +27,7 @@ export function CustomerNavigation() {
   return (
     <BottomNavigation
       accessibilityLabel={translate("navMain")}
-      value={activeTab}
+      value={activeTab === "none" ? "" : activeTab}
       onChange={(key) => {
         const destination = tabs.find((tab) => tab.id === key)?.path;
         if (destination && pathname !== destination) router.replace(destination);
