@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
@@ -68,7 +68,7 @@ export default function DeliveryProfileScreen() {
   }
   if (profile.isError || wilayas.isError) {
     return <CustomerScreen>
-      <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
+      <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" size={20} />} />} />
       <ErrorState title={translate("deliveryProfileLoadError")} retryLabel={translate("retry")} onRetry={() => { void profile.refetch(); void wilayas.refetch(); }} />
     </CustomerScreen>;
   }
@@ -119,17 +119,18 @@ export default function DeliveryProfileScreen() {
 
   return <CustomerScreen>
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
-    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("deliveryProfileSubtitle")}</Text>
-    <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
+    <Caption>{translate("deliveryProfileSubtitle")}</Caption>
+    <Card style={styles.panel} contentStyle={{ gap: 10 }}>
+      <Heading level={3}>{translate("deliveryProfileTitle")}</Heading>
+      <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
       <TextField value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
+      <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
       <TextField value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" />
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
+      <FormLabel>{translate("checkoutWilaya")}</FormLabel>
       <PressableSurface onPress={() => setPicker("wilaya")} style={pickerStyle}>
-        <Text style={[styles.pickerText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
+        <UiText tone={selectedWilaya ? "foreground" : "muted"}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</UiText>
       </PressableSurface>
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutCommune")}</Text>
+      <FormLabel>{translate("checkoutCommune")}</FormLabel>
       <TextField
         value={commune}
         onChangeText={(value) => { setCommune(value); clearSaveFeedback(); }}
@@ -140,14 +141,14 @@ export default function DeliveryProfileScreen() {
         textAlign="right"
       />
       {(communes.data?.length ?? 0) > 0 ? <PressableSurface onPress={() => setPicker("commune")} style={styles.suggestionButton}>
-        <Text style={styles.suggestionText}>{translate("checkoutChooseCommune")}</Text>
+        <UiText tone="accentMuted" weight="700">{translate("checkoutChooseCommune")}</UiText>
       </PressableSurface> : null}
-      {communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
-      {formError ? <Text style={styles.error}>{formError}</Text> : null}
+      {communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
+      {formError ? <UiText tone="danger">{formError}</UiText> : null}
       <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} fullWidth />
-      {mutation.isSuccess ? <Text style={styles.success}>{translate("deliveryProfileSaved")}</Text> : null}
-    </View>
-    <Text style={styles.note}>{translate("deliveryProfileDefaultAreaNote")}</Text>
+      {mutation.isSuccess ? <UiText tone="success" weight="700">{translate("deliveryProfileSaved")}</UiText> : null}
+    </Card>
+    <Caption>{translate("deliveryProfileDefaultAreaNote")}</Caption>
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
