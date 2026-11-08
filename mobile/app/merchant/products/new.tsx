@@ -36,7 +36,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { Button, TextField } from "@/components/ui";
+import { AppHeader, Button, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -223,19 +223,8 @@ export default function MerchantNewProductScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Button label={translate("merchantProductCreateBack")} onPress={() => router.back()} variant="ghost" size="sm" />
-
-          <View style={styles.header}>
-            <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
-              {translate("merchantDashboardEyebrow")}
-            </Text>
-            <Text style={[styles.title, { color: theme.colors.foreground }]}>
-              {translate("merchantProductCreateTitle")}
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
-              {translate("merchantProductCreateSubtitle")}
-            </Text>
-          </View>
+          <AppHeader title={translate("merchantProductCreateTitle")} leading={<Button label={translate("merchantProductCreateBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
+          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductCreateSubtitle")}</Text>
 
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <FormField label={translate("merchantProductNameLabel")} theme={theme}>
