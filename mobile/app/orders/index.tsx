@@ -122,7 +122,7 @@ export default function OrdersScreen() {
   if (!auth.data) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
     <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "right" }}>{translate("ordersLoginHint")}</UiText>
-    <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
+    <PressableSurface accessibilityRole="button" accessibilityLabel={translate("login")} onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
 
   return <CustomerScreen>
