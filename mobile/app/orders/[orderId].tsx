@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Modal, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { PressableSurface } from "@/components/ui";
+import { AppHeader, IconButton, PressableSurface } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
@@ -127,8 +127,8 @@ export default function OrderDetailsScreen() {
   const orderCode = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
 
   return <CustomerScreen>
-    <PressableSurface accessibilityRole="button" onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></PressableSurface>
-    <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersCode") + ": " + orderCode} />
+    <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
+    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersCode") + ": " + orderCode}</Text>
 
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderSummary")}</Text>
