@@ -216,12 +216,12 @@ export function Select({
   style
 }: {
   options: SelectOption[];
-  value?: string;
+  value?: string | undefined;
   onChange: (value: string) => void;
   placeholder: string;
   accessibilityLabel: string;
-  disabled?: boolean;
-  style?: StyleProp<ViewStyle>;
+  disabled?: boolean | undefined;
+  style?: StyleProp<ViewStyle> | undefined;
 }) {
   const theme = useAppTheme();
   const [open, setOpen] = useState(false);
