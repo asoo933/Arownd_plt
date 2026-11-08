@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button, IconButton, TextField } from "@/components/ui";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { translate } from "@/lib/i18n";
 import {
@@ -106,12 +107,10 @@ export default function AddressesScreen() {
   }
 
   return <CustomerScreen>
-    <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></Pressable>
+    <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
     <CustomerHeading title={translate("addressesTitle")} subtitle={translate("addressesSubtitle")} />
     {defaultMutation.isError ? <Text style={styles.error}>{translate("addressesDefaultError")}</Text> : null}
-    <Pressable accessibilityRole="button" onPress={() => openEditor(null)} style={styles.addButton}>
-      <Text style={styles.addText}>＋ {translate("addressesAdd")}</Text>
-    </Pressable>
+    <Button label={"＋ " + translate("addressesAdd")} onPress={() => openEditor(null)} fullWidth />
     {addresses.data.length === 0 ? (
       <View style={styles.empty}>
         <Text style={styles.emptyTitle}>{translate("addressesEmpty")}</Text>
@@ -155,9 +154,7 @@ export default function AddressesScreen() {
             <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} theme={theme} />
             <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} theme={theme} />
             {formError ? <Text style={styles.error}>{formError}</Text> : null}
-            <Pressable disabled={saveMutation.isPending} onPress={submit} style={[styles.saveButton, saveMutation.isPending && styles.disabled]}>
-              {saveMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.saveText}>{translate("deliveryProfileSave")}</Text>}
-            </Pressable>
+            <Button label={translate("deliveryProfileSave")} onPress={submit} loading={saveMutation.isPending} fullWidth />
             <Pressable onPress={() => setEditor(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></Pressable>
           </ScrollView>
         </View>
@@ -178,9 +175,7 @@ export default function AddressesScreen() {
       <View style={styles.backdrop}><View style={styles.confirmPanel}>
         <Text style={styles.modalTitle}>{translate("addressesDeleteTitle")}</Text>
         <Text style={styles.detail}>{translate("addressesDeleteHint")}</Text>
-        <Pressable disabled={deleteMutation.isPending} onPress={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); }} style={styles.deleteConfirm}>
-          {deleteMutation.isPending ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.deleteConfirmText}>{translate("addressesDelete")}</Text>}
-        </Pressable>
+        <Button label={translate("addressesDelete")} onPress={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); }} loading={deleteMutation.isPending} variant="danger" fullWidth />
         <Pressable onPress={() => setDeleteTarget(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></Pressable>
         {deleteMutation.isError ? <Text style={styles.error}>{translate("addressesDeleteError")}</Text> : null}
       </View></View>
@@ -197,31 +192,16 @@ function Field({ label, value, onChangeText, styles, theme, keyboardType }: {
   keyboardType?: "default" | "phone-pad";
 }) {
   return <View style={styles.field}>
-    <Text style={styles.label}>{label}</Text>
-    <TextInput value={value} onChangeText={onChangeText} keyboardType={keyboardType ?? "default"} maxLength={240} placeholderTextColor={theme.colors.placeholder} style={styles.input} textAlign="right" />
+    <TextField label={label} value={value} onChangeText={onChangeText} keyboardType={keyboardType ?? "default"} maxLength={240} style={styles.input} textAlign="right" />
   </View>;
 }
 
 function Action({ label, onPress, disabled = false, danger = false }: { label: string; onPress: () => void; disabled?: boolean; danger?: boolean }) {
-  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={[stylesAction.button, danger && stylesAction.danger, disabled && stylesAction.disabled]}>
-    <Text style={[stylesAction.text, danger && stylesAction.dangerText]}>{label}</Text>
-  </Pressable>;
+  return <Button label={label} onPress={onPress} disabled={disabled} variant={danger ? "danger" : "outline"} size="sm" />;
 }
-
-const stylesAction = StyleSheet.create({
-  button: { minHeight: 38, paddingHorizontal: 11, borderRadius: 10, backgroundColor: "#EFEFEF", justifyContent: "center", alignItems: "center" },
-  danger: { backgroundColor: "#FCE8E8" },
-  text: { color: "#202020", fontSize: 11, fontWeight: "800" },
-  dangerText: { color: "#B42318" },
-  disabled: { opacity: 0.5 }
-});
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
-    back: { minHeight: 40, justifyContent: "center", alignSelf: "flex-start" },
-    backText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
-    addButton: { minHeight: 48, borderRadius: 13, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-    addText: { color: theme.colors.foreground, fontWeight: "900", fontSize: 13 },
     empty: { padding: 24, borderRadius: 16, backgroundColor: theme.colors.surface, alignItems: "center", gap: 8 },
     emptyTitle: { color: theme.colors.foreground, fontWeight: "900", fontSize: 15 },
     emptyHint: { color: theme.colors.muted, fontSize: 12, textAlign: "center" },
@@ -248,12 +228,7 @@ function createStyles(theme: AppTheme) {
     inputText: { color: theme.colors.foreground, fontSize: 13, textAlign: "right" },
     pickerOption: { minHeight: 44, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
     error: { color: theme.colors.danger, fontSize: 11, textAlign: "right", marginVertical: 7 },
-    saveButton: { minHeight: 48, borderRadius: 12, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center", marginTop: 8 },
-    saveText: { color: theme.colors.foreground, fontWeight: "900" },
     cancelButton: { minHeight: 43, alignItems: "center", justifyContent: "center", marginTop: 5 },
     cancelText: { color: theme.colors.muted, fontWeight: "800" },
-    deleteConfirm: { minHeight: 46, borderRadius: 12, backgroundColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
-    deleteConfirmText: { color: "#FFFFFF", fontWeight: "900" },
-    disabled: { opacity: 0.5 }
   });
 }
