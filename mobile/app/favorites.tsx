@@ -1,28 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { FavoriteButton, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
-import { AppHeader, IconButton, SegmentedControl } from "@/components/ui";
+import { FavoriteButton as FavoriteToggle, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
+import {
+  AppHeader,
+  Caption,
+  Card,
+  Heading,
+  Icon,
+  IconButton,
+  Image,
+  PriceText,
+  ProductCard,
+  SegmentedControl,
+  StoreCard,
+  Text as UiText
+} from "@/components/ui";
 import {
   CustomerScreen,
   EmptyState,
   ErrorState,
-  LoadingState,
-  ProductTile,
-  StoreTile
+  LoadingState
 } from "@/components/customer-ui";
 import { fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { getFavorites } from "@/lib/favorites";
 import type { FavoriteKind } from "@/lib/favorites-state";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
 
 type FavoriteTab = FavoriteKind;
 
 export default function FavoritesScreen() {
-  const theme = useAppTheme();
   const [tab, setTab] = useState<FavoriteTab>("products");
   const favorites = useQuery({ queryKey: FAVORITES_QUERY_KEY, queryFn: getFavorites });
   const content = useQuery({
@@ -61,13 +70,14 @@ export default function FavoritesScreen() {
   const visibleCount = content.data
     ? tab === "products" ? content.data.products.length : content.data.stores.length
     : count;
+
   return (
     <CustomerScreen>
       <AppHeader
         title={translate("favoritesTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" size={20} />} />}
       />
-      <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("favoritesSubtitle")}</Text>
+      <Caption>{translate("favoritesSubtitle")}</Caption>
       <SegmentedControl
         accessibilityLabel={translate("favoritesTitle")}
         value={tab}
@@ -89,31 +99,54 @@ export default function FavoritesScreen() {
         <View style={styles.productGrid}>
           {content.data.products.map(({ id, offer }) => (
             <View key={id} style={styles.productItem}>
-              <ProductTile
-                name={offer.product.name}
-                store={offer.store.name}
-                price={formatDZD(offer.price)}
-                imageUrl={getPrimaryImage(offer)}
+              <ProductCard
                 onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: id } })}
-              />
-              <FavoriteButton kind="products" id={id} />
+                accessibilityLabel={offer.product.name}
+                contentStyle={styles.productContent}
+                media={
+                  <View style={styles.productMedia}>
+                    <Image
+                      uri={getPrimaryImage(offer) ?? undefined}
+                      accessibilityLabel={offer.product.name}
+                      aspectRatio={1}
+                      style={styles.productImage}
+                    />
+                    <View style={styles.favoriteOverlay}>
+                      <FavoriteToggle kind="products" id={id} />
+                    </View>
+                  </View>
+                }
+              >
+                <Heading level={3} numberOfLines={2}>{offer.product.name}</Heading>
+                <Caption numberOfLines={1}>{offer.store.name}</Caption>
+                <PriceText value={formatDZD(offer.price)} tone="accentMuted" />
+              </ProductCard>
             </View>
           ))}
         </View>
       ) : (
         <View style={styles.storeList}>
           {content.data.stores.map(({ id, store }) => store ? (
-            <View key={id} style={styles.storeItem}>
-              <StoreTile
-                name={store.name}
-                description={store.description}
-                logoUrl={store.logo_url}
-                commune={store.commune}
-                rating={store.rating}
-                onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: id } })}
-              />
-              <FavoriteButton kind="stores" id={id} />
-            </View>
+            <StoreCard
+              key={id}
+              onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: id } })}
+              accessibilityLabel={store.name}
+              contentStyle={styles.storeContent}
+              media={
+                <Image
+                  uri={store.logo_url ?? undefined}
+                  accessibilityLabel={store.name}
+                  aspectRatio={1}
+                  style={styles.storeLogo}
+                />
+              }
+              actions={<View style={styles.storeFavorite}><FavoriteToggle kind="stores" id={id} /></View>}
+            >
+              <Heading level={3}>{store.name}</Heading>
+              {store.commune ? <Caption>{store.commune}</Caption> : null}
+              {store.description ? <UiText tone="muted" numberOfLines={2}>{store.description}</UiText> : null}
+              {store.rating != null ? <UiText tone="warning" weight="700">★ {store.rating.toFixed(1)}</UiText> : null}
+            </StoreCard>
           ) : null)}
         </View>
       )}
@@ -123,7 +156,13 @@ export default function FavoritesScreen() {
 
 const styles = StyleSheet.create({
   productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 12 },
-  productItem: { width: "48%", alignItems: "center", gap: 7 },
+  productItem: { width: "48%" },
+  productContent: { gap: 6, padding: 10 },
+  productMedia: { position: "relative" },
+  productImage: { borderRadius: 0 },
+  favoriteOverlay: { position: "absolute", top: 7, end: 7 },
   storeList: { gap: 12 },
-  storeItem: { gap: 7, alignItems: "flex-end" }
+  storeContent: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
+  storeLogo: { width: 76, aspectRatio: 1, borderRadius: 12 },
+  storeFavorite: { alignSelf: "center" }
 });
