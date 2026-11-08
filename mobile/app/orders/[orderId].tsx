@@ -197,7 +197,7 @@ export default function OrderDetailsScreen() {
         {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <PressableSurface
           accessibilityLabel={translate("orderCancelStore")}
           disabled={cancelMutation.isPending}
-          onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })
+          onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })}
           style={styles.cancelButton}
         >
           <UiText style={styles.cancelButtonText}>{translate("orderCancelStore")}</UiText>
@@ -208,7 +208,7 @@ export default function OrderDetailsScreen() {
             <PressableSurface
               accessibilityLabel={translate("orderQuoteAccept")}
               disabled={quoteMutation.isPending}
-              onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })
+              onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
               style={styles.acceptButton}
             >
               {quoteMutation.isPending ? <Spinner color={theme.colors.foreground} size="small" /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
@@ -216,7 +216,7 @@ export default function OrderDetailsScreen() {
             <PressableSurface
               accessibilityLabel={translate("orderQuoteDecline")}
               disabled={quoteMutation.isPending}
-              onPress={() => setDeclineTarget(merchantOrder.id)
+              onPress={() => setDeclineTarget(merchantOrder.id)}
               style={styles.declineButton}
             >
               <UiText style={styles.declineButtonText}>{translate("orderQuoteDecline")}</UiText>
@@ -256,7 +256,7 @@ export default function OrderDetailsScreen() {
     {canCancelLegacyOrder(order.status, merchantOrders.length > 0, query.data.shipments.map((shipment) => shipment.status)) ? <PressableSurface
       accessibilityLabel={translate("orderCancel")}
       disabled={cancelMutation.isPending}
-      onPress={() => setCancelTarget({ type: "order", id: order.id })
+      onPress={() => setCancelTarget({ type: "order", id: order.id })}
       style={styles.cancelButton}
     >
       <UiText style={styles.cancelButtonText}>{translate("orderCancel")}</UiText>
