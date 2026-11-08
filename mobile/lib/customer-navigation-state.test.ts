@@ -6,6 +6,7 @@ describe("getCustomerTab", () => {
   it("maps the main customer navigation routes", () => {
     expect(getCustomerTab("/home")).toBe("home");
     expect(getCustomerTab("/explore")).toBe("explore");
+    expect(getCustomerTab("/cart")).toBe("cart");
     expect(getCustomerTab("/stores")).toBe("none");
     expect(getCustomerTab("/favorites")).toBe("none");
   });
