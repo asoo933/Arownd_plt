@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - Arownd-native-v2
+      - cleanup/remove-legacy-web
     paths:
       - "mobile/**"
       - ".github/workflows/mobile-quality.yml"
