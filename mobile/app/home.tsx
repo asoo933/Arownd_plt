@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { CartButton } from "@/components/cart-button";
-import { AppHeader, Button, Icon, PressableSurface, Text as UiText } from "@/components/ui";
+import { AppHeader, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import {
-  CustomerScreen,
-  CustomerSearch,
   EmptyState,
   ErrorState,
   LoadingState,
@@ -19,18 +15,8 @@ import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } fr
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
-const categories = [
-  { id: "fashion", icon: "shirt", label: "categoryFashion" },
-  { id: "electronics", icon: "smartphone", label: "categoryElectronics" },
-  { id: "beauty", icon: "sparkles", label: "categoryBeauty" },
-  { id: "home", icon: "house", label: "categoryHome" },
-  { id: "kids", icon: "baby", label: "categoryKids" },
-  { id: "food", icon: "cake-slice", label: "categoryFood" }
-] as const;
-
 export default function CustomerHomeScreen() {
   const theme = useAppTheme();
-  const [search, setSearch] = useState("");
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
 
@@ -38,7 +24,22 @@ export default function CustomerHomeScreen() {
     <CustomerScreen>
       <AppHeader
         title="arownd"
-        leading={<CartButton />}
+        leading={
+          <View
+            accessibilityRole="button"
+            accessibilityLabel={translate("notificationsTitle")}
+            accessibilityState={{ disabled: true }}
+            style={[
+              styles.notificationButton,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border
+              }
+            ]}
+          >
+            <Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />
+          </View>
+        }
         trailing={
           <PressableSurface
             accessibilityLabel={translate("homeLocation")}
@@ -50,38 +51,6 @@ export default function CustomerHomeScreen() {
           </PressableSurface>
         }
       />
-
-      <View style={[styles.hero, { backgroundColor: theme.colors.surfaceMuted }]}>
-        <UiText tone="accentMuted" style={styles.heroEyebrow}>{translate("homeEyebrow")}</UiText>
-        <UiText style={[styles.heroTitle, { color: theme.colors.foreground, fontSize: theme.typography.title }]} >{translate("homeTitle")}</UiText>
-        <UiText tone="muted" style={styles.heroSubtitle}>{translate("homeSubtitle")}</UiText>
-        <CustomerSearch value={search} onChangeText={setSearch} placeholder={translate("homeSearchPlaceholder")} />
-        <Button
-          label={translate("homeSearchAction")}
-          onPress={() => router.push({ pathname: "/explore", params: search.trim() ? { q: search.trim() } : {} })}
-          fullWidth
-          style={styles.searchButton}
-          textStyle={styles.searchButtonText}
-        />
-      </View>
-
-      <View>
-        <SectionTitle title={translate("homeCategories")} action={translate("homeSeeAll")} onAction={() => router.push("/explore")} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRail}>
-          {categories.map((category) => (
-            <PressableSurface
-              key={category.id}
-              accessibilityRole="button"
-              accessibilityLabel={translate(category.label)}
-              onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })}
-              style={[styles.category, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}
-            >
-              <Icon name={category.icon} size={26} color={theme.colors.accentMuted} accessibilityHidden />
-              <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</UiText>
-            </PressableSurface>
-          ))}
-        </ScrollView>
-      </View>
 
       <View>
         <SectionTitle title={translate("homeNewArrivals")} action={translate("homeSeeAll")} onAction={() => router.push("/explore")} />
@@ -118,17 +87,16 @@ export default function CustomerHomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  notificationButton: {
+    width: designTokens.dimensions.controlHeight.md,
+    height: designTokens.dimensions.controlHeight.md,
+    borderRadius: designTokens.radius.pill,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center"
+  },
   location: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, minHeight: designTokens.dimensions.controlHeight.sm },
   locationText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-  hero: { borderRadius: designTokens.radius.xl, padding: designTokens.spacing.xl, gap: designTokens.spacing.md },
-  heroEyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  heroTitle: { lineHeight: 35, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  heroSubtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 21, textAlign: "right" },
-  searchButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
-  searchButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
-  categoryRail: { flexDirection: "row-reverse", gap: designTokens.spacing.sm, paddingBottom: 3 },
-  category: { width: 93, minHeight: 94, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
-  categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   productRail: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
   storeList: { gap: designTokens.spacing.sm },
 });
