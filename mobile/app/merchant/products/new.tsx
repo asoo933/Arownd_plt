@@ -4,7 +4,6 @@ import type { ImagePickerAsset } from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -33,7 +32,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -345,7 +344,7 @@ export default function MerchantNewProductScreen() {
                 style={[styles.imagePickerButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background, opacity: imagePickerBusy ? 0.6 : 1 }]}
               >
                 {imagePickerBusy ? (
-                  <ActivityIndicator color={theme.colors.accentMuted} />
+                  <Spinner size="small" />
                 ) : (
                   <UiText style={[styles.imagePickerText, { color: theme.colors.accentMuted }]}>
                     {translate("merchantProductImagesChoose")}
