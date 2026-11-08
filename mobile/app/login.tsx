@@ -6,11 +6,13 @@ import { StyleSheet, View } from "react-native";
 
 import { ActionButton, AuthField, AuthLayout, FormError, InlineLink } from "@/components/auth-ui";
 import { Text as UiText } from "@/components/ui";
+import { useAppTheme } from "@/lib/theme";
 import { signIn } from "@/lib/auth-service";
 import { loginSchema, type LoginInput } from "@/lib/auth-validation";
 import { translate } from "@/lib/i18n";
 
 export default function LoginScreen() {
+  const theme = useAppTheme();
   const [serverError, setServerError] = useState<string | null>(null);
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -74,7 +76,7 @@ export default function LoginScreen() {
             loading={isSubmitting}
           />
           <View style={styles.signupRow}>
-            <UiText style={styles.secondaryText}>{translate("noAccount")}</UiText>
+            <UiText tone="muted" style={styles.secondaryText}>{translate("noAccount")}</UiText>
             <Link href="/account-type" style={styles.link}>{translate("createAccount")}</Link>
           </View>
       </View>
@@ -86,6 +88,6 @@ const styles = StyleSheet.create({
   form: { gap: 17 },
   forgotRow: { alignItems: "flex-start" },
   signupRow: { flexDirection: "row-reverse", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 4 },
-  secondaryText: { color: "#737373", fontSize: 13 },
-  link: { color: "#536719", fontSize: 13, fontWeight: "800" }
+  secondaryText: { fontSize: 13 },
+  link: { fontSize: 13, fontWeight: "800" }
 });
