@@ -1,4 +1,5 @@
 name: Arownd Native Android preview APK
+# Re-triggered after repository secrets were configured.
 
 on:
   workflow_dispatch:
