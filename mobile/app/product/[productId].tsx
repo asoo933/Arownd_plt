@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, PressableSurface, QuantityStepper } from "@/components/ui";
+import { AppHeader, Button, Card, Icon, IconButton, Image as UiImage, PriceDisplay, ProductImageGallery, ProductQuantitySelector, PressableSurface, Text as UiText } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
@@ -61,24 +61,22 @@ export default function ProductDetailsScreen() {
     <CustomerScreen>
       <AppHeader
         title={translate("detailProductTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} /> />}
         trailing={<><FavoriteButton kind="products" id={productId} /><CartButton /></>}
       />
-      <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
-      </View>
-      <View style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.productName, { color: theme.colors.foreground }]}>{productDetails.name}</Text>
-        {selectedOffer ? <Text style={[styles.price, { color: theme.colors.accentMuted }]}>{formatDZD(selectedOffer.price)}</Text> : null}
+      {imageUrl ? <ProductImageGallery images={[imageUrl]} accessibilityLabel={productDetails.name} onSelect={() => undefined} imageStyle={styles.heroImage} /> : <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" size={42} color={theme.colors.subtle} accessibilityHidden /></View>}
+      <Card contentStyle={styles.infoCard}>
+        <UiText weight="800" style={styles.productName}>{productDetails.name}</UiText>
+        {selectedOffer ? <PriceDisplay value={formatDZD(selectedOffer.price)} style={styles.priceDisplay} /> : null}
         <View style={styles.metadata}>
-          {productDetails.brand ? <Text style={[styles.metaText, { color: theme.colors.muted }]}>{translate("productBrand")}: {productDetails.brand}</Text> : null}
-          {productDetails.category ? <Text style={[styles.metaText, { color: theme.colors.muted }]}>{translate("productCategory")}: {productDetails.category}</Text> : null}
+          {productDetails.brand ? <UiText tone="muted" style={styles.metaText}>{translate("productBrand")}: {productDetails.brand}</UiText> : null}
+          {productDetails.category ? <UiText tone="muted" style={styles.metaText}>{translate("productCategory")}: {productDetails.category}</UiText> : null}
         </View>
-        <Text style={[styles.description, { color: theme.colors.muted }]}>{productDetails.description || translate("productNoDescription")}</Text>
-      </View>
+        <UiText tone="muted" style={styles.description}>{productDetails.description || translate("productNoDescription")}</UiText>
+      </Card>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("productOffersTitle")}</Text>
+        <UiText weight="800" style={styles.sectionTitle}>{translate("productOffersTitle")}</UiText>
         {offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} />
         ) : productOffers.length === 0 ? (
@@ -96,11 +94,11 @@ export default function ProductDetailsScreen() {
               style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: active ? theme.colors.accentMuted : theme.colors.border }]}
             >
               <View style={styles.offerInfo}>
-                <Text style={[styles.offerStore, { color: theme.colors.foreground }]}>{offer.store.name}</Text>
-                <Text style={[styles.metaText, { color: theme.colors.muted }]}>{offer.store.commune || offer.store.address_line || " "}</Text>
-                <Text style={[styles.stock, { color: available ? theme.colors.success : theme.colors.warning }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
+                <UiText weight="800" style={styles.offerStore}>{offer.store.name}</UiText>
+                <UiText tone="muted" style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</UiText>
+                <UiText tone={available ? "success" : "warning"} weight="700" style={styles.stock}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</UiText>
               </View>
-              <Text style={[styles.offerPrice, { color: theme.colors.accentMuted }]}>{formatDZD(offer.price)}</Text>
+              <PriceDisplay value={formatDZD(offer.price)} style={styles.offerPriceDisplay} />
             </PressableSurface>
           );
         })}
@@ -111,8 +109,8 @@ export default function ProductDetailsScreen() {
           {variants.colors.length > 0 ? <OptionPicker label={translate("productColorOption")} values={variants.colors} value={selectedColor} onSelect={setColor} /> : null}
           {variants.sizes.length > 0 ? <OptionPicker label={translate("productSizeOption")} values={variants.sizes} value={selectedSize} onSelect={setSize} /> : null}
           <View style={styles.quantityRow}>
-            <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{translate("productQuantity")}</Text>
-            <QuantityStepper
+            <UiText weight="700" style={styles.optionLabel}>{translate("productQuantity")}</UiText>
+            <ProductQuantitySelector
               value={quantity}
               max={Math.max(1, Math.min(10, selectedOffer.stock_quantity))}
               onChange={setQuantity}
@@ -138,7 +136,7 @@ export default function ProductDetailsScreen() {
             disabled={!canAdd}
             fullWidth
           />
-          {addMutation.isError ? <Text style={styles.mutationError}>{translate("genericError")}</Text> : null}
+          {addMutation.isError ? <UiText tone="danger" style={styles.mutationError}>{translate("genericError")}</UiText> : null}
         </View>
       ) : null}
 
@@ -158,9 +156,9 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
   const theme = useAppTheme();
   return (
     <View style={styles.optionGroup}>
-      <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</Text>
+      <UiText style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</UiText>
       <View style={styles.optionValues}>
-        {values.map((option) => <PressableSurface key={option} accessibilityRole="button" accessibilityLabel={label + ": " + option} accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, { backgroundColor: value === option ? theme.colors.accent : theme.colors.surface, borderColor: value === option ? theme.colors.accentMuted : theme.colors.border }]}><Text style={[styles.optionChipText, { color: value === option ? theme.colors.accentForeground : theme.colors.foreground }]}>{option}</Text></PressableSurface>)}
+        {values.map((option) => <PressableSurface key={option} accessibilityRole="button" accessibilityLabel={label + ": " + option} accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, { backgroundColor: value === option ? theme.colors.accent : theme.colors.surface, borderColor: value === option ? theme.colors.accentMuted : theme.colors.border }]}><UiText style={[styles.optionChipText, { color: value === option ? theme.colors.accentForeground : theme.colors.foreground }]}>{option}</UiText></PressableSurface>)}
       </View>
     </View>
   );
@@ -171,6 +169,7 @@ const styles = StyleSheet.create({
   imageFallback: { color: "#8A9B55", fontSize: 46 },
   infoCard: { borderRadius: 18, padding: 16, gap: 10 },
   productName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
+  priceDisplay: { justifyContent: "flex-end" },
   price: { fontSize: 22, fontWeight: "900", textAlign: "right" },
   metadata: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 12 },
   metaText: { fontSize: 12, textAlign: "right" },
@@ -181,6 +180,7 @@ const styles = StyleSheet.create({
   offerInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
   offerStore: { fontSize: 14, fontWeight: "800", textAlign: "right" },
   stock: { fontSize: 11, fontWeight: "800" },
+  offerPriceDisplay: { justifyContent: "flex-start" },
   offerPrice: { fontSize: 14, fontWeight: "900" },
   purchaseCard: { borderRadius: 18, padding: 14, gap: 13 },
   optionGroup: { gap: 8 },
