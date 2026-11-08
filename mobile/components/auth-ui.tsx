@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +15,7 @@ import { router } from "expo-router";
 
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Button } from "@/components/ui";
 
 type AuthLayoutProps = {
   title: string;
@@ -90,25 +90,15 @@ export function AuthField({ label, error, style, ...props }: FieldProps) {
 type ActionButtonProps = { label: string; onPress: () => void; loading?: boolean; disabled?: boolean };
 
 export function ActionButton({ label, onPress, loading = false, disabled = false }: ActionButtonProps) {
-  const theme = useAppTheme();
   return (
-    <Pressable
-      accessibilityRole="button"
+    <Button
+      label={label}
       onPress={onPress}
-      disabled={disabled || loading}
-      style={({ pressed }) => [
-        styles.primaryButton,
-        { backgroundColor: theme.colors.accent },
-        pressed ? styles.primaryButtonPressed : undefined,
-        disabled || loading ? styles.primaryButtonDisabled : undefined
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator color={theme.colors.accentForeground} />
-      ) : (
-        <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{label}</Text>
-      )}
-    </Pressable>
+      loading={loading}
+      disabled={disabled}
+      fullWidth
+      size="lg"
+    />
   );
 }
 
