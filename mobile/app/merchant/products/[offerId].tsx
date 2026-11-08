@@ -523,9 +523,9 @@ export default function MerchantEditProductScreen() {
                       hitSlop={8}
                     >
                       {removingImageId === image.id ? (
-                        <Spinner color="#FFFFFF" size="small" />
+                        <Spinner color=designTokens.brand.white size="small" />
                       ) : (
-                        <Icon name="x" color="#FFFFFF" size={15} accessibilityHidden />
+                        <Icon name="x" color=designTokens.brand.white size={15} accessibilityHidden />
                       )}
                     </PressableSurface>
                   </View>
@@ -700,7 +700,7 @@ function createStyles(theme: AppTheme) {
     primaryBadge: { position: "absolute", left: 4, bottom: 4, borderRadius: designTokens.radius.sm, paddingHorizontal: 5, paddingVertical: designTokens.spacing.xs },
     primaryBadgeText: { fontSize: 8, fontWeight: designTokens.fontWeights.extrabold },
     imageRemove: { position: "absolute", top: -7, right: -7, width: 26, height: 26, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
-    imageRemoveText: { color: "#FFFFFF", fontSize: 19, lineHeight: 22, fontWeight: designTokens.fontWeights.extrabold },
+    imageRemoveText: { color: designTokens.brand.white, fontSize: 19, lineHeight: 22, fontWeight: designTokens.fontWeights.extrabold },
     emptyImages: { minHeight: 78, borderRadius: designTokens.radius.sm, justifyContent: "center", alignItems: "center", padding: designTokens.spacing.md },
     emptyText: { fontSize: designTokens.typography.caption, textAlign: "center" },
     secondaryButton: { minHeight: 46, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center", paddingHorizontal: designTokens.spacing.lg },
@@ -717,7 +717,7 @@ function createStyles(theme: AppTheme) {
     cancelButton: { flex: 1, minHeight: 45, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     cancelText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     removeConfirmButton: { flex: 1, minHeight: 45, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
-    removeConfirmText: { color: "#FFFFFF", fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+    removeConfirmText: { color: designTokens.brand.white, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     message: { flex: 1, alignItems: "center", justifyContent: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, lineHeight: 21, textAlign: "center" }
   });
