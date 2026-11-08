@@ -20,7 +20,6 @@ import { translate } from "@/lib/i18n";
 import { fetchMyOrders } from "@/lib/orders";
 import { getProfileDisplayName } from "@/lib/profile-state";
 import { getSupabaseClient } from "@/lib/supabase";
-import { useAppTheme } from "@/lib/theme";
 
 export default function ProfileScreen() {
   const theme = useAppTheme();
