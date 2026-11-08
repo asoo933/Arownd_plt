@@ -44,9 +44,6 @@ export type { TextAreaProps, NumberFieldProps, CheckboxProps, RadioOption, Selec
 export { Alert, Banner, ProgressBar, Spinner, Skeleton, SuccessState, Dialog, ConfirmDialog, BottomSheet, Toast } from "./feedback";
 export type { FeedbackTone } from "./feedback";
 
-export { ButtonGroup, FloatingActionButton, LinkButton } from "./actions";
-export type { ActionOption } from "./actions";
-
 export {
   Card,
   ProductCard,
@@ -140,17 +137,6 @@ export {
   Pagination
 } from "./data-components";
 export type { DataTableColumn } from "./data-components";
-
-export {
-  AppShell,
-  Screen,
-  Section,
-  SectionHeader,
-  StickyActionBar,
-  SafeAreaContainer,
-  KeyboardAvoidingContainer,
-  RefreshContainer
-} from "./app-layout";
 
 export { Icon } from "./icon";
 export type { IconName } from "./icon";
