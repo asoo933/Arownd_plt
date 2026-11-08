@@ -183,7 +183,7 @@ function ProfileMenuItem({ label, hint, onPress }: {
     <ListItem
       onPress={onPress}
       accessibilityLabel={label}
-      leading={<Icon name="chevron-left" color="muted" size={20} />}
+      leading={<Icon name="chevron-left" size={20} />}
     >
       <View style={styles.menuCopy}>
         <Text weight="800">{label}</Text>
