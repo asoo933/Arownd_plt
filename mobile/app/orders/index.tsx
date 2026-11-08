@@ -9,7 +9,7 @@ import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
 type OrderRow = {
@@ -121,13 +121,13 @@ export default function OrdersScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
-    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersLoginHint")}</UiText>
+    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "right" }}>{translate("ordersLoginHint")}</UiText>
     <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
 
   return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
-    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersSubtitle")}</UiText>
+    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "right" }}>{translate("ordersSubtitle")}</UiText>
     <SegmentedControl
       accessibilityLabel={translate("ordersTitle")}
       options={TABS.map((item) => ({ key: item.id, label: translate(item.key) }))}
@@ -164,17 +164,17 @@ export default function OrdersScreen() {
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   tabs: { width: "100%" },
-  card: { borderRadius: 18 },
+  card: { borderRadius: designTokens.radius.md },
   priceDisplay: { justifyContent: "flex-start" },
-  cardHeader: { flexDirection: "row-reverse", alignItems: "flex-start", justifyContent: "space-between", gap: 8 },
-  cardHeading: { flex: 1, alignItems: "flex-end", gap: 4 },
-  orderCode: { fontSize: 13, fontWeight: "900" },
-  date: { color: theme.colors.muted, fontSize: 10 },
-  storeName: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900", textAlign: "right" },
-  meta: { fontSize: 11, textAlign: "right" },
-  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 10 },
-  openLabel: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "900" },
-  primary: { minHeight: 48, borderRadius: 14, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
-  primaryText: { color: theme.colors.foreground, fontWeight: "900" }
+  cardHeader: { flexDirection: "row-reverse", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.sm },
+  cardHeading: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+  orderCode: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
+  date: { color: theme.colors.muted, fontSize: designTokens.typography.caption - 1 },
+  storeName: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  meta: { fontSize: designTokens.typography.caption, textAlign: "right" },
+  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.md },
+  openLabel: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+  primary: { minHeight: 48, borderRadius: designTokens.radius.md, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
+  primaryText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold }
 }); }
 
