@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   Image,
   Modal,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, IconButton, TextField } from "@/components/ui";
+import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -270,7 +269,7 @@ function MerchantOfferCard({
   return (
     <View style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <View style={styles.productHeader}>
-        <Pressable
+        <PressableSurface
           accessibilityRole={image ? "button" : undefined}
           accessibilityLabel={translate("merchantProductImagesLabel")}
           disabled={!image}
@@ -282,7 +281,7 @@ function MerchantOfferCard({
           ) : (
             <Text style={[styles.imageFallback, { color: theme.colors.muted }]}>A</Text>
           )}
-        </Pressable>
+        </PressableSurface>
         <View style={styles.productInfo}>
           <Text style={[styles.productName, { color: theme.colors.foreground }]} numberOfLines={2}>
             {offer.product.name}
@@ -348,7 +347,7 @@ function MerchantOfferCard({
               <Text style={[styles.galleryTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductImagesLabel")}
               </Text>
-              <Pressable
+              <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setGalleryOpen(false)}
                 hitSlop={10}
@@ -356,7 +355,7 @@ function MerchantOfferCard({
                 <Text style={[styles.galleryClose, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductCategoryClose")}
                 </Text>
-              </Pressable>
+              </PressableSurface>
             </View>
             <ScrollView
               horizontal
@@ -421,7 +420,7 @@ function FilterButton({
   const styles = createStyles(theme);
 
   return (
-    <Pressable
+    <PressableSurface
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={() => onPress(value)}
@@ -436,7 +435,7 @@ function FilterButton({
       <Text style={[styles.filterLabel, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>
         {label}
       </Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
