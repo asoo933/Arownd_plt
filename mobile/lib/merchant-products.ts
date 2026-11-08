@@ -131,7 +131,7 @@ export async function fetchMerchantProductOffer(
 async function updateOwnedOffer(
   offerId: string,
   storeId: string,
-  patch: Partial<MerchantOfferValues> | { is_merchant_hidden: boolean }
+  patch: { is_merchant_hidden: boolean }
 ): Promise<void> {
   await assertOwnedStore(storeId);
 
