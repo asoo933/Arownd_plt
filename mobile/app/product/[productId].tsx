@@ -65,16 +65,16 @@ export default function ProductDetailsScreen() {
         <View style={styles.titleActions}><FavoriteButton kind="products" id={productId} /><CartButton /></View>
       </View>
       <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={styles.imageFallback}>▧</Text>}
+        {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
       </View>
       <View style={[styles.infoCard, { backgroundColor: theme.colors.surface }]}>
         <Text style={[styles.productName, { color: theme.colors.foreground }]}>{productDetails.name}</Text>
-        {selectedOffer ? <Text style={styles.price}>{formatDZD(selectedOffer.price)}</Text> : null}
+        {selectedOffer ? <Text style={[styles.price, { color: theme.colors.accentMuted }]}>{formatDZD(selectedOffer.price)}</Text> : null}
         <View style={styles.metadata}>
-          {productDetails.brand ? <Text style={styles.metaText}>{translate("productBrand")}: {productDetails.brand}</Text> : null}
-          {productDetails.category ? <Text style={styles.metaText}>{translate("productCategory")}: {productDetails.category}</Text> : null}
+          {productDetails.brand ? <Text style={[styles.metaText, { color: theme.colors.muted }]}>{translate("productBrand")}: {productDetails.brand}</Text> : null}
+          {productDetails.category ? <Text style={[styles.metaText, { color: theme.colors.muted }]}>{translate("productCategory")}: {productDetails.category}</Text> : null}
         </View>
-        <Text style={styles.description}>{productDetails.description || translate("productNoDescription")}</Text>
+        <Text style={[styles.description, { color: theme.colors.muted }]}>{productDetails.description || translate("productNoDescription")}</Text>
       </View>
 
       <View style={styles.section}>
@@ -96,10 +96,10 @@ export default function ProductDetailsScreen() {
             >
               <View style={styles.offerInfo}>
                 <Text style={[styles.offerStore, { color: theme.colors.foreground }]}>{offer.store.name}</Text>
-                <Text style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</Text>
+                <Text style={[styles.metaText, { color: theme.colors.muted }]}>{offer.store.commune || offer.store.address_line || " "}</Text>
                 <Text style={[styles.stock, { color: available ? theme.colors.success : theme.colors.warning }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
               </View>
-              <Text style={styles.offerPrice}>{formatDZD(offer.price)}</Text>
+              <Text style={[styles.offerPrice, { color: theme.colors.accentMuted }]}>{formatDZD(offer.price)}</Text>
             </Pressable>
           );
         })}
@@ -173,17 +173,17 @@ const styles = StyleSheet.create({
   imageFallback: { color: "#8A9B55", fontSize: 46 },
   infoCard: { borderRadius: 18, padding: 16, gap: 10 },
   productName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
-  price: { color: "#647D13", fontSize: 22, fontWeight: "900", textAlign: "right" },
+  price: { fontSize: 22, fontWeight: "900", textAlign: "right" },
   metadata: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 12 },
-  metaText: { color: "#737373", fontSize: 12, textAlign: "right" },
-  description: { color: "#737373", fontSize: 13, lineHeight: 22, textAlign: "right" },
+  metaText: { fontSize: 12, textAlign: "right" },
+  description: { fontSize: 13, lineHeight: 22, textAlign: "right" },
   section: { gap: 12 },
   sectionTitle: { fontSize: 17, fontWeight: "900", textAlign: "right" },
   offerCard: { minHeight: 82, borderWidth: 1.5, borderRadius: 16, padding: 12, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 12 },
   offerInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
   offerStore: { fontSize: 14, fontWeight: "800", textAlign: "right" },
   stock: { fontSize: 11, fontWeight: "800" },
-  offerPrice: { color: "#647D13", fontSize: 14, fontWeight: "900" },
+  offerPrice: { fontSize: 14, fontWeight: "900" },
   purchaseCard: { borderRadius: 18, padding: 14, gap: 13 },
   optionGroup: { gap: 8 },
   optionLabel: { fontSize: 12, fontWeight: "800", textAlign: "right" },
