@@ -9,7 +9,7 @@ import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import { translate } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 type Picker = "wilaya" | "commune" | null;
 
@@ -120,7 +120,7 @@ export default function DeliveryProfileScreen() {
   return <CustomerScreen>
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" size={20} />} />} />
     <Caption>{translate("deliveryProfileSubtitle")}</Caption>
-    <Card style={styles.panel} contentStyle={{ gap: 10, padding: 16 }}>
+    <Card style={styles.panel} contentStyle={{ gap: designTokens.spacing.md, padding: designTokens.spacing.lg }}>
       <Heading level={3}>{translate("deliveryProfileTitle")}</Heading>
       <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
       <TextField value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
@@ -177,24 +177,24 @@ export default function DeliveryProfileScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  panel: { borderRadius: 18, padding: 0 },
-  label: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, fontSize: 13 },
-  picker: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, justifyContent: "center" },
-  pickerText: { textAlign: "right", fontSize: 13 },
+  panel: { borderRadius: designTokens.radius.md, padding: 0 },
+  label: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  input: { minHeight: 48, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 13, fontSize: designTokens.typography.body - 1 },
+  picker: { minHeight: 48, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 13, justifyContent: "center" },
+  pickerText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
   suggestionButton: { alignSelf: "flex-start", minHeight: 34, justifyContent: "center" },
-  suggestionText: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "800" },
-  error: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
-  success: { color: theme.colors.accentMuted, fontSize: 12, textAlign: "right", fontWeight: "800" },
-  note: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
+  suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+  error: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "right" },
+  success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
+  note: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" },
   disabled: { opacity: 0.5 },
-  backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: 18 },
-  modalPanel: { maxHeight: "80%", borderRadius: 18, padding: 16, gap: 12 },
-  modalTitle: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900", textAlign: "right" },
+  backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: designTokens.spacing.lg },
+  modalPanel: { maxHeight: "80%", borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  modalTitle: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
   options: { maxHeight: 440 },
   option: { minHeight: 45, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
-  optionText: { textAlign: "right", fontSize: 13 },
-  closeButton: { minHeight: 42, justifyContent: "center", alignItems: "center", borderRadius: 11, backgroundColor: theme.colors.accent },
-  closeText: { color: theme.colors.foreground, fontWeight: "900", fontSize: 12 }
+  optionText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
+  closeButton: { minHeight: 42, justifyContent: "center", alignItems: "center", borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.accent },
+  closeText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold, fontSize: designTokens.typography.caption + 1 }
 }); }
 
