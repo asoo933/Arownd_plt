@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { designTokens, getAppTheme } from "./theme";
 
-describe("getAppTheme", () => {
-  it("keeps the Arownd brand colors in both modes", () => {
+describe("design system theme tokens", () => {
+  it("keeps brand and base colors consistent in both modes", () => {
+    expect(designTokens.brand.accent).toBe("#C6F135");
     expect(getAppTheme("light").colors.accent).toBe("#C6F135");
     expect(getAppTheme("dark").colors.accent).toBe("#C6F135");
     expect(getAppTheme("light").colors.background).toBe("#F5F5F5");
@@ -18,11 +19,21 @@ describe("getAppTheme", () => {
     expect(light.colors.surface).toBe("#FFFFFF");
     expect(dark.colors.foreground).toBe("#F5F5F5");
     expect(dark.colors.surface).toBe("#171717");
+    expect(light.colors.foregroundSecondary).toBe("#525252");
+    expect(dark.colors.foregroundSecondary).toBe("#D4D4D4");
   });
 
-  it("exposes consistent spacing and radius tokens", () => {
+  it("exposes consistent spacing, radius, typography and dimensions", () => {
     expect(designTokens.spacing.md).toBe(12);
     expect(designTokens.radius.lg).toBe(18);
     expect(designTokens.typography.body).toBe(14);
+    expect(designTokens.dimensions.controlHeight.md).toBe(44);
+    expect(designTokens.fontFamilies.arabic).toBe("IBMPlexSansArabic");
+  });
+
+  it("keeps semantic, commerce and delivery colors centralized", () => {
+    expect(designTokens.semantic.success).toBe("#16A34A");
+    expect(designTokens.commerce.discount).toBe("#DC2626");
+    expect(designTokens.delivery.completed).toBe("#16A34A");
   });
 });
