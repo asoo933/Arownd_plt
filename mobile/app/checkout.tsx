@@ -302,10 +302,7 @@ export default function CheckoutScreen() {
             <Text style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</Text>
             {optionSummary ? <Text style={styles.fieldHint}>{optionSummary}</Text> : null}
           </View>
-          <View style={{ alignItems: "flex-end", gap: 2 }}>
-            {offer?.old_price != null && offer.old_price > offer.price ? <Text style={styles.summaryOriginalPrice}>{formatDZD(offer.old_price * item.quantity)}</Text> : null}
-            <Text style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</Text>
-          </View>
+          <Text style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</Text>
         </View>;
       })}
       {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
@@ -383,7 +380,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   summaryRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   summaryInfo: { flex: 1, alignItems: "flex-end", gap: 3 },
   summaryName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  summaryOriginalPrice: { color: theme.colors.muted, fontSize: 10, textDecorationLine: "line-through" },
   summaryPrice: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900" },
   totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingTop: 8 },
   total: { color: theme.colors.accentMuted, fontSize: 19, fontWeight: "900" },
