@@ -35,7 +35,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, ConfirmDialog, Image as UiImage, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ConfirmDialog, ErrorState, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -337,7 +337,7 @@ export default function MerchantEditProductScreen() {
           <AppHeader title={translate("merchantProductEditTitle")} leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />} />
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</UiText>
 
-          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.card}>
             <View style={styles.productHeading}>
               <UiText style={[styles.productName, { color: theme.colors.foreground }]}>{offer.product.name}</UiText>
               {offer.product.brand ? (
@@ -487,9 +487,9 @@ export default function MerchantEditProductScreen() {
             </View>
 
             <Button label={translate("merchantProductEditSave")} onPress={() => void saveOffer()} loading={saving} disabled={isBusy && !saving} fullWidth />
-          </View>
+          </Card>
 
-          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.card}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitles}>
                 <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
@@ -555,7 +555,7 @@ export default function MerchantEditProductScreen() {
                 </UiText>
               )}
             </PressableSurface>
-          </View>
+          </Card>
 
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
@@ -660,11 +660,13 @@ function MessageScreen({
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
-        {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-        <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
-        {actionLabel && onAction ? (
-          <Button label={actionLabel} onPress={onAction} variant="outline" />
-        ) : null}
+        {loading ? (
+          <LoadingState label={label} />
+        ) : actionLabel && onAction ? (
+          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+        ) : (
+          <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -681,7 +683,7 @@ function createStyles(theme: AppTheme) {
     eyebrow: { fontSize: 10, fontWeight: "900" },
     title: { width: "100%", fontSize: 24, lineHeight: 32, fontWeight: "900", textAlign: "right" },
     subtitle: { width: "100%", fontSize: 12, lineHeight: 19, textAlign: "right" },
-    card: { borderWidth: 1, borderRadius: 18, padding: 14, gap: 14 },
+    card: { padding: 14, gap: 14 },
     productHeading: { alignItems: "flex-end", gap: 4, paddingBottom: 3 },
     productName: { width: "100%", fontSize: 16, lineHeight: 23, fontWeight: "900", textAlign: "right" },
     productBrand: { width: "100%", fontSize: 11, textAlign: "right" },
