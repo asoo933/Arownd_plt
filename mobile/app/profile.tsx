@@ -12,6 +12,7 @@ import {
   Icon,
   IconButton,
   IdentityRow,
+  PressableSurface,
   StatCard
 } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
@@ -79,7 +80,6 @@ export default function ProfileScreen() {
   if (profile.isError) {
     return (
       <CustomerScreen>
-        <CustomerHeading title={translate("profileTitle")} />
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
@@ -125,7 +125,13 @@ export default function ProfileScreen() {
           </Card>
 
           <View style={styles.stats}>
-            <Card style={styles.statCardOuter} contentStyle={styles.statCard}>
+            <PressableSurface
+              accessibilityRole="button"
+              accessibilityLabel={translate("profileOrders")}
+              onPress={() => router.push("/orders")}
+              style={styles.statCardOuter}
+            >
+              <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
                 <Icon name="package" size={19} />
                 <StatCard
@@ -134,8 +140,15 @@ export default function ProfileScreen() {
                   style={styles.stat}
                 />
               </View>
-            </Card>
-            <Card style={styles.statCardOuter} contentStyle={styles.statCard}>
+              </Card>
+            </PressableSurface>
+            <PressableSurface
+              accessibilityRole="button"
+              accessibilityLabel={translate("profileFavorites")}
+              onPress={() => router.push("/favorites")}
+              style={styles.statCardOuter}
+            >
+              <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
                 <Icon name="heart" size={19} />
                 <StatCard
@@ -144,8 +157,15 @@ export default function ProfileScreen() {
                   style={styles.stat}
                 />
               </View>
-            </Card>
-            <Card style={styles.statCardOuter} contentStyle={styles.statCard}>
+              </Card>
+            </PressableSurface>
+            <PressableSurface
+              accessibilityRole="button"
+              accessibilityLabel={translate("myReviewsTitle")}
+              onPress={() => router.push("/my-reviews")}
+              style={styles.statCardOuter}
+            >
+              <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
                 <Icon name="star" size={19} />
                 <StatCard
@@ -154,7 +174,8 @@ export default function ProfileScreen() {
                   style={styles.stat}
                 />
               </View>
-            </Card>
+              </Card>
+            </PressableSurface>
           </View>
 
           {orders.isError || favorites.isError || reviews.isError ? (
