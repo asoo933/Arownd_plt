@@ -90,7 +90,7 @@ export function ActionButton({ label, onPress, loading = false, disabled = false
 export function InlineLink({ label, onPress }: { label: string; onPress: () => void }) {
   const theme = useAppTheme();
   return (
-    <PressableSurface accessibilityRole="link" onPress={onPress}>
+    <PressableSurface accessibilityRole="link" onPress={onPress} hitSlop={8}>
       <Text style={[styles.link, { color: theme.colors.accentMuted }]}>{label}</Text>
     </PressableSurface>
   );
