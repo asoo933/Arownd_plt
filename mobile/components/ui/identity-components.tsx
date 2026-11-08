@@ -64,7 +64,7 @@ export function RatingStars({
   return (
     <View accessibilityRole="image" accessibilityLabel={String(value)} style={[{ flexDirection: "row", alignItems: "center", gap: 2 }, style]}>
       {Array.from({ length: count }, (_, index) => (
-        <Text key={index} style={{ fontSize: size, color: index < Math.round(normalized) ? theme.colors.warning : theme.colors.border }}>★</Text>
+        <Icon key={index} name="star" size={size} color={index < Math.round(normalized) ? theme.colors.warning : theme.colors.border} fill={index < Math.round(normalized) ? theme.colors.warning : "none"} accessibilityHidden />
       ))}
       {showValue ? <Text style={{ marginStart: designTokens.spacing.xs, color: theme.colors.muted, fontSize: theme.typography.caption }}>{value.toFixed(1)}</Text> : null}
     </View>
@@ -92,7 +92,7 @@ export function RatingSelector({
         const selected = rating <= value;
         return (
           <Pressable key={rating} accessibilityRole="radio" accessibilityLabel={String(rating)} accessibilityState={{ checked: value === rating, disabled }} disabled={disabled} onPress={() => onChange(rating)} hitSlop={4} style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ fontSize: size * 0.72, color: selected ? theme.colors.warning : theme.colors.border }}>★</Text>
+            <Icon name="star" size={size * 0.72} color={selected ? theme.colors.warning : theme.colors.border} fill={selected ? theme.colors.warning : "none"} accessibilityHidden />
           </Pressable>
         );
       })}
