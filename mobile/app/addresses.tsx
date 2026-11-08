@@ -146,7 +146,7 @@ export default function AddressesScreen() {
                 <Text style={[styles.chipText, label === item && styles.chipTextActive]}>{translate(item === "home" ? "addressesHome" : item === "work" ? "addressesWork" : "addressesOther")}</Text>
               </Pressable>)}
             </View>
-            <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} theme={theme} />
+            <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
             <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} theme={theme} />
             <Text style={styles.label}>{translate("checkoutWilaya")}</Text>
             <Pressable onPress={() => setPickerOpen(true)} style={styles.input}><Text style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text></Pressable>
@@ -188,7 +188,6 @@ function Field({ label, value, onChangeText, styles, theme, keyboardType }: {
   value: string;
   onChangeText: (value: string) => void;
   styles: ReturnType<typeof createStyles>;
-  theme: AppTheme;
   keyboardType?: "default" | "phone-pad";
 }) {
   return <View style={styles.field}>
