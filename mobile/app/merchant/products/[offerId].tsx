@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -38,7 +37,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, TextField } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -397,7 +396,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductCategoryLabel")}
                 </Text>
-                <Pressable
+                <PressableSurface
                   accessibilityRole="button"
                   disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
                   onPress={() => setCategoryPickerOpen(true)}
@@ -408,7 +407,7 @@ export default function MerchantEditProductScreen() {
                       ? `${selectedCategory.emoji} ${selectedCategory.label}`
                       : translate("merchantProductCategoryUnknown")}
                   </Text>
-                </Pressable>
+                </PressableSurface>
                 {categoriesQuery.isError ? (
                   <Text style={[styles.hint, { color: theme.colors.danger }]}>
                     {translate("merchantProductCategoriesLoadError")}
@@ -519,7 +518,7 @@ export default function MerchantEditProductScreen() {
                         </Text>
                       </View>
                     ) : null}
-                    <Pressable
+                    <PressableSurface
                       accessibilityRole="button"
                       accessibilityLabel={translate("merchantProductImageRemove")}
                       disabled={isBusy}
@@ -532,7 +531,7 @@ export default function MerchantEditProductScreen() {
                       ) : (
                         <Text style={styles.imageRemoveText}>×</Text>
                       )}
-                    </Pressable>
+                    </PressableSurface>
                   </View>
                 ))}
               </View>
@@ -544,7 +543,7 @@ export default function MerchantEditProductScreen() {
               </View>
             )}
 
-            <Pressable
+            <PressableSurface
               accessibilityRole="button"
               disabled={isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT}
               onPress={() => void chooseAndUploadImage()}
@@ -557,7 +556,7 @@ export default function MerchantEditProductScreen() {
                   {translate("merchantProductImageAdd")}
                 </Text>
               )}
-            </Pressable>
+            </PressableSurface>
           </View>
 
           {notice ? (
@@ -591,7 +590,7 @@ export default function MerchantEditProductScreen() {
             </Text>
             <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
               {selectableCategories.map((category) => (
-                <Pressable
+                <PressableSurface
                   key={category.id}
                   accessibilityRole="button"
                   accessibilityState={{ selected: productCategory === category.id }}
@@ -610,7 +609,7 @@ export default function MerchantEditProductScreen() {
                   <Text style={[styles.categoryOptionText, { color: theme.colors.foreground }]}>
                     {category.emoji} {category.label}
                   </Text>
-                </Pressable>
+                </PressableSurface>
               ))}
               {selectableCategories.length === 0 ? (
                 <Text style={[styles.confirmHint, { color: theme.colors.muted }]}>
@@ -618,7 +617,7 @@ export default function MerchantEditProductScreen() {
                 </Text>
               ) : null}
             </ScrollView>
-            <Pressable
+            <PressableSurface
               accessibilityRole="button"
               onPress={() => setCategoryPickerOpen(false)}
               style={[styles.cancelButton, { borderColor: theme.colors.border }]}
@@ -626,7 +625,7 @@ export default function MerchantEditProductScreen() {
               <Text style={[styles.cancelText, { color: theme.colors.foreground }]}>
                 {translate("merchantProductCategoryClose")}
               </Text>
-            </Pressable>
+            </PressableSurface>
           </View>
         </View>
       </Modal>
@@ -646,7 +645,7 @@ export default function MerchantEditProductScreen() {
               {translate("merchantProductImageRemoveConfirmHint")}
             </Text>
             <View style={styles.confirmActions}>
-              <Pressable
+              <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setPendingRemoval(null)}
                 style={[styles.cancelButton, { borderColor: theme.colors.border }]}
@@ -654,8 +653,8 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.cancelText, { color: theme.colors.foreground }]}>
                   {translate("merchantProductCategoryClose")}
                 </Text>
-              </Pressable>
-              <Pressable
+              </PressableSurface>
+              <PressableSurface
                 accessibilityRole="button"
                 onPress={() => void confirmRemoveImage()}
                 style={[styles.removeConfirmButton, { backgroundColor: theme.colors.danger }]}
@@ -663,7 +662,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={styles.removeConfirmText}>
                   {translate("merchantProductImageRemoveConfirmAction")}
                 </Text>
-              </Pressable>
+              </PressableSurface>
             </View>
           </View>
         </View>
