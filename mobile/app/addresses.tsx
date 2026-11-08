@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, SegmentedControl, StatusBadge, TextField } from "@/components/ui";
+import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
+import { AppHeader, Button, IconButton, PressableSurface, SegmentedControl, StatusBadge, TextField } from "@/components/ui";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { translate } from "@/lib/i18n";
 import {
@@ -101,7 +101,7 @@ export default function AddressesScreen() {
   }
   if (addresses.isError || wilayas.isError) {
     return <CustomerScreen>
-      <CustomerHeading title={translate("addressesTitle")} />
+      <AppHeader title={translate("addressesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
       <ErrorState title={translate("addressesLoadError")} retryLabel={translate("retry")} onRetry={() => { void addresses.refetch(); void wilayas.refetch(); }} />
     </CustomerScreen>;
   }
@@ -159,13 +159,13 @@ export default function AddressesScreen() {
             <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
             <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
             <Text style={styles.label}>{translate("checkoutWilaya")}</Text>
-            <Pressable onPress={() => setPickerOpen(true)} style={styles.input}><Text style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text></Pressable>
+            <PressableSurface onPress={() => setPickerOpen(true)} style={styles.input}><Text style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text></PressableSurface>
             <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
             <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
             <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
             {formError ? <Text style={styles.error}>{formError}</Text> : null}
             <Button label={translate("deliveryProfileSave")} onPress={submit} loading={saveMutation.isPending} fullWidth />
-            <Pressable onPress={() => setEditor(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></Pressable>
+            <PressableSurface onPress={() => setEditor(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></PressableSurface>
           </ScrollView>
         </View>
       </View>
@@ -174,10 +174,10 @@ export default function AddressesScreen() {
     <Modal visible={pickerOpen} transparent animationType="fade" onRequestClose={() => setPickerOpen(false)}>
       <View style={styles.backdrop}><View style={styles.pickerPanel}>
         <Text style={styles.modalTitle}>{translate("checkoutChooseWilaya")}</Text>
-        <ScrollView>{wilayas.data.map((item: Wilaya) => <Pressable key={item.id} onPress={() => { setWilayaId(item.id); setCommune(""); setPickerOpen(false); }} style={styles.pickerOption}>
+        <ScrollView>{wilayas.data.map((item: Wilaya) => <PressableSurface key={item.id} onPress={() => { setWilayaId(item.id); setCommune(""); setPickerOpen(false); }} style={styles.pickerOption}>
           <Text style={styles.inputText}>{String(item.id).padStart(2, "0")} - {item.name_ar}</Text>
-        </Pressable>)}</ScrollView>
-        <Pressable onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></Pressable>
+        </PressableSurface>)}</ScrollView>
+        <PressableSurface onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></PressableSurface>
       </View></View>
     </Modal>
 
@@ -186,7 +186,7 @@ export default function AddressesScreen() {
         <Text style={styles.modalTitle}>{translate("addressesDeleteTitle")}</Text>
         <Text style={styles.detail}>{translate("addressesDeleteHint")}</Text>
         <Button label={translate("addressesDelete")} onPress={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); }} loading={deleteMutation.isPending} variant="danger" fullWidth />
-        <Pressable onPress={() => setDeleteTarget(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></Pressable>
+        <PressableSurface onPress={() => setDeleteTarget(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></PressableSurface>
         {deleteMutation.isError ? <Text style={styles.error}>{translate("addressesDeleteError")}</Text> : null}
       </View></View>
     </Modal>
