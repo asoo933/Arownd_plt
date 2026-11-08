@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CartButton } from "@/components/cart-button";
-import { Button, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, PressableSurface } from "@/components/ui";
 import {
   CustomerScreen,
   CustomerSearch,
@@ -36,17 +36,20 @@ export default function CustomerHomeScreen() {
 
   return (
     <CustomerScreen>
-      <View style={styles.topBar}>
-        <View style={styles.brandWrap}>
-          <View style={styles.brandMark}><Text style={styles.brandMarkText}>A</Text></View>
-          <Text style={[styles.brand, { color: theme.colors.foreground }]}>arownd</Text>
-          <CartButton />
-        </View>
-        <Pressable accessibilityRole="button" style={styles.location} onPress={() => router.push("/stores")}>
-          <Text style={styles.locationText}>{translate("homeLocation")}</Text>
-          <Text style={styles.locationIcon}>⌖</Text>
-        </Pressable>
-      </View>
+      <AppHeader
+        title="arownd"
+        leading={<CartButton />}
+        trailing={
+          <PressableSurface
+            accessibilityLabel={translate("homeLocation")}
+            onPress={() => router.push("/stores")}
+            style={styles.location}
+          >
+            <Text style={styles.locationText}>{translate("homeLocation")}</Text>
+            <Text style={styles.locationIcon}>⌖</Text>
+          </PressableSurface>
+        }
+      />
 
       <View style={styles.hero}>
         <Text style={styles.heroEyebrow}>{translate("homeEyebrow")}</Text>
@@ -115,12 +118,7 @@ export default function CustomerHomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  topBar: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  brandWrap: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brandMark: { width: 31, height: 31, borderRadius: 11, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  brandMarkText: { color: "#0A0A0A", fontWeight: "900", fontSize: 18 },
-  brand: { fontSize: 21, fontWeight: "900", letterSpacing: -0.8 },
-  location: { flexDirection: "row-reverse", alignItems: "center", gap: 7, backgroundColor: "#C6F135", borderRadius: 12, paddingHorizontal: 11, minHeight: 38 },
+  location: { flexDirection: "row-reverse", alignItems: "center", gap: 7, backgroundColor: "#C6F135", borderRadius: 12, paddingHorizontal: 11, minHeight: 40 },
   locationText: { color: "#0A0A0A", fontSize: 11, fontWeight: "800" },
   locationIcon: { color: "#0A0A0A", fontSize: 17 },
   hero: { backgroundColor: "#111A0A", borderRadius: 24, padding: 19, gap: 10 },
