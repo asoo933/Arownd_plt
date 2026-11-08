@@ -54,11 +54,11 @@ export function DataTable<Row extends object>({
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={style}>
       <View>
         <View style={{ flexDirection: "row-reverse", borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
-          {columns.map((column) => <View key={String(column.key)} style={{ width: column.width ?? 120, padding: designTokens.spacing.sm }}><View>{typeof column.header === "string" ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, fontWeight: "700", textAlign: "right" }}>{column.header}</UiText> : column.header}</View></View>)}
+          {columns.map((column) => <View key={String(column.key)} style={{ width: column.width ?? 120, padding: designTokens.spacing.sm }}><View>{typeof column.header === "string" ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold, textAlign: "right" }}>{column.header}</UiText> : column.header}</View></View>)}
         </View>
         {rows.map((row, index) => (
           <View key={keyExtractor(row, index)} style={{ flexDirection: "row-reverse", borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
-            {columns.map((column) => <View key={String(column.key)} style={{ width: column.width ?? 120, minHeight: 44, justifyContent: "center", padding: designTokens.spacing.sm }}>{column.render ? column.render(row) : <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, textAlign: "right" }}>{String(row[column.key] ?? "")}</UiText>}</View>)}
+            {columns.map((column) => <View key={String(column.key)} style={{ width: column.width ?? 120, minHeight: theme.dimensions.controlHeight.md, justifyContent: "center", padding: designTokens.spacing.sm }}>{column.render ? column.render(row) : <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, textAlign: "right" }}>{String(row[column.key] ?? "")}</UiText>}</View>)}
           </View>
         ))}
       </View>
@@ -68,7 +68,7 @@ export function DataTable<Row extends object>({
 
 export function StatCard({ label, value, hint, style }: { label: string; value: string; hint?: string; style?: StyleProp<ViewStyle> }) {
   const theme = useAppTheme();
-  return <View style={[{ flex: 1, minWidth: 112, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.surface, gap: designTokens.spacing.xs }, style]}><UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{label}</UiText><UiText adjustsFontSizeToFit numberOfLines={1} style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: "800", textAlign: "right" }}>{value}</UiText>{hint ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{hint}</UiText> : null}</View>;
+  return <View style={[{ flex: 1, minWidth: 112, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.surface, gap: designTokens.spacing.xs }, style]}><UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{label}</UiText><UiText adjustsFontSizeToFit numberOfLines={1} style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: theme.fontWeights.extrabold, textAlign: "right" }}>{value}</UiText>{hint ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{hint}</UiText> : null}</View>;
 }
 
 export function ChartCard({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
@@ -166,7 +166,7 @@ export function Pagination({
   const safePage = Math.min(safeCount, Math.max(1, Math.floor(page)));
   return (
     <View accessibilityRole="adjustable" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm }, style]}>
-      <Pressable accessibilityRole="button" accessibilityLabel={previousLabel} accessibilityState={{ disabled: safePage <= 1 }} disabled={safePage <= 1} onPress={() => onChange(safePage - 1)} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.foreground }}>‹</UiText></Pressable>
+      <Pressable accessibilityRole="button" accessibilityLabel={previousLabel} accessibilityState={{ disabled: safePage <= 1 }} disabled={safePage <= 1} onPress={() => onChange(safePage - 1)} style={{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.foreground }}>‹</UiText></Pressable>
       <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontVariant: ["tabular-nums"] }}>{safePage} / {safeCount}</UiText>
       <Pressable accessibilityRole="button" accessibilityLabel={nextLabel} accessibilityState={{ disabled: safePage >= safeCount }} disabled={safePage >= safeCount} onPress={() => onChange(safePage + 1)} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.foreground }}>›</UiText></Pressable>
     </View>
