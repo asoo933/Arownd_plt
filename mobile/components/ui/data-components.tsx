@@ -28,7 +28,7 @@ export function ListItem({
   const theme = useAppTheme();
   const content = <View style={[{ minHeight: 56, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm }, style]}>{leading}<View style={{ flex: 1 }}>{children}</View>{trailing}</View>;
   if (!onPress) return content;
-  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={({ pressed }) => ({ borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: pressed ? 0.72 : 1 })}>{content}</Pressable>;
+  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? (typeof children === "string" ? children : undefined)} onPress={onPress} style={({ pressed }) => ({ borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: pressed ? 0.72 : 1 })}>{content}</Pressable>;
 }
 
 export type DataTableColumn<Row extends object> = {
@@ -99,7 +99,7 @@ export function FilterChip({
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: theme.dimensions.controlHeight.sm, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accentMuted : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }]}>
+    <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: theme.dimensions.controlHeight.md, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accentMuted : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }]}>
       {leading}
       <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>{label}</UiText>
     </Pressable>
