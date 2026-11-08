@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } from "@/components/customer-ui";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -9,7 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
-import { IconButton } from "@/components/ui";
+import { IconButton, SegmentedControl } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -54,14 +54,18 @@ export default function StoreDetailsScreen() {
         </View>
       </View>
 
-      <View style={[styles.tabs, { borderBottomColor: theme.colors.border }]}>
-        <Pressable accessibilityRole="tab" accessibilityState={{ selected: tab === "products" }} onPress={() => setTab("products")} style={[styles.tab, tab === "products" && { borderBottomColor: theme.colors.accentMuted }, tab === "products" && styles.activeTab]}>
-          <Text style={[styles.tabText, { color: tab === "products" ? theme.colors.accentMuted : theme.colors.muted }]}>{translate("storeProductsTitle")}</Text>
-        </Pressable>
-        <Pressable accessibilityRole="tab" accessibilityState={{ selected: tab === "about" }} onPress={() => setTab("about")} style={[styles.tab, tab === "about" && { borderBottomColor: theme.colors.accentMuted }, tab === "about" && styles.activeTab]}>
-          <Text style={[styles.tabText, { color: tab === "about" ? theme.colors.accentMuted : theme.colors.muted }]}>{translate("storeAboutTitle")}</Text>
-        </Pressable>
-      </View>
+      <SegmentedControl
+        accessibilityLabel={translate("storeAboutTitle")}
+        options={[
+          { key: "products", label: translate("storeProductsTitle") },
+          { key: "about", label: translate("storeAboutTitle") }
+        ]}
+        value={tab}
+        onChange={(value) => {
+          if (value === "products" || value === "about") setTab(value);
+        }}
+        style={styles.tabs}
+      />
 
       {tab === "products" ? (
         offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
@@ -100,10 +104,7 @@ const styles = StyleSheet.create({
   metaText: { fontSize: 12, textAlign: "right" },
   verified: { fontSize: 11, fontWeight: "800" },
   rating: { fontSize: 11, fontWeight: "700" },
-  tabs: { flexDirection: "row-reverse", borderBottomWidth: 1 },
-  tab: { flex: 1, minHeight: 44, alignItems: "center", justifyContent: "center" },
-  activeTab: { borderBottomWidth: 2 },
-  tabText: { fontSize: 12, fontWeight: "700" },
+  tabs: { width: "100%" },
   productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
   aboutCard: { borderRadius: 18, padding: 16, gap: 11 },
   aboutTitle: { fontSize: 17, fontWeight: "900", textAlign: "right" },
