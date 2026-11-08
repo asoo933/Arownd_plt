@@ -16,14 +16,6 @@ import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } fr
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
-const categories = [
-  { id: "fashion", icon: "shirt", label: "categoryFashion" },
-  { id: "electronics", icon: "smartphone", label: "categoryElectronics" },
-  { id: "beauty", icon: "sparkles", label: "categoryBeauty" },
-  { id: "home", icon: "house", label: "categoryHome" },
-  { id: "kids", icon: "baby", label: "categoryKids" },
-  { id: "food", icon: "cake-slice", label: "categoryFood" }
-] as const;
 
 export default function CustomerHomeScreen() {
   const theme = useAppTheme();
@@ -77,26 +69,6 @@ export default function CustomerHomeScreen() {
         )}
       </View>
 
-      <View>
-        <SectionTitle title={translate("homeCategories")} action={translate("homeSeeAll")} onAction={() => router.push("/explore")} />
-        <View style={styles.categoryGrid}>
-          {categories.map((category) => (
-            <PressableSurface
-              key={category.id}
-              accessibilityRole="button"
-              accessibilityLabel={translate(category.label)}
-              onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })}
-              style={[
-                styles.category,
-                { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }
-              ]}
-            >
-              <Icon name={category.icon} size={27} color={theme.colors.accentMuted} accessibilityHidden />
-              <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</UiText>
-            </PressableSurface>
-          ))}
-        </View>
-      </View>
 
       <View>
         <SectionTitle title={translate("homeFeaturedStores")} action={translate("homeSeeAll")} onAction={() => router.push("/stores")} />
@@ -128,8 +100,5 @@ const styles = StyleSheet.create({
   location: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, minHeight: designTokens.dimensions.controlHeight.sm },
   locationText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   productRail: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
-  categoryGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", rowGap: designTokens.spacing.sm },
-  category: { width: "31.5%", minHeight: 104, borderWidth: 1, borderRadius: designTokens.radius.lg, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
-  categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   storeList: { gap: designTokens.spacing.sm }
 });
