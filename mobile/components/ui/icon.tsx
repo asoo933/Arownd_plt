@@ -115,7 +115,7 @@ export type IconName = keyof typeof iconRegistry;
 
 export function Icon({
   name,
-  size = 20,
+  size,
   color,
   fill = "none",
   strokeWidth = 1.8,
@@ -134,15 +134,16 @@ export function Icon({
 }) {
   const IconComponent = iconRegistry[name];
   const theme = useAppTheme();
+  const resolvedSize = size ?? theme.dimensions.iconSize.md;
 
   return (
     <View
       accessible={!accessibilityHidden}
       accessibilityLabel={accessibilityLabel}
       accessibilityElementsHidden={accessibilityHidden}
-      style={[{ width: size, height: size, alignItems: "center", justifyContent: "center" }, style]}
+      style={[{ width: resolvedSize, height: resolvedSize, alignItems: "center", justifyContent: "center" }, style]}
     >
-      <IconComponent size={size} color={color ?? theme.colors.foreground} fill={fill} strokeWidth={strokeWidth} />
+      <IconComponent size={resolvedSize} color={color ?? theme.colors.foreground} fill={fill} strokeWidth={strokeWidth} />
     </View>
   );
 }
