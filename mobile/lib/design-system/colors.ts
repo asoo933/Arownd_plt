@@ -64,7 +64,7 @@ export const extendedThemeColors = {
     success: "#3F6212",
     successSurface: "#F7FBEA",
     successBorder: "#D7E9A1",
-    warning: "#9A6700",
+    warning: "#8A5B00",
     warningSurface: "#FFF7E0",
     warningBorder: "#F0D99A",
     placeholder: "#6F6F6F",
