@@ -167,7 +167,7 @@ export default function OrdersScreen() {
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   tabs: { width: "100%" },
-  card: { borderRadius: designTokens.radius.lg },
+  card: { borderRadius: designTokens.radius.xl },
   cardContent: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   priceDisplay: { justifyContent: "flex-start" },
   cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
