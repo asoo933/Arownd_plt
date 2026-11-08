@@ -15,7 +15,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { AppHeader, Button, Card, ErrorState, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
@@ -124,7 +124,7 @@ export default function MerchantEntryScreen() {
               {data.store.logo_url ? (
                 <UiImage uri={data.store.logo_url} accessibilityLabel={data.store.name} aspectRatio={1} style={styles.storeImage} />
               ) : (
-                <UiText style={[styles.storeAvatarText, { color: theme.colors.accentMuted }]}>A</UiText>
+                <Icon name="store" color={theme.colors.accentMuted} size={28} accessibilityHidden />
               )}
             </View>
             <View style={styles.storeInfo}>
