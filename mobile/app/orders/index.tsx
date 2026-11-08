@@ -143,7 +143,7 @@ export default function OrdersScreen() {
       const orderCode = row.order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
       const tone = getOrderStatusTone(row.status);
       const total = row.status === "cancelled" || row.status === "rejected" ? 0 : row.subtotal + row.shippingFee;
-      return <OrderCard key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card}>
+      return <OrderCard key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card} contentStyle={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <UiText style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</UiText>
@@ -152,7 +152,10 @@ export default function OrdersScreen() {
           <OrderStatusBadge label={statusLabel(row.status)} tone={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "neutral"} />
         </View>
         {row.storeName ? <UiText style={styles.storeName}>{row.storeName}</UiText> : null}
-        <UiText style={[styles.meta, { color: theme.colors.muted }]}>{row.itemCount} {translate("ordersItems")}</UiText>
+        <View style={styles.metaRow}>
+          <UiText style={[styles.meta, { color: theme.colors.muted }]}>{row.itemCount} {translate("ordersItems")}</UiText>
+          <Icon name="shopping-bag" size={designTokens.dimensions.iconSize.xs} color={theme.colors.muted} />
+        </View>
         <View style={styles.cardFooter}>
           <UiText style={styles.openLabel}>{translate("ordersViewDetails")}</UiText>
           <PriceDisplay value={formatDZD(total)} style={styles.priceDisplay} />
@@ -164,15 +167,17 @@ export default function OrdersScreen() {
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   tabs: { width: "100%" },
-  card: { borderRadius: designTokens.radius.md },
+  card: { borderRadius: designTokens.radius.lg },
+  cardContent: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   priceDisplay: { justifyContent: "flex-start" },
-  cardHeader: { flexDirection: "row-reverse", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.sm },
+  cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
   cardHeading: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
   orderCode: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
   date: { color: theme.colors.muted, fontSize: designTokens.typography.caption - 1 },
   storeName: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  metaRow: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs },
   meta: { fontSize: designTokens.typography.caption, textAlign: "right" },
-  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.md },
+  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.md, marginTop: designTokens.spacing.xs },
   openLabel: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   primary: { minHeight: 48, borderRadius: designTokens.radius.md, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
   primaryText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold }
