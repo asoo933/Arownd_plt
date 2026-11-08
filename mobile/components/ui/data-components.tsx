@@ -168,7 +168,7 @@ export function Pagination({
     <View accessibilityRole="adjustable" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm }, style]}>
       <Pressable accessibilityRole="button" accessibilityLabel={previousLabel} accessibilityState={{ disabled: safePage <= 1 }} disabled={safePage <= 1} onPress={() => onChange(safePage - 1)} style={{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.foreground }}>‹</UiText></Pressable>
       <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontVariant: ["tabular-nums"] }}>{safePage} / {safeCount}</UiText>
-      <Pressable accessibilityRole="button" accessibilityLabel={nextLabel} accessibilityState={{ disabled: safePage >= safeCount }} disabled={safePage >= safeCount} onPress={() => onChange(safePage + 1)} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.foreground }}>›</UiText></Pressable>
+      <Pressable accessibilityRole="button" accessibilityLabel={nextLabel} accessibilityState={{ disabled: safePage >= safeCount }} disabled={safePage >= safeCount} onPress={() => onChange(safePage + 1)} style={{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.foreground }}>›</UiText></Pressable>
     </View>
   );
 }
