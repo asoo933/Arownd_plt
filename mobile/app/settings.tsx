@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { Modal, StyleSheet, Text, View } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { CustomerHeading, CustomerScreen } from "@/components/customer-ui";
+import { CustomerScreen } from "@/components/customer-ui";
 import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
 import { translate } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
