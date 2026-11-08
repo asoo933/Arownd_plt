@@ -151,3 +151,8 @@ export {
   KeyboardAvoidingContainer,
   RefreshContainer
 } from "./app-layout";
+
+export { Icon } from "./icon";
+export type { IconName } from "./icon";
+export { Avatar } from "./identity";
+export { normalizeOtp, getCalendarDays } from "./forms-state";
