@@ -7,7 +7,6 @@ import { FavoriteButton as FavoriteToggle, FAVORITES_QUERY_KEY } from "@/compone
 import {
   AppHeader,
   Caption,
-  Card,
   Heading,
   Icon,
   IconButton,
