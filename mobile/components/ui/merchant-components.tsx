@@ -19,7 +19,7 @@ export function MerchantStatusBadge({ label, tone }: { label: string; tone: Stat
   return <StatusBadge label={label} tone={tone} />;
 }
 
-export function MerchantOrderCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void }) {
+export function MerchantOrderCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void; accessibilityLabel?: string }) {
   return <Card {...props} />;
 }
 
