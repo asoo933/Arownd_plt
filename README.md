@@ -1,404 +1,409 @@
-# Arownd
+# Arownd | منصة أراوند
 
-**Arownd is an Arabic-first, Algeria-focused, multi-store shopping marketplace.** It connects customers with local stores through one native mobile application. Customers can discover stores and products, compare offers from different merchants, place orders, choose home delivery or store pickup, and follow order progress. Merchants can create and manage their storefront, publish product offers, maintain stock and pricing, and process orders.
+<p align="center">
+  <strong>Local Commerce. Connected.</strong><br/>
+  <strong>تجارة محلية، متصلة في مكان واحد.</strong>
+</p>
 
-The active client is a **native Expo + React Native application** in `mobile/`. This repository is maintained as a native-first codebase. The former React web client and its Capacitor wrapper are not part of the active application.
-
-> **Project scope:** This README describes functionality and infrastructure present in the repository. It does not imply that every database migration has been applied to the live Supabase project or that every external operational integration is production-ready. See [Known integration and release considerations](#known-integration-and-release-considerations).
+<p align="center">
+  <em>An Arabic-first, Algeria-focused, multi-store shopping marketplace built as a native mobile application.</em><br/>
+  <em>منصة تسوّق متعددة المتاجر، موجّهة للسوق الجزائري، وتعطي الأولوية للغة العربية، مبنية كتطبيق هاتف أصلي.</em>
+</p>
 
 ---
 
-## Contents
+## 🌍 About Arownd | عن أراوند
 
-- [Product overview](#product-overview)
-- [User experiences](#user-experiences)
-  - [Customer experience](#customer-experience)
-  - [Merchant experience](#merchant-experience)
-  - [Order, delivery, and payment lifecycle](#order-delivery-and-payment-lifecycle)
-- [Application screens and routes](#application-screens-and-routes)
-- [System architecture](#system-architecture)
-- [Technology stack](#technology-stack)
-- [Repository structure](#repository-structure)
-- [Data model and Supabase resources](#data-model-and-supabase-resources)
-- [Local development](#local-development)
-- [Environment and security](#environment-and-security)
-- [Quality checks and automated builds](#quality-checks-and-automated-builds)
-- [Android build and distribution](#android-build-and-distribution)
-- [Known integration and release considerations](#known-integration-and-release-considerations)
-- [Development conventions](#development-conventions)
+**EN** — Arownd connects customers with local stores through one mobile marketplace. Customers can discover stores and products, compare offers from different merchants, add items to a cart, choose home delivery or store pickup, place orders, and follow their progress. Merchants can establish a storefront, publish product offers, manage prices and inventory, and process customer orders.
 
-## Product overview
+**AR** — أراوند منصة تجمع العملاء بالمتاجر المحلية من خلال تطبيق واحد. يستطيع العميل اكتشاف المتاجر والمنتجات، ومقارنة عروض التجار، وإضافة المنتجات إلى السلة، واختيار التوصيل إلى المنزل أو الاستلام من المتجر، وإرسال الطلبات ومتابعة حالتها. ويستطيع التاجر إنشاء متجره وإدارة عروض المنتجات والأسعار والمخزون ومعالجة طلبات العملاء.
 
-Arownd is designed around a local-commerce marketplace model:
+**Current product direction | التوجّه التقني الحالي:** Native-first. The active mobile client lives in `mobile/` and is built with Expo and React Native. The former React web client and its Capacitor wrapper are not part of the active application.
 
-- **One customer app:** browse a shared marketplace of stores and products.
-- **Store-specific offers:** a product can be offered by different stores, with each offer carrying its own price, stock, availability, images, and selectable options.
-- **Two account journeys:** personal customers and business/merchant accounts.
-- **Multi-store order structure:** a customer checkout can be represented by a parent order and merchant-specific suborders, allowing each store to process its own part of the purchase.
-- **Algerian delivery context:** checkout uses wilayas and communes, supports home delivery and store pickup, and displays prices in Algerian dinars (DZD).
-- **Native mobile foundation:** navigation, authentication callbacks, media selection, persistent client state, and Android/iOS app configuration are implemented with Expo and React Native.
+التطبيق المعتمد حالياً هو تطبيق هاتف أصلي مبني باستخدام Expo وReact Native داخل المجلد `mobile/`. واجهة React Web القديمة وغلاف Capacitor لم يعودا جزءاً من التطبيق النشط.
 
-The product has two primary user roles:
+> **Scope note | تنبيه حول نطاق التوثيق:** This README documents the implementation and repository configuration that have been inspected. A migration file in Git does not prove that the corresponding change exists in the live Supabase database. Production readiness and external integrations must be verified independently.
+>
+> يوثّق هذا الملف ما تمت مراجعته من التطبيق وإعدادات المستودع. وجود Migration داخل Git لا يعني بالضرورة أن التغيير مطبّق في قاعدة Supabase الحية. يجب التحقق بشكل مستقل من جاهزية الإنتاج والتكاملات الخارجية.
 
-| Role | Main purpose | Main workspace |
-| --- | --- | --- |
-| Customer | Discover products and stores, purchase items, and manage orders | Customer marketplace and account screens |
-| Merchant | Operate a store, manage product offers and inventory, and fulfill orders | Merchant dashboard |
+---
 
-## User experiences
+## 📚 Contents | الفهرس
 
-### Customer experience
+- [Product overview | نظرة عامة](#-product-overview--نظرة-عامة)
+- [User experiences | تجارب الاستخدام](#-user-experiences--تجارب-الاستخدام)
+- [Order lifecycle | دورة الطلب](#-order-delivery-and-payment--الطلب-والتوصيل-والدفع)
+- [Screens and routes | الشاشات والمسارات](#-application-screens--الشاشات-والمسارات)
+- [Architecture | المعمارية](#-system-architecture--معمارية-النظام)
+- [Technology stack | التقنيات](#-technology-stack--التقنيات)
+- [Repository structure | بنية المستودع](#-repository-structure--بنية-المستودع)
+- [Data and Supabase | البيانات وSupabase](#-data-model-and-supabase--البيانات)
+- [Local development | التشغيل المحلي](#-local-development--التطوير-المحلي)
+- [Security | الأمان](#-environment-and-security--الإعدادات-والأمان)
+- [CI and quality | الجودة والبناء الآلي](#-quality-and-automation--الجودة-والأتمتة)
+- [Android builds | بناء Android](#-android-build-and-distribution--بناء-وتوزيع-أندرويد)
+- [Known considerations | ملاحظات التكامل والإصدار](#-known-integration-considerations--ملاحظات-التكامل)
+- [Development conventions | معايير التطوير](#-development-conventions--معايير-التطوير)
 
-The customer journey is implemented through the following capabilities.
+---
 
-1. **Account access**
-   - Create a personal account or sign in with email and password.
-   - Confirm an email address through the native deep-link callback.
-   - Request a password recovery email and set a replacement password.
-   - Maintain a persisted Supabase Auth session on the device.
+## 🛍️ Product overview | نظرة عامة على المنتج
 
-2. **Marketplace discovery**
-   - Browse the home feed, recently added available offers, and featured verified stores.
-   - Explore the marketplace by category.
-   - Search the catalog by text and category.
-   - Open a store profile to review its information and product offers.
-   - Open a product page to inspect product details and available store offers.
+### Product model | نموذج المنصة
 
-3. **Product selection**
-   - Compare offers for the same product across stores.
-   - Review offer price, availability, and stock information.
-   - Select supported offer options such as size and color when supplied.
-   - Choose a quantity and add the selected store offer to the cart.
-   - Save products and stores to favorites.
+**EN**
+- **One marketplace:** customers browse stores and products from a unified mobile experience.
+- **Merchant-specific offers:** the same product may have offers from multiple stores. Each store offer can have its own price, stock, availability, images, and options.
+- **Two account journeys:** personal customer accounts and business/merchant accounts.
+- **Multi-store order model:** a customer order can be split into merchant-specific orders so each store can process its own items.
+- **Local delivery context:** checkout supports Algerian wilayas and communes, home delivery, and store pickup. Prices are represented in Algerian dinars (DZD).
+- **Native application:** navigation, authentication callbacks, media selection, persisted client state, and Android/iOS configuration are implemented with Expo and React Native.
 
-4. **Cart and checkout**
-   - Review cart items grouped by store.
-   - Change quantities or remove items.
-   - Re-check current offer availability, stock, and price before checkout.
-   - Identify blocking cart conditions such as a missing offer, unavailable item, insufficient stock, or changed price.
-   - Use a saved address or enter delivery details.
-   - Select home delivery or store pickup.
-   - Submit the order through the Supabase checkout RPC with a client-persisted idempotency key to reduce accidental duplicate submissions.
+**AR**
+- **سوق موحّد:** يتصفح العميل المتاجر والمنتجات من تجربة هاتف واحدة.
+- **عروض خاصة بكل تاجر:** يمكن أن يتوفر المنتج نفسه لدى عدة متاجر، ولكل عرض سعره ومخزونه وحالة توفره وصوره وخياراته.
+- **مساران للحسابات:** حساب شخصي للعميل وحساب تجاري للتاجر.
+- **طلبات متعددة المتاجر:** يمكن تقسيم طلب العميل إلى طلبات فرعية مرتبطة بكل تاجر، حتى يعالج كل متجر المنتجات التابعة له.
+- **ملاءمة السوق المحلي:** يدعم مسار الطلب الولايات والبلديات الجزائرية والتوصيل المنزلي والاستلام من المتجر، مع عرض الأسعار بالدينار الجزائري.
+- **تطبيق أصلي:** تم بناء التنقل وتدفقات المصادقة واختيار الوسائط وحفظ حالة العميل وإعدادات Android وiOS باستخدام Expo وReact Native.
 
-5. **Orders and post-purchase**
-   - Browse all orders and filter active, delivered, and cancelled orders.
-   - Open order details and review order items, store suborders, status, and tracking information.
-   - Receive order updates through Supabase Realtime subscriptions and periodic detail refresh.
-   - Respond to a merchant shipping quote where the order flow requires customer approval.
-   - Cancel an order or eligible merchant suborder when the current order state allows it.
+| Role / الدور | Responsibility / المسؤولية | Main workspace / مساحة العمل |
+|---|---|---|
+| Customer / العميل | Discover, compare, order, and track purchases. / اكتشاف المنتجات ومقارنتها وطلبها ومتابعتها. | Marketplace and account screens / واجهات السوق والحساب |
+| Merchant / التاجر | Operate a store, manage offers and inventory, and fulfill orders. / إدارة المتجر والعروض والمخزون والطلبات. | Merchant workspace / مساحة التاجر |
 
-6. **Account and preferences**
-   - View profile information and account activity summaries.
-   - Maintain delivery/contact details and saved addresses.
-   - Review favorites, notifications, and submitted product/store reviews.
-   - Mark notifications as read.
-   - Change the app appearance between system, light, and dark themes.
-   - Update the account password and sign out.
+## 👥 User experiences | تجارب الاستخدام
 
-### Merchant experience
+### Customer experience | تجربة العميل
 
-A business account can set up and operate a store from the same native application.
+1. **Authentication and account access | التسجيل والدخول**
+   - **EN:** Personal registration, email/password sign-in, email confirmation through a native deep link, password recovery, and persisted Supabase Auth sessions.
+   - **AR:** إنشاء حساب شخصي، وتسجيل الدخول بالبريد وكلمة المرور، وتأكيد البريد عبر رابط يفتح التطبيق، واستعادة كلمة المرور، والاحتفاظ بجلسة المصادقة على الجهاز.
 
-1. **Merchant onboarding**
-   - Start from a business account and complete the store setup form.
-   - Provide store name, contact phone, WhatsApp contact, location, address, business category, and subcategories.
-   - Configure opening and closing times.
-   - The merchant area checks account/store readiness before allowing access to operational screens.
+2. **Marketplace discovery | اكتشاف السوق**
+   - **EN:** Home feed, recently added available offers, featured verified stores, category browsing, text/category search, store profiles, and product details.
+   - **AR:** الصفحة الرئيسية، والعروض المتاحة المضافة حديثاً، والمتاجر المميزة والموثقة، وتصفح التصنيفات، والبحث النصي وبحسب التصنيف، وصفحات المتاجر وتفاصيل المنتجات.
 
-2. **Storefront management**
-   - View the merchant dashboard and store summary.
-   - Edit store details and location.
-   - Configure opening hours and closed weekdays.
-   - Upload or replace the store logo and cover image.
-   - Manage the store's public-facing information.
+3. **Product and offer selection | اختيار المنتج والعرض**
+   - **EN:** Compare offers for the same product across stores; inspect price, availability, and stock; choose supported options such as size or color; select quantity; and add a store-specific offer to the cart. Products and stores can be saved to favorites.
+   - **AR:** مقارنة عروض المنتج نفسه بين المتاجر، ومراجعة السعر والتوفر والمخزون، واختيار الخيارات المدعومة مثل المقاس أو اللون، وتحديد الكمية، ثم إضافة عرض متجر محدد إلى السلة. كما يمكن حفظ المنتجات والمتاجر في المفضلة.
 
-3. **Product and inventory management**
-   - Create a product offer with product information, category, brand, description, price, and stock quantity.
-   - Add product images from the device photo library.
-   - Define supported size and color options.
-   - Edit offer price and stock.
-   - Search and filter inventory, including low-stock and out-of-stock views.
-   - Control offer visibility in the marketplace.
+4. **Cart and checkout | السلة وإتمام الطلب**
+   - **EN:** Review cart items grouped by store, update quantities, remove items, and revalidate offer price, availability, and stock before submission. The checkout flow supports saved or newly entered delivery details and home delivery or store pickup. Submission uses a Supabase checkout RPC and a client-persisted idempotency key to help prevent duplicate requests.
+   - **AR:** مراجعة عناصر السلة مجمّعة حسب المتجر، وتعديل الكميات أو حذف العناصر، وإعادة التحقق من السعر والتوفر والمخزون قبل الإرسال. يدعم إتمام الطلب بيانات توصيل محفوظة أو جديدة، مع الاختيار بين التوصيل المنزلي والاستلام من المتجر. يُرسل الطلب عبر دالة Checkout في Supabase مع مفتاح idempotency محفوظ على الجهاز للمساعدة في منع تكرار الإرسال.
 
-4. **Order processing**
-   - View incoming and historical merchant orders.
-   - Filter orders by operational status.
-   - Open an order to inspect customer, item, delivery, and payment information.
-   - Accept or reject eligible orders and handle merchant-managed delivery quotes.
-   - Progress fulfillment and tracking states according to the delivery type and order rules.
-   - Record eligible cash-on-delivery collection for completed store-pickup orders.
+5. **Orders and after-sales | الطلبات وما بعد الشراء**
+   - **EN:** Browse and filter orders, inspect order details and merchant suborders, follow status/tracking updates, receive updates through Supabase Realtime and periodic refresh, respond to applicable shipping quotes, and cancel orders or eligible suborders when permitted by their state.
+   - **AR:** تصفح الطلبات وتصفيتها، وعرض تفاصيل الطلب والطلبات الفرعية الخاصة بالتجار، ومتابعة الحالة والتتبع، واستقبال التحديثات عبر Supabase Realtime والتحديث الدوري، والرد على عروض التوصيل عند الحاجة، وإلغاء الطلب أو الطلب الفرعي عندما تسمح حالته بذلك.
 
-5. **Store performance**
-   - Review order counts, delivered orders, active orders, and cancelled orders.
-   - View delivered revenue and average delivered order value.
-   - Monitor product count, low-stock count, and out-of-stock count.
-   - Inspect the delivered-revenue trend for the last seven days.
+6. **Account and preferences | الحساب والتفضيلات**
+   - **EN:** Profile and activity summary, delivery/contact details, saved addresses, favorites, notifications, submitted reviews, mark-as-read actions, system/light/dark appearance, password update, and sign-out.
+   - **AR:** الملف الشخصي وملخص النشاط، وبيانات الاتصال والتوصيل والعناوين المحفوظة، والمفضلة والإشعارات والتقييمات، وتعليم الإشعارات كمقروءة، واختيار مظهر النظام أو الفاتح أو الداكن، وتحديث كلمة المرور وتسجيل الخروج.
 
-Merchant routes are guarded by the account's merchant access/readiness state. A signed-in user without a configured merchant store is directed through the onboarding flow rather than being treated as an active merchant.
+### Merchant experience | تجربة التاجر
 
-### Order, delivery, and payment lifecycle
+1. **Merchant onboarding | تهيئة المتجر**
+   - **EN:** Business accounts can complete store setup with store name, contact phone, WhatsApp contact, location, address, business category/subcategories, and opening/closing times. Merchant access checks account and store readiness.
+   - **AR:** يستطيع صاحب الحساب التجاري إعداد متجره بإدخال الاسم ورقم الاتصال وواتساب والموقع والعنوان والتصنيف الرئيسي والفرعي وأوقات العمل. ويتحقق قسم التاجر من جاهزية الحساب والمتجر قبل إتاحة وظائف الإدارة.
 
-Arownd's current native checkout and merchant screens implement these delivery and payment concepts:
+2. **Storefront management | إدارة واجهة المتجر**
+   - **EN:** View the merchant dashboard, edit store details and location, configure opening hours and closed weekdays, and upload or replace the logo and cover image.
+   - **AR:** عرض لوحة التاجر، وتعديل بيانات المتجر وموقعه، وضبط ساعات العمل وأيام الإغلاق، ورفع شعار المتجر وصورة الغلاف أو استبدالهما.
 
-| Area | Implemented behavior |
-| --- | --- |
-| Home delivery | Customer supplies a wilaya, commune, and street/address details. Merchant-managed delivery can require a shipping quote and customer approval. |
-| Store pickup | Customer chooses pickup instead of home delivery. The merchant progresses the pickup/fulfillment state. |
-| Payment method | The native checkout currently submits `cod` (cash on delivery). |
-| COD collection | The merchant interface exposes a collection action for eligible completed store-pickup orders and records the paid amount/status through the database operation. |
-| Order statuses | The customer and merchant interfaces handle states including pending, quoted, confirmed, shipped, delivered, cancelled, and rejected, with delivery-specific tracking states. |
-| Multi-store purchases | A parent customer order can contain separate merchant orders, each with its own store, items, status, and shipping fee. |
+3. **Products and inventory | المنتجات والمخزون**
+   - **EN:** Create offers with product information, category, brand, description, price, and stock; select images from the device; define supported size/color options; edit price and quantity; search/filter inventory; identify low/out-of-stock items; and control offer visibility.
+   - **AR:** إنشاء عروض تتضمن معلومات المنتج والتصنيف والعلامة والوصف والسعر والكمية، واختيار الصور من الجهاز، وتحديد خيارات المقاس واللون المدعومة، وتعديل السعر والمخزون، والبحث والتصفية، ومعرفة المنتجات منخفضة أو منعدمة المخزون، والتحكم في ظهور العرض.
 
-**Payment scope clarification:** the native checkout code currently sends `_payment_method: "cod"`. This repository does not demonstrate an integrated card processor or a completed online-payment gateway in the native checkout. Do not describe online card payment or BaridiMob payment as available based only on the existence of wallet-related database objects or historical project work.
+4. **Order operations | معالجة الطلبات**
+   - **EN:** View incoming and historical orders, filter by status, inspect customer/items/delivery/payment details, accept or reject eligible orders, handle merchant-managed delivery quotes, progress fulfillment/tracking states, and record eligible cash-on-delivery collection for completed store-pickup orders.
+   - **AR:** عرض الطلبات الجديدة والسابقة وتصفيتها حسب الحالة، ومراجعة بيانات العميل والمنتجات والتوصيل والدفع، وقبول الطلبات أو رفضها وفق شروطها، ومعالجة عروض التوصيل التي يديرها التاجر، وتحديث مراحل التجهيز والتتبع، وتسجيل تحصيل الدفع عند الاستلام للطلبات المؤهلة المكتملة بالاستلام من المتجر.
 
-## Application screens and routes
+5. **Store analytics | إحصائيات المتجر**
+   - **EN:** The merchant analytics screen presents order counts, delivered/active/cancelled orders, delivered revenue, average delivered order value, product count, low-stock/out-of-stock counts, and a seven-day delivered-revenue trend.
+   - **AR:** تعرض شاشة الإحصائيات أعداد الطلبات والمسلّم منها والنشط والملغى، وإيرادات الطلبات المسلّمة ومتوسط قيمة الطلب المسلّم، وعدد المنتجات ومنخفضة المخزون والمنتهية، واتجاه الإيرادات المسلّمة خلال آخر سبعة أيام.
 
-Expo Router maps files in `mobile/app/` to application routes.
+Merchant routes are guarded by account/store readiness. A business user without a configured store is directed to onboarding before accessing operational screens.
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Resolve the current session and redirect to the customer home or login |
-| `/login`, `/account-type` | Sign in and choose the account journey |
-| `/signup-personal`, `/signup-business` | Personal and business registration |
-| `/forgot-password`, `/reset-password`, `/auth/callback` | Password recovery and email/deep-link callback |
-| `/home` | Customer marketplace home |
-| `/explore` | Product discovery, search, and category filtering |
-| `/stores` | Featured stores |
-| `/store/[storeId]` | Store details, offers, and reviews |
-| `/product/[productId]` | Product details, store offers, options, and add-to-cart |
-| `/cart`, `/checkout` | Cart review and order submission |
-| `/orders`, `/orders/[orderId]` | Customer order list and order details |
-| `/addresses`, `/delivery-profile` | Saved addresses and delivery/contact profile |
-| `/favorites`, `/my-reviews`, `/notifications` | Customer saved items, reviews, and notifications |
-| `/profile`, `/settings` | Account overview and app preferences |
-| `/merchant` | Merchant dashboard and access routing |
-| `/merchant/onboarding` | Store setup |
-| `/merchant/products`, `/merchant/products/new`, `/merchant/products/[offerId]` | Merchant offer and inventory management |
-| `/merchant/orders`, `/merchant/orders/[orderId]` | Merchant order queue and fulfillment |
-| `/merchant/analytics` | Merchant performance metrics |
-| `/merchant/settings` | Store profile and operating settings |
+تخضع مسارات التاجر للتحقق من جاهزية الحساب والمتجر. ويُوجّه صاحب الحساب التجاري الذي لم يُكمل إعداد متجره إلى شاشة التهيئة قبل الوصول إلى شاشات الإدارة.
 
-The root layout in `mobile/app/_layout.tsx` loads the font families, theme provider, status bar, and shared TanStack Query client. It also clears cached query data when the Supabase authentication state changes between signed-in and signed-out.
+## 📦 Order, delivery and payment | الطلب والتوصيل والدفع
 
-## System architecture
+| Area / المجال | Current behavior / السلوك الحالي |
+|---|---|
+| Home delivery / التوصيل المنزلي | Customer provides wilaya, commune, and address details. Merchant-managed delivery may require a shipping quote and customer approval. / يحدد العميل الولاية والبلدية والعنوان، وقد يتطلب التوصيل الذي يديره التاجر عرض سعر وموافقة العميل. |
+| Store pickup / الاستلام من المتجر | Customer selects pickup; the merchant progresses the fulfillment/pickup state. / يختار العميل الاستلام من المتجر ويتابع التاجر حالة التجهيز والاستلام. |
+| Payment / الدفع | Native checkout currently submits `cod` (cash on delivery). / يرسل مسار الدفع الحالي في التطبيق طريقة `cod` أي الدفع عند الاستلام. |
+| COD collection / تحصيل الدفع عند الاستلام | Merchant UI exposes a collection action for eligible completed store-pickup orders and records the collection through a database operation. / تتيح واجهة التاجر تسجيل التحصيل للطلبات المؤهلة المكتملة بالاستلام من المتجر عبر عملية في قاعدة البيانات. |
+| Order states / حالات الطلب | UI handles states including pending, quoted, confirmed, shipped, delivered, cancelled, and rejected, alongside delivery-specific tracking states. / تتعامل الواجهة مع حالات مثل قيد الانتظار، وعرض سعر، ومؤكد، ومشحون، ومسلّم، وملغى، ومرفوض، إضافة إلى حالات التتبع المرتبطة بالتوصيل. |
+| Multi-store / تعدد المتاجر | A parent customer order can contain merchant-specific suborders, each with its own store, items, status, and shipping fee. / يمكن أن يحتوي طلب العميل الرئيسي على طلبات فرعية لكل تاجر، ولكل منها متجرها وعناصرها وحالتها ورسوم توصيلها. |
 
-Arownd is organized as a native client with Supabase-backed application services and shared TypeScript packages.
+> **Payment limitation | حدود الدفع:** The current native checkout explicitly sends `_payment_method: "cod"`. The inspected implementation does not demonstrate a completed online card processor or BaridiMob payment integration. Wallet-related database objects alone are not evidence that these payment methods are available.
+>
+> يرسل مسار إتمام الطلب الحالي صراحةً `_payment_method: "cod"`. ولا يثبت التنفيذ الذي تمت مراجعته وجود بوابة دفع إلكتروني بالبطاقات أو تكامل مكتمل مع بريدي موب. وجود جداول أو عناصر مرتبطة بالمحفظة في قاعدة البيانات لا يعني أن هذه الوسائل متاحة فعلياً.
+
+## 📱 Application screens | شاشات التطبيق
+
+Expo Router maps files under `mobile/app/` to application routes. يربط Expo Router الملفات داخل `mobile/app/` بمسارات التطبيق.
+
+| Route / المسار | Purpose / الوظيفة |
+|---|---|
+| `/` | Resolve session and redirect / التحقق من الجلسة والتوجيه |
+| `/login`, `/account-type` | Sign-in and account journey / الدخول واختيار نوع الحساب |
+| `/signup-personal`, `/signup-business` | Personal/business registration / التسجيل الشخصي والتجاري |
+| `/forgot-password`, `/reset-password`, `/auth/callback` | Password recovery and auth deep links / استعادة كلمة المرور وروابط المصادقة |
+| `/home` | Customer marketplace home / الصفحة الرئيسية للعميل |
+| `/explore` | Search, discovery, categories / الاستكشاف والبحث والتصنيفات |
+| `/stores` | Featured stores / المتاجر المميزة |
+| `/store/[storeId]` | Store profile, offers, reviews / المتجر والعروض والتقييمات |
+| `/product/[productId]` | Product details and store offers / تفاصيل المنتج وعروض المتاجر |
+| `/cart`, `/checkout` | Cart and order submission / السلة وإرسال الطلب |
+| `/orders`, `/orders/[orderId]` | Customer order list and details / قائمة طلبات العميل وتفاصيلها |
+| `/addresses`, `/delivery-profile` | Saved addresses and delivery profile / العناوين وبيانات التوصيل |
+| `/favorites`, `/my-reviews`, `/notifications` | Favorites, reviews, notifications / المفضلة والتقييمات والإشعارات |
+| `/profile`, `/settings` | Profile and preferences / الملف الشخصي والإعدادات |
+| `/merchant`, `/merchant/onboarding` | Merchant dashboard and store setup / لوحة التاجر وإعداد المتجر |
+| `/merchant/products`, `/merchant/products/new`, `/merchant/products/[offerId]` | Offers and inventory / العروض والمخزون |
+| `/merchant/orders`, `/merchant/orders/[orderId]` | Merchant orders and fulfillment / طلبات التاجر ومعالجتها |
+| `/merchant/analytics` | Store performance / إحصائيات المتجر |
+| `/merchant/settings` | Store settings / إعدادات المتجر |
+
+The root layout in `mobile/app/_layout.tsx` loads fonts, the theme provider, status bar, and shared TanStack Query client. It clears cached query data when Supabase authentication changes between signed-in and signed-out states.
+
+يقوم التخطيط الرئيسي في `mobile/app/_layout.tsx` بتحميل الخطوط ومزوّد السمات وشريط الحالة وعميل TanStack Query المشترك. كما يمسح بيانات الاستعلام المخزنة مؤقتاً عند تغيّر حالة المصادقة في Supabase بين الدخول والخروج.
+
+## 🏗️ System architecture | معمارية النظام
+
+Arownd is a native mobile client backed primarily by Supabase, with shared TypeScript workspace packages and an Express API service foundation.
+
+أراوند تطبيق هاتف أصلي يعتمد في خدماته الحالية بشكل أساسي على Supabase، مع حزم TypeScript مشتركة وخدمة API مبنية باستخدام Express.
 
 ```text
-┌──────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────┐
 │                 Arownd Native Mobile App                 │
-│                 mobile/ — Expo Router                    │
-│                                                          │
-│  Customer marketplace       Merchant workspace           │
-│  Catalog / cart / checkout  Store / products / orders     │
-│  Profile / addresses       Analytics / settings          │
-│                                                          │
-│  UI components · Design system · i18n · Query state       │
-└──────────────────────────────┬───────────────────────────┘
-                               │ Supabase JS client
-                               ▼
-┌──────────────────────────────────────────────────────────┐
-│                       Supabase                            │
-│                                                          │
-│  Auth · PostgreSQL · RLS · RPC functions · Realtime       │
-│  Storage buckets · Edge Functions                        │
-└──────────────────────────────────────────────────────────┘
+│                  mobile/ — Expo Router                   │
+│                                                         │
+│ Customer Marketplace          Merchant Workspace         │
+│ Catalog · Cart · Checkout     Store · Offers · Orders    │
+│ Profile · Addresses           Analytics · Settings       │
+│                                                         │
+│ UI Components · Design System · i18n · Query State       │
+└───────────────────────────────┬─────────────────────────┘
+                                │ Supabase JS Client
+                                ▼
+┌─────────────────────────────────────────────────────────┐
+│                        Supabase                          │
+│                                                         │
+│ Auth · PostgreSQL · RLS · RPC · Realtime · Storage       │
+│                    Edge Functions                       │
+└─────────────────────────────────────────────────────────┘
 
-┌──────────────────────────────┐
-│ Shared workspace packages    │
-│ lib/db · lib/api-zod         │
-│ lib/api-spec                 │
-└──────────────────────────────┘
-
-┌──────────────────────────────┐
-│ Express API service          │
-│ artifacts/api-server/        │
-│ Current health endpoint      │
-└──────────────────────────────┘
+┌─────────────────────────────┐  ┌────────────────────────┐
+│ Shared workspace packages   │  │ Express API service    │
+│ lib/db · lib/api-zod        │  │ artifacts/api-server/  │
+│ lib/api-spec                │  │ Health endpoint        │
+└─────────────────────────────┘  └────────────────────────┘
 ```
 
-### Mobile application
+### Mobile application | تطبيق الهاتف
 
-- `mobile/app/`: route-level screens and layouts.
-- `mobile/components/`: reusable customer, authentication, and UI components.
-- `mobile/lib/`: feature services, validation, state helpers, Supabase access, localization, and design-system logic.
-- `mobile/test/`: test adapters and test setup.
-- Expo Router provides file-based navigation and typed route support.
-- TanStack Query manages asynchronous server state, caching, invalidation, and refetching.
-- React Hook Form and Zod are used for validated form flows.
-- AsyncStorage is used for persisted native client state and Supabase session storage.
+- `mobile/app/` — route-level screens and layouts. / الشاشات والمسارات والتخطيطات.
+- `mobile/components/` — reusable UI and feature components. / المكونات المشتركة.
+- `mobile/lib/` — feature services, validation, state helpers, Supabase access, localization, and design-system logic. / خدمات الخصائص والتحقق وإدارة الحالة والاتصال بـSupabase والترجمة ونظام التصميم.
+- `mobile/test/` — test setup and adapters. / إعداد الاختبارات والمحولات.
+- Expo Router provides file-based navigation and typed route support. / يوفر Expo Router تنقلاً مبنياً على الملفات ومسارات مدعومة بالأنواع.
+- TanStack Query manages asynchronous server state, caching, invalidation, and refetching. / يدير TanStack Query حالة البيانات غير المتزامنة والتخزين المؤقت وإعادة الجلب.
+- React Hook Form and Zod support validated forms. / يدعم React Hook Form وZod النماذج والتحقق من البيانات.
+- AsyncStorage supports persisted native client state and Supabase session storage. / يدعم AsyncStorage حفظ حالة التطبيق وجلسة Supabase محلياً.
 
-### Supabase application services
+### Supabase services | خدمات Supabase
 
-The mobile client currently uses `@supabase/supabase-js` directly. Its application service responsibilities include:
+The mobile client uses `@supabase/supabase-js` directly. Current responsibilities include:
 
-- **Auth:** registration, sign-in, persisted sessions, email confirmation, and password recovery.
-- **PostgreSQL:** marketplace catalog, store offers, profiles, addresses, orders, merchant operations, reviews, and notifications.
-- **RPC functions:** transactional operations such as checkout, merchant product creation/updates, order transitions, and other protected workflows.
-- **Row Level Security (RLS):** database-side access boundaries for user and merchant data.
-- **Realtime:** order and notification updates consumed by the mobile application.
-- **Storage:** store and product media, plus private receipt storage.
-- **Edge Functions:** the repository includes a push-notification sender function that integrates with registered device tokens and Firebase Cloud Messaging credentials.
+يستخدم تطبيق الهاتف مكتبة `@supabase/supabase-js` مباشرة. وتشمل مسؤوليات Supabase الحالية:
 
-The app's Supabase client is initialized in `mobile/lib/supabase.ts`. It uses AsyncStorage for persisted authentication, automatic token refresh, and the PKCE auth flow.
+- **Auth:** registration, sign-in, persisted sessions, email confirmation, and password recovery. / التسجيل والدخول والجلسات وتأكيد البريد واستعادة كلمة المرور.
+- **PostgreSQL:** marketplace catalog, stores, offers, profiles, addresses, orders, reviews, and notifications. / بيانات السوق والمتاجر والعروض والملفات الشخصية والعناوين والطلبات والتقييمات والإشعارات.
+- **RPC:** transactional checkout and protected merchant/order operations. / عمليات الطلبات والمعاملات وعمليات التاجر المحمية.
+- **RLS:** database-side access boundaries for customer and merchant data. / سياسات التحكم في الوصول إلى بيانات العملاء والتجار.
+- **Realtime:** order and notification updates. / تحديثات الطلبات والإشعارات الفورية.
+- **Storage:** store/product media and private receipt storage. / صور المتاجر والمنتجات وإيصالات خاصة.
+- **Edge Functions:** the repository includes a push-notification sender that uses registered device tokens and Firebase Cloud Messaging credentials. / يحتوي المستودع على دالة لإرسال إشعارات الدفع اعتماداً على رموز الأجهزة وبيانات Firebase Cloud Messaging.
 
-### Express API service
+The Supabase client is initialized in `mobile/lib/supabase.ts` with AsyncStorage-backed session persistence, automatic token refresh, and the PKCE auth flow.
 
-`artifacts/api-server/` contains an Express 5 service with request logging, CORS/JSON middleware, and an `/api/healthz` health endpoint. The current Native feature modules access Supabase directly; the Express service should therefore be treated as a small API-service foundation, not as proof that a complete marketplace REST API is implemented.
+يتم تهيئة عميل Supabase في `mobile/lib/supabase.ts` مع حفظ الجلسة عبر AsyncStorage وتجديد الرموز تلقائياً واستخدام تدفق PKCE.
 
-### Shared packages
+### Express API service | خدمة Express API
 
-| Package | Responsibility |
-| --- | --- |
-| `lib/db/` | Shared database package and Drizzle configuration |
-| `lib/api-zod/` | Generated Zod API response schemas and types |
-| `lib/api-spec/` | OpenAPI specification and generation configuration |
+**EN:** `artifacts/api-server/` contains an Express 5 service with request logging, CORS/JSON middleware, and an `/api/healthz` endpoint. Current Native feature modules access Supabase directly. This service is an API foundation, not evidence of a complete marketplace REST API.
 
-These packages provide shared infrastructure. They do not replace the Supabase database migrations or the mobile application's current Supabase data access.
+**AR:** يحتوي `artifacts/api-server/` على خدمة Express 5 تتضمن تسجيل الطلبات ووسائط CORS وJSON ونقطة فحص صحة `/api/healthz`. تتصل وحدات التطبيق الأصلي الحالية بـSupabase مباشرة. لذلك تمثل هذه الخدمة أساساً أولياً لواجهة API، وليست دليلاً على اكتمال REST API خاص بالسوق.
 
-## Technology stack
+### Shared packages | الحزم المشتركة
 
-| Layer | Technologies |
-| --- | --- |
-| Native application | Expo SDK 58, React Native 0.88.1, React 19.3, TypeScript |
-| Navigation | Expo Router |
-| Server state | TanStack Query 5 |
-| Forms | React Hook Form, Zod, `@hookform/resolvers` |
-| Backend services | Supabase Auth, PostgreSQL, RLS, RPC, Realtime, Storage, Edge Functions |
-| API service foundation | Node.js, Express 5 |
-| Database tooling | Drizzle ORM/configuration |
-| API contracts | Zod, OpenAPI |
-| UI and icons | Shared React Native UI components, Lucide React Native, React Native SVG |
-| Fonts | Inter and IBM Plex Sans Arabic |
-| Native persistence | AsyncStorage |
-| Media selection | Expo Image Picker |
-| Tests and static checks | Vitest, TypeScript, ESLint, Expo Doctor |
-| Android packaging | Expo Prebuild, Gradle, EAS build profiles |
+| Package / الحزمة | Responsibility / المسؤولية |
+|---|---|
+| `lib/db/` | Shared database package and Drizzle configuration / حزمة قاعدة البيانات وإعداد Drizzle |
+| `lib/api-zod/` | Generated Zod response schemas and types / مخططات وأنواع استجابات Zod المولّدة |
+| `lib/api-spec/` | OpenAPI specification and generation configuration / مواصفات OpenAPI وإعدادات التوليد |
 
-## Repository structure
+These packages provide shared infrastructure; they do not replace Supabase migrations or the mobile app's current direct Supabase access.
+
+توفر هذه الحزم بنية مشتركة، لكنها لا تستبدل ترحيلات Supabase ولا طريقة اتصال تطبيق الهاتف الحالية المباشرة بـSupabase.
+
+## 🧰 Technology stack | التقنيات المستخدمة
+
+| Layer / الطبقة | Technologies / التقنيات |
+|---|---|
+| Native app / التطبيق | Expo SDK 58, React Native 0.88.1, React 19.3, TypeScript |
+| Navigation / التنقل | Expo Router |
+| Server state / حالة الخادم | TanStack Query 5 |
+| Forms / النماذج | React Hook Form, Zod, `@hookform/resolvers` |
+| Backend services / خدمات الخلفية | Supabase Auth, PostgreSQL, RLS, RPC, Realtime, Storage, Edge Functions |
+| API foundation / أساس API | Node.js, Express 5 |
+| Database tooling / أدوات البيانات | Drizzle ORM and configuration |
+| API contracts / عقود API | Zod, OpenAPI |
+| UI and icons / الواجهات والأيقونات | Shared React Native UI, Lucide React Native, React Native SVG |
+| Fonts / الخطوط | Inter, IBM Plex Sans Arabic |
+| Persistence / التخزين المحلي | AsyncStorage |
+| Media / الوسائط | Expo Image Picker |
+| Quality / الجودة | Vitest, TypeScript, ESLint, Expo Doctor |
+| Android / أندرويد | Expo Prebuild, Gradle, EAS build profiles |
+
+## 🗂️ Repository structure | بنية المستودع
 
 ```text
 .
 ├── .github/
-│   └── workflows/                 # CI, Android builds, and secret scanning
+│   └── workflows/                 # CI, Android builds, secret scanning
 ├── artifacts/
-│   └── api-server/                 # Express API service foundation
+│   └── api-server/                # Express API service foundation
 ├── docs/
-│   ├── database/                   # Database audits and technical records
-│   └── REDESIGN_*.md               # UI/UX redesign documentation
+│   ├── database/                  # Database audits and technical records
+│   └── REDESIGN_*.md              # UI/UX redesign documentation
 ├── lib/
-│   ├── api-spec/                   # OpenAPI specification
-│   ├── api-zod/                    # Shared generated API schemas
-│   └── db/                         # Drizzle database package
+│   ├── api-spec/                  # OpenAPI specification
+│   ├── api-zod/                   # Shared generated API schemas
+│   └── db/                        # Drizzle database package
 ├── mobile/
-│   ├── app/                        # Expo Router screens
-│   ├── assets/                     # App assets
-│   ├── components/                 # Shared native UI
-│   ├── lib/                        # Feature and service modules
-│   ├── plugins/                    # Expo config plugins
-│   ├── test/                       # Test setup and adapters
-│   ├── app.json                    # Expo application configuration
-│   ├── eas.json                    # EAS build profiles
-│   └── package.json                # Mobile scripts and dependencies
+│   ├── app/                       # Expo Router screens
+│   ├── assets/                    # App assets
+│   ├── components/                # Shared native UI
+│   ├── lib/                       # Feature and service modules
+│   ├── plugins/                   # Expo config plugins
+│   ├── test/                      # Test setup and adapters
+│   ├── app.json                   # Expo configuration
+│   ├── eas.json                   # EAS build profiles
+│   └── package.json               # Mobile scripts/dependencies
 ├── supabase/
-│   ├── functions/                  # Supabase Edge Functions
-│   ├── migrations/                 # Versioned SQL migrations
-│   └── config.toml                 # Supabase CLI configuration
+│   ├── functions/                 # Supabase Edge Functions
+│   ├── migrations/                # Versioned SQL migrations
+│   └── config.toml                # Supabase CLI configuration
 ├── pnpm-workspace.yaml
 ├── tsconfig.base.json
 └── README.md
 ```
 
-## Data model and Supabase resources
+**EN:** The active application is in `mobile/`. The repository also contains backend/shared infrastructure and Supabase resources; their presence does not mean every package is part of the mobile runtime.
 
-The database audit dated **2026-11-08** records the following main data domains. The table list describes the audited Supabase environment and repository dependencies; it is not a substitute for checking the schema of the target environment.
+**AR:** التطبيق النشط موجود داخل `mobile/`. ويحتوي المستودع أيضاً على بنية خدمات خلفية وحزم مشتركة وموارد Supabase، لكن وجودها لا يعني أن كل حزمة منها تعمل ضمن بيئة تشغيل تطبيق الهاتف.
 
-| Domain | Main entities |
-| --- | --- |
-| Identity and access | `profiles`, `user_roles`, account types |
-| Geography | `wilayas`, commune values associated with stores |
-| Marketplace | `stores`, `products`, `categories`, `store_offers`, `product_images` |
-| Customer engagement | `reviews`, `notifications`, `user_activity_archive` |
-| Commerce | `orders`, `order_items`, `merchant_orders`, `checkout_idempotency` |
-| Delivery and fulfillment | `delivery_companies`, `delivery_coverage_areas`, `delivery_services`, `shipments`, shipment tracking and status logs |
-| Financial and governance | `wallet_transactions`, COD collection records, account deletion requests, content reports, feedback, and admin audit logs |
-| Device notifications | `push_device_tokens` |
+## 🗄️ Data model and Supabase resources | البيانات وموارد Supabase
 
-### Storage buckets
+The database audit dated **2026-11-08** records the following domains. This is an audited snapshot and must not be treated as a live schema guarantee.
 
-The audit identifies three storage buckets:
+يوثّق تدقيق قاعدة البيانات بتاريخ **2026-11-08** المجالات التالية. هذه لقطة تدقيق بتاريخ محدد وليست ضماناً بأن المخطط نفسه موجود حالياً في البيئة الحية.
 
-- `store-media`: store logos and cover images.
-- `product-media`: product images.
-- `receipts`: private receipt files; access must remain scoped to the relevant participants.
+| Domain / المجال | Main entities / الكيانات الرئيسية |
+|---|---|
+| Identity and access / الهوية والصلاحيات | `profiles`, `user_roles`, account types |
+| Geography / الجغرافيا | `wilayas`, commune values associated with stores |
+| Marketplace / السوق | `stores`, `products`, `categories`, `store_offers`, `product_images` |
+| Customer engagement / تفاعل العملاء | `reviews`, `notifications`, `user_activity_archive` |
+| Commerce / التجارة | `orders`, `order_items`, `merchant_orders`, `checkout_idempotency` |
+| Delivery / التوصيل | `delivery_companies`, `delivery_coverage_areas`, `delivery_services`, `shipments`, tracking/status logs |
+| Finance and governance / المالية والحوكمة | `wallet_transactions`, COD collection records, deletion requests, reports, feedback, audit logs |
+| Device notifications / إشعارات الأجهزة | `push_device_tokens` |
 
-### Database change policy
+### Storage buckets | حاويات التخزين
 
-- SQL migrations are maintained in `supabase/migrations/`.
-- Treat historical migrations as immutable.
-- Review the target project's migration history, SQL definitions, grants, triggers, and RLS policies before applying changes.
-- Do not assume that every repository migration has already been applied to the live project.
-- Never replay all migrations blindly against a live database. Use a reviewed reconciliation/corrective migration and a verified backup when a live schema change is approved.
+- `store-media` — store logos and cover images. / شعارات المتاجر وصور الغلاف.
+- `product-media` — product images. / صور المنتجات.
+- `receipts` — private receipt files; access must be restricted to authorized participants. / ملفات إيصالات خاصة يجب تقييد الوصول إليها بالمستخدمين المخولين.
 
-## Local development
+### Database change policy | سياسة تغيير قاعدة البيانات
 
-### Requirements
+- **EN:** SQL migrations live in `supabase/migrations/`. Treat historical migrations as immutable. Review migration history, SQL definitions, grants, triggers, and RLS policies before a change. Never assume every repository migration is applied to production. Never replay all migrations blindly against a live database; use an approved, reviewed corrective migration and a verified backup.
+- **AR:** توجد ترحيلات SQL داخل `supabase/migrations/`. يجب التعامل مع الترحيلات التاريخية باعتبارها غير قابلة للتعديل. راجع سجل الترحيلات وتعريفات SQL والصلاحيات والمحفزات وسياسات RLS قبل أي تغيير. لا تفترض أن جميع ترحيلات المستودع مطبقة في الإنتاج. لا تعِد تشغيل جميع الترحيلات عشوائياً على قاعدة حية؛ استخدم ترحيلاً تصحيحياً معتمداً ومراجعاً ونسخة احتياطية تم التحقق منها.
+
+## 🚀 Local development | التطوير والتشغيل المحلي
+
+### Requirements | المتطلبات
 
 - Node.js **22.x**
 - npm
-- Android device/emulator for Android development, or an iOS device/simulator on macOS
+- Android device/emulator, or an iOS device/simulator on macOS
 - A Supabase project with the required application schema and Auth configuration
 
-### 1. Configure the mobile environment
+- Node.js الإصدار **22.x**
+- مدير الحزم npm
+- جهاز Android أو محاكي، أو جهاز/محاكي iOS على macOS
+- مشروع Supabase مجهّز بمخطط البيانات وإعدادات المصادقة المطلوبة
 
-Create `mobile/.env.local`:
+### 1. Configure environment | إعداد البيئة
+
+Create `mobile/.env.local` أنشئ الملف التالي:
 
 ```env
 EXPO_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
-Use the Supabase **publishable key** in the mobile app. The mobile client must never contain a service-role key, database password, or database connection string.
+Use the Supabase **publishable key** in the mobile app. Never put a service-role key, database password, or database connection string in the client.
 
-### 2. Install mobile dependencies
+استخدم **مفتاح Supabase Publishable** في تطبيق الهاتف. يُمنع وضع Service Role Key أو كلمة مرور قاعدة البيانات أو رابط اتصال قاعدة البيانات داخل التطبيق.
 
-Run commands from the mobile project directory:
+### 2. Install dependencies | تثبيت الاعتماديات
+
+Run from the mobile directory نفّذ من مجلد الهاتف:
 
 ```bash
 cd mobile
 npm install --legacy-peer-deps
 ```
 
-### 3. Start the application
+### 3. Start the app | تشغيل التطبيق
 
 ```bash
 npm start
 ```
 
-To open the app directly on a connected platform:
+Platform shortcuts اختصارات التشغيل حسب المنصة:
 
 ```bash
 npm run android
 npm run ios
 ```
 
-These commands start the Expo development workflow. They are not production APK/AAB build commands.
+**EN:** These commands start the Expo development workflow. They do not create a production APK or AAB.
 
-### 4. Available mobile scripts
+**AR:** تشغّل هذه الأوامر بيئة تطوير Expo، ولا تنشئ ملف APK أو AAB مخصصاً للإنتاج.
 
-Run from `mobile/`:
+### 4. Available scripts | الأوامر المتاحة
 
-| Command | Purpose |
-| --- | --- |
-| `npm start` | Start the Expo development server |
-| `npm run android` | Start Expo targeting Android |
-| `npm run ios` | Start Expo targeting iOS |
-| `npm run typecheck` | Run TypeScript without emitting files |
-| `npm run lint` | Run ESLint |
-| `npm test` | Run the Vitest suite |
-| `npm run doctor` | Run Expo Doctor |
+Run from `mobile/` نفّذ من داخل `mobile/`:
 
-Additional useful Expo checks:
+| Command / الأمر | Purpose / الوظيفة |
+|---|---|
+| `npm start` | Start Expo / تشغيل Expo |
+| `npm run android` | Start targeting Android / التشغيل على Android |
+| `npm run ios` | Start targeting iOS / التشغيل على iOS |
+| `npm run typecheck` | TypeScript check / فحص TypeScript |
+| `npm run lint` | ESLint / فحص ESLint |
+| `npm test` | Vitest suite / تشغيل اختبارات Vitest |
+| `npm run doctor` | Expo Doctor / فحص إعدادات Expo |
+
+Additional Expo checks أوامر فحص إضافية:
 
 ```bash
 npx expo install --check
@@ -406,97 +411,117 @@ npx expo config --type public
 npx expo-doctor
 ```
 
-## Environment and security
+## 🔐 Environment and security | الإعدادات والأمان
 
-### Client configuration
+### Client configuration | إعدادات التطبيق
 
-The app reads only these public client variables:
+The app reads these public variables يقرأ التطبيق المتغيرات العامة التالية:
 
 - `EXPO_PUBLIC_SUPABASE_URL`
 - `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-Values prefixed with `EXPO_PUBLIC_` are embedded in the client bundle and must be considered public. Security must be enforced by Supabase Auth, RLS, grants, and carefully designed database functions—not by hiding client-side values.
+Any `EXPO_PUBLIC_*` value is embedded in the client bundle and must be considered public. Enforce security through Supabase Auth, RLS, grants, and carefully designed database functions—not by hiding client-side values.
 
-### Authentication deep links
+كل متغير يبدأ بـ`EXPO_PUBLIC_*` يُضمّن داخل حزمة التطبيق ويجب اعتباره معلومة عامة. يجب فرض الأمان من خلال Supabase Auth وRLS والصلاحيات ودوال قاعدة البيانات المصممة بعناية، وليس بالاعتماد على إخفاء قيم جهة العميل.
 
-The configured application scheme is:
+### Authentication deep links | روابط المصادقة
+
+Configured app scheme الإعداد الحالي لمخطط التطبيق:
 
 ```text
 com.arownd.app
 ```
 
-The same scheme is used for email confirmation and password recovery redirects. Configure matching redirect URLs in Supabase Auth for the app environments being tested.
+Configure matching redirect URLs in Supabase Auth for the environments being tested.
 
-### Security principles
+يجب ضبط روابط Redirect المطابقة داخل Supabase Auth لكل بيئة يتم اختبارها، خصوصاً تأكيد البريد واستعادة كلمة المرور.
 
-- Never commit secrets or production credentials.
-- Never ship Supabase service-role credentials in the app.
-- Keep private receipt storage private and participant-scoped.
-- Enforce ownership and role checks inside database policies and RPC functions.
-- Validate user input at the client boundary, while treating database constraints and server-side validation as authoritative.
-- Review RLS policies, table/column grants, and `SECURITY DEFINER` functions together.
-- Do not modify a live Supabase project or its data without an explicitly approved, reviewed change.
+### Security principles | مبادئ الأمان
 
-## Quality checks and automated builds
+- Never commit secrets or production credentials. / لا ترفع الأسرار أو بيانات الإنتاج إلى Git.
+- Never ship Supabase service-role credentials in the app. / لا تضع Service Role Key داخل التطبيق.
+- Keep receipt storage private and participant-scoped. / حافظ على خصوصية الإيصالات وقيّد الوصول للمصرح لهم.
+- Enforce ownership and role checks in database policies and RPC functions. / تحقق من الملكية والأدوار داخل سياسات قاعدة البيانات ودوال RPC.
+- Validate at the client boundary, but treat database constraints and server-side validation as authoritative. / تحقّق من المدخلات في التطبيق، مع اعتبار قيود قاعدة البيانات والتحقق الخلفي المرجع النهائي.
+- Review RLS, grants, and `SECURITY DEFINER` functions together. / راجع RLS والصلاحيات ودوال `SECURITY DEFINER` معاً.
+- Do not change live Supabase data or schema without explicit approval and review. / لا تغيّر مخطط Supabase الحي أو بياناته دون موافقة ومراجعة صريحتين.
 
-GitHub Actions workflows are maintained in `.github/workflows/`.
+## 🧪 Quality and automation | الجودة والأتمتة
 
-| Workflow | Purpose |
-| --- | --- |
-| `mobile-quality.yml` | Install mobile dependencies and run TypeScript, ESLint, Vitest, and Expo Doctor |
-| `mobile-android-preview-apk.yml` | Build an Android preview APK after the required quality workflow succeeds and upload the artifact |
-| `android-diagnostic-apk.yml` | Android diagnostic build workflow |
-| `android-generate-keystore.yml` | Keystore-generation workflow |
-| `android-push-test-apk.yml` | Android test APK workflow |
-| `android-release-aab.yml` | Android release AAB workflow |
-| `secret-scan.yml` | Repository secret scanning |
+GitHub Actions workflows live in `.github/workflows/`. توجد مسارات GitHub Actions داخل `.github/workflows/`.
 
-The preview APK workflow uses the Supabase public client configuration as GitHub Actions secrets:
+| Workflow | Purpose / الوظيفة |
+|---|---|
+| `mobile-quality.yml` | TypeScript, ESLint, Vitest, Expo Doctor / فحوصات جودة تطبيق الهاتف |
+| `mobile-android-preview-apk.yml` | Android preview APK after quality succeeds / بناء APK تجريبي بعد نجاح فحوصات الجودة |
+| `android-diagnostic-apk.yml` | Diagnostic Android build / بناء تشخيصي لأندرويد |
+| `android-generate-keystore.yml` | Keystore generation / إنشاء مفتاح توقيع |
+| `android-push-test-apk.yml` | Test APK workflow / مسار APK للاختبار |
+| `android-release-aab.yml` | Release Android App Bundle / بناء AAB للإصدار |
+| `secret-scan.yml` | Repository secret scanning / فحص الأسرار في المستودع |
+
+The preview workflow expects these GitHub Actions secrets ويتطلب مسار APK التجريبي أسرار GitHub التالية:
 
 - `EXPO_PUBLIC_SUPABASE_URL`
 - `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-The preview artifact is configured for a 14-day retention period. A successful quality workflow is not, by itself, evidence that an APK or AAB was built; check the corresponding Android workflow run and artifact.
+The preview artifact retention is configured for 14 days. A successful quality workflow alone does not prove that an APK/AAB was built; inspect the relevant Android workflow run and artifact.
 
-## Android build and distribution
+مدة الاحتفاظ بملف APK التجريبي مضبوطة على 14 يوماً. نجاح فحوصات الجودة وحده لا يثبت بناء APK أو AAB؛ يجب مراجعة تشغيل مسار Android والملف الناتج.
 
-The Expo app configuration is in `mobile/app.json`:
+## 🤖 Android build and distribution | بناء وتوزيع أندرويد
 
-- App name: `Arownd`
-- Expo slug: `arownd-mobile`
-- Android package: `com.arownd.app`
-- iOS bundle identifier: `com.arownd.app`
-- App scheme: `com.arownd.app`
+Expo configuration in `mobile/app.json` إعدادات Expo داخل `mobile/app.json`:
 
-### Android project boundary
+| Property / الخاصية | Value / القيمة |
+|---|---|
+| App name / اسم التطبيق | `Arownd` |
+| Expo slug | `arownd-mobile` |
+| Android package | `com.arownd.app` |
+| iOS bundle identifier | `com.arownd.app` |
+| App scheme | `com.arownd.app` |
 
-The Expo-generated Android project belongs at `mobile/android/`. It is generated from the Expo configuration when prebuild is run.
+### Android project boundary | حدود مشروع Android
 
-The repository-root `android/` directory, if present in a checkout, belongs to the retired Capacitor application and is **not** the Android native project for the current Expo app. Do not copy or reuse it.
+**EN:** The Expo-generated Android project belongs in `mobile/android/`. It is generated from the Expo configuration by Prebuild.
 
-Generate the Expo Android project without reinstalling dependencies:
+**AR:** مشروع Android الذي يولّده Expo مكانه `mobile/android/`، ويتم توليده انطلاقاً من إعدادات Expo عبر Prebuild.
+
+The repository-root `android/` directory, if present, belongs to the retired Capacitor application. It is not the Android project for the current Expo app.
+
+مجلد `android/` الموجود في جذر المستودع، إن وُجد، يعود إلى تطبيق Capacitor السابق، وليس مشروع Android الخاص بتطبيق Expo الحالي.
+
+Generate the Expo Android project without reinstalling dependencies ولتوليد مشروع Android دون إعادة تثبيت الاعتماديات:
 
 ```bash
 cd mobile
 npx expo prebuild --platform android --no-install
 ```
 
-This command generates native project files only. It does **not** assemble an APK or AAB.
+This generates native project files only; it does **not** assemble an APK or AAB.
 
-### EAS profiles
+هذا الأمر يولّد ملفات المشروع الأصلي فقط، ولا ينشئ ملف APK أو AAB.
 
-The build profiles are defined in `mobile/eas.json`:
+### EAS build profiles | ملفات بناء EAS
 
-- `preview`: internal Android APK distribution.
-- `production`: Android App Bundle (AAB) for production distribution.
+Profiles are defined in `mobile/eas.json`:
 
-Before an EAS build, link the Expo app to the intended EAS project and configure Android signing credentials securely. Confirm the generated artifact and install/test it on the target devices before treating a release as verified.
+- `preview`: internal Android APK distribution. / توزيع APK داخلي للتجربة.
+- `production`: Android App Bundle (AAB). / حزمة Android App Bundle للإنتاج.
 
-## Known integration and release considerations
+Before building, link the intended Expo/EAS project and configure signing credentials securely. Verify the artifact and install/test it on target devices before declaring a release ready.
 
-A read-only database audit recorded in `docs/database/AROWND_DATABASE_AUDIT_2026-11-08.md` compared the Native code with a live Supabase snapshot on that date. It reported schema drift that must be resolved before relying on the affected flows in that live environment.
+قبل البناء، اربط مشروع Expo/EAS الصحيح واضبط بيانات توقيع Android بطريقة آمنة. تحقّق من الملف الناتج وثبّته واختبره على الأجهزة المستهدفة قبل إعلان جاهزية الإصدار.
 
-The audit specifically identified Native code references to these objects that were absent from the audited live schema:
+## ⚠️ Known integration considerations | ملاحظات التكامل والإصدار
+
+A read-only database audit in `docs/database/AROWND_DATABASE_AUDIT_2026-11-08.md` compared Native code with a live Supabase snapshot on **2026-11-08**. It reported schema drift that affects some Native flows.
+
+قارن تدقيق قراءة فقط موجود في `docs/database/AROWND_DATABASE_AUDIT_2026-11-08.md` بين كود Native ولقطة من Supabase الحية بتاريخ **2026-11-08**. وقد رصد اختلافات في المخطط تؤثر في بعض وظائف التطبيق.
+
+The audit identified Native references to these objects that were absent from the audited live schema:
+
+رصد التدقيق اعتماد كود Native على العناصر التالية التي لم تكن موجودة في مخطط قاعدة البيانات الحية وقت التدقيق:
 
 - `public.user_addresses`
 - `public.set_my_default_address(uuid)`
@@ -504,34 +529,45 @@ The audit specifically identified Native code references to these objects that w
 - `public.update_merchant_product_details(...)`
 - `public.get_my_store_analytics(uuid)`
 
-It also reported that the live `create_order_with_delivery` and `submit_review` implementations did not yet match the current repository's intended Native behavior, plus migration-history differences and permission/grant items requiring review.
+It also reported that the live `create_order_with_delivery` and `submit_review` implementations did not yet match the Native code's intended behavior, alongside migration-history and permission/grant items requiring review.
 
-**Important:** repository migration files for these capabilities do exist, but their presence in Git does not prove that their effects are present in the live database. The audit is a dated snapshot; re-check the current target environment before making release decisions. Do not resolve these findings by blindly applying every SQL file or editing migration history.
+كما أشار إلى أن تنفيذَي `create_order_with_delivery` و`submit_review` في قاعدة البيانات الحية لم يكونا متوافقين بالكامل مع السلوك الذي يتوقعه كود Native، إضافة إلى نقاط تتعلق بتاريخ الترحيلات والصلاحيات والمنح تحتاج إلى مراجعة.
 
-Other scope boundaries visible in the current code:
+**Important / مهم:** Migration files in Git do not prove that their changes have been applied to the live database. The audit is a dated snapshot; re-check the target environment before release. Do not fix drift by blindly replaying migrations or editing migration history.
 
-- Native checkout currently submits cash-on-delivery (`cod`); no completed online card/BaridiMob payment integration is demonstrated by the checkout implementation.
-- The Express API service currently exposes a health endpoint and shared middleware, not a complete marketplace API.
-- EAS build profiles and GitHub workflows describe build paths; verify actual workflow runs and artifacts before claiming a distributable build exists.
-- Supabase live schema changes, production credentials, and customer data are outside the scope of ordinary mobile README or UI changes.
+وجود ملفات Migration في Git لا يثبت تطبيق تغييراتها على قاعدة البيانات الحية. التدقيق لقطة بتاريخ محدد؛ أعد فحص البيئة المستهدفة قبل الإصدار. لا تعالج الاختلافات بإعادة تشغيل الترحيلات عشوائياً أو بتعديل تاريخ الترحيلات.
 
-## Development conventions
+Other verified scope boundaries نقاط أخرى يجب أخذها في الحسبان:
 
-- Keep the active native application in `mobile/`.
-- Keep route screens in `mobile/app/`, reusable UI in `mobile/components/`, and feature/data logic in `mobile/lib/`.
-- Keep shared contracts and database tooling in the root `lib/` packages.
-- Keep Supabase configuration, Edge Functions, and versioned migrations in `supabase/`.
-- Keep secrets out of source control and out of public client configuration.
-- Prefer database RPCs for multi-step transactional operations and enforce authorization in the database.
-- Invalidate or update relevant TanStack Query keys after successful mutations.
-- Preserve typed routes, form validation, and the existing test coverage when changing feature logic.
-- Run focused checks for the files and behavior affected by a change; use the full quality workflow when the change warrants it.
+- Native checkout currently uses cash on delivery (`cod`); completed online card/BaridiMob integration is not demonstrated. / يستخدم Checkout حالياً الدفع عند الاستلام (`cod`)؛ ولا يوجد ما يثبت اكتمال الدفع بالبطاقات أو بريدي موب.
+- Express currently exposes a health endpoint and middleware, not a complete marketplace API. / توفر خدمة Express حالياً نقطة فحص صحة ووسائط تشغيل، وليست API متكاملة للسوق.
+- EAS profiles and workflow definitions describe build paths, not proof of a successful distributable build. / ملفات EAS ومسارات Actions تصف طريقة البناء ولا تثبت نجاح إصدار قابل للتوزيع.
+- Live Supabase schema/data and production credentials are outside routine README changes. / مخطط Supabase الحي وبياناته وأسرار الإنتاج ليست ضمن تغييرات README الاعتيادية.
 
-## Further documentation
+## 🧭 Development conventions | معايير التطوير
 
-- [Native mobile development guide](mobile/README.md)
-- [Expo application configuration](mobile/app.json)
-- [EAS build profiles](mobile/eas.json)
-- [Supabase CLI configuration](supabase/config.toml)
-- [Database audit and integration findings](docs/database/AROWND_DATABASE_AUDIT_2026-11-08.md)
-- [Repository redesign audit](docs/REDESIGN_REPOSITORY_AUDIT.md)
+- Keep the active native application in `mobile/`. / حافظ على تطبيق الهاتف النشط داخل `mobile/`.
+- Keep route screens in `mobile/app/`, reusable UI in `mobile/components/`, and feature/data logic in `mobile/lib/`. / ضع الشاشات في `mobile/app/` والمكونات المشتركة في `mobile/components/` ومنطق الخصائص والبيانات في `mobile/lib/`.
+- Keep shared contracts and database tooling in root `lib/` packages. / ضع العقود المشتركة وأدوات قاعدة البيانات في حزم `lib/` الجذرية.
+- Keep Supabase configuration, Edge Functions, and migrations in `supabase/`. / احتفظ بإعدادات Supabase ودوال Edge والترحيلات داخل `supabase/`.
+- Keep secrets out of source control and public client configuration. / لا تضع الأسرار في Git أو إعدادات العميل العامة.
+- Prefer database RPCs for transactional operations and enforce authorization in the database. / فضّل RPC للعمليات المعاملاتية وطبّق الصلاحيات داخل قاعدة البيانات.
+- Invalidate/update relevant TanStack Query keys after successful mutations. / حدّث أو ألغِ مفاتيح TanStack Query المناسبة بعد نجاح عمليات التعديل.
+- Preserve typed routes, form validation, and test coverage when changing feature logic. / حافظ على المسارات المعرّفة والـValidation وتغطية الاختبارات عند تعديل منطق الخصائص.
+- Run focused checks for the affected behavior; use the full quality workflow when appropriate. / نفّذ فحوصات مركزة على الجزء المتأثر، واستخدم مسار الجودة الكامل عندما تستدعي طبيعة التغيير ذلك.
+
+## 📖 Further documentation | وثائق إضافية
+
+- [Native mobile development guide | دليل تطوير تطبيق الهاتف](mobile/README.md)
+- [Expo application configuration | إعدادات Expo](mobile/app.json)
+- [EAS build profiles | ملفات بناء EAS](mobile/eas.json)
+- [Supabase CLI configuration | إعدادات Supabase CLI](supabase/config.toml)
+- [Database audit and integration findings | تدقيق قاعدة البيانات وملاحظات التكامل](docs/database/AROWND_DATABASE_AUDIT_2026-11-08.md)
+- [Repository redesign audit | تدقيق إعادة تصميم المستودع](docs/REDESIGN_REPOSITORY_AUDIT.md)
+
+---
+
+<p align="center">
+  <strong>Arownd — Local Commerce. Connected.</strong><br/>
+  <strong>أراوند — التجارة المحلية في مكان واحد.</strong>
+</p>
