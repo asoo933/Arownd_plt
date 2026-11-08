@@ -10,7 +10,7 @@ import {
   View
 } from "react-native";
 
-import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
@@ -151,7 +151,7 @@ export default function CheckoutScreen() {
     return <CustomerScreen>
       <View style={[styles.successPanel, { backgroundColor: theme.colors.surface }]}>
         <Text style={styles.successMark}>✓</Text>
-        <CustomerHeading title={translate("checkoutSuccessTitle")} subtitle={translate("checkoutSuccessMessage")} />
+        <AppHeader title={translate("checkoutSuccessTitle")} />\n        <Text style={styles.hint}>{translate("checkoutSuccessMessage")}</Text>
         <Text style={styles.orderLabel}>{translate("checkoutOrderNumber")}</Text>
         <Text selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</Text>
         <Text style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</Text>
@@ -163,7 +163,7 @@ export default function CheckoutScreen() {
   if (cart.isPending || auth.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
   if (!cart.data.length) return <CustomerScreen>
-    <CustomerHeading title={translate("checkoutTitle")} />
+    <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
     <Button label={translate("cartBrowse")} onPress={() => router.replace("/explore")} fullWidth />
   </CustomerScreen>;
@@ -240,7 +240,7 @@ export default function CheckoutScreen() {
             <PressableSurface onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutManageAddresses")}</Text></PressableSurface>
           </View>
           {savedAddresses.data.map((address) => (
-            <PressableSurfaceSurface
+            <PressableSurface
               key={address.id}
               accessibilityRole="radio"
               accessibilityLabel={address.recipient_name + "، " + address.commune}
@@ -263,7 +263,7 @@ export default function CheckoutScreen() {
         <PressableSurface onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutAddSavedAddress")}</Text></PressableSurface>
       )}
       <View style={styles.deliveryOptions}>
-        <PressableSurfaceSurface
+        <PressableSurface
           accessibilityRole="radio"
           accessibilityLabel={translate("checkoutHomeDelivery")}
           accessibilityState={{ selected: deliveryType === "home" }}
@@ -273,7 +273,7 @@ export default function CheckoutScreen() {
           <Text style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</Text>
           <Text style={styles.deliveryHint}>{translate("checkoutHomeDeliveryHint")}</Text>
         </PressableSurface>
-        <PressableSurfaceSurface
+        <PressableSurface
           accessibilityRole="radio"
           accessibilityLabel={translate("checkoutStorePickup")}
           accessibilityState={{ selected: deliveryType === "desk" }}
