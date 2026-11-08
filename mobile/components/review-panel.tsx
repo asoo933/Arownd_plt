@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button } from "@/components/ui";
+import { Button, TextField } from "@/components/ui";
 import { fetchApprovedReviews, fetchMyReview, submitMyReview } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
@@ -71,7 +71,15 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
               </Pressable>
             ))}
           </View>
-          <TextInput value={comment} onChangeText={setComment} multiline maxLength={1000} placeholder={translate("reviewsCommentPlaceholder")} placeholderTextColor={theme.colors.muted} textAlign="right" style={[styles.input, { color: theme.colors.foreground, borderColor: theme.colors.border }]} />
+          <TextField
+            value={comment}
+            onChangeText={setComment}
+            multiline
+            maxLength={1000}
+            placeholder={translate("reviewsCommentPlaceholder")}
+            textAlign="right"
+            style={[styles.input, { color: theme.colors.foreground, borderColor: theme.colors.border }]}
+          />
           <Button
             label={translate("reviewsSubmit")}
             onPress={() => submit.mutate()}
