@@ -36,7 +36,7 @@ export function Alert({
 
   return (
     <View accessibilityRole="alert" style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, gap: designTokens.spacing.xs }, style]}>
-      {title ? <UiText style={{ color: colors.foreground, fontWeight: "700", fontSize: theme.typography.body, textAlign: "right" }}>{title}</UiText> : null}
+      {title ? <UiText style={{ color: colors.foreground, fontWeight: theme.fontWeights.bold, fontSize: theme.typography.body, textAlign: "right" }}>{title}</UiText> : null}
       <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText>
     </View>
   );
@@ -118,10 +118,10 @@ export function SuccessState({
   const theme = useAppTheme();
   return (
     <View style={{ minHeight: 144, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl }}>
-      <View style={{ width: 48, height: 48, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.successSurface }}>
+      <View style={{ width: theme.dimensions.avatarSize.md, height: theme.dimensions.avatarSize.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.successSurface }}>
         <Icon name="check" size={24} color={theme.colors.success} accessibilityHidden />
       </View>
-      <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "center" }}>{title}</UiText>
+      <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.extrabold, textAlign: "center" }}>{title}</UiText>
       {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "center" }}>{description}</UiText> : null}
       {action}
     </View>
@@ -171,7 +171,7 @@ export function BottomSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onRequestClose}>
       <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "flex-end", backgroundColor: theme.colors.overlay }}>
         <Pressable onPress={() => undefined} style={{ maxHeight, padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.xxl, borderTopLeftRadius: theme.radius.xl, borderTopRightRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
-          <View style={{ width: 40, height: 4, borderRadius: theme.radius.pill, backgroundColor: theme.colors.border, alignSelf: "center" }} />
+          <View style={{ width: theme.dimensions.avatarSize.md, height: 4, borderRadius: theme.radius.pill, backgroundColor: theme.colors.border, alignSelf: "center" }} />
           {children}
         </Pressable>
       </Pressable>
@@ -193,7 +193,7 @@ export function Toast({
 
   return (
     <View accessibilityRole="alert" pointerEvents="box-none" style={{ position: "absolute", start: designTokens.spacing.md, end: designTokens.spacing.md, bottom: designTokens.spacing.xl, alignItems: "center" }}>
-      <View style={{ minHeight: 48, maxWidth: "100%", flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
+      <View style={{ minHeight: theme.dimensions.controlHeight.lg, maxWidth: "100%", flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
         <UiText style={{ color: theme.colors.surface, flex: 1, textAlign: "right" }}>{message}</UiText>
         {action}
       </View>
