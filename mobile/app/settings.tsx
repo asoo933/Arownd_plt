@@ -77,26 +77,6 @@ export default function SettingsScreen() {
       <AppHeader title={translate("settingsTitle")} />
       <Caption>{translate("settingsSubtitle")}</Caption>
 
-      <Card style={styles.sectionCard} contentStyle={styles.sectionContent}>
-        <Heading level={3}>{translate("settingsAppearanceTitle")}</Heading>
-        <Caption>{translate("settingsAppearanceHint")}</Caption>
-        <SegmentedControl
-          accessibilityLabel={translate("settingsAppearanceTitle")}
-          value={themeMode}
-          onChange={(value) => {
-            if (!isThemeMode(value)) return;
-            setAppearanceError(false);
-            void setThemeMode(value).catch(() => setAppearanceError(true));
-          }}
-          options={[
-            { key: "system", label: translate("settingsThemeSystem") },
-            { key: "light", label: translate("settingsThemeLight") },
-            { key: "dark", label: translate("settingsThemeDark") }
-          ]}
-        />
-        {appearanceError ? <UiText tone="danger">{translate("settingsAppearanceError")}</UiText> : null}
-      </Card>
-
       <Card contentStyle={styles.sectionContent}>
         <Heading level={3}>{translate("settingsSecurityTitle")}</Heading>
         <Caption>{translate("settingsPasswordHint")}</Caption>
@@ -129,7 +109,7 @@ export default function SettingsScreen() {
       </Card>
 
       <Card contentStyle={styles.sectionContent}>
-        <Heading level={3}>{translate("settingsAccountTitle")}</Heading>
+        <Heading level={3}>{translate("settingsSecurityTitle")}</Heading>
         <PressableSurface
           accessibilityRole="button"
           accessibilityLabel={translate("profileEditDetails")}
@@ -154,30 +134,54 @@ export default function SettingsScreen() {
           </View>
           <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
         </PressableSurface>
-        <PressableSurface
-          accessibilityRole="button"
-          accessibilityLabel={translate("settingsStoreManagement")}
-          onPress={() => router.push("/merchant")}
-          style={styles.linkRow}
-        >
-          <View style={styles.linkLabel}>
-            <Icon name="store" size={19} color={theme.colors.foregroundSecondary} />
-            <UiText weight="700">{translate("settingsStoreManagement")}</UiText>
-          </View>
-          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
-        </PressableSurface>
-        <PressableSurface
-          accessibilityRole="button"
-          accessibilityLabel={translate("forgotPassword")}
-          onPress={() => router.push("/forgot-password")}
-          style={styles.linkRow}
-        >
-          <View style={styles.linkLabel}>
-            <Icon name="lock" size={19} color={theme.colors.foregroundSecondary} />
-            <UiText weight="700">{translate("forgotPassword")}</UiText>
-          </View>
-          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
-        </PressableSurface>
+        <Heading level={4}>{translate("settingsPasswordChangeTitle")}</Heading>
+        <Caption>{translate("settingsPasswordHint")}</Caption>
+        <TextField
+          value={password}
+          onChangeText={setPassword}
+          placeholder={translate("newPassword")}
+          secureTextEntry
+          autoCapitalize="none"
+          textContentType="newPassword"
+          style={styles.input}
+        />
+        <TextField
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          placeholder={translate("confirmPassword")}
+          secureTextEntry
+          autoCapitalize="none"
+          textContentType="newPassword"
+          style={styles.input}
+        />
+        {formError ? <UiText tone="danger">{formError}</UiText> : null}
+        {message ? <UiText tone="success" weight="700">{message}</UiText> : null}
+        <Button
+          label={translate("settingsPasswordSave")}
+          onPress={() => passwordMutation.mutate()}
+          loading={passwordMutation.isPending}
+          fullWidth
+        />
+      </Card>
+
+      <Card style={styles.sectionCard} contentStyle={styles.sectionContent}>
+        <Heading level={3}>{translate("settingsAppearanceTitle")}</Heading>
+        <Caption>{translate("settingsAppearanceHint")}</Caption>
+        <SegmentedControl
+          accessibilityLabel={translate("settingsAppearanceTitle")}
+          value={themeMode}
+          onChange={(value) => {
+            if (!isThemeMode(value)) return;
+            setAppearanceError(false);
+            void setThemeMode(value).catch(() => setAppearanceError(true));
+          }}
+          options={[
+            { key: "system", label: translate("settingsThemeSystem") },
+            { key: "light", label: translate("settingsThemeLight") },
+            { key: "dark", label: translate("settingsThemeDark") }
+          ]}
+        />
+        {appearanceError ? <UiText tone="danger">{translate("settingsAppearanceError")}</UiText> : null}
       </Card>
 
       <Card contentStyle={styles.sectionContent}>
