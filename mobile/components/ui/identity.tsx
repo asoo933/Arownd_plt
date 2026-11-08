@@ -9,6 +9,7 @@ import {
 
 import { useAppTheme } from "@/lib/theme";
 import { getIdentityInitials } from "./identity-state";
+import { Icon } from "./icon";
 
 export type AvatarProps = {
   name: string;
@@ -82,7 +83,7 @@ export function Avatar({
             borderColor: theme.colors.surface
           }}
         >
-          <Text style={{ color: theme.colors.accentForeground, fontSize: size * 0.18, fontWeight: "900" }}>✓</Text>
+          <Icon name="check" size={Math.max(10, size * 0.18)} color={theme.colors.accentForeground} accessibilityHidden />
         </View>
       ) : null}
       {online ? (
