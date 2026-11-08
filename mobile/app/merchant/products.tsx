@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, FilterBar, FilterChip, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, FilterBar, FilterChip, Image as UiImage, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -256,7 +256,7 @@ function MerchantOfferCard({
       : translate("merchantProductsAvailable");
 
   return (
-    <View style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+    <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.offerCard}>
       <View style={styles.productHeader}>
         <PressableSurface
           accessibilityRole={image ? "button" : undefined}
@@ -266,7 +266,7 @@ function MerchantOfferCard({
           style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}
         >
           {image ? (
-            <Image source={{ uri: image.image_url }} style={styles.image} resizeMode="cover" />
+            <UiImage uri={image.image_url} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.image} />
           ) : (
             <UiText style={[styles.imageFallback, { color: theme.colors.muted }]}>A</UiText>
           )}
@@ -322,46 +322,29 @@ function MerchantOfferCard({
 
       <Button label={translate("merchantProductEditOpen")} onPress={onEdit} disabled={anyBusy} variant="ghost" size="sm" fullWidth />
 
-      <Modal
+      <MediaViewer
         visible={galleryOpen}
-        transparent
-        animationType="fade"
         onRequestClose={() => setGalleryOpen(false)}
+        closeLabel={translate("merchantProductCategoryClose")}
       >
-        <View style={[styles.galleryOverlay, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.galleryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <View style={styles.galleryHeader}>
-              <UiText style={[styles.galleryTitle, { color: theme.colors.foreground }]}>
-                {translate("merchantProductImagesLabel")}
-              </UiText>
-              <PressableSurface
-                accessibilityRole="button"
-                onPress={() => setGalleryOpen(false)}
-                hitSlop={10}
-              >
-                <UiText style={[styles.galleryClose, { color: theme.colors.accentMuted }]}>
-                  {translate("merchantProductCategoryClose")}
-                </UiText>
-              </PressableSurface>
-            </View>
-            <ScrollView
-              horizontal
-              contentContainerStyle={styles.galleryImages}
-              showsHorizontalScrollIndicator={false}
-            >
-              {offer.images.map((item) => (
-                <Image
-                  key={item.id}
-                  source={{ uri: item.image_url }}
-                  style={styles.galleryImage}
-                  resizeMode="contain"
-                />
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-    </View>
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.galleryImages}
+          showsHorizontalScrollIndicator={false}
+        >
+          {offer.images.map((item) => (
+            <UiImage
+              key={item.id}
+              uri={item.image_url}
+              accessibilityLabel={translate("merchantProductImagesLabel")}
+              aspectRatio={260 / 300}
+              style={styles.galleryImage}
+              resizeMode="contain"
+            />
+          ))}
+        </ScrollView>
+      </MediaViewer>
+    </Card>
   );
 }
 
