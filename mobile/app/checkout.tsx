@@ -8,11 +8,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -227,8 +227,8 @@ export default function CheckoutScreen() {
       <Pressable onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
       </Pressable>
-      <TextInput value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" maxLength={120} />
-      <TextInput value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
+      <TextField value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" maxLength={120} />
+      <TextField value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
@@ -281,13 +281,13 @@ export default function CheckoutScreen() {
           <Text style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</Text>
         </Pressable>
       ) : (
-        <TextInput value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} placeholderTextColor={theme.colors.placeholder} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
+        <TextField value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
       )}
       {communes.isError ? <Text style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</Text> : null}
 
       {deliveryType === "home" ? <>
         <Text style={styles.fieldLabel}>{translate("checkoutAddress")}</Text>
-        <TextInput value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} placeholderTextColor={theme.colors.placeholder} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
+        <TextField value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
       </> : <Text style={styles.fieldHint}>{translate("checkoutPickupNote")}</Text>}
     </View>
 
@@ -317,9 +317,13 @@ export default function CheckoutScreen() {
     </View>
 
     {formError ? <Text accessibilityRole="alert" style={styles.errorText}>{formError}</Text> : null}
-    <Pressable onPress={submit} disabled={mutation.isPending || offers.isPending || offers.isError || hasBlockingItems || wilayas.isError} style={[styles.primary, (mutation.isPending || offers.isPending || offers.isError || hasBlockingItems) && styles.disabled]}>
-      {mutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.primaryText}>{translate("checkoutConfirm")}</Text>}
-    </Pressable>
+    <Button
+      label={translate("checkoutConfirm")}
+      onPress={submit}
+      loading={mutation.isPending}
+      disabled={offers.isPending || offers.isError || hasBlockingItems || wilayas.isError}
+      fullWidth
+    />
 
     <Modal visible={picker !== null} transparent animationType="slide" onRequestClose={() => setPicker(null)}>
       <View style={styles.modalBackdrop}>
