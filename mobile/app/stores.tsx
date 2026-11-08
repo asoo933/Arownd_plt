@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { CustomerScreen, EmptyState, ErrorState, LoadingState, StoreTile } from "@/components/customer-ui";
 import { fetchFeaturedStores } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 import { AppHeader, Icon, IconButton, Text as UiText } from "@/components/ui";
 
 export default function StoresScreen() {
@@ -14,7 +14,7 @@ export default function StoresScreen() {
   return (
     <CustomerScreen>
       <AppHeader title={translate("storesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={20} />} />} />
-      <UiText tone="muted" style={{ fontSize: 12 }}>{translate("storesSubtitle")}</UiText>
+      <UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("storesSubtitle")}</UiText>
       {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void stores.refetch()} />
       ) : stores.data.length === 0 ? (
@@ -31,5 +31,5 @@ export default function StoresScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: { gap: 10 }
+  list: { gap: designTokens.spacing.md }
 });
