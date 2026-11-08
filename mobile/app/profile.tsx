@@ -10,6 +10,7 @@ import {
   Caption,
   Card,
   Icon,
+  IconButton,
   IdentityRow,
   ListItem,
   StatCard,
@@ -89,32 +90,57 @@ export default function ProfileScreen() {
 
   return (
     <CustomerScreen>
-      <AppHeader title={translate("profileTitle")} />
-      <Caption>{translate("profileSubtitle")}</Caption>
+      <AppHeader
+        title=""
+        leading={
+          <IconButton
+            icon={<Icon name="settings" size={20} />}
+            accessibilityLabel={translate("profileSettings")}
+            onPress={() => router.push("/settings")}
+          />
+        }
+      />
 
       {profile.isPending ? (
         <LoadingState label={translate("stateLoading")} />
       ) : (
         <>
-          <Card>
+          <Card contentStyle={styles.identityCard}>
             <IdentityRow
               name={displayName}
-              subtitle={[user.data.email, profile.data?.phone].filter(Boolean).join(" · ")}
-              avatarSize={58}
+              subtitle={user.data.email}
+              avatarSize={64}
+              style={styles.identityRow}
             />
+            {profile.data?.phone ? (
+              <View style={styles.phoneRow}>
+                <Caption>{profile.data.phone}</Caption>
+                <Icon name="phone" size={16} />
+              </View>
+            ) : null}
           </Card>
 
           <View style={styles.stats}>
-            <StatCard
-              label={translate("profileOrders")}
-              value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)}
-              style={styles.stat}
-            />
-            <StatCard
-              label={translate("profileFavorites")}
-              value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)}
-              style={styles.stat}
-            />
+            <Card contentStyle={styles.statCard}>
+              <View style={styles.statHeader}>
+                <Icon name="package" size={19} />
+                <StatCard
+                  label={translate("profileOrders")}
+                  value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)}
+                  style={styles.stat}
+                />
+              </View>
+            </Card>
+            <Card contentStyle={styles.statCard}>
+              <View style={styles.statHeader}>
+                <Icon name="heart" size={19} />
+                <StatCard
+                  label={translate("profileFavorites")}
+                  value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)}
+                  style={styles.stat}
+                />
+              </View>
+            </Card>
           </View>
 
           {orders.isError || favorites.isError ? (
@@ -193,8 +219,20 @@ function ProfileMenuItem({ label, hint, onPress }: {
 }
 
 const styles = StyleSheet.create({
+  identityCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  identityRow: { flexDirection: "row-reverse" },
+  phoneRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: designTokens.spacing.sm,
+    paddingTop: designTokens.spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(128, 128, 128, 0.25)"
+  },
   stats: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
-  stat: { flex: 1 },
+  statCard: { padding: designTokens.spacing.md },
+  statHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.sm },
+  stat: { flex: 1, minWidth: 0, padding: 0, backgroundColor: "transparent" },
   menuContent: { gap: 0, padding: 0 },
   menuCopy: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs }
 });
