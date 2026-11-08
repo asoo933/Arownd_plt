@@ -30,7 +30,7 @@ export function getButtonPalette(theme: AppTheme, variant: ButtonVariant): Butto
     case "danger":
       return {
         backgroundColor: theme.colors.danger,
-        foregroundColor: brandColors.white
+        foregroundColor: theme.mode === "dark" ? brandColors.black : brandColors.white
       };
   }
 }
