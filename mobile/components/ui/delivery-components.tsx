@@ -57,7 +57,7 @@ export function TrackingTimeline({ steps, style }: { steps: TrackingStepItem[]; 
 }
 
 export function DeliveryAddressCard(props: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  return <Card {...props} compact />;
+  return <Card {...props} />;
 }
 
 export function DeliveryRouteCard(props: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
