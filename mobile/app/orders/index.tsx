@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { PressableSurface } from "@/components/ui";
+import { PressableSurface, SegmentedControl, StatusBadge } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -126,11 +126,13 @@ export default function OrdersScreen() {
 
   return <CustomerScreen>
     <CustomerHeading title={translate("ordersTitle")} subtitle={translate("ordersSubtitle")} />
-    <View style={styles.tabs}>
-      {TABS.map((item) => <PressableSurface accessibilityRole="button" key={item.id} onPress={() => setTab(item.id)} style={[styles.tab, { borderColor: theme.colors.border }, tab === item.id && { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent }]}>
-        <Text style={[styles.tabText, { color: theme.colors.muted }, tab === item.id && { color: theme.colors.accentForeground }]}>{translate(item.key)}</Text>
-      </PressableSurface>)}
-    </View>
+    <SegmentedControl
+      accessibilityLabel={translate("ordersTitle")}
+      options={TABS.map((item) => ({ key: item.id, label: translate(item.key) }))}
+      value={tab}
+      onChange={(value) => setTab(value as OrdersTab)}
+      style={styles.tabs}
+    />
     {filtered.length === 0 ? <EmptyState title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
     {filtered.map((row) => {
       const orderCode = row.order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
@@ -142,9 +144,10 @@ export default function OrdersScreen() {
             <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</Text>
             <Text style={styles.date}>{dateLabel(row.order.created_at)}</Text>
           </View>
-          <View style={[styles.status, tone === "success" ? styles.statusSuccess : tone === "danger" ? styles.statusDanger : tone === "pending" ? styles.statusPending : styles.statusMuted]}>
-            <Text style={styles.statusText}>{statusLabel(row.status)}</Text>
-          </View>
+          <StatusBadge
+            label={statusLabel(row.status)}
+            tone={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "neutral"}
+          />
         </View>
         {row.storeName ? <Text style={styles.storeName}>{row.storeName}</Text> : null}
         <Text style={[styles.meta, { color: theme.colors.muted }]}>{row.itemCount} {translate("ordersItems")}</Text>
@@ -158,7 +161,7 @@ export default function OrdersScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  tabs: { flexDirection: "row-reverse", gap: 7, flexWrap: "wrap" },
+  tabs: { width: "100%" },
   tab: { minHeight: 44, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.border, paddingHorizontal: 12, justifyContent: "center" },
   tabActive: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
   tabText: { color: theme.colors.muted, fontSize: 11, fontWeight: "800" },
