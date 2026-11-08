@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, IconButton, MerchantMetricCard, PressableSurface, StatusBadge, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -156,9 +156,9 @@ export default function MerchantProductsScreen() {
         <Button label={translate("merchantProductCreateOpen")} onPress={() => router.push("/merchant/products/new")} fullWidth />
 
         <View style={styles.summaryGrid}>
-          <SummaryCard label={translate("merchantProductsSummaryTotal")} value={summary.total} theme={theme} />
-          <SummaryCard label={translate("merchantProductsSummaryLow")} value={summary.low} theme={theme} tone="warning" />
-          <SummaryCard label={translate("merchantProductsSummaryOut")} value={summary.out} theme={theme} tone="danger" />
+          <MerchantMetricCard label={translate("merchantProductsSummaryTotal")} value={String(summary.total)} style={styles.summaryCard} />
+          <MerchantMetricCard label={translate("merchantProductsSummaryLow")} value={String(summary.low)} valueTone="warning" style={styles.summaryCard} />
+          <MerchantMetricCard label={translate("merchantProductsSummaryOut")} value={String(summary.out)} valueTone="danger" style={styles.summaryCard} />
         </View>
 
         <TextField
@@ -255,16 +255,6 @@ function MerchantOfferCard({
     : inventoryLevel === "low"
       ? translate("merchantProductsLow")
       : translate("merchantProductsAvailable");
-  const inventoryTone = inventoryLevel === "out"
-    ? theme.colors.danger
-    : inventoryLevel === "low"
-      ? theme.colors.warning
-      : theme.colors.success;
-  const inventorySurface = inventoryLevel === "out"
-    ? theme.colors.dangerSurface
-    : inventoryLevel === "low"
-      ? theme.colors.warningSurface
-      : theme.colors.successSurface;
 
   return (
     <View style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
@@ -292,16 +282,14 @@ function MerchantOfferCard({
             </Text>
           ) : null}
           <View style={styles.badgeRow}>
-            <View style={[styles.statusPill, { backgroundColor: inventorySurface }]}>
-              <Text style={[styles.statusText, { color: inventoryTone }]}>{inventoryLabel}</Text>
-            </View>
-            <View style={[styles.statusPill, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.statusText, { color: theme.colors.muted }]}>
-                {offer.is_merchant_hidden
-                  ? translate("merchantProductsHidden")
-                  : translate("merchantProductsVisible")}
-              </Text>
-            </View>
+            <StatusBadge
+              label={inventoryLabel}
+              tone={inventoryLevel === "out" ? "danger" : inventoryLevel === "low" ? "warning" : "success"}
+            />
+            <StatusBadge
+              label={offer.is_merchant_hidden ? translate("merchantProductsHidden") : translate("merchantProductsVisible")}
+              tone={offer.is_merchant_hidden ? "neutral" : "accent"}
+            />
           </View>
           <Text style={[styles.currentPrice, { color: theme.colors.accentMuted }]}>{formatDZD(offer.price)}</Text>
         </View>
@@ -378,31 +366,6 @@ function MerchantOfferCard({
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-  theme,
-  tone = "normal"
-}: {
-  label: string;
-  value: number;
-  theme: AppTheme;
-  tone?: "normal" | "warning" | "danger";
-}) {
-  const styles = createStyles(theme);
-  const color = tone === "warning"
-    ? theme.colors.warning
-    : tone === "danger"
-      ? theme.colors.danger
-      : theme.colors.foreground;
-
-  return (
-    <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-      <Text style={[styles.summaryLabel, { color: theme.colors.muted }]}>{label}</Text>
-      <Text style={[styles.summaryValue, { color }]}>{String(value)}</Text>
-    </View>
-  );
-}
 
 function FilterButton({
   value,
@@ -476,9 +439,6 @@ function createStyles(theme: AppTheme) {
     title: { width: "100%", fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
     subtitle: { width: "100%", fontSize: 12, lineHeight: 20, textAlign: "right" },
     summaryGrid: { flexDirection: "row-reverse", gap: 8 },
-    summaryCard: { flex: 1, minHeight: 75, borderWidth: 1, borderRadius: 15, padding: 11, gap: 5, alignItems: "flex-end" },
-    summaryLabel: { fontSize: 10, fontWeight: "800", textAlign: "right" },
-    summaryValue: { fontSize: 22, fontWeight: "900" },
     searchInput: { minHeight: 48, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, textAlign: "right", fontSize: 13 },
     filters: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7 },
     filterButton: { minHeight: 42, borderWidth: 1, borderRadius: 999, paddingHorizontal: 15, justifyContent: "center", alignItems: "center" },
