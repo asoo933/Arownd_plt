@@ -110,6 +110,6 @@ const styles = StyleSheet.create({
   productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
   aboutCard: { padding: 16, gap: 11 },
   aboutTitle: { fontSize: 17, fontWeight: "900", textAlign: "right" },
-  fieldTitle: { color: "#647D13", fontSize: 12, fontWeight: "800", textAlign: "right" },
+  fieldTitle: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   description: { fontSize: 13, lineHeight: 22, textAlign: "right" }
 });
