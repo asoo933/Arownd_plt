@@ -210,6 +210,7 @@ export function IconButton({
   testID
 }: IconButtonProps) {
   const theme = useAppTheme();
+  const targetSize = Math.max(size, designTokens.dimensions.controlHeight.md);
   const backgroundColor =
     variant === "accent"
       ? theme.colors.accent
@@ -230,8 +231,8 @@ export function IconButton({
       testID={testID}
       style={({ pressed }) => [
         {
-          width: size,
-          height: size,
+          width: targetSize,
+          height: targetSize,
           borderRadius: theme.radius.pill,
           borderWidth: variant === "surface" ? 1 : 0,
           borderColor,
