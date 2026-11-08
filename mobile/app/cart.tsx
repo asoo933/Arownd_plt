@@ -75,7 +75,7 @@ export default function CartScreen() {
         const totalRequestedForOffer = cart.data.filter((entry) => entry.offerId === item.offerId).reduce((sum, entry) => sum + entry.quantity, 0);
         return <View key={key} style={style.line}>
           <PressableSurface
-            accessibilityLabel={translate("cartOpenProduct") + ": " + (offer?.product.name ?? item.name)}
+            accessibilityLabel={offer?.product.name ?? item.name}
             disabled={!item.productId}
             onPress={item.productId ? () => router.push({ pathname: "/product/[productId]", params: { productId: item.productId as string } }) : undefined}
             style={style.lineMain}
