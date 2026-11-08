@@ -180,6 +180,7 @@ export default function MerchantOnboardingScreen() {
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
+                    accessibilityLabel={translate("merchantStoreNameLabel")}
                     placeholder={translate("merchantStoreNamePlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     style={styles.input}
@@ -205,6 +206,7 @@ export default function MerchantOnboardingScreen() {
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
+                    accessibilityLabel={translate("merchantStorePhoneLabel")}
                     placeholder={translate("merchantStorePhonePlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     style={styles.input}
@@ -230,6 +232,7 @@ export default function MerchantOnboardingScreen() {
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
+                    accessibilityLabel={translate("merchantStoreWhatsAppLabel")}
                     placeholder={translate("merchantStoreWhatsAppPlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     style={styles.input}
@@ -258,6 +261,7 @@ export default function MerchantOnboardingScreen() {
                 >
                   <PressableSurface
                     accessibilityRole="button"
+                    accessibilityLabel={translate("merchantStoreWilayaLabel")}
                     onPress={() => setWilayaPickerOpen(true)}
                     style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}
                   >
@@ -342,6 +346,7 @@ export default function MerchantOnboardingScreen() {
                   <PressableSurface
                     key={category.id}
                     accessibilityRole="button"
+                    accessibilityLabel={category.label}
                     accessibilityState={{ selected: categoryId === category.id }}
                     onPress={() => {
                       setValue("category", category.id, { shouldValidate: true });
@@ -385,6 +390,7 @@ export default function MerchantOnboardingScreen() {
                         <PressableSurface
                           key={category.id}
                           accessibilityRole="button"
+                          accessibilityLabel={category.label}
                           accessibilityState={{ selected }}
                           onPress={() => {
                             const next = selected
@@ -487,6 +493,7 @@ export default function MerchantOnboardingScreen() {
               </UiText>
               <PressableSurface
                 accessibilityRole="button"
+                accessibilityLabel={translate("merchantModalClose")}
                 onPress={() => setWilayaPickerOpen(false)}
                 style={styles.modalClose}
               >
@@ -584,6 +591,7 @@ function WilayaOption({
   return (
     <PressableSurface
       accessibilityRole="button"
+      accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + wilaya.name_ar}
       accessibilityState={{ selected }}
       onPress={onPress}
       style={[stylesForScreen.wilayaOption, { borderBottomColor: theme.colors.border }]}
