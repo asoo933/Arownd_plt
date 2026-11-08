@@ -4,7 +4,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, Icon, IconButton, Image as UiImage, PriceDisplay, ProductImageGallery, ProductQuantitySelector, PressableSurface, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, Icon, IconButton, PriceDisplay, ProductImageGallery, ProductQuantitySelector, PressableSurface, Text as UiText } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
