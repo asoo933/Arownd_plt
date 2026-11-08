@@ -148,7 +148,7 @@ export default function MerchantOrderDetailsScreen() {
           <View style={styles.summaryRow}>
             <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
             <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} />
-          </MerchantOrderCard>
+          </View>
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderItems")}</UiText>
           {detail.data.items.length === 0 ? (
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderItemsUnavailable")}</UiText>
@@ -174,7 +174,7 @@ export default function MerchantOrderDetailsScreen() {
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderTotal")}</UiText>
             <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
           </View>
-        </View>
+        </MerchantOrderCard>
 
         <MerchantOrderCard>
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</UiText>
@@ -235,9 +235,9 @@ export default function MerchantOrderDetailsScreen() {
             <View key={event.id} style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
               <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</UiText>
               <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString("ar-DZ")}</UiText>
-            </MerchantOrderCard>
+            </View>
           ))}
-        </View>
+        </MerchantOrderCard>
 
         {nextStatus && nextStatusLabel ? (
           <MerchantOrderCard>
