@@ -4,7 +4,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { Button, RatingSelector, RatingStars, Text as UiText, TextField } from "@/components/ui";
 import { fetchApprovedReviews, fetchMyReview, submitMyReview } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
@@ -64,13 +64,12 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
       ) : auth.data ? (
         <View style={styles.form}>
           <UiText style={[styles.body, { color: theme.colors.muted }]}>{translate("reviewsEligibilityHint")}</UiText>
-          <View style={styles.stars}>
-            {[1, 2, 3, 4, 5].map(value => (
-              <PressableSurface key={value} accessibilityRole="button" accessibilityState={{ selected: rating === value }} onPress={() => setRating(value)} style={styles.starButton}>
-                <UiText style={{ color: value <= rating ? theme.colors.warning : theme.colors.muted, fontSize: 27 }}>★</UiText>
-              </PressableSurface>
-            ))}
-          </View>
+          <RatingSelector
+            value={rating}
+            onChange={setRating}
+            accessibilityLabel={translate("reviewsRating")}
+            size={42}
+          />
           <TextField
             value={comment}
             onChangeText={setComment}
@@ -96,7 +95,7 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
         <View key={item.id} style={[styles.review, { borderTopColor: theme.colors.border }]}>
           <View style={styles.reviewHeader}>
             <UiText style={[styles.caption, { color: theme.colors.muted }]}>{new Intl.DateTimeFormat("ar-DZ", { dateStyle: "medium" }).format(new Date(item.created_at))}</UiText>
-            <UiText style={{ color: theme.colors.warning, fontWeight: "900" }}>{"★".repeat(item.rating)}{"☆".repeat(5 - item.rating)}</UiText>
+            <RatingStars value={item.rating} size={16} />
           </View>
           {item.comment ? <UiText style={[styles.body, { color: theme.colors.foreground }]}>{item.comment}</UiText> : null}
         </View>
@@ -111,8 +110,6 @@ function createStyles(theme: AppTheme) {
     heading: { fontSize: 17, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 11, textAlign: "right" },
     form: { gap: 10 },
-    stars: { flexDirection: "row-reverse", justifyContent: "flex-start", gap: 8 },
-    starButton: { minWidth: 42, minHeight: 44, alignItems: "center", justifyContent: "center" },
     input: { minHeight: 88, borderWidth: 1, borderRadius: 13, padding: 12, textAlignVertical: "top", fontSize: 13 },
     error: { fontSize: 11, textAlign: "right" },
     ownReview: { borderRadius: 13, padding: 12, gap: 6 },
