@@ -4,6 +4,7 @@ import { Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Card } from "./cards";
 import { StatusBadge, type StatusBadgeTone } from "./extended";
+import { Icon } from "./icon";
 
 export function MerchantProfileCard(props: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return <Card {...props} />;
@@ -39,7 +40,7 @@ export function MerchantOnboardingStep({
       {steps.map((step, index) => (
         <View key={step.key} style={{ flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.md }}>
           <View style={{ width: 36, height: 36, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
-            {step.icon ?? <Text style={{ color: step.status === "complete" ? theme.colors.success : theme.colors.foreground, fontWeight: "800" }}>{step.status === "complete" ? "✓" : index + 1}</Text>}
+            {step.icon ?? (step.status === "complete" ? <Icon name="check" size={18} color={theme.colors.success} accessibilityHidden /> : <Text style={{ color: theme.colors.foreground, fontWeight: "800" }}>{index + 1}</Text>)}
           </View>
           <View style={{ flex: 1, paddingTop: designTokens.spacing.xs, gap: designTokens.spacing.xs }}>
             <Text style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "right" }}>{step.label}</Text>
