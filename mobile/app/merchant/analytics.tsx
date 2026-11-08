@@ -34,7 +34,7 @@ export default function MerchantAnalyticsScreen() {
 
   const data = analytics.data;
   const maxDaily = Math.max(1, ...data.daily_delivered.map((item) => item.amount));
-  const cards = [
+  const cards: { label: string; value: string; tone: "default" | "success" | "warning" | "danger" | "accent" }[] = [
     { label: translate("merchantAnalyticsOrders"), value: String(data.orders_total), tone: "default" },
     { label: translate("merchantAnalyticsDelivered"), value: String(data.delivered_orders), tone: "success" },
     { label: translate("merchantAnalyticsActive"), value: String(data.active_orders), tone: "warning" },
