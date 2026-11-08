@@ -102,3 +102,22 @@ export function getNextMerchantOrderStatus(
   if (currentStatus === "shipped" && deliveryType === "desk") return "delivered";
   return null;
 }
+
+export type MerchantTrackingStep =
+  | "preparing"
+  | "ready_for_dispatch"
+  | "out_for_delivery"
+  | "delivered";
+
+export function getNextMerchantTrackingStatus(
+  currentStatus: string,
+  deliveryType: string
+): MerchantTrackingStep | null {
+  if (currentStatus === "confirmed") return "preparing";
+  if (currentStatus === "preparing") return "ready_for_dispatch";
+  if (currentStatus === "ready_for_dispatch") {
+    return deliveryType === "desk" ? "delivered" : deliveryType === "home" ? "out_for_delivery" : null;
+  }
+  if (currentStatus === "out_for_delivery" && deliveryType === "home") return "delivered";
+  return null;
+}
