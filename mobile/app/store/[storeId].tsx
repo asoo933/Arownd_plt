@@ -9,7 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
-import { IconButton, SegmentedControl } from "@/components/ui";
+import { AppHeader, IconButton, SegmentedControl } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -37,7 +37,11 @@ export default function StoreDetailsScreen() {
   const details = store.data;
   return (
     <CustomerScreen>
-      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
+      <AppHeader
+        title={details.name}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+        trailing={<FavoriteButton kind="stores" id={storeId} />}
+      />
       <View style={[styles.cover, { backgroundColor: theme.colors.surfaceMuted }]}>
         {details.cover_url ? <Image source={{ uri: details.cover_url }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
       </View>
@@ -47,7 +51,6 @@ export default function StoreDetailsScreen() {
         </View>
         <View style={styles.storeTitleWrap}>
           <Text style={[styles.storeName, { color: theme.colors.foreground }]}>{details.name}</Text>
-          <FavoriteButton kind="stores" id={storeId} />
           <Text style={[styles.metaText, { color: theme.colors.muted }]}>{details.commune || details.address_line || " "}</Text>
           <Text style={[styles.verified, { color: details.is_verified ? theme.colors.success : theme.colors.muted }]}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</Text>
           {details.rating != null ? <Text style={[styles.rating, { color: theme.colors.warning }]}>★ {translate("storeRating")}: {details.rating.toFixed(1)}</Text> : null}
