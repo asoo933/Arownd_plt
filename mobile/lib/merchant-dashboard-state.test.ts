@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getNextMerchantOrderStatus,
+  getNextMerchantTrackingStatus,
   groupMerchantOrderRows,
   type MerchantOrderRow
 } from "@/lib/merchant-dashboard-state";
@@ -119,5 +120,27 @@ describe("getNextMerchantOrderStatus", () => {
     expect(getNextMerchantOrderStatus("delivered", "desk")).toBeNull();
     expect(getNextMerchantOrderStatus("cancelled", "home")).toBeNull();
     expect(getNextMerchantOrderStatus("pending", "desk")).toBeNull();
+  });
+});
+
+
+describe("getNextMerchantTrackingStatus", () => {
+  it("advances home delivery through preparation, dispatch and delivery", () => {
+    expect(getNextMerchantTrackingStatus("confirmed", "home")).toBe("preparing");
+    expect(getNextMerchantTrackingStatus("preparing", "home")).toBe("ready_for_dispatch");
+    expect(getNextMerchantTrackingStatus("ready_for_dispatch", "home")).toBe("out_for_delivery");
+    expect(getNextMerchantTrackingStatus("out_for_delivery", "home")).toBe("delivered");
+  });
+
+  it("allows desk pickup to complete after preparation", () => {
+    expect(getNextMerchantTrackingStatus("confirmed", "desk")).toBe("preparing");
+    expect(getNextMerchantTrackingStatus("preparing", "desk")).toBe("ready_for_dispatch");
+    expect(getNextMerchantTrackingStatus("ready_for_dispatch", "desk")).toBe("delivered");
+  });
+
+  it("rejects unsupported and terminal transitions", () => {
+    expect(getNextMerchantTrackingStatus("delivered", "home")).toBeNull();
+    expect(getNextMerchantTrackingStatus("ready_for_dispatch", "unknown")).toBeNull();
+    expect(getNextMerchantTrackingStatus("out_for_delivery", "desk")).toBeNull();
   });
 });
