@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { designTokens } from "@/lib/theme";
 import { FavoriteButton as FavoriteToggle, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
 import {
   AppHeader,
@@ -151,14 +152,14 @@ export default function FavoritesScreen() {
 }
 
 const styles = StyleSheet.create({
-  productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 12 },
+  productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
   productItem: { width: "48%" },
-  productContent: { gap: 6, padding: 10 },
+  productContent: { gap: designTokens.spacing.xs, padding: designTokens.spacing.md },
   productMedia: { position: "relative" },
   productImage: { borderRadius: 0 },
   favoriteOverlay: { position: "absolute", top: 7, end: 7 },
-  storeList: { gap: 12 },
-  storeContent: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
-  storeLogo: { width: 76, aspectRatio: 1, borderRadius: 12 },
+  storeList: { gap: designTokens.spacing.md },
+  storeContent: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
+  storeLogo: { width: 76, aspectRatio: 1, borderRadius: designTokens.radius.sm },
   storeFavorite: { alignSelf: "center" }
 });
