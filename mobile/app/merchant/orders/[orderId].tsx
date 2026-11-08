@@ -3,10 +3,8 @@ import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Modal,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,7 +23,7 @@ import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, StatusBadge, TextField } from "@/components/ui";
+import { AppHeader, Button, ConfirmDialog, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -143,43 +141,43 @@ export default function MerchantOrderDetailsScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AppHeader title={translate("merchantOrderDetailTitle")} leading={<Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
-        <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString("ar-DZ")}</Text>
+        <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</UiText>
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString("ar-DZ")}</UiText>
 
-        <View style={styles.card}>
+        <MerchantOrderCard>
           <View style={styles.summaryRow}>
-            <Text style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</Text>
+            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
             <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} />
-          </View>
-          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderItems")}</Text>
+          </MerchantOrderCard>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderItems")}</UiText>
           {detail.data.items.length === 0 ? (
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderItemsUnavailable")}</Text>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderItemsUnavailable")}</UiText>
           ) : detail.data.items.map((item) => (
             <View key={item.id} style={[styles.itemRow, { borderBottomColor: theme.colors.border }]}>
               <View style={styles.itemInfo}>
-                <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name || translate("merchantOrderItems")}</Text>
-                <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderQuantity")}: {item.quantity}</Text>
-                {Object.entries(readCartOptions(item.options)).length > 0 ? <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</Text> : null}
+                <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name || translate("merchantOrderItems")}</UiText>
+                <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderQuantity")}: {item.quantity}</UiText>
+                {Object.entries(readCartOptions(item.options)).length > 0 ? <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</UiText> : null}
               </View>
-              <Text style={[styles.itemPrice, { color: theme.colors.foreground }]}>{formatDZD(item.unit_price * item.quantity)}</Text>
+              <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
             </View>
           ))}
           <View style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderSubtotal")}</Text>
-            <Text style={[styles.valueText, { color: theme.colors.foreground }]}>{formatDZD(order.subtotal)}</Text>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderSubtotal")}</UiText>
+            <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{formatDZD(order.subtotal)}</UiText>
           </View>
           <View style={styles.totalRow}>
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderShippingFee")}</Text>
-            <Text style={[styles.valueText, { color: theme.colors.foreground }]}>{formatDZD(order.shipping_fee)}</Text>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderShippingFee")}</UiText>
+            <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{formatDZD(order.shipping_fee)}</UiText>
           </View>
           <View style={styles.totalRow}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderTotal")}</Text>
-            <Text style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</Text>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderTotal")}</UiText>
+            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</Text>
+        <MerchantOrderCard>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</UiText>
           <InfoRow label={translate("merchantCustomerUnknown")} value={customerOrder.full_name || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderPhone")} value={customerOrder.phone || "—"} theme={theme} />
           <InfoRow label={translate("merchantStoreWilayaLabel")} value={customerOrder.wilaya?.name_ar || "—"} theme={theme} />
@@ -190,15 +188,15 @@ export default function MerchantOrderDetailsScreen() {
           {detail.data.shipment ? (
             <InfoRow label={translate("merchantOrderShipmentStatus")} value={detail.data.shipment.status} theme={theme} />
           ) : null}
-        </View>
+        </MerchantOrderCard>
 
         {canQuote ? (
-          <View style={styles.card}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantQuoteTitle")}</Text>
+          <MerchantOrderCard>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantQuoteTitle")}</UiText>
             {deliveryType === "desk" ? (
-              <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantQuotePickupHint")}</Text>
+              <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantQuotePickupHint")}</UiText>
             ) : (
-              <TextField
+              <UiTextField
                 value={shippingFee}
                 onChangeText={setShippingFee}
                 keyboardType="number-pad"
@@ -212,85 +210,80 @@ export default function MerchantOrderDetailsScreen() {
             {canReject ? (
               <Button label={translate("merchantOrderReject")} onPress={() => setConfirmAction("reject")} variant="danger" fullWidth />
             ) : null}
-          </View>
+          </MerchantOrderCard>
         ) : null}
 
         {order.status === "quoted" ? (
           <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
-            <Text style={[styles.noticeText, { color: theme.colors.warning }]}>{translate("merchantQuoteAwaitingCustomer")}</Text>
+            <UiText style={[styles.noticeText, { color: theme.colors.warning }]}>{translate("merchantQuoteAwaitingCustomer")}</UiText>
           </View>
         ) : null}
 
         {isCarrierManaged ? (
           <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
-            <Text style={[styles.noticeText, { color: theme.colors.warning }]}>
+            <UiText style={[styles.noticeText, { color: theme.colors.warning }]}>
               {translate("merchantTrackingCarrierCompletesDelivery")}
-            </Text>
+            </UiText>
           </View>
         ) : null}
 
-        <View style={styles.card}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantTrackingTitle")}</Text>
+        <MerchantOrderCard>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantTrackingTitle")}</UiText>
           {trackingEvents.length === 0 ? (
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantTrackingEmpty")}</Text>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantTrackingEmpty")}</UiText>
           ) : trackingEvents.map((event) => (
             <View key={event.id} style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
-              <Text style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</Text>
-              <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString("ar-DZ")}</Text>
-            </View>
+              <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</UiText>
+              <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString("ar-DZ")}</UiText>
+            </MerchantOrderCard>
           ))}
         </View>
 
         {nextStatus && nextStatusLabel ? (
-          <View style={styles.card}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantFulfillmentTitle")}</Text>
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>
+          <MerchantOrderCard>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantFulfillmentTitle")}</UiText>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>
               {nextStatus === "delivered" && deliveryType === "desk"
                 ? translate("merchantMarkPickupDeliveredHint")
                 : translate("merchantMarkShippedHint")}
-            </Text>
+            </UiText>
             <Button label={translate("merchantTrackingAdvance") + ": " + translate(nextStatusLabel)} onPress={() => statusMutation.mutate(nextStatus)} loading={statusMutation.isPending} fullWidth />
-          </View>
+          </MerchantOrderCard>
         ) : null}
 
         {canCollectCod ? (
-          <View style={styles.card}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantCodTitle")}</Text>
-            <Text style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</Text>
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantCodPickupHint")}</Text>
+          <MerchantOrderCard>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantCodTitle")}</UiText>
+            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantCodPickupHint")}</UiText>
             <Button label={translate("merchantCodCollect")} onPress={() => setConfirmAction("collect")} fullWidth />
-          </View>
+          </MerchantOrderCard>
         ) : null}
 
         {order.payment_status === "paid" ? (
           <View style={[styles.notice, { backgroundColor: theme.colors.successSurface }]}>
-            <Text style={[styles.noticeText, { color: theme.colors.success }]}>{translate("merchantCodPaid")}: {formatDZD(order.paid_amount ?? 0)}</Text>
+            <UiText style={[styles.noticeText, { color: theme.colors.success }]}>{translate("merchantCodPaid")}: {formatDZD(order.paid_amount ?? 0)}</UiText>
           </View>
         ) : null}
 
         {actionError ? (
           <View style={[styles.errorCard, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-            <Text style={[styles.dangerButtonText, { color: theme.colors.danger }]}>{translateError(actionError)}</Text>
+            <UiText style={[styles.dangerButtonText, { color: theme.colors.danger }]}>{translateError(actionError)}</UiText>
           </View>
         ) : null}
       </ScrollView>
 
-      <Modal transparent visible={confirmAction !== null} animationType="fade" onRequestClose={() => setConfirmAction(null)}>
-        <View style={[styles.modalBackdrop, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.confirmPanel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-              {confirmAction === "reject" ? translate("merchantRejectConfirmTitle") : translate("merchantCodConfirmTitle")}
-            </Text>
-            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>
-              {confirmAction === "reject" ? translate("merchantRejectConfirmHint") : translate("merchantCodConfirmHint")}
-            </Text>
-            <View style={styles.confirmActions}>
-              <Button label={translate("merchantModalClose")} onPress={() => setConfirmAction(null)} variant="outline" style={{ flex: 1 }} />
-              <Button label={translate("merchantConfirmAction")} onPress={() => confirmAction && actionMutation.mutate(confirmAction)} loading={actionMutation.isPending} variant={confirmAction === "reject" ? "danger" : "primary"} style={{ flex: 1 }} />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <ConfirmDialog
+        visible={confirmAction !== null}
+        onRequestClose={() => setConfirmAction(null)}
+        onConfirm={() => confirmAction && actionMutation.mutate(confirmAction)}
+        title={confirmAction === "reject" ? translate("merchantRejectConfirmTitle") : translate("merchantCodConfirmTitle")}
+        description={confirmAction === "reject" ? translate("merchantRejectConfirmHint") : translate("merchantCodConfirmHint")}
+        cancelLabel={translate("merchantModalClose")}
+        confirmLabel={translate("merchantConfirmAction")}
+        busy={actionMutation.isPending}
+        destructive={confirmAction === "reject"}
+      />
     </SafeAreaView>
   );
 }
@@ -327,14 +320,14 @@ function StatusPill({ status, deliveryType }: { status: string; deliveryType: st
   const displayKey = status === "shipped" && deliveryType === "desk"
     ? "merchantOrderStatusPrepared"
     : keyByStatus[status] ?? "merchantOrderStatusUnknown";
-  return <StatusBadge label={translate(displayKey)} tone={tone} />;
+  return <MerchantStatusBadge label={translate(displayKey)} tone={tone} />;
 }
 
 function InfoRow({ label, value, theme }: { label: string; value: string; theme: AppTheme }) {
   return (
     <View style={stylesForComponents.infoRow}>
-      <Text style={{ color: theme.colors.muted, fontSize: 11 }}>{label}</Text>
-      <Text style={{ color: theme.colors.foreground, fontSize: 12, fontWeight: "700", textAlign: "right", flexShrink: 1 }}>{value}</Text>
+      <UiText style={{ color: theme.colors.muted, fontSize: 11 }}>{label}</UiText>
+      <UiText style={{ color: theme.colors.foreground, fontSize: 12, fontWeight: "700", textAlign: "right", flexShrink: 1 }}>{value}</UiText>
     </View>
   );
 }
@@ -344,7 +337,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
     <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
         <ActivityIndicator color={theme.colors.accentMuted} />
-        <Text style={{ color: theme.colors.muted, fontSize: 13 }}>{label}</Text>
+        <UiText style={{ color: theme.colors.muted, fontSize: 13 }}>{label}</UiText>
       </View>
     </SafeAreaView>
   );
@@ -354,7 +347,7 @@ function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppThem
   return (
     <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
-        <Text style={{ color: theme.colors.foreground, fontSize: 14, fontWeight: "800", textAlign: "center" }}>{title}</Text>
+        <UiText style={{ color: theme.colors.foreground, fontSize: 14, fontWeight: "800", textAlign: "center" }}>{title}</UiText>
         <Button label={actionLabel} onPress={onAction} />
       </View>
     </SafeAreaView>
@@ -378,14 +371,13 @@ function createStyles(theme: AppTheme) {
     eyebrow: { fontSize: 11, fontWeight: "900" },
     title: { fontSize: 23, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 11, textAlign: "right" },
-    card: { borderRadius: 18, borderWidth: 1, borderColor: theme.colors.border, backgroundColor: theme.colors.surface, padding: 14, gap: 11 },
     summaryRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
     amount: { fontSize: 17, fontWeight: "900" },
     sectionTitle: { fontSize: 14, fontWeight: "900", textAlign: "right" },
     itemRow: { minHeight: 55, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 7 },
     itemInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
     itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-    itemPrice: { fontSize: 12, fontWeight: "900" },
+    itemPriceDisplay: { alignSelf: "flex-start" },
     mutedText: { fontSize: 11, lineHeight: 17, textAlign: "right" },
     totalRow: { minHeight: 30, flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 7 },
     valueText: { fontSize: 12, fontWeight: "800" },
@@ -397,11 +389,6 @@ function createStyles(theme: AppTheme) {
     notice: { borderRadius: 14, padding: 13 },
     noticeText: { fontSize: 12, fontWeight: "800", textAlign: "right" },
     errorCard: { borderWidth: 1, borderRadius: 14, padding: 12 },
-    modalBackdrop: { flex: 1, justifyContent: "center", padding: 22 },
-    confirmPanel: { borderWidth: 1, borderRadius: 20, padding: 18, gap: 13 },
-    confirmActions: { flexDirection: "row-reverse", gap: 9 },
-    secondaryButton: { minHeight: 46, flex: 1, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-    secondaryButtonText: { fontSize: 12, fontWeight: "800" },
     disabled: { opacity: 0.5 }
   });
 }
