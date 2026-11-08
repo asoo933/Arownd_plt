@@ -177,23 +177,19 @@ export default function OrderDetailsScreen() {
     </View> : null}
 
     {merchantOrders.map((merchantOrder) => {
-      const tone = getOrderStatusTone(merchantOrder.status);
       const cancelled = merchantOrder.status === "cancelled" || merchantOrder.status === "rejected";
       const subTotal = cancelled ? 0 : merchantOrder.subtotal + merchantOrder.shipping_fee;
       return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.merchantHeader}>
           <UiText style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</UiText>
-          <StatusBadge
-            label={statusLabel(merchantOrder.status)}
-            tone={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "neutral"}
-          />
+          <OrderStatusBadge status={merchantOrder.status} />
         </View>
         {merchantOrder.items.map((item) => <View key={item.id} style={styles.itemRow}>
           <View style={styles.itemInfo}>
             <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</UiText>
             
           </View>
-          <UiText style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</UiText>
+          <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
         </View>)}
         <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderStoreSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.subtotal)}</UiText></View>
         {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</UiText></View> : null}
@@ -315,8 +311,6 @@ export default function OrderDetailsScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  back: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
-  backText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   panel: { borderRadius: 18, padding: 14, gap: 12 },
   sectionTitle: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900", textAlign: "right" },
   totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9 },
@@ -325,17 +319,9 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   priceDisplay: { justifyContent: "flex-start" },
   itemPriceDisplay: { justifyContent: "flex-start" },
   meta: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
-  step: { flexDirection: "row-reverse", gap: 11, alignItems: "flex-start" },
-  stepDot: { width: 29, height: 29, borderRadius: 15, borderWidth: 1, borderColor: theme.colors.border, alignItems: "center", justifyContent: "center" },
-  stepDone: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
-  stepNumber: { color: theme.colors.muted, fontSize: 11, fontWeight: "900" },
-  stepNumberDone: { color: theme.colors.foreground },
-  stepContent: { flex: 1, gap: 3, alignItems: "flex-end" },
-  stepTitle: { fontSize: 12, fontWeight: "900", textAlign: "right" },
   itemRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   itemInfo: { flex: 1, alignItems: "flex-end", gap: 3 },
   itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  itemPrice: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900" },
   merchantHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: 8 },
   notice: { color: theme.colors.warning, fontSize: 11, textAlign: "right", lineHeight: 18 },
   recipient: { fontSize: 13, fontWeight: "900", textAlign: "right" },
