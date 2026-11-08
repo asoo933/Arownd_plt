@@ -77,7 +77,7 @@ export default function CartScreen() {
           <PressableSurface
             accessibilityLabel={offer?.product.name ?? item.name}
             disabled={!item.productId}
-            onPress={item.productId ? () => router.push({ pathname: "/product/[productId]", params: { productId: item.productId! } }) : undefined}
+            onPress={() => { if (item.productId) router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }); }}
             style={style.lineMain}
           >
             <View style={style.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={style.imageMark}>▧</Text>}</View>
