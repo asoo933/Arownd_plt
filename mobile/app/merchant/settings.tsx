@@ -144,7 +144,7 @@ export default function MerchantStoreSettingsScreen() {
           <View style={styles.brandingRow}>
             <View style={styles.brandingItem}>
               <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreLogo")}</UiText>
-              {form.logo_url ? <UiImage uri={form.logo_url} accessibilityLabel={translate("merchantStoreLogo")} aspectRatio={1} style={styles.logoPreview} /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><UiText style={{ color: theme.colors.muted }}>A</UiText></View>}
+              {form.logo_url ? <UiImage uri={form.logo_url} accessibilityLabel={translate("merchantStoreLogo")} aspectRatio={1} style={styles.logoPreview} /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" color={theme.colors.muted} size={24} accessibilityHidden /></View>}
               <Button
                 label={translate("merchantStoreImageUpload")}
                 onPress={() => void chooseStoreImage("logo")}
@@ -157,7 +157,7 @@ export default function MerchantStoreSettingsScreen() {
             </View>
             <View style={styles.brandingItem}>
               <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreCover")}</UiText>
-              {form.cover_url ? <UiImage uri={form.cover_url} accessibilityLabel={translate("merchantStoreCover")} aspectRatio={16 / 5} style={styles.coverPreview} /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><UiText style={{ color: theme.colors.muted }}>A</UiText></View>}
+              {form.cover_url ? <UiImage uri={form.cover_url} accessibilityLabel={translate("merchantStoreCover")} aspectRatio={16 / 5} style={styles.coverPreview} /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" color={theme.colors.muted} size={24} accessibilityHidden /></View>}
               <Button
                 label={translate("merchantStoreImageUpload")}
                 onPress={() => void chooseStoreImage("cover")}
