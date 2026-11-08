@@ -96,6 +96,6 @@ const styles = StyleSheet.create({
   fieldError: { fontSize: designTokens.typography.caption, textAlign: "right" },
   stepper: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   stepButton: { width: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
-  stepSymbol: { fontSize: designTokens.dimensions.iconSize.md, lineHeight: 24, fontWeight: "700" },
+  stepSymbol: { fontSize: designTokens.dimensions.iconSize.md, lineHeight: designTokens.dimensions.iconSize.lg - 4, fontWeight: designTokens.fontWeights.bold },
   quantity: { minWidth: 28, textAlign: "center", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, fontVariant: ["tabular-nums"] }
 });
