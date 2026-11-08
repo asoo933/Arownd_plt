@@ -7,7 +7,7 @@ import { Card } from "./cards";
 import { StatusBadge, type StatusBadgeTone } from "./extended";
 import { Icon } from "./icon";
 
-export function DeliveryOrderCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void }) {
+export function DeliveryOrderCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void; accessibilityLabel?: string }) {
   return <Card {...props} />;
 }
 
