@@ -215,7 +215,7 @@ export default function CheckoutScreen() {
   return <CustomerScreen>
     <AppHeader
       title={translate("checkoutTitle")}
-      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<UiText style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</UiText>} />}
+      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={theme.dimensions.iconSize.md} accessibilityHidden />} />}
     />
     <UiText style={styles.fieldHint}>{translate("checkoutSubtitle")}</UiText>
 
