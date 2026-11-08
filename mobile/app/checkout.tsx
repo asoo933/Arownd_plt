@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -150,11 +150,11 @@ export default function CheckoutScreen() {
   if (createdOrderId) {
     return <CustomerScreen>
       <View style={[styles.successPanel, { backgroundColor: theme.colors.surface }]}>
-        <Text style={styles.successMark}>✓</Text>
-        <AppHeader title={translate("checkoutSuccessTitle")} />\n        <Text style={styles.hint}>{translate("checkoutSuccessMessage")}</Text>
-        <Text style={styles.orderLabel}>{translate("checkoutOrderNumber")}</Text>
-        <Text selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</Text>
-        <Text style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</Text>
+        <UiText style={styles.successMark}>✓</UiText>
+        <AppHeader title={translate("checkoutSuccessTitle")} />\n        <UiText style={styles.hint}>{translate("checkoutSuccessMessage")}</UiText>
+        <UiText style={styles.orderLabel}>{translate("checkoutOrderNumber")}</UiText>
+        <UiText selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</UiText>
+        <UiText style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</UiText>
         <Button label={translate("checkoutBackHome")} onPress={() => router.replace("/home")} fullWidth />
       </View>
     </CustomerScreen>;
@@ -163,7 +163,7 @@ export default function CheckoutScreen() {
   if (cart.isPending || auth.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
   if (!cart.data.length) return <CustomerScreen>
-    <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
+    <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
     <Button label={translate("cartBrowse")} onPress={() => router.replace("/explore")} fullWidth />
   </CustomerScreen>;
@@ -216,28 +216,28 @@ export default function CheckoutScreen() {
   return <CustomerScreen>
     <AppHeader
       title={translate("checkoutTitle")}
-      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<UiText style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</UiText>} />}
     />
-    <Text style={styles.fieldHint}>{translate("checkoutSubtitle")}</Text>
+    <UiText style={styles.fieldHint}>{translate("checkoutSubtitle")}</UiText>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("checkoutContactTitle")}</Text>
+      <UiText style={styles.sectionTitle}>{translate("checkoutContactTitle")}</UiText>
       <PressableSurface onPress={() => router.push("/delivery-profile")} hitSlop={8}>
-        <Text style={styles.retryText}>{translate("deliveryProfileManage")}</Text>
+        <UiText style={styles.retryText}>{translate("deliveryProfileManage")}</UiText>
       </PressableSurface>
       <TextField value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" maxLength={120} />
       <TextField value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
     </View>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</Text>
+      <UiText style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</UiText>
       {savedAddresses.isError ? (
-        <PressableSurface onPress={() => void savedAddresses.refetch()}><Text style={styles.retryText}>{translate("checkoutSavedAddressesError")}</Text></PressableSurface>
+        <PressableSurface onPress={() => void savedAddresses.refetch()}><UiText style={styles.retryText}>{translate("checkoutSavedAddressesError")}</UiText></PressableSurface>
       ) : savedAddresses.data && savedAddresses.data.length > 0 ? (
         <View style={styles.savedAddresses}>
           <View style={styles.savedHeader}>
-            <Text style={styles.fieldLabel}>{translate("checkoutSavedAddresses")}</Text>
-            <PressableSurface onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutManageAddresses")}</Text></PressableSurface>
+            <UiText style={styles.fieldLabel}>{translate("checkoutSavedAddresses")}</UiText>
+            <PressableSurface onPress={() => router.push("/addresses")}><UiText style={styles.retryText}>{translate("checkoutManageAddresses")}</UiText></PressableSurface>
           </View>
           {savedAddresses.data.map((address) => (
             <PressableSurface
@@ -249,18 +249,18 @@ export default function CheckoutScreen() {
               style={[styles.savedAddress, selectedAddressId === address.id && styles.savedAddressSelected]}
             >
               <View style={styles.savedAddressTop}>
-                <Text style={styles.savedAddressName}>{address.recipient_name}</Text>
+                <UiText style={styles.savedAddressName}>{address.recipient_name}</UiText>
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
               </View>
-              <Text style={styles.fieldHint}>{address.phone}</Text>
-              <Text style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}</Text>
-              <Text style={styles.fieldHint}>{address.address_line}</Text>
-              {address.is_default ? <Text style={styles.savedDefault}>{translate("addressesDefault")}</Text> : null}
+              <UiText style={styles.fieldHint}>{address.phone}</UiText>
+              <UiText style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}</UiText>
+              <UiText style={styles.fieldHint}>{address.address_line}</UiText>
+              {address.is_default ? <UiText style={styles.savedDefault}>{translate("addressesDefault")}</UiText> : null}
             </PressableSurface>
           ))}
         </View>
       ) : (
-        <PressableSurface onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutAddSavedAddress")}</Text></PressableSurface>
+        <PressableSurface onPress={() => router.push("/addresses")}><UiText style={styles.retryText}>{translate("checkoutAddSavedAddress")}</UiText></PressableSurface>
       )}
       <View style={styles.deliveryOptions}>
         <PressableSurface
@@ -270,8 +270,8 @@ export default function CheckoutScreen() {
           onPress={() => setDeliveryType("home")}
           style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}
         >
-          <Text style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</Text>
-          <Text style={styles.deliveryHint}>{translate("checkoutHomeDeliveryHint")}</Text>
+          <UiText style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</UiText>
+          <UiText style={styles.deliveryHint}>{translate("checkoutHomeDeliveryHint")}</UiText>
         </PressableSurface>
         <PressableSurface
           accessibilityRole="radio"
@@ -280,60 +280,60 @@ export default function CheckoutScreen() {
           onPress={() => setDeliveryType("desk")}
           style={[styles.deliveryOption, deliveryType === "desk" && styles.deliverySelected]}
         >
-          <Text style={[styles.deliveryTitle, deliveryType === "desk" && styles.deliveryTextSelected]}>{translate("checkoutStorePickup")}</Text>
-          <Text style={styles.deliveryHint}>{translate("checkoutStorePickupHint")}</Text>
+          <UiText style={[styles.deliveryTitle, deliveryType === "desk" && styles.deliveryTextSelected]}>{translate("checkoutStorePickup")}</UiText>
+          <UiText style={styles.deliveryHint}>{translate("checkoutStorePickupHint")}</UiText>
         </PressableSurface>
       </View>
 
-      <Text style={styles.fieldLabel}>{translate("checkoutWilaya")}</Text>
+      <UiText style={styles.fieldLabel}>{translate("checkoutWilaya")}</UiText>
       <PressableSurface onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
-        <Text style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</Text>
+        <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
         {wilayas.isPending ? <ActivityIndicator size="small" /> : null}
       </PressableSurface>
-      {wilayas.isError ? <PressableSurface onPress={() => void wilayas.refetch()}><Text style={styles.retryText}>{translate("retry")}</Text></PressableSurface> : null}
+      {wilayas.isError ? <PressableSurface onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
 
-      <Text style={styles.fieldLabel}>{translate("checkoutCommune")}</Text>
+      <UiText style={styles.fieldLabel}>{translate("checkoutCommune")}</UiText>
       {communes.data && communes.data.length > 0 ? (
         <PressableSurface onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]} disabled={!wilayaId}>
-          <Text style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</Text>
+          <UiText style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</UiText>
         </PressableSurface>
       ) : (
         <TextField value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
       )}
-      {communes.isError ? <Text style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</Text> : null}
+      {communes.isError ? <UiText style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</UiText> : null}
 
       {deliveryType === "home" ? <>
-        <Text style={styles.fieldLabel}>{translate("checkoutAddress")}</Text>
+        <UiText style={styles.fieldLabel}>{translate("checkoutAddress")}</UiText>
         <TextField value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
-      </> : <Text style={styles.fieldHint}>{translate("checkoutPickupNote")}</Text>}
+      </> : <UiText style={styles.fieldHint}>{translate("checkoutPickupNote")}</UiText>}
     </View>
 
-    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("checkoutSummary")}</Text>
+    <CheckoutSummary style={styles.summaryCard}>
+      <UiText style={styles.sectionTitle}>{translate("checkoutSummary")}</UiText>
       {cart.data.map((item) => {
         const offer = offerById.get(item.offerId);
         const optionSummary = Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ");
         return <View key={cartLineKey(item)} style={styles.summaryRow}>
           <View style={styles.summaryInfo}>
-            <Text style={[styles.summaryName, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name ?? translate("cartUnknownStore")}</Text>
-            <Text style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</Text>
-            {optionSummary ? <Text style={styles.fieldHint}>{optionSummary}</Text> : null}
+            <UiText style={[styles.summaryName, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name ?? translate("cartUnknownStore")}</UiText>
+            <UiText style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</UiText>
+            {optionSummary ? <UiText style={styles.fieldHint}>{optionSummary}</UiText> : null}
           </View>
-          <Text style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</Text>
+          <UiText style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</UiText>
         </View>;
       })}
       {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
       {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
-      {hasBlockingItems ? <Text style={styles.errorText}>{translate("checkoutFixCart")}</Text> : null}
+      {hasBlockingItems ? <UiText style={styles.errorText}>{translate("checkoutFixCart")}</UiText> : null}
       <View style={styles.totalRow}>
-        <Text style={styles.sectionTitle}>{translate("cartSubtotal")}</Text>
-        <Text style={styles.total}>{offers.data ? formatDZD(evaluation.subtotal) : "—"}</Text>
+        <UiText style={styles.sectionTitle}>{translate("cartSubtotal")}</UiText>
+        <PriceDisplay value={offers.data ? formatDZD(evaluation.subtotal) : "—"} style={styles.totalDisplay} />
       </View>
-      <Text style={styles.fieldHint}>{translate("cartDeliveryNote")}</Text>
-      <Text style={styles.fieldHint}>{translate("checkoutCodNote")}</Text>
-    </View>
+      <UiText style={styles.fieldHint}>{translate("cartDeliveryNote")}</UiText>
+      <UiText style={styles.fieldHint}>{translate("checkoutCodNote")}</UiText>
+    </CheckoutSummary>
 
-    {formError ? <Text accessibilityRole="alert" style={styles.errorText}>{formError}</Text> : null}
+    {formError ? <UiText accessibilityRole="alert" style={styles.errorText}>{formError}</UiText> : null}
     <Button
       label={translate("checkoutConfirm")}
       onPress={submit}
@@ -346,8 +346,8 @@ export default function CheckoutScreen() {
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.modalHeader}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{modalTitle}</Text>
-            <PressableSurface onPress={() => setPicker(null)} hitSlop={10}><Text style={styles.back}>{translate("back")}</Text></PressableSurface>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{modalTitle}</UiText>
+            <PressableSurface onPress={() => setPicker(null)} hitSlop={10}><UiText style={styles.back}>{translate("back")}</UiText></PressableSurface>
           </View>
           {((picker === "wilaya" && wilayas.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
           <ScrollView keyboardShouldPersistTaps="handled">
@@ -360,9 +360,9 @@ export default function CheckoutScreen() {
               }
               setPicker(null);
             }} style={styles.pickerItem}>
-              <Text style={[styles.pickerText, { color: theme.colors.foreground }]}>{item.label}</Text>
+              <UiText style={[styles.pickerText, { color: theme.colors.foreground }]}>{item.label}</UiText>
             </PressableSurface>)}
-            {picker === "commune" && pickerItems.length === 0 ? <Text style={styles.fieldHint}>{translate("checkoutNoCommunes")}</Text> : null}
+            {picker === "commune" && pickerItems.length === 0 ? <UiText style={styles.fieldHint}>{translate("checkoutNoCommunes")}</UiText> : null}
           </ScrollView>
         </View>
       </View>
@@ -373,6 +373,8 @@ export default function CheckoutScreen() {
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   back: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   section: { borderRadius: 18, padding: 14, gap: 11 },
+  summaryCard: { padding: 14, gap: 11 },
+  totalDisplay: { justifyContent: "flex-start" },
   sectionTitle: { color: theme.colors.accentMuted, fontSize: 15, fontWeight: "900", textAlign: "right" },
   input: { minHeight: 49, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, fontSize: 14 },
   multiline: { minHeight: 90, textAlignVertical: "top", paddingTop: 12 },
