@@ -250,6 +250,7 @@ export function Select({
               key={option.value}
               disabled={option.disabled}
               accessibilityRole="button"
+              accessibilityLabel={option.label}
               accessibilityState={{ selected: option.value === value, disabled: option.disabled }}
               onPress={() => {
                 onChange(option.value);
