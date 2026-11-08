@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Button } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
   const theme = useAppTheme();
@@ -164,9 +165,7 @@ export function ErrorState({ title, retryLabel, onRetry }: {
   return (
     <View style={styles.state}>
       <Text style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</Text>
-      <Pressable accessibilityRole="button" onPress={onRetry} style={[styles.retry, { backgroundColor: theme.colors.accent }]}>
-        <Text style={[styles.retryText, { color: theme.colors.accentForeground }]}>{retryLabel}</Text>
-      </Pressable>
+      <Button label={retryLabel} onPress={onRetry} size="md" />
     </View>
   );
 }
