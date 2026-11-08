@@ -6,7 +6,7 @@ export { fontFamilies, fontWeights, typography } from "./typography";
 export { getAppTheme, ThemeProvider, useAppTheme } from "./themes";
 export type { AppTheme, ThemeMode } from "./themes";
 
-import { brandColors, commerceColors, deliveryColors, semanticColors, themeColors } from "./colors";
+import { brandColors, commerceColors, deliveryColors, extendedThemeColors, semanticColors, themeColors } from "./colors";
 import { dimensions } from "./dimensions";
 import { shadows } from "./shadows";
 import { borderRadius, spacing } from "./spacing";
