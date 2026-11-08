@@ -43,5 +43,5 @@ export function ErrorState({ title, retryLabel, onRetry }: {
 const styles = StyleSheet.create({
   state: { minHeight: 135, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl },
   stateText: { fontSize: designTokens.typography.caption + 1, textAlign: "center" },
-  stateTitle: { fontSize: designTokens.typography.body, fontWeight: "800", textAlign: "center" }
+  stateTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" }
 });
