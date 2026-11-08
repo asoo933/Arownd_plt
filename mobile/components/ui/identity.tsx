@@ -1,6 +1,5 @@
 import {
   Image,
-  Text,
   View,
   type ImageSourcePropType,
   type StyleProp,
@@ -8,6 +7,7 @@ import {
 } from "react-native";
 
 import { useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { getIdentityInitials } from "./identity-state";
 import { Icon } from "./icon";
 
@@ -54,7 +54,7 @@ export function Avatar({
         {imageSource ? (
           <Image source={imageSource} resizeMode="cover" style={{ width: size, height: size }} />
         ) : (
-          <Text
+          <UiText
             numberOfLines={1}
             style={{
               color: theme.colors.foreground,
@@ -63,7 +63,7 @@ export function Avatar({
             }}
           >
             {getIdentityInitials(name)}
-          </Text>
+          </UiText>
         )}
       </View>
       {verified ? (
@@ -127,19 +127,19 @@ export function IdentityRow({
     <View style={[{ flexDirection: "row", alignItems: "center", gap: theme.spacing.md }, style]}>
       <Avatar name={name} imageUri={imageUri} size={avatarSize} verified={verified} />
       <View style={{ flex: 1, gap: theme.spacing.xs }}>
-        <Text
+        <UiText
           numberOfLines={1}
           style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "700", textAlign: "right" }}
         >
           {name}
-        </Text>
+        </UiText>
         {subtitle ? (
-          <Text
+          <UiText
             numberOfLines={2}
             style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}
           >
             {subtitle}
-          </Text>
+          </UiText>
         ) : null}
       </View>
     </View>
