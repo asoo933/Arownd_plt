@@ -18,7 +18,8 @@ import {
   PressableSurface,
   SegmentedControl,
   Text as UiText,
-  TextField
+  TextField,
+  type IconName
 } from "@/components/ui";
 import { translate } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
@@ -142,14 +143,14 @@ export default function SettingsScreen() {
         <Heading level={3}>{translate("settingsPreferencesTitle")}</Heading>
         <Card contentStyle={styles.sectionContent}>
           <SettingsRow
-            icon="sliders-horizontal"
+            icon="settings"
             label={translate("settingsAppearanceHint")}
             onPress={() => openSheet("appearance")}
             theme={theme}
             styles={styles}
           />
           <SettingsRow
-            icon="languages"
+            icon="list"
             label={translate("settingsLanguageTitle")}
             onPress={() => openSheet("language")}
             theme={theme}
@@ -214,7 +215,7 @@ export default function SettingsScreen() {
                   <UiText weight="700">
                     {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
                   </UiText>
-                  {address.is_default ? <Icon name="check-circle" size={17} color={theme.colors.success} /> : null}
+                  {address.is_default ? <Icon name="circle-check" size={17} color={theme.colors.success} /> : null}
                 </View>
                 <UiText>{address.recipient_name}</UiText>
                 <Caption>{address.phone}</Caption>
@@ -296,7 +297,7 @@ export default function SettingsScreen() {
         <Heading level={3}>{translate("settingsLanguageTitle")}</Heading>
         <View style={styles.languageOption}>
           <UiText weight="700">{translate("settingsLanguageArabic")}</UiText>
-          <Icon name="check-circle" size={19} color={theme.colors.success} />
+          <Icon name="circle-check" size={19} color={theme.colors.success} />
         </View>
         <View style={styles.languageOption}>
           <UiText tone="muted">{translate("settingsLanguageEnglish")}</UiText>
@@ -332,7 +333,7 @@ function SettingsRow({
   styles,
   last = false
 }: {
-  icon: string;
+  icon: IconName;
   label: string;
   onPress: () => void;
   theme: AppTheme;
@@ -347,7 +348,7 @@ function SettingsRow({
       style={[styles.linkRow, last ? undefined : { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border }]}
     >
       <View style={styles.linkLabel}>
-        <Icon name={icon as "user"} size={19} color={theme.colors.foregroundSecondary} />
+        <Icon name={icon} size={19} color={theme.colors.foregroundSecondary} />
         <UiText weight="700">{label}</UiText>
       </View>
       <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
