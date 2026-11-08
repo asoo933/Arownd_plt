@@ -144,13 +144,14 @@ export function Dialog({
   const theme = useAppTheme();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
-      <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, backgroundColor: theme.colors.overlay }}>
-        <Pressable onPress={() => undefined} style={{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
+      <View style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.lg }}>
+        <Pressable accessible={false} onPress={onRequestClose} style={{ position: "absolute", top: 0, bottom: 0, start: 0, end: 0, backgroundColor: theme.colors.overlay }} />
+        <View accessibilityViewIsModal style={{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
           {title ? <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.extrabold, textAlign: "right" }}>{title}</UiText> : null}
           {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText> : null}
           {children}
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -169,12 +170,13 @@ export function BottomSheet({
   const theme = useAppTheme();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onRequestClose}>
-      <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "flex-end", backgroundColor: theme.colors.overlay }}>
-        <Pressable onPress={() => undefined} style={{ maxHeight, padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.xxl, borderTopLeftRadius: theme.radius.xl, borderTopRightRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
+      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <Pressable accessible={false} onPress={onRequestClose} style={{ position: "absolute", top: 0, bottom: 0, start: 0, end: 0, backgroundColor: theme.colors.overlay }} />
+        <View accessibilityViewIsModal style={{ maxHeight, padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.xxl, borderTopLeftRadius: theme.radius.xl, borderTopRightRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
           <View style={{ width: theme.dimensions.avatarSize.md, height: 4, borderRadius: theme.radius.pill, backgroundColor: theme.colors.border, alignSelf: "center" }} />
           {children}
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
