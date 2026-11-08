@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { isThemeMode, useThemePreference } from "@/lib/design-system";
 import { CustomerScreen } from "@/components/customer-ui";
 import {
   AppHeader,
+  BottomSheet,
   Button,
   Caption,
   Card,
@@ -22,12 +23,17 @@ import {
 import { translate } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
+import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
+import { fetchMyAddresses } from "@/lib/user-address";
+
+type SettingsSheet = "delivery" | "addresses" | "password" | "appearance" | "language" | null;
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
   const { mode: themeMode, setMode: setThemeMode } = useThemePreference();
+  const [activeSheet, setActiveSheet] = useState<SettingsSheet>(null);
   const [appearanceError, setAppearanceError] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -35,6 +41,17 @@ export default function SettingsScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState(false);
   const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
+
+  const deliveryProfile = useQuery({
+    queryKey: ["my-delivery-profile"],
+    queryFn: fetchMyDeliveryProfile,
+    enabled: activeSheet === "delivery"
+  });
+  const addresses = useQuery({
+    queryKey: ["my-addresses"],
+    queryFn: fetchMyAddresses,
+    enabled: activeSheet === "addresses"
+  });
 
   const passwordMutation = useMutation({
     mutationFn: async () => {
@@ -60,6 +77,7 @@ export default function SettingsScreen() {
             : translate("settingsPasswordError"));
     }
   });
+
   const signOutMutation = useMutation({
     mutationFn: async () => {
       const { error } = await getSupabaseClient().auth.signOut();
@@ -71,6 +89,13 @@ export default function SettingsScreen() {
     },
     onError: () => setSignOutError(true)
   });
+
+  const openSheet = (sheet: Exclude<SettingsSheet, null>) => {
+    setActiveSheet(sheet);
+    setFormError(null);
+    setMessage(null);
+  };
+  const closeSheet = () => setActiveSheet(null);
 
   return (
     <CustomerScreen showNavigation={false}>
@@ -85,12 +110,139 @@ export default function SettingsScreen() {
       <AppHeader title={translate("settingsTitle")} />
       <Caption>{translate("settingsSubtitle")}</Caption>
 
-      <Card contentStyle={styles.sectionContent}>
+      <View style={styles.section}>
         <Heading level={3}>{translate("settingsSecurityTitle")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="user"
+            label={translate("profileEditDetails")}
+            onPress={() => openSheet("delivery")}
+            theme={theme}
+            styles={styles}
+          />
+          <SettingsRow
+            icon="map-pin"
+            label={translate("profileAddresses")}
+            onPress={() => openSheet("addresses")}
+            theme={theme}
+            styles={styles}
+          />
+          <SettingsRow
+            icon="lock"
+            label={translate("settingsPasswordChangeTitle")}
+            onPress={() => openSheet("password")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
+
+      <View style={styles.section}>
+        <Heading level={3}>{translate("settingsPreferencesTitle")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="sliders-horizontal"
+            label={translate("settingsAppearanceHint")}
+            onPress={() => openSheet("appearance")}
+            theme={theme}
+            styles={styles}
+          />
+          <SettingsRow
+            icon="languages"
+            label={translate("settingsLanguageTitle")}
+            onPress={() => openSheet("language")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
+
+      <Button
+        label={translate("settingsSignOut")}
+        onPress={() => {
+          setSignOutError(false);
+          setSignOutConfirmOpen(true);
+        }}
+        disabled={signOutMutation.isPending}
+        variant="danger"
+        fullWidth
+        style={styles.signOutButton}
+      />
+      {signOutError ? <UiText tone="danger">{translate("settingsSignOutError")}</UiText> : null}
+
+      <BottomSheet visible={activeSheet === "delivery"} onRequestClose={closeSheet}>
+        <Heading level={3}>{translate("profileEditDetails")}</Heading>
+        {deliveryProfile.isPending ? (
+          <Caption>{translate("stateLoading")}</Caption>
+        ) : deliveryProfile.isError ? (
+          <UiText tone="danger">{translate("deliveryProfileLoadError")}</UiText>
+        ) : deliveryProfile.data ? (
+          <View style={styles.sheetDetails}>
+            <DetailRow label={translate("fullNamePlaceholder")} value={deliveryProfile.data.full_name || "—"} />
+            <DetailRow label={translate("checkoutPhonePlaceholder")} value={deliveryProfile.data.phone || "—"} />
+            <DetailRow label={translate("checkoutWilaya")} value={deliveryProfile.data.wilaya_id ? String(deliveryProfile.data.wilaya_id).padStart(2, "0") : "—"} />
+            <DetailRow label={translate("checkoutCommune")} value={deliveryProfile.data.commune || "—"} />
+          </View>
+        ) : (
+          <Caption>{translate("deliveryProfileSubtitle")}</Caption>
+        )}
+        <Button
+          label={translate("deliveryProfileManage")}
+          onPress={() => {
+            closeSheet();
+            router.push("/delivery-profile");
+          }}
+          fullWidth
+        />
+      </BottomSheet>
+
+      <BottomSheet visible={activeSheet === "addresses"} onRequestClose={closeSheet}>
+        <Heading level={3}>{translate("addressesTitle")}</Heading>
+        {addresses.isPending ? (
+          <Caption>{translate("stateLoading")}</Caption>
+        ) : addresses.isError ? (
+          <UiText tone="danger">{translate("addressesLoadError")}</UiText>
+        ) : addresses.data.length === 0 ? (
+          <Caption>{translate("addressesEmptyHint")}</Caption>
+        ) : (
+          <View style={styles.sheetDetails}>
+            {addresses.data.map((address) => (
+              <View key={address.id} style={styles.addressSummary}>
+                <View style={styles.addressSummaryHeader}>
+                  <UiText weight="700">
+                    {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
+                  </UiText>
+                  {address.is_default ? <Icon name="check-circle" size={17} color={theme.colors.success} /> : null}
+                </View>
+                <UiText>{address.recipient_name}</UiText>
+                <Caption>{address.phone}</Caption>
+                <Caption>{address.commune}، {address.address_line}</Caption>
+              </View>
+            ))}
+          </View>
+        )}
+        <Button
+          label={translate("profileAddresses")}
+          onPress={() => {
+            closeSheet();
+            router.push("/addresses");
+          }}
+          fullWidth
+        />
+      </BottomSheet>
+
+      <BottomSheet visible={activeSheet === "password"} onRequestClose={closeSheet}>
+        <Heading level={3}>{translate("settingsPasswordChangeTitle")}</Heading>
         <Caption>{translate("settingsPasswordHint")}</Caption>
         <TextField
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(value) => {
+            setPassword(value);
+            setFormError(null);
+            setMessage(null);
+          }}
           placeholder={translate("newPassword")}
           secureTextEntry
           autoCapitalize="none"
@@ -99,7 +251,11 @@ export default function SettingsScreen() {
         />
         <TextField
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(value) => {
+            setConfirmPassword(value);
+            setFormError(null);
+            setMessage(null);
+          }}
           placeholder={translate("confirmPassword")}
           secureTextEntry
           autoCapitalize="none"
@@ -114,65 +270,9 @@ export default function SettingsScreen() {
           loading={passwordMutation.isPending}
           fullWidth
         />
-      </Card>
+      </BottomSheet>
 
-      <Card contentStyle={styles.sectionContent}>
-        <Heading level={3}>{translate("settingsSecurityTitle")}</Heading>
-        <PressableSurface
-          accessibilityRole="button"
-          accessibilityLabel={translate("profileEditDetails")}
-          onPress={() => router.push("/delivery-profile")}
-          style={styles.linkRow}
-        >
-          <View style={styles.linkLabel}>
-            <Icon name="user" size={19} color={theme.colors.foregroundSecondary} />
-            <UiText weight="700">{translate("profileEditDetails")}</UiText>
-          </View>
-          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
-        </PressableSurface>
-        <PressableSurface
-          accessibilityRole="button"
-          accessibilityLabel={translate("profileAddresses")}
-          onPress={() => router.push("/addresses")}
-          style={styles.linkRow}
-        >
-          <View style={styles.linkLabel}>
-            <Icon name="map-pin" size={19} color={theme.colors.foregroundSecondary} />
-            <UiText weight="700">{translate("profileAddresses")}</UiText>
-          </View>
-          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
-        </PressableSurface>
-        <Heading level={4}>{translate("settingsPasswordChangeTitle")}</Heading>
-        <Caption>{translate("settingsPasswordHint")}</Caption>
-        <TextField
-          value={password}
-          onChangeText={setPassword}
-          placeholder={translate("newPassword")}
-          secureTextEntry
-          autoCapitalize="none"
-          textContentType="newPassword"
-          style={styles.input}
-        />
-        <TextField
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          placeholder={translate("confirmPassword")}
-          secureTextEntry
-          autoCapitalize="none"
-          textContentType="newPassword"
-          style={styles.input}
-        />
-        {formError ? <UiText tone="danger">{formError}</UiText> : null}
-        {message ? <UiText tone="success" weight="700">{message}</UiText> : null}
-        <Button
-          label={translate("settingsPasswordSave")}
-          onPress={() => passwordMutation.mutate()}
-          loading={passwordMutation.isPending}
-          fullWidth
-        />
-      </Card>
-
-      <Card style={styles.sectionCard} contentStyle={styles.sectionContent}>
+      <BottomSheet visible={activeSheet === "appearance"} onRequestClose={closeSheet}>
         <Heading level={3}>{translate("settingsAppearanceTitle")}</Heading>
         <Caption>{translate("settingsAppearanceHint")}</Caption>
         <SegmentedControl
@@ -190,21 +290,19 @@ export default function SettingsScreen() {
           ]}
         />
         {appearanceError ? <UiText tone="danger">{translate("settingsAppearanceError")}</UiText> : null}
-      </Card>
+      </BottomSheet>
 
-      <Card contentStyle={styles.sectionContent}>
-        <Button
-          label={translate("settingsSignOut")}
-          onPress={() => {
-            setSignOutError(false);
-            setSignOutConfirmOpen(true);
-          }}
-          disabled={signOutMutation.isPending}
-          variant="danger"
-          fullWidth
-        />
-        {signOutError ? <UiText tone="danger">{translate("settingsSignOutError")}</UiText> : null}
-      </Card>
+      <BottomSheet visible={activeSheet === "language"} onRequestClose={closeSheet}>
+        <Heading level={3}>{translate("settingsLanguageTitle")}</Heading>
+        <View style={styles.languageOption}>
+          <UiText weight="700">{translate("settingsLanguageArabic")}</UiText>
+          <Icon name="check-circle" size={19} color={theme.colors.success} />
+        </View>
+        <View style={styles.languageOption}>
+          <UiText tone="muted">{translate("settingsLanguageEnglish")}</UiText>
+        </View>
+        <Caption>{translate("settingsLanguageComingSoon")}</Caption>
+      </BottomSheet>
 
       <ConfirmDialog
         visible={signOutConfirmOpen}
@@ -226,6 +324,56 @@ export default function SettingsScreen() {
   );
 }
 
+function SettingsRow({
+  icon,
+  label,
+  onPress,
+  theme,
+  styles,
+  last = false
+}: {
+  icon: string;
+  label: string;
+  onPress: () => void;
+  theme: AppTheme;
+  styles: ReturnType<typeof createStyles>;
+  last?: boolean;
+}) {
+  return (
+    <PressableSurface
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={[styles.linkRow, last ? undefined : { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border }]}
+    >
+      <View style={styles.linkLabel}>
+        <Icon name={icon as "user"} size={19} color={theme.colors.foregroundSecondary} />
+        <UiText weight="700">{label}</UiText>
+      </View>
+      <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
+    </PressableSurface>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  const theme = useAppTheme();
+  return (
+    <View style={detailStyles.row}>
+      <Caption>{label}</Caption>
+      <UiText weight="700">{value}</UiText>
+    </View>
+  );
+}
+
+const detailStyles = StyleSheet.create({
+  row: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: designTokens.spacing.md
+  }
+});
+
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     backButton: {
@@ -236,22 +384,21 @@ function createStyles(theme: AppTheme) {
       alignSelf: "flex-start",
       borderRadius: designTokens.radius.md
     },
-    sectionCard: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: designTokens.radius.lg
+    section: {
+      gap: designTokens.spacing.md
     },
     sectionContent: {
-      gap: designTokens.spacing.md,
-      padding: designTokens.spacing.lg
+      gap: 0,
+      paddingHorizontal: designTokens.spacing.lg,
+      paddingVertical: designTokens.spacing.xs
     },
     input: {
       minHeight: 48,
       textAlign: "right"
     },
     linkRow: {
-      minHeight: 54,
-      paddingVertical: designTokens.spacing.xs,
+      minHeight: 58,
+      paddingVertical: designTokens.spacing.md,
       flexDirection: "row-reverse",
       alignItems: "center",
       justifyContent: "space-between",
@@ -263,6 +410,35 @@ function createStyles(theme: AppTheme) {
       flexDirection: "row-reverse",
       alignItems: "center",
       gap: designTokens.spacing.md
+    },
+    sheetDetails: {
+      gap: designTokens.spacing.md,
+      padding: designTokens.spacing.md,
+      borderRadius: designTokens.radius.lg,
+      backgroundColor: theme.colors.surfaceMuted
+    },
+    addressSummary: {
+      gap: designTokens.spacing.xs,
+      paddingBottom: designTokens.spacing.md,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border
+    },
+    addressSummaryHeader: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "space-between"
+    },
+    languageOption: {
+      minHeight: 48,
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: designTokens.spacing.md,
+      borderRadius: designTokens.radius.md,
+      backgroundColor: theme.colors.surfaceMuted
+    },
+    signOutButton: {
+      marginTop: designTokens.spacing.sm
     }
   });
 }
