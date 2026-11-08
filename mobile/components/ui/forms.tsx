@@ -49,6 +49,7 @@ export function TextArea({
             color: theme.colors.foreground,
             backgroundColor: theme.colors.surface,
             fontSize: theme.typography.body,
+            fontFamily: theme.fontFamilies.arabic,
             textAlign: "right"
           },
           style
@@ -71,6 +72,7 @@ export function NumberField({ onChangeText, ...props }: NumberFieldProps) {
       {...props}
       keyboardType="numeric"
       onChangeText={handleChange}
+      style={[{ fontFamily: designTokens.fontFamilies.arabic }, props.style]}
     />
   );
 }
@@ -337,7 +339,7 @@ export function InputOTP({
         maxLength={length}
         editable={!disabled}
         accessibilityLabel={accessibilityLabel}
-        style={{ position: "absolute", inset: 0, opacity: 0.02 }}
+        style={{ position: "absolute", inset: 0, opacity: 0.02, fontFamily: theme.fontFamilies.arabic }}
       />
     </View>
   );
