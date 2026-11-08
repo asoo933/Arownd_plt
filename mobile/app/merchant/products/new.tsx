@@ -362,7 +362,7 @@ export default function MerchantNewProductScreen() {
                         style={[styles.imageRemove, { backgroundColor: theme.colors.danger }]}
                         hitSlop={8}
                       >
-                        <Icon name="x" color="#FFFFFF" size={15} accessibilityHidden />
+                        <Icon name="x" color=designTokens.brand.white size={15} accessibilityHidden />
                       </PressableSurface>
                     </View>
                   ))}
@@ -573,7 +573,7 @@ function createStyles(theme: AppTheme) {
     imageItem: { width: 88, height: 88, borderRadius: designTokens.radius.sm, overflow: "visible" },
     imagePreview: { width: 88, height: 88, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
     imageRemove: { position: "absolute", top: -7, right: -7, width: 25, height: 25, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
-    imageRemoveText: { color: "#FFFFFF", fontSize: 19, lineHeight: 22, fontWeight: designTokens.fontWeights.extrabold },
+    imageRemoveText: { color: designTokens.brand.white, fontSize: 19, lineHeight: 22, fontWeight: designTokens.fontWeights.extrabold },
     noteText: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "right" },
     errorBox: { borderWidth: 1, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
     errorText: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "right", fontWeight: designTokens.fontWeights.bold },
