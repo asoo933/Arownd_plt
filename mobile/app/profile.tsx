@@ -141,7 +141,9 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="package" size={designTokens.dimensions.iconSize.sm} /></View>
+                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <Icon name="package" size={designTokens.dimensions.iconSize.sm} />
+                </View>
                 <StatCard
                   label={translate("profileOrders")}
                   value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)}
@@ -158,7 +160,9 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="heart" size={designTokens.dimensions.iconSize.sm} /></View>
+                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <Icon name="heart" size={designTokens.dimensions.iconSize.sm} />
+                </View>
                 <StatCard
                   label={translate("profileFavorites")}
                   value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)}
@@ -175,7 +179,9 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="star" size={designTokens.dimensions.iconSize.sm} /></View>
+                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <Icon name="star" size={designTokens.dimensions.iconSize.sm} />
+                </View>
                 <StatCard
                   label={translate("myReviewsTitle")}
                   value={reviews.isPending ? "…" : reviews.isError ? "—" : String(reviews.data?.length ?? 0)}
@@ -208,8 +214,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: designTokens.spacing.sm,
     paddingTop: designTokens.spacing.sm,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "transparent"
+    borderTopWidth: StyleSheet.hairlineWidth
   },
   stats: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
   statCardOuter: { flex: 1, minWidth: 0 },
