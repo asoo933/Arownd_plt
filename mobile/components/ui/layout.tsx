@@ -7,7 +7,7 @@ import {
   type ViewStyle
 } from "react-native";
 
-import { designTokens } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 export type ContainerProps = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
@@ -92,11 +92,12 @@ export function Divider({
   inset?: number;
   style?: StyleProp<ViewStyle>;
 }) {
+  const theme = useAppTheme();
   return (
     <View
       accessibilityElementsHidden
       style={[
-        { height: 1, alignSelf: "stretch", marginHorizontal: inset, backgroundColor: "transparent" },
+        { height: 1, alignSelf: "stretch", marginHorizontal: inset, backgroundColor: theme.colors.border },
         style
       ]}
     />
