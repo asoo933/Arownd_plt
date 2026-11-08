@@ -49,7 +49,8 @@ import {
   X,
   type LucideIcon
 } from "lucide-react-native";
-import type { StyleProp, ViewStyle } from "react-native";
+import { View, type StyleProp, type ViewStyle } from "react-native";
+import { useAppTheme } from "@/lib/theme";
 
 const iconRegistry = {
   arrowDownUp: ArrowDownUp,
@@ -122,15 +123,15 @@ export function Icon({
   style?: StyleProp<ViewStyle>;
 }) {
   const IconComponent = iconRegistry[name];
+  const theme = useAppTheme();
   return (
-    <IconComponent
-      size={size}
-      color={color}
-      strokeWidth={strokeWidth}
+    <View
       accessible={!accessibilityHidden}
       accessibilityLabel={accessibilityLabel}
       accessibilityElementsHidden={accessibilityHidden}
-      style={style}
-    />
+      style={[{ width: size, height: size, alignItems: "center", justifyContent: "center" }, style]}
+    >
+      <IconComponent size={size} color={color ?? theme.colors.foreground} strokeWidth={strokeWidth} />
+    </View>
   );
 }
