@@ -38,7 +38,7 @@ export function BackButton({
       disabled={disabled}
       onPress={onPress}
       hitSlop={8}
-      style={({ pressed }) => [{ width: 44, height: 44, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }, style]}
+      style={({ pressed }) => [{ width: theme.dimensions.controlHeight.md, height: theme.dimensions.controlHeight.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }, style]}
     >
       {children}
     </Pressable>
@@ -71,10 +71,10 @@ export function BottomNavigation({
             accessibilityState={{ selected, disabled: item.disabled }}
             disabled={item.disabled}
             onPress={() => onChange(item.key)}
-            style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: 52, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: 3, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
+            style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: theme.dimensions.controlHeight.lg, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: 3, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
           >
             {item.icon}
-            <UiText numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? "700" : "400" }}>{item.label}</UiText>
+            <UiText numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular }}>{item.label}</UiText>
           </Pressable>
         );
       })}
