@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { Modal, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
   Button,
+  BottomSheet,
   Card,
   Caption,
   ConfirmDialog,
@@ -192,9 +193,7 @@ export default function AddressesScreen() {
         </Card>
       ))}
 
-      <Modal visible={editor !== null} transparent animationType="slide" onRequestClose={() => setEditor(null)}>
-        <View style={styles.backdrop}>
-          <View style={styles.modalPanel}>
+      <BottomSheet visible={editor !== null} onRequestClose={() => setEditor(null)} maxHeight="92%">
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.formContent}>
               <Heading level={3}>{translate(editor?.address ? "addressesEditTitle" : "addressesAddTitle")}</Heading>
 
@@ -233,13 +232,9 @@ export default function AddressesScreen() {
               <Button label={translate("deliveryProfileSave")} onPress={submit} loading={saveMutation.isPending} fullWidth />
               <Button label={translate("back")} onPress={() => setEditor(null)} variant="ghost" fullWidth disabled={saveMutation.isPending} />
             </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      </BottomSheet>
 
-      <Modal visible={pickerOpen} transparent animationType="fade" onRequestClose={() => setPickerOpen(false)}>
-        <View style={styles.backdrop}>
-          <View style={styles.pickerPanel}>
+      <BottomSheet visible={pickerOpen} onRequestClose={() => setPickerOpen(false)} maxHeight="78%">
             <Heading level={3}>{translate("checkoutChooseWilaya")}</Heading>
             <ScrollView>
               {wilayas.data.map((item: Wilaya) => (
@@ -257,9 +252,7 @@ export default function AddressesScreen() {
               ))}
             </ScrollView>
             <Button label={translate("back")} onPress={() => setPickerOpen(false)} variant="ghost" fullWidth />
-          </View>
-        </View>
-      </Modal>
+      </BottomSheet>
 
       <ConfirmDialog
         visible={deleteTarget !== null}
@@ -325,9 +318,6 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     cardHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
     actions: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7, marginTop: 7 },
-    backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: 15 },
-    modalPanel: { maxHeight: "92%", backgroundColor: theme.colors.surface, borderRadius: 18, padding: 16 },
-    pickerPanel: { maxHeight: "78%", backgroundColor: theme.colors.surface, borderRadius: 18, padding: 16, gap: 10 },
     formContent: { gap: 12, paddingBottom: 8 },
     field: { gap: 6, marginBottom: 3 },
     input: { minHeight: 47, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 11, paddingHorizontal: 12, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: 13 },
