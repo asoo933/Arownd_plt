@@ -623,7 +623,7 @@ function createStyles(theme: AppTheme) {
     content: { padding: 18, paddingBottom: 38, gap: 14 },
     backText: { fontSize: 13, fontWeight: "800" },
     subtitle: { fontSize: 13, lineHeight: 21, textAlign: "right" },
-    section: { borderWidth: 1, borderRadius: 20, padding: 15, gap: 14 },
+    section: { padding: 15, gap: 14 },
     sectionTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
     input: {
       minHeight: 49,
