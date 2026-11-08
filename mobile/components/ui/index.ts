@@ -108,18 +108,6 @@ export {
 } from "./delivery-components";
 export type { TrackingStepItem } from "./delivery-components";
 
-export {
-  MapView,
-  MapMarker,
-  LocationPicker,
-  DirectionsButton,
-  LocationSearch,
-  AddressPicker,
-  WilayaSelect,
-  CommuneSelect,
-  LocationPermissionPrompt
-} from "./location-components";
-
 export { Image, ImageGallery, ImagePreview, ImageUploader, CameraButton, FileUploader, ImageSearch, MediaViewer } from "./media-components";
 
 export {
