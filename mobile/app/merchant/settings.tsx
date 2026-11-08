@@ -206,9 +206,7 @@ export default function MerchantStoreSettingsScreen() {
           <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} fullWidth />
         </Card>
       </ScrollView>
-      <Modal visible={wilayaPickerOpen} transparent animationType="slide" onRequestClose={() => setWilayaPickerOpen(false)}>
-        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.modalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+      <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
             <View style={styles.modalHeader}>
               <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
               <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
@@ -222,9 +220,8 @@ export default function MerchantStoreSettingsScreen() {
                 </PressableSurface>
               ))}
             </ScrollView>
-          </View>
-        </View>
-      </Modal>
+
+      </BottomSheet>
     </SafeAreaView>
   );
 }
