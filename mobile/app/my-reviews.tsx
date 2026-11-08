@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IconButton } from "@/components/ui";
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { AppHeader, Button, IconButton, PressableSurface, StatusBadge } from "@/components/ui";
 import { fetchMyReviews, getReviewTargetPath, type AppReview } from "@/lib/reviews";
 import { translate } from "@/lib/i18n";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -29,8 +29,8 @@ export default function MyReviewsScreen() {
 
   return (
     <CustomerScreen>
-      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
-      <CustomerHeading title={translate("myReviewsTitle")} subtitle={translate("myReviewsSubtitle")} />
+      <AppHeader title={translate("myReviewsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
+      <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("myReviewsSubtitle")}</Text>
       {auth.isPending || (auth.data && query.isPending) ? <LoadingState label={translate("stateLoading")} /> : null}
       {auth.isError || query.isError ? (
         <ErrorState title={translate("myReviewsLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void query.refetch(); }} />
@@ -64,17 +64,17 @@ function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void
     : new Intl.DateTimeFormat("ar-DZ", { dateStyle: "medium" }).format(date);
 
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={[styles.row, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+    <PressableSurface accessibilityRole="button" accessibilityLabel={target} onPress={onPress} style={[styles.row, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <View style={styles.rowHeader}>
         <Text style={[styles.target, { color: theme.colors.foreground }]}>{target}</Text>
         <Text style={[styles.rating, { color: theme.colors.warning }]}>{review.rating}/5 ★</Text>
       </View>
       {review.comment ? <Text style={[styles.comment, { color: theme.colors.muted }]}>{review.comment}</Text> : null}
       <View style={styles.rowFooter}>
-        <Text style={[styles.status, { color: review.status === "rejected" ? theme.colors.danger : theme.colors.accentMuted }]}>{status}</Text>
+        <StatusBadge label={status} tone={review.status === "rejected" ? "danger" : review.status === "approved" ? "success" : "warning"} />
         <Text style={[styles.date, { color: theme.colors.muted }]}>{dateLabel}</Text>
       </View>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
@@ -85,6 +85,5 @@ const styles = StyleSheet.create({
   rating: { fontSize: 13, fontWeight: "900" },
   comment: { fontSize: 12, lineHeight: 19, textAlign: "right" },
   rowFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-  status: { fontSize: 11, fontWeight: "800" },
   date: { fontSize: 10 }
 });
