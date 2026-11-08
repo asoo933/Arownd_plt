@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { CustomerNavigation } from "@/components/customer-navigation";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -13,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Button, PressableSurface, TextField } from "@/components/ui";
+export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
   const theme = useAppTheme();
@@ -139,40 +139,6 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
   );
 }
 
-export function LoadingState({ label }: { label: string }) {
-  const theme = useAppTheme();
-  return (
-    <View style={styles.state}>
-      <ActivityIndicator color={theme.colors.accentMuted} />
-      <Text style={[styles.stateText, { color: theme.colors.muted }]}>{label}</Text>
-    </View>
-  );
-}
-
-export function EmptyState({ title, hint }: { title: string; hint: string }) {
-  const theme = useAppTheme();
-  return (
-    <View style={styles.state}>
-      <Text style={[styles.emptyMark, { color: theme.colors.accentMuted }]}>⌕</Text>
-      <Text style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</Text>
-      <Text style={[styles.stateText, { color: theme.colors.muted }]}>{hint}</Text>
-    </View>
-  );
-}
-
-export function ErrorState({ title, retryLabel, onRetry }: {
-  title: string;
-  retryLabel: string;
-  onRetry: () => void;
-}) {
-  const theme = useAppTheme();
-  return (
-    <View style={styles.state}>
-      <Text style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</Text>
-      <Button label={retryLabel} onPress={onRetry} size="md" />
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
@@ -199,11 +165,5 @@ const styles = StyleSheet.create({
   storeInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-end" },
   storeName: { fontSize: designTokens.typography.body, fontWeight: "800" },
   storeRating: { fontSize: designTokens.typography.caption, fontWeight: "700" },
-  verified: { fontSize: 16, fontWeight: "900" },
-  state: { minHeight: 135, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl },
-  stateText: { fontSize: designTokens.typography.caption + 1, textAlign: "center" },
-  stateTitle: { fontSize: designTokens.typography.body, fontWeight: "800", textAlign: "center" },
-  emptyMark: { fontSize: 30 },
-  retry: { minHeight: 44, justifyContent: "center", paddingHorizontal: designTokens.spacing.xl, borderRadius: designTokens.radius.md },
-  retryText: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" }
+  verified: { fontSize: 16, fontWeight: "900" }
 });
