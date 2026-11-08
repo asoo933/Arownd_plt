@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -156,9 +156,7 @@ export default function CheckoutScreen() {
         <Text style={styles.orderLabel}>{translate("checkoutOrderNumber")}</Text>
         <Text selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</Text>
         <Text style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</Text>
-        <Pressable onPress={() => router.replace("/home")} style={styles.primary}>
-          <Text style={styles.primaryText}>{translate("checkoutBackHome")}</Text>
-        </Pressable>
+        <Button label={translate("checkoutBackHome")} onPress={() => router.replace("/home")} fullWidth />
       </View>
     </CustomerScreen>;
   }
@@ -168,7 +166,7 @@ export default function CheckoutScreen() {
   if (!cart.data.length) return <CustomerScreen>
     <CustomerHeading title={translate("checkoutTitle")} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
-    <Pressable onPress={() => router.replace("/explore")} style={styles.primary}><Text style={styles.primaryText}>{translate("cartBrowse")}</Text></Pressable>
+    <Button label={translate("cartBrowse")} onPress={() => router.replace("/explore")} fullWidth />
   </CustomerScreen>;
 
   const submit = () => {
@@ -217,10 +215,11 @@ export default function CheckoutScreen() {
     : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
   return <CustomerScreen>
-    <View style={styles.topRow}>
-      <Pressable onPress={() => router.back()} hitSlop={10}><Text style={styles.back}>{translate("back")}</Text></Pressable>
-      <CustomerHeading title={translate("checkoutTitle")} subtitle={translate("checkoutSubtitle")} />
-    </View>
+    <AppHeader
+      title={translate("checkoutTitle")}
+      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+    />
+    <Text style={styles.fieldHint}>{translate("checkoutSubtitle")}</Text>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("checkoutContactTitle")}</Text>
@@ -373,7 +372,6 @@ export default function CheckoutScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  topRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
   back: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   section: { borderRadius: 18, padding: 14, gap: 11 },
   sectionTitle: { color: theme.colors.accentMuted, fontSize: 15, fontWeight: "900", textAlign: "right" },
