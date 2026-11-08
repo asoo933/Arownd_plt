@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  Text,
   View,
   type PressableProps,
   type StyleProp,
@@ -12,6 +11,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { getButtonPalette, type ButtonVariant } from "./palette";
 
 type SurfaceProps = Pick<ViewProps, "accessibilityHint" | "accessibilityLabel" | "accessibilityRole" | "testID"> & {
@@ -175,7 +175,7 @@ export function Button({
       ) : (
         <>
           {startIcon}
-          <Text
+          <UiText
             numberOfLines={1}
             style={[
               {
@@ -188,7 +188,7 @@ export function Button({
             ]}
           >
             {label}
-          </Text>
+          </UiText>
           {endIcon}
         </>
       )}
