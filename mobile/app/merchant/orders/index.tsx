@@ -18,7 +18,7 @@ import {
 import { translate, type TranslationKey } from "@/lib/i18n";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, StatusBadge } from "@/components/ui";
 
 type OrderFilter = "all" | "pending" | "quoted" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -190,7 +190,7 @@ function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; t
         <Text style={[style.orderCode, { color: theme.colors.foreground }]}>
           {translate("merchantOrderNumber")} {order.parentOrderId.slice(0, 8)}
         </Text>
-        <OrderStatus order={order} theme={theme} />
+        <OrderStatus order={order} />
       </View>
       <Text style={[style.customerName, { color: theme.colors.foreground }]}>
         {order.customerName || translate("merchantCustomerUnknown")}
@@ -218,7 +218,7 @@ function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; t
   );
 }
 
-function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: AppTheme }) {
+function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
   const labelByStatus: Record<string, TranslationKey> = {
     pending: "merchantOrderStatusPending",
     quoted: "merchantOrderStatusQuoted",
@@ -228,31 +228,17 @@ function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: A
     cancelled: "merchantOrderStatusCancelled"
   };
   const tone = order.status === "delivered"
-    ? theme.colors.success
+    ? "success"
     : order.status === "cancelled"
-      ? theme.colors.danger
+      ? "danger"
       : order.status === "pending" || order.status === "quoted"
-        ? theme.colors.warning
-        : theme.colors.muted;
-  const background = order.status === "delivered"
-    ? theme.colors.successSurface
-    : order.status === "cancelled"
-      ? theme.colors.dangerSurface
-      : order.status === "pending" || order.status === "quoted"
-        ? theme.colors.warningSurface
-        : theme.colors.surfaceMuted;
-
-  const displayKey = order.status === "shipped" && order.deliveryType === "desk"
+        ? "warning"
+        : "neutral";
+  const key = order.status === "shipped" && order.deliveryType === "desk"
     ? "merchantOrderStatusPrepared"
     : labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
 
-  return (
-    <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 5 }}>
-      <Text style={{ color: tone, fontSize: 10, fontWeight: "900" }}>
-        {translate(displayKey)}
-      </Text>
-    </View>
-  );
+  return <StatusBadge label={translate(key)} tone={tone} />;
 }
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
