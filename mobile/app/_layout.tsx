@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -19,6 +20,8 @@ import { useEffect, useState } from "react";
 
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
+
+void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 export default function RootLayout() {
   return (
@@ -64,6 +67,12 @@ function RootLayoutContent() {
   );
   const theme = useAppTheme();
   const { isReady: themeReady } = useThemePreference();
+
+  useEffect(() => {
+    if ((fontsLoaded || fontError) && themeReady) {
+      void SplashScreen.hideAsync();
+    }
+  }, [fontError, fontsLoaded, themeReady]);
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
