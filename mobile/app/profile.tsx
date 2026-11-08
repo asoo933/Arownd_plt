@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button } from "@/components/ui";
+import { Button, PressableSurface } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
 import { translate } from "@/lib/i18n";
@@ -92,7 +92,7 @@ export default function ProfileScreen() {
       ) : (
         <>
           <View style={[styles.identity, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <View style={[styles.avatar, { backgroundColor: theme.colors.accent }]}><Text style={styles.avatarText}>{getProfileInitial(displayName)}</Text></View>
+            <View style={[styles.avatar, { backgroundColor: theme.colors.accent }]}><Text style={[styles.avatarText, { color: theme.colors.accentForeground }]}>{getProfileInitial(displayName)}</Text></View>
             <View style={styles.identityCopy}>
               <Text numberOfLines={1} style={[styles.name, { color: colors.text }]}>{displayName}</Text>
               <Text numberOfLines={1} style={[styles.email, { color: colors.muted }]}>{user.data.email ?? ""}</Text>
@@ -146,20 +146,20 @@ function MenuAction({ label, hint, onPress, colors }: {
   colors: { text: string; muted: string; card: string; border: string };
 }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={[styles.menuAction, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <PressableSurface accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} onPress={onPress} style={[styles.menuAction, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.menuCopy}>
         <Text style={[styles.menuTitle, { color: colors.text }]}>{label}</Text>
         <Text style={[styles.menuHint, { color: colors.muted }]}>{hint}</Text>
       </View>
       <Text style={[styles.arrow, { color: colors.muted }]}>‹</Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
 const styles = StyleSheet.create({
   identity: { minHeight: 104, borderWidth: 1, borderRadius: 20, padding: 16, flexDirection: "row-reverse", alignItems: "center", gap: 13 },
-  avatar: { width: 58, height: 58, borderRadius: 29, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  avatarText: { color: "#0A0A0A", fontSize: 23, fontWeight: "900" },
+  avatar: { width: 58, height: 58, borderRadius: 29, alignItems: "center", justifyContent: "center" },
+  avatarText: { fontSize: 23, fontWeight: "900" },
   identityCopy: { flex: 1, alignItems: "flex-end", gap: 4 },
   name: { fontSize: 16, fontWeight: "900" },
   email: { fontSize: 12 },
