@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, SearchField, Text as UiText } from "@/components/ui";
+import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
