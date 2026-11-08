@@ -178,24 +178,63 @@ export default function DeliveryProfileScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  panel: { borderRadius: designTokens.radius.md, padding: 0 },
+  panel: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.xl,
+    padding: 0
+  },
   label: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body - 1 },
-  picker: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center" },
+  input: {
+    minHeight: designTokens.dimensions.controlHeight.lg,
+    borderWidth: 1,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: designTokens.spacing.md,
+    fontSize: designTokens.typography.body - 1
+  },
+  picker: {
+    minHeight: designTokens.dimensions.controlHeight.lg,
+    borderWidth: 1,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: designTokens.spacing.md,
+    justifyContent: "center"
+  },
   pickerText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
-  suggestionButton: { alignSelf: "flex-start", minHeight: designTokens.dimensions.controlHeight.md, justifyContent: "center" },
+  suggestionButton: {
+    alignSelf: "flex-start",
+    minHeight: designTokens.dimensions.controlHeight.md,
+    paddingHorizontal: designTokens.spacing.sm,
+    justifyContent: "center"
+  },
   suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   error: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "right" },
   success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
   note: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" },
   disabled: { opacity: 0.5 },
   backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: designTokens.spacing.lg },
-  modalPanel: { maxHeight: "80%", borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  modalPanel: {
+    maxHeight: "80%",
+    borderRadius: theme.radius.xl,
+    padding: designTokens.spacing.lg,
+    gap: designTokens.spacing.md
+  },
   modalTitle: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
   options: { maxHeight: 440 },
-  option: { minHeight: 45, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
+  option: {
+    minHeight: 52,
+    paddingHorizontal: designTokens.spacing.sm,
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border
+  },
   optionText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
-  closeButton: { minHeight: designTokens.dimensions.controlHeight.md, justifyContent: "center", alignItems: "center", borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.accent },
+  closeButton: {
+    minHeight: designTokens.dimensions.controlHeight.md,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.accent
+  },
   closeText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold, fontSize: designTokens.typography.caption + 1 }
 }); }
 
