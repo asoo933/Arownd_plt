@@ -96,10 +96,10 @@ export function BottomNavigation({
             accessibilityState={{ selected, disabled: item.disabled }}
             disabled={item.disabled}
             onPress={() => onChange(item.key)}
-            style={({ pressed }) => [{ minWidth: 56, minHeight: 48, alignItems: "center", justifyContent: "center", gap: 3, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
+            style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: 52, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: 3, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
           >
             {item.icon}
-            <Text numberOfLines={1} style={{ color: selected ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? "700" : "400" }}>{item.label}</Text>
+            <Text numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? "700" : "400" }}>{item.label}</Text>
           </Pressable>
         );
       })}
