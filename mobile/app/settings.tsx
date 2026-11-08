@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { designTokens } from "@/lib/theme";
+import { isThemeMode, useThemePreference } from "@/lib/design-system";
 import { CustomerScreen } from "@/components/customer-ui";
 import {
   AppHeader,
@@ -14,6 +15,7 @@ import {
   Heading,
   Icon,
   PressableSurface,
+  SegmentedControl,
   Text as UiText,
   TextField
 } from "@/components/ui";
@@ -23,6 +25,8 @@ import { getSupabaseClient } from "@/lib/supabase";
 
 export default function SettingsScreen() {
   const queryClient = useQueryClient();
+  const { mode: themeMode, setMode: setThemeMode } = useThemePreference();
+  const [appearanceError, setAppearanceError] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
@@ -70,6 +74,26 @@ export default function SettingsScreen() {
     <CustomerScreen>
       <AppHeader title={translate("settingsTitle")} />
       <Caption>{translate("settingsSubtitle")}</Caption>
+
+      <Card contentStyle={styles.sectionContent}>
+        <Heading level={3}>{translate("settingsAppearanceTitle")}</Heading>
+        <Caption>{translate("settingsAppearanceHint")}</Caption>
+        <SegmentedControl
+          accessibilityLabel={translate("settingsAppearanceTitle")}
+          value={themeMode}
+          onChange={(value) => {
+            if (!isThemeMode(value)) return;
+            setAppearanceError(false);
+            void setThemeMode(value).catch(() => setAppearanceError(true));
+          }}
+          options={[
+            { key: "system", label: translate("settingsThemeSystem") },
+            { key: "light", label: translate("settingsThemeLight") },
+            { key: "dark", label: translate("settingsThemeDark") }
+          ]}
+        />
+        {appearanceError ? <UiText tone="danger">{translate("settingsAppearanceError")}</UiText> : null}
+      </Card>
 
       <Card contentStyle={styles.sectionContent}>
         <Heading level={3}>{translate("settingsSecurityTitle")}</Heading>
