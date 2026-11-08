@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import {
-  Modal,
   Pressable,
-  ScrollView,
   View,
   type StyleProp,
   type ViewStyle
@@ -10,7 +8,6 @@ import {
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Text as UiText } from "./typography";
-import { AppHeader } from "./navigation";
 
 export type NavigationItem = {
   key: string;
@@ -18,28 +15,6 @@ export type NavigationItem = {
   icon?: ReactNode;
   disabled?: boolean;
 };
-
-export function PageHeader({
-  title,
-  subtitle,
-  leading,
-  trailing,
-  style
-}: {
-  title: string;
-  subtitle?: string;
-  leading?: ReactNode;
-  trailing?: ReactNode;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-  return (
-    <View style={[{ gap: designTokens.spacing.xs }, style]}>
-      <AppHeader title={title} leading={leading} trailing={trailing} />
-      {subtitle ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}>{subtitle}</UiText> : null}
-    </View>
-  );
-}
 
 export function BackButton({
   onPress,
@@ -104,129 +79,5 @@ export function BottomNavigation({
         );
       })}
     </View>
-  );
-}
-
-export function TabBar({
-  items,
-  value,
-  onChange,
-  accessibilityLabel,
-  style
-}: {
-  items: NavigationItem[];
-  value: string;
-  onChange: (key: string) => void;
-  accessibilityLabel: string;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-  return (
-    <View accessibilityRole="tablist" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row-reverse", borderBottomWidth: 1, borderBottomColor: theme.colors.border }, style]}>
-      {items.map((item) => {
-        const selected = item.key === value;
-        return (
-          <Pressable
-            key={item.key}
-            accessibilityRole="tab"
-            accessibilityLabel={item.label}
-            accessibilityState={{ selected, disabled: item.disabled }}
-            disabled={item.disabled}
-            onPress={() => onChange(item.key)}
-            style={({ pressed }) => [{ flex: 1, minHeight: 46, alignItems: "center", justifyContent: "center", borderBottomWidth: selected ? 3 : 0, borderBottomColor: theme.colors.accentMuted, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
-          >
-            <UiText style={{ color: selected ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{item.label}</UiText>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-export function Breadcrumb({
-  items,
-  separator,
-  style
-}: {
-  items: Array<{ key: string; label: string; onPress?: () => void }>;
-  separator?: ReactNode;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-  return (
-    <View style={[{ flexDirection: "row-reverse", alignItems: "center", flexWrap: "wrap", gap: designTokens.spacing.xs }, style]}>
-      {items.map((item, index) => {
-        const current = index === items.length - 1;
-        return (
-          <View key={item.key} style={{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs }}>
-            <Pressable disabled={!item.onPress || current} onPress={item.onPress} accessibilityRole={item.onPress ? "link" : "text"}>
-              <UiText style={{ color: current ? theme.colors.foreground : theme.colors.muted, fontSize: theme.typography.caption + 1, fontWeight: current ? "700" : "400" }}>{item.label}</UiText>
-            </Pressable>
-            {!current ? separator ?? <UiText style={{ color: theme.colors.muted }}>‹</UiText> : null}
-          </View>
-        );
-      })}
-    </View>
-  );
-}
-
-export function NavigationMenu({
-  items,
-  value,
-  onChange,
-  style
-}: {
-  items: NavigationItem[];
-  value: string;
-  onChange: (key: string) => void;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-  return (
-    <View style={[{ gap: designTokens.spacing.xs }, style]}>
-      {items.map((item) => {
-        const selected = item.key === value;
-        return (
-          <Pressable
-            key={item.key}
-            accessibilityRole="button"
-            accessibilityLabel={item.label}
-            accessibilityState={{ selected, disabled: item.disabled }}
-            disabled={item.disabled}
-            onPress={() => onChange(item.key)}
-            style={({ pressed }) => [{ minHeight: 48, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.md, backgroundColor: selected ? theme.colors.surfaceMuted : "transparent", opacity: item.disabled ? 0.45 : pressed ? 0.72 : 1 }]}
-          >
-            {item.icon}
-            <UiText style={{ flex: 1, color: selected ? theme.colors.foreground : theme.colors.muted, textAlign: "right", fontSize: theme.typography.body, fontWeight: selected ? "700" : "500" }}>{item.label}</UiText>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-export function Drawer({
-  visible,
-  onRequestClose,
-  children,
-  width = "86%",
-  closeAccessibilityLabel
-}: {
-  visible: boolean;
-  onRequestClose: () => void;
-  children: ReactNode;
-  closeAccessibilityLabel: string;
-  width?: ViewStyle["width"];
-}) {
-  const theme = useAppTheme();
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
-      <View style={{ flex: 1, flexDirection: "row-reverse", backgroundColor: theme.colors.overlay }}>
-        <Pressable onPress={onRequestClose} style={{ flex: 1 }} accessibilityRole="button" accessibilityLabel={closeAccessibilityLabel} />
-        <View style={{ width, maxWidth: "90%", height: "100%", padding: designTokens.spacing.lg, backgroundColor: theme.colors.surface }}>
-          <ScrollView>{children}</ScrollView>
-        </View>
-      </View>
-    </Modal>
   );
 }
