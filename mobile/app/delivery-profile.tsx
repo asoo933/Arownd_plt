@@ -127,7 +127,7 @@ export default function DeliveryProfileScreen() {
       <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
       <TextField value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" />
       <FormLabel>{translate("checkoutWilaya")}</FormLabel>
-      <PressableSurface onPress={() => setPicker("wilaya")} style={pickerStyle}>
+      <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <UiText tone={selectedWilaya ? "foreground" : "muted"}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</UiText>
       </PressableSurface>
       <FormLabel>{translate("checkoutCommune")}</FormLabel>
@@ -140,7 +140,7 @@ export default function DeliveryProfileScreen() {
         style={[...fieldStyle, wilayaId === null && styles.disabled]}
         textAlign="right"
       />
-      {(communes.data?.length ?? 0) > 0 ? <PressableSurface onPress={() => setPicker("commune")} style={styles.suggestionButton}>
+      {(communes.data?.length ?? 0) > 0 ? <PressableSurface accessibilityLabel={translate("checkoutChooseCommune")} onPress={() => setPicker("commune")} style={styles.suggestionButton}>
         <UiText tone="accentMuted" weight="700">{translate("checkoutChooseCommune")}</UiText>
       </PressableSurface> : null}
       {communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
@@ -156,7 +156,7 @@ export default function DeliveryProfileScreen() {
           {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
           <ScrollView style={styles.options}>
-            {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
+            {pickerItems.map((item) => <PressableSurface key={item.id} accessibilityLabel={item.label} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {
                 setWilayaId(item.wilaya.id);
                 setCommune("");
@@ -169,7 +169,7 @@ export default function DeliveryProfileScreen() {
               <UiText style={styles.optionText}>{item.label}</UiText>
             </PressableSurface>)}
           </ScrollView>
-          <PressableSurface onPress={() => setPicker(null)} style={styles.closeButton}><UiText weight="800" style={styles.closeText}>{translate("back")}</UiText></PressableSurface>
+          <PressableSurface accessibilityLabel={translate("back")} onPress={() => setPicker(null)} style={styles.closeButton}><UiText weight="800" style={styles.closeText}>{translate("back")}</UiText></PressableSurface>
         </View>
       </View>
     </Modal>
@@ -182,7 +182,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body - 1 },
   picker: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center" },
   pickerText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
-  suggestionButton: { alignSelf: "flex-start", minHeight: 34, justifyContent: "center" },
+  suggestionButton: { alignSelf: "flex-start", minHeight: designTokens.dimensions.controlHeight.md, justifyContent: "center" },
   suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   error: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "right" },
   success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
@@ -194,7 +194,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   options: { maxHeight: 440 },
   option: { minHeight: 45, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   optionText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
-  closeButton: { minHeight: 42, justifyContent: "center", alignItems: "center", borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.accent },
+  closeButton: { minHeight: designTokens.dimensions.controlHeight.md, justifyContent: "center", alignItems: "center", borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.accent },
   closeText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold, fontSize: designTokens.typography.caption + 1 }
 }); }
 
