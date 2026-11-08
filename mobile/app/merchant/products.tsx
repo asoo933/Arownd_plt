@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -265,7 +265,7 @@ function MerchantOfferCard({
           {image ? (
             <UiImage uri={image.image_url} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.image} />
           ) : (
-            <UiText style={[styles.imageFallback, { color: theme.colors.muted }]}>A</UiText>
+            <Icon name="image" color={theme.colors.muted} size={24} accessibilityHidden />
           )}
         </PressableSurface>
         <View style={styles.productInfo}>
