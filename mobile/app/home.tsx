@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CartButton } from "@/components/cart-button";
+import { Button } from "@/components/ui";
 import {
   CustomerScreen,
   CustomerSearch,
@@ -52,9 +53,13 @@ export default function CustomerHomeScreen() {
         <Text style={styles.heroTitle}>{translate("homeTitle")}</Text>
         <Text style={styles.heroSubtitle}>{translate("homeSubtitle")}</Text>
         <CustomerSearch value={search} onChangeText={setSearch} placeholder={translate("homeSearchPlaceholder")} />
-        <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/explore", params: search.trim() ? { q: search.trim() } : {} })} style={styles.searchButton}>
-          <Text style={styles.searchButtonText}>{translate("homeSearchAction")}</Text>
-        </Pressable>
+        <Button
+          label={translate("homeSearchAction")}
+          onPress={() => router.push({ pathname: "/explore", params: search.trim() ? { q: search.trim() } : {} })}
+          fullWidth
+          style={styles.searchButton}
+          textStyle={styles.searchButtonText}
+        />
       </View>
 
       <View>
