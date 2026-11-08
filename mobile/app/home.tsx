@@ -17,7 +17,7 @@ import {
 } from "@/components/customer-ui";
 import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 const categories = [
   { id: "fashion", icon: "👗", label: "categoryFashion" },
@@ -118,18 +118,18 @@ export default function CustomerHomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  location: { flexDirection: "row-reverse", alignItems: "center", gap: 7, borderRadius: 12, paddingHorizontal: 11, minHeight: 40 },
-  locationText: { fontSize: 11, fontWeight: "800" },
-  hero: { borderRadius: 24, padding: 19, gap: 10 },
-  heroEyebrow: { fontSize: 11, fontWeight: "800", textAlign: "right" },
-  heroTitle: { lineHeight: 35, fontWeight: "900", textAlign: "right" },
-  heroSubtitle: { fontSize: 12, lineHeight: 21, textAlign: "right" },
-  searchButton: { minHeight: 48, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-  searchButtonText: { fontSize: 13, fontWeight: "900" },
-  categoryRail: { flexDirection: "row-reverse", gap: 9, paddingBottom: 3 },
-  category: { width: 93, minHeight: 94, borderRadius: 17, alignItems: "center", justifyContent: "center", gap: 8, padding: 9 },
-  categoryIcon: { fontSize: 25 },
-  categoryLabel: { fontSize: 11, fontWeight: "800", textAlign: "center" },
-  productRail: { flexDirection: "row-reverse", gap: 10 },
-  storeList: { gap: 9 },
+  location: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: 11, minHeight: 40 },
+  locationText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+  hero: { borderRadius: designTokens.radius.xl, padding: designTokens.spacing.xl, gap: designTokens.spacing.md },
+  heroEyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  heroTitle: { lineHeight: 35, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  heroSubtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 21, textAlign: "right" },
+  searchButton: { minHeight: 48, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
+  searchButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
+  categoryRail: { flexDirection: "row-reverse", gap: designTokens.spacing.sm, paddingBottom: 3 },
+  category: { width: 93, minHeight: 94, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
+  categoryIcon: { fontSize: designTokens.typography.subtitle + 9 },
+  categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
+  productRail: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
+  storeList: { gap: designTokens.spacing.sm },
 });
