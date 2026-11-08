@@ -145,7 +145,7 @@ export function BadgeText({
   align = "right",
   fontFamily,
   ...props
-}: TextComponentProps & { tone?: "accent" | "success" | "warning" | "danger" }) {
+}: Omit<TextComponentProps, "tone"> & { tone?: "accent" | "success" | "warning" | "danger" }) {
   const theme = useAppTheme();
   const colors = {
     accent: { backgroundColor: theme.colors.accent, color: theme.colors.accentForeground },
