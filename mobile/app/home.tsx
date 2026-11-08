@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -13,7 +14,6 @@ import {
 import { fetchFeaturedStores } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { useQuery } from "@tanstack/react-query";
 
 const categories = [
   { id: "fashion", icon: "shirt", label: "categoryFashion" },
