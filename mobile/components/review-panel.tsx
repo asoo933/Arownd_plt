@@ -67,7 +67,7 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
           <RatingSelector
             value={rating}
             onChange={setRating}
-            accessibilityLabel={translate("reviewsRating")}
+            accessibilityLabel={translate("storeRating")}
             size={42}
           />
           <TextField
