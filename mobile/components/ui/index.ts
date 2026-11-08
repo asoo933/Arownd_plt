@@ -1,4 +1,4 @@
-export { Button, Divider, IconButton, Surface } from "./primitives";
+export { Button, Divider, IconButton, PressableSurface, Surface } from "./primitives";
 export { Checkbox, QuantityStepper, TextField } from "./form-controls";
 export { getButtonPalette } from "./palette";
 export { getQuantityStepState } from "./form-controls-state";
