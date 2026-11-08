@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IconButton, TextField } from "@/components/ui";
+import { AppHeader, Button, IconButton, SegmentedControl, StatusBadge, TextField } from "@/components/ui";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { translate } from "@/lib/i18n";
 import {
@@ -107,7 +107,10 @@ export default function AddressesScreen() {
   }
 
   return <CustomerScreen>
-    <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
+    <AppHeader
+      title={translate("addressesTitle")}
+      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+    />
     <CustomerHeading title={translate("addressesTitle")} subtitle={translate("addressesSubtitle")} />
     {defaultMutation.isError ? <Text style={styles.error}>{translate("addressesDefaultError")}</Text> : null}
     <Button label={"＋ " + translate("addressesAdd")} onPress={() => openEditor(null)} fullWidth />
@@ -120,7 +123,7 @@ export default function AddressesScreen() {
       <View key={address.id} style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.addressLabel}>{translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}</Text>
-          {address.is_default ? <Text style={styles.defaultBadge}>{translate("addressesDefault")}</Text> : null}
+          {address.is_default ? <StatusBadge label={translate("addressesDefault")} tone="accent" /> : null}
         </View>
         <Text style={styles.recipient}>{address.recipient_name}</Text>
         <Text style={styles.detail}>{address.phone}</Text>
@@ -142,9 +145,16 @@ export default function AddressesScreen() {
             <Text style={styles.modalTitle}>{translate(editor?.address ? "addressesEditTitle" : "addressesAddTitle")}</Text>
             <Text style={styles.label}>{translate("addressesType")}</Text>
             <View style={styles.chips}>
-              {(["home", "work", "other"] as const).map((item) => <Pressable key={item} onPress={() => setLabel(item)} style={[styles.chip, label === item && styles.chipActive]}>
-                <Text style={[styles.chipText, label === item && styles.chipTextActive]}>{translate(item === "home" ? "addressesHome" : item === "work" ? "addressesWork" : "addressesOther")}</Text>
-              </Pressable>)}
+              <SegmentedControl
+                accessibilityLabel={translate("addressesType")}
+                value={label}
+                onChange={(value) => { if (value === "home" || value === "work" || value === "other") setLabel(value); }}
+                options={[
+                  { key: "home", label: translate("addressesHome") },
+                  { key: "work", label: translate("addressesWork") },
+                  { key: "other", label: translate("addressesOther") }
+                ]}
+              />
             </View>
             <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
             <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
@@ -207,7 +217,6 @@ function createStyles(theme: AppTheme) {
     card: { padding: 15, borderRadius: 16, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border, gap: 7 },
     cardHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
     addressLabel: { color: theme.colors.foreground, fontSize: 14, fontWeight: "900" },
-    defaultBadge: { color: theme.colors.foreground, backgroundColor: theme.colors.accent, borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4, fontSize: 10, fontWeight: "900" },
     recipient: { color: theme.colors.foreground, fontWeight: "800", textAlign: "right" },
     detail: { color: theme.colors.muted, fontSize: 12, textAlign: "right", lineHeight: 19 },
     actions: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7, marginTop: 7 },
@@ -218,11 +227,6 @@ function createStyles(theme: AppTheme) {
     modalTitle: { color: theme.colors.foreground, fontSize: 16, fontWeight: "900", textAlign: "right", marginBottom: 14 },
     field: { gap: 6, marginBottom: 11 },
     label: { color: theme.colors.foreground, fontSize: 12, fontWeight: "800", textAlign: "right", marginBottom: 6 },
-    chips: { flexDirection: "row-reverse", gap: 7, marginBottom: 12 },
-    chip: { paddingHorizontal: 12, minHeight: 36, justifyContent: "center", borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border },
-    chipActive: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
-    chipText: { color: theme.colors.foreground, fontSize: 11, fontWeight: "700" },
-    chipTextActive: { color: theme.colors.foreground, fontWeight: "900" },
     input: { minHeight: 47, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 11, paddingHorizontal: 12, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: 13 },
     inputText: { color: theme.colors.foreground, fontSize: 13, textAlign: "right" },
     pickerOption: { minHeight: 44, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
