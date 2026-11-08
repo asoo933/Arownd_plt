@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, QuantityStepper } from "@/components/ui";
+import { AppHeader, Button, IconButton, PressableSurface, QuantityStepper } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
@@ -87,9 +87,10 @@ export default function ProductDetailsScreen() {
           const active = selectedOffer?.id === offer.id;
           const available = offer.is_available && offer.stock_quantity > 0;
           return (
-            <Pressable
+            <PressableSurface
               key={offer.id}
               accessibilityRole="button"
+              accessibilityLabel={offer.store.name}
               accessibilityState={{ selected: active }}
               onPress={() => { setSelectedOfferId(offer.id); setSize(""); setColor(""); setQuantity(1); addMutation.reset(); }}
               style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: active ? theme.colors.accentMuted : theme.colors.border }]}
@@ -100,7 +101,7 @@ export default function ProductDetailsScreen() {
                 <Text style={[styles.stock, { color: available ? theme.colors.success : theme.colors.warning }]}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</Text>
               </View>
               <Text style={[styles.offerPrice, { color: theme.colors.accentMuted }]}>{formatDZD(offer.price)}</Text>
-            </Pressable>
+            </PressableSurface>
           );
         })}
       </View>
@@ -159,7 +160,7 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
     <View style={styles.optionGroup}>
       <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</Text>
       <View style={styles.optionValues}>
-        {values.map((option) => <Pressable key={option} accessibilityRole="button" accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, { backgroundColor: value === option ? theme.colors.accent : theme.colors.surface, borderColor: value === option ? theme.colors.accentMuted : theme.colors.border }]}><Text style={[styles.optionChipText, { color: value === option ? theme.colors.accentForeground : theme.colors.foreground }]}>{option}</Text></Pressable>)}
+        {values.map((option) => <PressableSurface key={option} accessibilityRole="button" accessibilityLabel={label + ": " + option} accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, { backgroundColor: value === option ? theme.colors.accent : theme.colors.surface, borderColor: value === option ? theme.colors.accentMuted : theme.colors.border }]}><Text style={[styles.optionChipText, { color: value === option ? theme.colors.accentForeground : theme.colors.foreground }]}>{option}</Text></PressableSurface>)}
       </View>
     </View>
   );
