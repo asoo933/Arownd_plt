@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,7 +17,7 @@ import {
 import { translate, type TranslationKey } from "@/lib/i18n";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface, StatusBadge } from "@/components/ui";
+import { AppHeader, Button, FilterBar, FilterChip, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
 
 type OrderFilter = "all" | "pending" | "quoted" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -97,60 +96,34 @@ export default function MerchantOrdersScreen() {
           title={translate("merchantOrdersPageTitle")}
           leading={<Button label={translate("merchantOrdersBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />}
         />
-        <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{dashboard.data.store.name}</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantOrdersPageSubtitle")}</Text>
+        <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{dashboard.data.store.name}</UiText>
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantOrdersPageSubtitle")}</UiText>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filters}
-        >
-          {FILTERS.map((item) => {
-            const selected = filter === item.value;
-            return (
-              <PressableSurface
-                key={item.value}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                onPress={() => setFilter(item.value)}
-                style={[
-                  styles.filterChip,
-                  {
-                    borderColor: selected ? theme.colors.accentMuted : theme.colors.border,
-                    backgroundColor: selected ? theme.colors.successSurface : theme.colors.surface
-                  }
-                ]}
-              >
-                <Text style={[
-                  styles.filterText,
-                  { color: selected ? theme.colors.accentMuted : theme.colors.muted }
-                ]}>
-                  {translate(item.label)}
-                </Text>
-              </PressableSurface>
-            );
-          })}
-        </ScrollView>
+        <FilterBar style={styles.filters}>
+          {FILTERS.map((item) => (
+            <FilterChip key={item.value} label={translate(item.label)} selected={filter === item.value} onPress={() => setFilter(item.value)} />
+          ))}
+        </FilterBar>
 
         <View style={styles.listHeading}>
-          <Text style={[styles.countText, { color: theme.colors.muted }]}>
+          <UiText style={[styles.countText, { color: theme.colors.muted }]}>
             {visibleOrders.length} / {dashboard.data.orders.length}
-          </Text>
-          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+          </UiText>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
             {translate("merchantRecentOrdersTitle")}
-          </Text>
+          </UiText>
         </View>
 
         {visibleOrders.length === 0 ? (
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
+            <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
               {filter === "all"
                 ? translate("merchantOrdersEmpty")
                 : translate("merchantOrdersFilterEmptyHint")}
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
+            </UiText>
+            <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
               {filter === "all" ? translate("merchantOrdersEmptyHint") : translate("merchantOrdersFilterEmpty")}
-            </Text>
+            </UiText>
           </View>
         ) : (
           <View style={styles.orderList}>
@@ -165,9 +138,9 @@ export default function MerchantOrdersScreen() {
           </View>
         )}
 
-        <Text style={[styles.limitHint, { color: theme.colors.subtle }]}>
+        <UiText style={[styles.limitHint, { color: theme.colors.subtle }]}>
           {translate("merchantOrdersListLimitHint")}
-        </Text>
+        </UiText>
       </ScrollView>
     </SafeAreaView>
   );
@@ -181,40 +154,34 @@ function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; t
   const location = [order.commune, order.wilayaName].filter(Boolean).join("، ");
 
   return (
-    <PressableSurface
-      accessibilityRole="button"
-      onPress={onPress}
-      style={[style.orderCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-    >
+    <MerchantOrderCard onPress={onPress} style={style.orderCard} accessibilityLabel={translate("merchantOrderNumber") + " " + order.parentOrderId.slice(0, 8)}>
       <View style={style.orderHeader}>
-        <Text style={[style.orderCode, { color: theme.colors.foreground }]}>
+        <UiText style={[style.orderCode, { color: theme.colors.foreground }]}>
           {translate("merchantOrderNumber")} {order.parentOrderId.slice(0, 8)}
-        </Text>
+        </UiText>
         <OrderStatus order={order} />
       </View>
-      <Text style={[style.customerName, { color: theme.colors.foreground }]}>
+      <UiText style={[style.customerName, { color: theme.colors.foreground }]}>
         {order.customerName || translate("merchantCustomerUnknown")}
-      </Text>
-      <Text style={[style.orderMeta, { color: theme.colors.muted }]} numberOfLines={2}>
+      </UiText>
+      <UiText style={[style.orderMeta, { color: theme.colors.muted }]} numberOfLines={2}>
         {itemNames} · {order.totalQuantity} {translate("merchantOrderQuantity")}
-      </Text>
+      </UiText>
       {location ? (
-        <Text style={[style.orderMeta, { color: theme.colors.muted }]}>{location}</Text>
+        <UiText style={[style.orderMeta, { color: theme.colors.muted }]}>{location}</UiText>
       ) : null}
       <View style={style.orderFooter}>
-        <Text style={[style.orderAmount, { color: theme.colors.accentMuted }]}>
-          {formatDZD(order.subtotal + order.shippingFee)}
-        </Text>
-        <Text style={[style.deliveryType, { color: theme.colors.subtle }]}>
+        <PriceDisplay value={formatDZD(order.subtotal + order.shippingFee)} style={style.orderPrice} />
+        <UiText style={[style.deliveryType, { color: theme.colors.subtle }]}>
           {order.deliveryType === "desk"
             ? translate("checkoutStorePickup")
             : translate("checkoutHomeDelivery")}
-        </Text>
+        </UiText>
       </View>
-      <Text style={{ color: theme.colors.accentMuted, fontSize: 10, fontWeight: "900", textAlign: "right" }}>
+      <UiText style={{ color: theme.colors.accentMuted, fontSize: 10, fontWeight: "900", textAlign: "right" }}>
         {translate("merchantOrderDetailTitle")} ←
-      </Text>
-    </PressableSurface>
+      </UiText>
+    </MerchantOrderCard>
   );
 }
 
@@ -238,7 +205,7 @@ function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
     ? "merchantOrderStatusPrepared"
     : labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
 
-  return <StatusBadge label={translate(key)} tone={tone} />;
+  return <MerchantStatusBadge label={translate(key)} tone={tone} />;
 }
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
@@ -246,7 +213,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <ActivityIndicator color={theme.colors.accentMuted} />
-        <Text style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</Text>
+        <UiText style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</UiText>
       </View>
     </SafeAreaView>
   );
@@ -266,7 +233,7 @@ function MessageScreen({
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
+        <UiText style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</UiText>
         <Button label={actionLabel} onPress={onAction} />
       </View>
     </SafeAreaView>
@@ -291,9 +258,7 @@ function createStyles(theme: AppTheme) {
     eyebrow: { fontSize: 11, fontWeight: "900" },
     title: { fontSize: 24, lineHeight: 32, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 19, textAlign: "right" },
-    filters: { flexDirection: "row-reverse", gap: 8, paddingVertical: 3 },
-    filterChip: { minHeight: 42, borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, alignItems: "center", justifyContent: "center" },
-    filterText: { fontSize: 11, fontWeight: "800" },
+    filters: { paddingVertical: 3 },
     listHeading: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
     sectionTitle: { fontSize: 14, fontWeight: "900", textAlign: "right" },
     countText: { fontSize: 11, fontWeight: "800" },
@@ -304,7 +269,7 @@ function createStyles(theme: AppTheme) {
     customerName: { fontSize: 13, fontWeight: "800", textAlign: "right" },
     orderMeta: { fontSize: 11, textAlign: "right", lineHeight: 17 },
     orderFooter: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
-    orderAmount: { fontSize: 13, fontWeight: "900" },
+    orderPrice: { alignSelf: "flex-start" },
     deliveryType: { fontSize: 10, fontWeight: "700" },
     emptyCard: { borderWidth: 1, borderRadius: 17, padding: 18, gap: 7, alignItems: "flex-end" },
     emptyTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
