@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { ActionButton, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
+import { Text as UiText } from "@/components/ui";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 
@@ -41,7 +42,7 @@ export default function AuthCallbackScreen() {
     <AuthLayout title={translate("callbackTitle")} subtitle={translate("callbackLoading")}>
       {state === "loading" ? (
         <View style={{ alignItems: "center", paddingVertical: 20 }}>
-          <Text style={{ color: "#737373", fontSize: 14 }}>{translate("callbackLoading")}</Text>
+          <UiText style={{ color: "#737373", fontSize: 14 }}>{translate("callbackLoading")}</UiText>
         </View>
       ) : state === "success" ? (
         <View style={{ gap: 18 }}>
