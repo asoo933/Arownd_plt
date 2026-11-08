@@ -9,11 +9,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Button, IconButton, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -148,11 +148,7 @@ export default function MerchantProductsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Pressable onPress={() => router.replace("/merchant")} style={styles.backButton}>
-          <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-            {translate("merchantProductsBack")}
-          </Text>
-        </Pressable>
+        <Button label={translate("merchantProductsBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />
 
         <View style={styles.header}>
           <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
@@ -166,15 +162,7 @@ export default function MerchantProductsScreen() {
           </Text>
         </View>
 
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.push("/merchant/products/new")}
-          style={[styles.addButton, { backgroundColor: theme.colors.accent }]}
-        >
-          <Text style={[styles.addButtonText, { color: theme.colors.accentForeground }]}>
-            {translate("merchantProductCreateOpen")}
-          </Text>
-        </Pressable>
+        <Button label={translate("merchantProductCreateOpen")} onPress={() => router.push("/merchant/products/new")} fullWidth />
 
         <View style={styles.summaryGrid}>
           <SummaryCard label={translate("merchantProductsSummaryTotal")} value={summary.total} theme={theme} />
@@ -182,11 +170,10 @@ export default function MerchantProductsScreen() {
           <SummaryCard label={translate("merchantProductsSummaryOut")} value={summary.out} theme={theme} tone="danger" />
         </View>
 
-        <TextInput
+        <TextField
           value={search}
           onChangeText={setSearch}
           placeholder={translate("merchantProductsSearchPlaceholder")}
-          placeholderTextColor={theme.colors.placeholder}
           accessibilityLabel={translate("merchantProductsSearchPlaceholder")}
           returnKeyType="search"
           style={[styles.searchInput, { color: theme.colors.foreground, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
@@ -332,25 +319,11 @@ function MerchantOfferCard({
       <View style={styles.inputsRow}>
         <View style={styles.inputGroup}>
           <Text style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsPriceLabel")}</Text>
-          <TextInput
-            value={price}
-            onChangeText={setPrice}
-            keyboardType="number-pad"
-            editable={!anyBusy}
-            accessibilityLabel={translate("merchantProductsPriceLabel")}
-            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
-          />
+          <TextField value={price} onChangeText={setPrice} keyboardType="number-pad" editable={!anyBusy} accessibilityLabel={translate("merchantProductsPriceLabel")} style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]} />
         </View>
         <View style={styles.inputGroup}>
           <Text style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsStockLabel")}</Text>
-          <TextInput
-            value={stock}
-            onChangeText={setStock}
-            keyboardType="number-pad"
-            editable={!anyBusy}
-            accessibilityLabel={translate("merchantProductsStockLabel")}
-            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
-          />
+          <TextField value={stock} onChangeText={setStock} keyboardType="number-pad" editable={!anyBusy} accessibilityLabel={translate("merchantProductsStockLabel")} style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]} />
           <Text style={[styles.stockHint, { color: theme.colors.subtle }]}>
             {translate("merchantProductsStockHint")}
           </Text>
@@ -358,42 +331,18 @@ function MerchantOfferCard({
       </View>
 
       <View style={styles.actionsRow}>
-        <Pressable
-          accessibilityRole="button"
-          disabled={anyBusy}
-          onPress={() => onSave(price, stock)}
-          style={[styles.saveButton, { backgroundColor: theme.colors.accent, opacity: anyBusy ? 0.55 : 1 }]}
-        >
-          {busy ? <ActivityIndicator color={theme.colors.accentForeground} /> : (
-            <Text style={[styles.saveButtonText, { color: theme.colors.accentForeground }]}>
-              {translate("merchantProductsSave")}
-            </Text>
-          )}
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          disabled={anyBusy}
+        <Button label={translate("merchantProductsSave")} onPress={() => onSave(price, stock)} loading={busy} disabled={anyBusy} fullWidth style={{ flex: 1 }} />
+        <Button
+          label={offer.is_merchant_hidden ? translate("merchantProductsShow") : translate("merchantProductsHide")}
           onPress={onToggleVisibility}
-          style={[styles.visibilityButton, { borderColor: theme.colors.border, opacity: anyBusy ? 0.55 : 1 }]}
-        >
-          <Text style={[styles.visibilityButtonText, { color: theme.colors.foreground }]}>
-            {offer.is_merchant_hidden
-              ? translate("merchantProductsShow")
-              : translate("merchantProductsHide")}
-          </Text>
-        </Pressable>
+          disabled={anyBusy}
+          variant="outline"
+          size="sm"
+          style={{ minWidth: 104 }}
+        />
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        disabled={anyBusy}
-        onPress={onEdit}
-        style={[styles.manageButton, { borderColor: theme.colors.border, opacity: anyBusy ? 0.55 : 1 }]}
-      >
-        <Text style={[styles.manageButtonText, { color: theme.colors.accentMuted }]}>
-          {translate("merchantProductEditOpen")}
-        </Text>
-      </Pressable>
+      <Button label={translate("merchantProductEditOpen")} onPress={onEdit} disabled={anyBusy} variant="ghost" size="sm" fullWidth />
 
       <Modal
         visible={galleryOpen}
@@ -521,11 +470,7 @@ function MessageScreen({
       <View style={styles.messageContainer}>
         {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
         <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{title ?? label ?? ""}</Text>
-        {onAction && actionLabel ? (
-          <Pressable accessibilityRole="button" onPress={onAction} style={[styles.retryButton, { backgroundColor: theme.colors.accent }]}>
-            <Text style={[styles.retryText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
-          </Pressable>
-        ) : null}
+        {onAction && actionLabel ? <Button label={actionLabel} onPress={onAction} /> : null}
       </View>
     </SafeAreaView>
   );
@@ -535,14 +480,10 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 16, paddingBottom: 36, gap: 15 },
-    backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
-    backText: { fontSize: 12, fontWeight: "800" },
     header: { alignItems: "flex-end", gap: 6 },
     eyebrow: { fontSize: 10, fontWeight: "900" },
     title: { width: "100%", fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
     subtitle: { width: "100%", fontSize: 12, lineHeight: 20, textAlign: "right" },
-    addButton: { minHeight: 47, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-    addButtonText: { fontSize: 12, fontWeight: "900" },
     summaryGrid: { flexDirection: "row-reverse", gap: 8 },
     summaryCard: { flex: 1, minHeight: 75, borderWidth: 1, borderRadius: 15, padding: 11, gap: 5, alignItems: "flex-end" },
     summaryLabel: { fontSize: 10, fontWeight: "800", textAlign: "right" },
@@ -584,13 +525,7 @@ function createStyles(theme: AppTheme) {
     actionsRow: { flexDirection: "row-reverse", gap: 8 },
     manageButton: { minHeight: 41, borderWidth: 1, borderRadius: 12, alignItems: "center", justifyContent: "center" },
     manageButtonText: { fontSize: 11, fontWeight: "900" },
-    saveButton: { flex: 1, minHeight: 46, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-    saveButtonText: { fontSize: 12, fontWeight: "900" },
-    visibilityButton: { minWidth: 104, minHeight: 46, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center", paddingHorizontal: 12 },
-    visibilityButtonText: { fontSize: 11, fontWeight: "900" },
     messageContainer: { flex: 1, padding: 24, justifyContent: "center", alignItems: "center", gap: 15 },
-    messageText: { fontSize: 13, lineHeight: 21, fontWeight: "800", textAlign: "center" },
-    retryButton: { minHeight: 46, borderRadius: 13, paddingHorizontal: 20, justifyContent: "center", alignItems: "center" },
-    retryText: { fontSize: 12, fontWeight: "900" }
+    messageText: { fontSize: 13, lineHeight: 21, fontWeight: "800", textAlign: "center" }
   });
 }
