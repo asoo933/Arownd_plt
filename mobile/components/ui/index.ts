@@ -68,7 +68,7 @@ export type { CardProps } from "./cards";
 export { PageHeader, BackButton, BottomNavigation, TabBar, Breadcrumb, NavigationMenu, Drawer } from "./navigation-components";
 export type { NavigationItem } from "./navigation-components";
 
-export { AvatarGroup, VerifiedBadge, RatingStars, RatingSelector, ReviewCard, ReviewList } from "./identity-components";
+export { AvatarGroup, VerifiedBadge, RatingStars, RatingSelector, ReviewCard, ReviewList, UserProfileCard } from "./identity-components";
 
 export {
   PriceDisplay,
