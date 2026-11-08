@@ -1,0 +1,138 @@
+import type { ReactNode } from "react";
+import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+
+import { useAppTheme } from "@/lib/theme";
+
+export function AppHeader({
+  title,
+  leading,
+  trailing,
+  style
+}: {
+  title: string;
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+
+  return (
+    <View style={[styles.header, { gap: theme.spacing.md }, style]}>
+      <View style={styles.slot}>{leading}</View>
+      <Text
+        accessibilityRole="header"
+        numberOfLines={1}
+        style={[styles.headerTitle, { color: theme.colors.foreground, fontSize: theme.typography.title }]}
+      >
+        {title}
+      </Text>
+      <View style={[styles.slot, styles.trailing]}>{trailing}</View>
+    </View>
+  );
+}
+
+export type SegmentedOption = {
+  key: string;
+  label: string;
+  accessibilityLabel?: string;
+};
+
+export function SegmentedControl({
+  options,
+  value,
+  onChange,
+  accessibilityLabel,
+  style
+}: {
+  options: SegmentedOption[];
+  value: string;
+  onChange: (value: string) => void;
+  accessibilityLabel: string;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+
+  return (
+    <View
+      accessibilityRole="tablist"
+      accessibilityLabel={accessibilityLabel}
+      style={[
+        styles.segmented,
+        { backgroundColor: theme.colors.surfaceMuted, borderRadius: theme.radius.pill },
+        style
+      ]}
+    >
+      {options.map((option) => {
+        const selected = option.key === value;
+
+        return (
+          <Pressable
+            key={option.key}
+            accessibilityRole="tab"
+            accessibilityLabel={option.accessibilityLabel ?? option.label}
+            accessibilityState={{ selected }}
+            onPress={() => {
+              if (!selected) onChange(option.key);
+            }}
+            style={({ pressed }) => [
+              styles.segment,
+              {
+                borderRadius: theme.radius.pill,
+                backgroundColor: selected ? theme.colors.surface : "transparent",
+                opacity: pressed ? 0.75 : 1
+              }
+            ]}
+          >
+            <Text
+              numberOfLines={1}
+              style={{
+                color: selected ? theme.colors.foreground : theme.colors.muted,
+                fontSize: theme.typography.body,
+                fontWeight: selected ? "700" : "500"
+              }}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    minHeight: 48,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  slot: {
+    minWidth: 40,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  trailing: {
+    flexDirection: "row",
+    gap: 8
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: "right",
+    fontWeight: "800"
+  },
+  segmented: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    padding: 4,
+    gap: 4
+  },
+  segment: {
+    flex: 1,
+    minHeight: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 8
+  }
+});
