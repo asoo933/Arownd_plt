@@ -6,7 +6,7 @@ export function isThemeMode(value: string | null): value is ThemeMode {
 
 export function resolveThemeMode(
   preference: ThemeMode,
-  systemScheme: "light" | "dark" | null | undefined
+  systemScheme: "light" | "dark" | "unspecified" | null | undefined
 ): "light" | "dark" {
   if (preference !== "system") return preference;
   return systemScheme === "dark" ? "dark" : "light";
