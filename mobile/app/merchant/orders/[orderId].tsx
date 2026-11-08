@@ -21,7 +21,7 @@ import {
 import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { AppHeader, Button, ConfirmDialog, ErrorState, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
@@ -325,8 +325,8 @@ function StatusPill({ status, deliveryType }: { status: string; deliveryType: st
 function InfoRow({ label, value, theme }: { label: string; value: string; theme: AppTheme }) {
   return (
     <View style={stylesForComponents.infoRow}>
-      <UiText style={{ color: theme.colors.muted, fontSize: 11 }}>{label}</UiText>
-      <UiText style={{ color: theme.colors.foreground, fontSize: 12, fontWeight: "700", textAlign: "right", flexShrink: 1 }}>{value}</UiText>
+      <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption }}>{label}</UiText>
+      <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.bold, textAlign: "right", flexShrink: 1 }}>{value}</UiText>
     </View>
   );
 }
@@ -353,7 +353,7 @@ function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppThem
 
 const stylesForComponents = StyleSheet.create({
   safe: { flex: 1 },
-  center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: 14 },
+  center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
   primaryButton: { minHeight: 46, borderRadius: 13, paddingHorizontal: 16, alignItems: "center", justifyContent: "center" },
   infoRow: { minHeight: 35, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 12 }
 });
@@ -362,23 +362,23 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 17, paddingBottom: 38, gap: 13 },
-    eyebrow: { fontSize: 11, fontWeight: "900" },
-    subtitle: { fontSize: 11, textAlign: "right" },
+    eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+    subtitle: { fontSize: designTokens.typography.caption, textAlign: "right" },
     summaryRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-    amount: { fontSize: 17, fontWeight: "900" },
-    sectionTitle: { fontSize: 14, fontWeight: "900", textAlign: "right" },
+    amount: { fontSize: 17, fontWeight: designTokens.fontWeights.extrabold },
+    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
     itemRow: { minHeight: 55, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 7 },
     itemInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
-    itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
+    itemName: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
     itemPriceDisplay: { alignSelf: "flex-start" },
-    mutedText: { fontSize: 11, lineHeight: 17, textAlign: "right" },
+    mutedText: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "right" },
     totalRow: { minHeight: 30, flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 7 },
-    valueText: { fontSize: 12, fontWeight: "800" },
-    input: { minHeight: 48, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, fontSize: 14 },
+    valueText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+    input: { minHeight: 48, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, fontSize: designTokens.typography.body },
     dangerButton: { minHeight: 45, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-    dangerButtonText: { fontSize: 12, fontWeight: "800", textAlign: "center" },
+    dangerButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
     notice: { borderRadius: 14, padding: 13 },
-    noticeText: { fontSize: 12, fontWeight: "800", textAlign: "right" },
+    noticeText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
     errorCard: { borderWidth: 1, borderRadius: 14, padding: 12 },
     disabled: { opacity: 0.5 }
   });
