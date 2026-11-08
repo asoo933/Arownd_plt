@@ -3,12 +3,12 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, PressableSurface } from "@/components/ui";
+import { Button, IdentityRow, PressableSurface } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
 import { translate } from "@/lib/i18n";
 import { fetchMyOrders } from "@/lib/orders";
-import { getProfileDisplayName, getProfileInitial } from "@/lib/profile-state";
+import { getProfileDisplayName } from "@/lib/profile-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useAppTheme } from "@/lib/theme";
 
@@ -92,12 +92,11 @@ export default function ProfileScreen() {
       ) : (
         <>
           <View style={[styles.identity, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <View style={[styles.avatar, { backgroundColor: theme.colors.accent }]}><Text style={[styles.avatarText, { color: theme.colors.accentForeground }]}>{getProfileInitial(displayName)}</Text></View>
-            <View style={styles.identityCopy}>
-              <Text numberOfLines={1} style={[styles.name, { color: colors.text }]}>{displayName}</Text>
-              <Text numberOfLines={1} style={[styles.email, { color: colors.muted }]}>{user.data.email ?? ""}</Text>
-              {profile.data?.phone ? <Text style={[styles.meta, { color: colors.muted }]}>{profile.data.phone}</Text> : null}
-            </View>
+            <IdentityRow
+              name={displayName}
+              subtitle={[user.data.email, profile.data?.phone].filter(Boolean).join(" · ")}
+              avatarSize={58}
+            />
           </View>
           <View style={styles.stats}>
             <StatCard label={translate("profileOrders")} value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)} colors={colors} />
