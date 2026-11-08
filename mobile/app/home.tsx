@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { AppHeader, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import {
+  CustomerScreen,
   EmptyState,
   ErrorState,
   LoadingState,
