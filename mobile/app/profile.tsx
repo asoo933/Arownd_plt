@@ -157,12 +157,6 @@ function MenuAction({ label, hint, onPress, colors }: {
 
 const styles = StyleSheet.create({
   identity: { minHeight: 104, borderWidth: 1, borderRadius: 20, padding: 16, flexDirection: "row-reverse", alignItems: "center", gap: 13 },
-  avatar: { width: 58, height: 58, borderRadius: 29, alignItems: "center", justifyContent: "center" },
-  avatarText: { fontSize: 23, fontWeight: "900" },
-  identityCopy: { flex: 1, alignItems: "flex-end", gap: 4 },
-  name: { fontSize: 16, fontWeight: "900" },
-  email: { fontSize: 12 },
-  meta: { fontSize: 11 },
   stats: { flexDirection: "row-reverse", gap: 10 },
   stat: { flex: 1, borderWidth: 1, borderRadius: 17, padding: 15, alignItems: "flex-end", gap: 5 },
   statValue: { fontSize: 22, fontWeight: "900" },
