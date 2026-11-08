@@ -193,6 +193,7 @@ export default function MerchantEntryScreen() {
               <PressableSurface
                 key={order.id}
                 accessibilityRole="button"
+                accessibilityLabel={`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}، ${order.customerName || translate("merchantCustomerUnknown")}، ${formatDZD(order.subtotal + order.shippingFee)}`}
                 onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
                 style={[
                   styles.orderRow,
