@@ -147,12 +147,12 @@ export default function AddressesScreen() {
               </Pressable>)}
             </View>
             <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
-            <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} theme={theme} />
+            <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
             <Text style={styles.label}>{translate("checkoutWilaya")}</Text>
             <Pressable onPress={() => setPickerOpen(true)} style={styles.input}><Text style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text></Pressable>
-            <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} theme={theme} />
-            <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} theme={theme} />
-            <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} theme={theme} />
+            <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
+            <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
+            <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
             {formError ? <Text style={styles.error}>{formError}</Text> : null}
             <Button label={translate("deliveryProfileSave")} onPress={submit} loading={saveMutation.isPending} fullWidth />
             <Pressable onPress={() => setEditor(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></Pressable>
@@ -183,7 +183,7 @@ export default function AddressesScreen() {
   </CustomerScreen>;
 }
 
-function Field({ label, value, onChangeText, styles, theme, keyboardType }: {
+function Field({ label, value, onChangeText, styles, keyboardType }: {
   label: string;
   value: string;
   onChangeText: (value: string) => void;
