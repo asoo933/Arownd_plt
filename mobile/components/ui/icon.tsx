@@ -113,6 +113,7 @@ export function Icon({
   name,
   size = 20,
   color,
+  fill = "none",
   strokeWidth = 1.8,
   accessibilityLabel,
   accessibilityHidden = false,
@@ -121,6 +122,7 @@ export function Icon({
   name: IconName;
   size?: number;
   color?: string;
+  fill?: string;
   strokeWidth?: number;
   accessibilityLabel?: string;
   accessibilityHidden?: boolean;
@@ -136,7 +138,7 @@ export function Icon({
       accessibilityElementsHidden={accessibilityHidden}
       style={[{ width: size, height: size, alignItems: "center", justifyContent: "center" }, style]}
     >
-      <IconComponent size={size} color={color ?? theme.colors.foreground} strokeWidth={strokeWidth} />
+      <IconComponent size={size} color={color ?? theme.colors.foreground} fill={fill} strokeWidth={strokeWidth} />
     </View>
   );
 }
