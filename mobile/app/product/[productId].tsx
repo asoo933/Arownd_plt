@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button, IconButton, QuantityStepper } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
@@ -58,9 +59,7 @@ export default function ProductDetailsScreen() {
 
   return (
     <CustomerScreen>
-      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
-        <Text style={styles.backText}>{translate("back")}</Text>
-      </Pressable>
+      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
       <View style={styles.titleRow}>
         <Text style={[styles.pageTitle, { color: theme.colors.foreground }]}>{translate("detailProductTitle")}</Text>
         <View style={styles.titleActions}><FavoriteButton kind="products" id={productId} /><CartButton /></View>
@@ -112,15 +111,17 @@ export default function ProductDetailsScreen() {
           {variants.sizes.length > 0 ? <OptionPicker label={translate("productSizeOption")} values={variants.sizes} value={selectedSize} onSelect={setSize} /> : null}
           <View style={styles.quantityRow}>
             <Text style={[styles.optionLabel, { color: theme.colors.foreground }]}>{translate("productQuantity")}</Text>
-            <View style={styles.quantityControls}>
-              <Pressable accessibilityRole="button" disabled={quantity <= 1} onPress={() => setQuantity((value) => Math.max(1, value - 1))} style={styles.quantityButton}><Text style={styles.quantityButtonText}>−</Text></Pressable>
-              <Text style={[styles.quantityValue, { color: theme.colors.foreground }]}>{quantity}</Text>
-              <Pressable accessibilityRole="button" disabled={quantity >= Math.min(10, selectedOffer.stock_quantity)} onPress={() => setQuantity((value) => Math.min(10, selectedOffer.stock_quantity, value + 1))} style={styles.quantityButton}><Text style={styles.quantityButtonText}>+</Text></Pressable>
-            </View>
+            <QuantityStepper
+              value={quantity}
+              max={Math.max(1, Math.min(10, selectedOffer.stock_quantity))}
+              onChange={setQuantity}
+              decreaseLabel={translate("cartDecrease")}
+              increaseLabel={translate("cartIncrease")}
+              disabled={!selectedOffer.is_available || selectedOffer.stock_quantity <= 0}
+            />
           </View>
-          <Pressable
-            accessibilityRole="button"
-            disabled={!canAdd || addMutation.isPending}
+          <Button
+            label={addMutation.isPending ? translate("productAddingToCart") : addMutation.isSuccess ? translate("productAddedToCart") : translate("productAddToCart")}
             onPress={() => addMutation.mutate({
               offerId: selectedOffer.id,
               productId: selectedOffer.product_id,
@@ -132,18 +133,20 @@ export default function ProductDetailsScreen() {
                 ...(selectedSize ? { size: selectedSize } : {})
               }
             })}
-            style={[styles.addButton, (!canAdd || addMutation.isPending) && styles.disabledButton]}
-          >
-            <Text style={styles.addButtonText}>{addMutation.isPending ? translate("productAddingToCart") : addMutation.isSuccess ? translate("productAddedToCart") : translate("productAddToCart")}</Text>
-          </Pressable>
+            loading={addMutation.isPending}
+            disabled={!canAdd}
+            fullWidth
+          />
           {addMutation.isError ? <Text style={styles.mutationError}>{translate("genericError")}</Text> : null}
         </View>
       ) : null}
 
       {selectedOffer ? (
-        <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: selectedOffer.store.id } })} style={styles.storeButton}>
-          <Text style={styles.storeButtonText}>{translate("productSelectedOffer")}: {selectedOffer.store.name}</Text>
-        </Pressable>
+        <Button
+          label={translate("productSelectedOffer") + ": " + selectedOffer.store.name}
+          onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: selectedOffer.store.id } })}
+          fullWidth
+        />
       ) : null}
       <ReviewPanel targetType="product" targetId={productId} />
     </CustomerScreen>
@@ -163,8 +166,6 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
 }
 
 const styles = StyleSheet.create({
-  back: { minHeight: 42, justifyContent: "center", alignItems: "flex-end" },
-  backText: { color: "#647D13", fontSize: 13, fontWeight: "800" },
   titleRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10 },
   pageTitle: { fontSize: 21, fontWeight: "900", textAlign: "right", flex: 1 },
   titleActions: { flexDirection: "row-reverse", alignItems: "center", gap: 7 },
@@ -190,14 +191,5 @@ const styles = StyleSheet.create({
   optionChip: { minWidth: 44, minHeight: 44, paddingHorizontal: 13, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   optionChipText: { fontSize: 12, fontWeight: "700" },
   quantityRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  quantityControls: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
-  quantityButton: { width: 36, height: 36, borderRadius: 11, backgroundColor: "#F0F2E8", alignItems: "center", justifyContent: "center" },
-  quantityButtonText: { color: "#0A0A0A", fontSize: 20, fontWeight: "900" },
-  quantityValue: { minWidth: 20, textAlign: "center", fontSize: 14, fontWeight: "900" },
-  addButton: { minHeight: 50, borderRadius: 14, backgroundColor: "#C6F135", justifyContent: "center", alignItems: "center" },
-  addButtonText: { color: "#0A0A0A", fontSize: 14, fontWeight: "900" },
-  disabledButton: { opacity: 0.4 },
   mutationError: { color: "#B42318", fontSize: 11, textAlign: "right" },
-  storeButton: { minHeight: 48, borderRadius: 14, backgroundColor: "#C6F135", justifyContent: "center", alignItems: "center", paddingHorizontal: 16 },
-  storeButtonText: { color: "#0A0A0A", fontSize: 13, fontWeight: "900" }
 });
