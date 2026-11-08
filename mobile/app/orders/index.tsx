@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { PressableSurface } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -120,22 +121,22 @@ export default function OrdersScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <CustomerHeading title={translate("ordersTitle")} subtitle={translate("ordersLoginHint")} />
-    <Pressable onPress={() => router.push("/login")} style={styles.primary}><Text style={styles.primaryText}>{translate("login")}</Text></Pressable>
+    <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.primary}><Text style={styles.primaryText}>{translate("login")}</Text></PressableSurface>
   </CustomerScreen>;
 
   return <CustomerScreen>
     <CustomerHeading title={translate("ordersTitle")} subtitle={translate("ordersSubtitle")} />
     <View style={styles.tabs}>
-      {TABS.map((item) => <Pressable key={item.id} onPress={() => setTab(item.id)} style={[styles.tab, { borderColor: theme.colors.border }, tab === item.id && { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent }]}>
+      {TABS.map((item) => <PressableSurface accessibilityRole="button" key={item.id} onPress={() => setTab(item.id)} style={[styles.tab, { borderColor: theme.colors.border }, tab === item.id && { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent }]}>
         <Text style={[styles.tabText, { color: theme.colors.muted }, tab === item.id && { color: theme.colors.accentForeground }]}>{translate(item.key)}</Text>
-      </Pressable>)}
+      </PressableSurface>)}
     </View>
     {filtered.length === 0 ? <EmptyState title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
     {filtered.map((row) => {
       const orderCode = row.order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
       const tone = getOrderStatusTone(row.status);
       const total = row.status === "cancelled" || row.status === "rejected" ? 0 : row.subtotal + row.shippingFee;
-      return <Pressable key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}>
+      return <PressableSurface accessibilityRole="button" key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</Text>
@@ -151,14 +152,14 @@ export default function OrdersScreen() {
           <Text style={styles.openLabel}>{translate("ordersViewDetails")}</Text>
           <Text style={styles.total}>{formatDZD(total)}</Text>
         </View>
-      </Pressable>;
+      </PressableSurface>;
     })}
   </CustomerScreen>;
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   tabs: { flexDirection: "row-reverse", gap: 7, flexWrap: "wrap" },
-  tab: { minHeight: 40, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.border, paddingHorizontal: 12, justifyContent: "center" },
+  tab: { minHeight: 44, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.border, paddingHorizontal: 12, justifyContent: "center" },
   tabActive: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
   tabText: { color: theme.colors.muted, fontSize: 11, fontWeight: "800" },
   tabTextActive: { color: theme.colors.foreground },
@@ -178,7 +179,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 10 },
   openLabel: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "900" },
   total: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900" },
-  primary: { minHeight: 50, borderRadius: 14, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
+  primary: { minHeight: 48, borderRadius: 14, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
   primaryText: { color: theme.colors.foreground, fontWeight: "900" }
 }); }
 
