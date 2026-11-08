@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import { useColorScheme } from "react-native";
 
 import { brandColors, extendedThemeColors, semanticColors, themeColors } from "./colors";
@@ -146,10 +146,10 @@ export function ThemeProvider({ children, mode }: ThemeProviderProps) {
     [preference, isReady, setMode]
   );
 
-  return (
-    <ThemePreferenceContext.Provider value={preferenceValue}>
-      <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
-    </ThemePreferenceContext.Provider>
+  return createElement(
+    ThemePreferenceContext.Provider,
+    { value: preferenceValue },
+    createElement(ThemeContext.Provider, { value: theme }, children)
   );
 }
 
