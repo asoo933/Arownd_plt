@@ -119,7 +119,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable
+    <PressableSurface
       accessibilityRole="button"
       accessibilityLabel={`${name}${commune ? `، ${commune}` : ""}${rating != null ? `، ${rating.toFixed(1)}` : ""}${verified ? `، ${translate("storeVerified")}` : ""}`}
       onPress={onPress}
@@ -135,7 +135,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
         {rating != null ? <Text style={[styles.storeRating, { color: theme.colors.warning }]}>★ {rating.toFixed(1)}</Text> : null}
       </View>
       {verified ? <Text accessibilityLabel={translate("storeVerified")} style={[styles.verified, { color: theme.colors.success }]}>✓</Text> : null}
-    </Pressable>
+    </PressableSurface>
   );
 }
 
