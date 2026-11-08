@@ -9,6 +9,9 @@ export function getCustomerTab(pathname: string): CustomerTab | null {
     pathname === "/profile" ||
     pathname === "/settings" ||
     pathname === "/delivery-profile" ||
+    pathname === "/addresses" ||
+    pathname === "/notifications" ||
+    pathname === "/my-reviews" ||
     pathname === "/orders" ||
     pathname.startsWith("/orders/")
   ) return "profile";
