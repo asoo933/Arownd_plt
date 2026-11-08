@@ -207,7 +207,7 @@ export default function MerchantEntryScreen() {
                     <Text style={[styles.orderCode, { color: theme.colors.foreground }]}>
                       {`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}`}
                     </Text>
-                    <OrderStatus order={order} theme={theme} />
+                    <OrderStatus order={order} />
                   </View>
                   <Text style={[styles.orderCustomer, { color: theme.colors.muted }]} numberOfLines={1}>
                     {order.customerName || translate("merchantCustomerUnknown")}
@@ -237,7 +237,7 @@ export default function MerchantEntryScreen() {
   );
 }
 
-function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: AppTheme }) {
+function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
   const labelByStatus: Record<string, TranslationKey> = {
     pending: "merchantOrderStatusPending",
     quoted: "merchantOrderStatusQuoted",
@@ -247,28 +247,17 @@ function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: A
     cancelled: "merchantOrderStatusCancelled"
   };
   const tone = order.status === "delivered"
-    ? theme.colors.success
+    ? "success"
     : order.status === "cancelled"
-      ? theme.colors.danger
+      ? "danger"
       : order.status === "pending" || order.status === "quoted"
-        ? theme.colors.warning
-        : theme.colors.muted;
-  const background = order.status === "delivered"
-    ? theme.colors.successSurface
-    : order.status === "cancelled"
-      ? theme.colors.dangerSurface
-      : order.status === "pending" || order.status === "quoted"
-        ? theme.colors.warningSurface
-        : theme.colors.surfaceMuted;
+        ? "warning"
+        : "neutral";
   const key = order.status === "shipped" && order.deliveryType === "desk"
     ? "merchantOrderStatusPrepared"
     : labelByStatus[order.status] ?? "merchantOrderStatusUnknown";
 
-  return (
-    <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 }}>
-      <Text style={{ color: tone, fontSize: 10, fontWeight: "900" }}>{translate(key)}</Text>
-    </View>
-  );
+  return <StatusBadge label={translate(key)} tone={tone} />;
 }
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
