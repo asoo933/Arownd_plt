@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { View, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Card } from "./cards";
 import { StatusBadge, type StatusBadgeTone } from "./extended";
 import { Icon } from "./icon";
+import { Text as UiText } from "./typography";
 
 export function MerchantProfileCard(props: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return <Card {...props} />;
@@ -40,11 +41,11 @@ export function MerchantOnboardingStep({
       {steps.map((step, index) => (
         <View key={step.key} style={{ flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.md }}>
           <View style={{ width: 36, height: 36, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
-            {step.icon ?? (step.status === "complete" ? <Icon name="check" size={18} color={theme.colors.success} accessibilityHidden /> : <Text style={{ color: theme.colors.foreground, fontWeight: "800" }}>{index + 1}</Text>)}
+            {step.icon ?? (step.status === "complete" ? <Icon name="check" size={18} color={theme.colors.success} accessibilityHidden /> : <UiText style={{ color: theme.colors.foreground, fontWeight: "800" }}>{index + 1}</UiText>)}
           </View>
           <View style={{ flex: 1, paddingTop: designTokens.spacing.xs, gap: designTokens.spacing.xs }}>
-            <Text style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "right" }}>{step.label}</Text>
-            {step.description ? <Text style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{step.description}</Text> : null}
+            <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "right" }}>{step.label}</UiText>
+            {step.description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{step.description}</UiText> : null}
           </View>
         </View>
       ))}
@@ -64,8 +65,8 @@ export function BusinessHours({
     <View style={[{ gap: designTokens.spacing.sm }, style]}>
       {rows.map((row) => (
         <View key={row.key} style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.xs, borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
-          <Text style={{ color: theme.colors.foreground, fontSize: theme.typography.body }}>{row.dayLabel}</Text>
-          <Text style={{ color: theme.colors.muted, fontSize: theme.typography.caption, fontVariant: ["tabular-nums"] }}>{row.hoursLabel}</Text>
+          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body }}>{row.dayLabel}</UiText>
+          <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, fontVariant: ["tabular-nums"] }}>{row.hoursLabel}</UiText>
         </View>
       ))}
     </View>
