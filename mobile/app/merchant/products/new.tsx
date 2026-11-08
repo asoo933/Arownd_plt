@@ -5,7 +5,6 @@ import { Redirect, router } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -580,8 +579,6 @@ function createStyles(theme: AppTheme) {
     errorText: { fontSize: 11, lineHeight: 17, textAlign: "right", fontWeight: "700" },
     submitButton: { minHeight: 49, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 2 },
     submitText: { fontSize: 13, fontWeight: "900" },
-    modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 10 },
-    modalCard: { maxHeight: "78%", borderRadius: 20, padding: 15, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
     modalTitle: { fontSize: 15, fontWeight: "900" },
     modalClose: { fontSize: 11, fontWeight: "800" },
