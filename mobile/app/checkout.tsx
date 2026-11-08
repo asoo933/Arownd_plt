@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   Modal,
   ScrollView,
   StyleSheet,
@@ -10,7 +9,7 @@ import {
 } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Spinner, Text as UiText, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -288,7 +287,7 @@ export default function CheckoutScreen() {
       <UiText style={styles.fieldLabel}>{translate("checkoutWilaya")}</UiText>
       <PressableSurface onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
         <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
-        {wilayas.isPending ? <ActivityIndicator size="small" /> : null}
+        {wilayas.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
       {wilayas.isError ? <PressableSurface onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
 
