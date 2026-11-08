@@ -1,10 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { Modal, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, ScrollView, StyleSheet, Text as NativeText, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, PressableSurface, SegmentedControl, StatusBadge, TextField } from "@/components/ui";
+import {
+  AppHeader,
+  Button,
+  Card,
+  Caption,
+  ConfirmDialog,
+  Heading,
+  Icon,
+  IconButton,
+  PressableSurface,
+  SegmentedControl,
+  StatusBadge,
+  Text as UiText,
+  TextField
+} from "@/components/ui";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { translate } from "@/lib/i18n";
 import {
@@ -45,6 +59,7 @@ export default function AddressesScreen() {
     await queryClient.invalidateQueries({ queryKey: ["my-addresses"] });
     await queryClient.invalidateQueries({ queryKey: ["checkout-profile"] });
   };
+
   const saveMutation = useMutation({
     mutationFn: async (input: UserAddressInput) => editor?.address
       ? updateMyAddress(editor.address.id, input)
@@ -56,13 +71,18 @@ export default function AddressesScreen() {
     },
     onError: () => setFormError(translate("addressesSaveError"))
   });
+
   const defaultMutation = useMutation({
     mutationFn: setMyDefaultAddress,
     onSuccess: refresh
   });
+
   const deleteMutation = useMutation({
     mutationFn: deleteMyAddress,
-    onSuccess: async () => { await refresh(); setDeleteTarget(null); }
+    onSuccess: async () => {
+      await refresh();
+      setDeleteTarget(null);
+    }
   });
 
   const openEditor = (address: UserAddress | null) => {
@@ -88,10 +108,12 @@ export default function AddressesScreen() {
       additional_info: additionalInfo.trim()
     };
     const parsed = UserAddressSchema.safeParse(candidate);
+
     if (!parsed.success) {
       setFormError(translate("addressesValidation"));
       return;
     }
+
     setFormError(null);
     saveMutation.mutate(parsed.data);
   };
@@ -99,139 +121,217 @@ export default function AddressesScreen() {
   if (addresses.isPending || wilayas.isPending) {
     return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   }
+
   if (addresses.isError || wilayas.isError) {
-    return <CustomerScreen>
-      <AppHeader title={translate("addressesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
-      <ErrorState title={translate("addressesLoadError")} retryLabel={translate("retry")} onRetry={() => { void addresses.refetch(); void wilayas.refetch(); }} />
-    </CustomerScreen>;
+    return (
+      <CustomerScreen>
+        <AppHeader
+          title={translate("addressesTitle")}
+          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="ChevronLeft" size={20} />} />}
+        />
+        <ErrorState
+          title={translate("addressesLoadError")}
+          retryLabel={translate("retry")}
+          onRetry={() => { void addresses.refetch(); void wilayas.refetch(); }}
+        />
+      </CustomerScreen>
+    );
   }
 
-  return <CustomerScreen>
-    <AppHeader
-      title={translate("addressesTitle")}
-      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
-    />
-    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("addressesSubtitle")}</Text>
-    {defaultMutation.isError ? <Text style={styles.error}>{translate("addressesDefaultError")}</Text> : null}
-    <Button label={"＋ " + translate("addressesAdd")} onPress={() => openEditor(null)} fullWidth />
-    {addresses.data.length === 0 ? (
-      <View style={styles.empty}>
-        <Text style={styles.emptyTitle}>{translate("addressesEmpty")}</Text>
-        <Text style={styles.emptyHint}>{translate("addressesEmptyHint")}</Text>
-      </View>
-    ) : addresses.data.map((address) => (
-      <View key={address.id} style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.addressLabel}>{translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}</Text>
-          {address.is_default ? <StatusBadge label={translate("addressesDefault")} tone="accent" /> : null}
-        </View>
-        <Text style={styles.recipient}>{address.recipient_name}</Text>
-        <Text style={styles.detail}>{address.phone}</Text>
-        <Text style={styles.detail}>{String(address.wilaya_id).padStart(2, "0")} - {wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}</Text>
-        <Text style={styles.detail}>{address.address_line}</Text>
-        {address.additional_info ? <Text style={styles.detail}>{address.additional_info}</Text> : null}
-        <View style={styles.actions}>
-          {!address.is_default ? <Action label={translate("addressesMakeDefault")} onPress={() => defaultMutation.mutate(address.id)} disabled={defaultMutation.isPending} /> : null}
-          <Action label={translate("addressesEdit")} onPress={() => openEditor(address)} />
-          <Action label={translate("addressesDelete")} onPress={() => setDeleteTarget(address)} danger />
-        </View>
-      </View>
-    ))}
+  return (
+    <CustomerScreen>
+      <AppHeader
+        title={translate("addressesTitle")}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="ChevronLeft" size={20} />} />}
+      />
 
-    <Modal visible={editor !== null} transparent animationType="slide" onRequestClose={() => setEditor(null)}>
-      <View style={styles.backdrop}>
-        <View style={styles.modalPanel}>
-          <ScrollView keyboardShouldPersistTaps="handled">
-            <Text style={styles.modalTitle}>{translate(editor?.address ? "addressesEditTitle" : "addressesAddTitle")}</Text>
-            <Text style={styles.label}>{translate("addressesType")}</Text>
-            <View style={styles.chips}>
+      <Caption>{translate("addressesSubtitle")}</Caption>
+
+      {defaultMutation.isError ? (
+        <UiText tone="danger">{translate("addressesDefaultError")}</UiText>
+      ) : null}
+
+      <Button
+        label={translate("addressesAdd")}
+        onPress={() => openEditor(null)}
+        fullWidth
+        startIcon={<Icon name="Plus" size={18} />}
+      />
+
+      {addresses.data.length === 0 ? (
+        <Card contentStyle={{ alignItems: "center", paddingVertical: 28 }}>
+          <Icon name="MapPin" size={30} color={theme.colors.muted} />
+          <Heading level={3}>{translate("addressesEmpty")}</Heading>
+          <Caption align="center">{translate("addressesEmptyHint")}</Caption>
+        </Card>
+      ) : addresses.data.map((address) => (
+        <Card key={address.id} contentStyle={{ gap: 9 }}>
+          <View style={styles.cardHeader}>
+            <UiText weight="800">
+              {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
+            </UiText>
+            {address.is_default ? <StatusBadge label={translate("addressesDefault")} tone="accent" /> : null}
+          </View>
+
+          <Heading level={3}>{address.recipient_name}</Heading>
+          <UiText tone="muted">{address.phone}</UiText>
+          <Caption>
+            {String(address.wilaya_id).padStart(2, "0")} - {wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}
+          </Caption>
+          <Caption>{address.address_line}</Caption>
+          {address.additional_info ? <Caption>{address.additional_info}</Caption> : null}
+
+          <View style={styles.actions}>
+            {!address.is_default ? (
+              <Action label={translate("addressesMakeDefault")} onPress={() => defaultMutation.mutate(address.id)} disabled={defaultMutation.isPending} />
+            ) : null}
+            <Action label={translate("addressesEdit")} onPress={() => openEditor(address)} />
+            <Action label={translate("addressesDelete")} onPress={() => setDeleteTarget(address)} danger />
+          </View>
+        </Card>
+      ))}
+
+      <Modal visible={editor !== null} transparent animationType="slide" onRequestClose={() => setEditor(null)}>
+        <View style={styles.backdrop}>
+          <View style={styles.modalPanel}>
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.formContent}>
+              <Heading level={3}>{translate(editor?.address ? "addressesEditTitle" : "addressesAddTitle")}</Heading>
+
+              <NativeText style={styles.label}>{translate("addressesType")}</NativeText>
               <SegmentedControl
                 accessibilityLabel={translate("addressesType")}
                 value={label}
-                onChange={(value) => { if (value === "home" || value === "work" || value === "other") setLabel(value); }}
+                onChange={(value) => {
+                  if (value === "home" || value === "work" || value === "other") setLabel(value);
+                }}
                 options={[
                   { key: "home", label: translate("addressesHome") },
                   { key: "work", label: translate("addressesWork") },
                   { key: "other", label: translate("addressesOther") }
                 ]}
               />
-            </View>
-            <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
-            <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
-            <Text style={styles.label}>{translate("checkoutWilaya")}</Text>
-            <PressableSurface onPress={() => setPickerOpen(true)} style={styles.input}><Text style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text></PressableSurface>
-            <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
-            <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
-            <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
-            {formError ? <Text style={styles.error}>{formError}</Text> : null}
-            <Button label={translate("deliveryProfileSave")} onPress={submit} loading={saveMutation.isPending} fullWidth />
-            <PressableSurface onPress={() => setEditor(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></PressableSurface>
-          </ScrollView>
+
+              <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
+              <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
+
+              <NativeText style={styles.label}>{translate("checkoutWilaya")}</NativeText>
+              <PressableSurface
+                onPress={() => setPickerOpen(true)}
+                style={styles.input}
+                accessibilityLabel={translate("checkoutChooseWilaya")}
+              >
+                <NativeText style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</NativeText>
+              </PressableSurface>
+
+              <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
+              <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
+              <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
+
+              {formError ? <UiText tone="danger">{formError}</UiText> : null}
+
+              <Button label={translate("deliveryProfileSave")} onPress={submit} loading={saveMutation.isPending} fullWidth />
+              <Button label={translate("back")} onPress={() => setEditor(null)} variant="ghost" fullWidth disabled={saveMutation.isPending} />
+            </ScrollView>
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
 
-    <Modal visible={pickerOpen} transparent animationType="fade" onRequestClose={() => setPickerOpen(false)}>
-      <View style={styles.backdrop}><View style={styles.pickerPanel}>
-        <Text style={styles.modalTitle}>{translate("checkoutChooseWilaya")}</Text>
-        <ScrollView>{wilayas.data.map((item: Wilaya) => <PressableSurface key={item.id} onPress={() => { setWilayaId(item.id); setCommune(""); setPickerOpen(false); }} style={styles.pickerOption}>
-          <Text style={styles.inputText}>{String(item.id).padStart(2, "0")} - {item.name_ar}</Text>
-        </PressableSurface>)}</ScrollView>
-        <PressableSurface onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></PressableSurface>
-      </View></View>
-    </Modal>
+      <Modal visible={pickerOpen} transparent animationType="fade" onRequestClose={() => setPickerOpen(false)}>
+        <View style={styles.backdrop}>
+          <View style={styles.pickerPanel}>
+            <Heading level={3}>{translate("checkoutChooseWilaya")}</Heading>
+            <ScrollView>
+              {wilayas.data.map((item: Wilaya) => (
+                <PressableSurface
+                  key={item.id}
+                  onPress={() => {
+                    setWilayaId(item.id);
+                    setCommune("");
+                    setPickerOpen(false);
+                  }}
+                  style={styles.pickerOption}
+                >
+                  <NativeText style={styles.inputText}>{String(item.id).padStart(2, "0")} - {item.name_ar}</NativeText>
+                </PressableSurface>
+              ))}
+            </ScrollView>
+            <Button label={translate("back")} onPress={() => setPickerOpen(false)} variant="ghost" fullWidth />
+          </View>
+        </View>
+      </Modal>
 
-    <Modal visible={deleteTarget !== null} transparent animationType="fade" onRequestClose={() => setDeleteTarget(null)}>
-      <View style={styles.backdrop}><View style={styles.confirmPanel}>
-        <Text style={styles.modalTitle}>{translate("addressesDeleteTitle")}</Text>
-        <Text style={styles.detail}>{translate("addressesDeleteHint")}</Text>
-        <Button label={translate("addressesDelete")} onPress={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id); }} loading={deleteMutation.isPending} variant="danger" fullWidth />
-        <PressableSurface onPress={() => setDeleteTarget(null)} style={styles.cancelButton}><Text style={styles.cancelText}>{translate("back")}</Text></PressableSurface>
-        {deleteMutation.isError ? <Text style={styles.error}>{translate("addressesDeleteError")}</Text> : null}
-      </View></View>
-    </Modal>
-  </CustomerScreen>;
+      <ConfirmDialog
+        visible={deleteTarget !== null}
+        onRequestClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+        }}
+        title={translate("addressesDeleteTitle")}
+        description={translate("addressesDeleteHint")}
+        cancelLabel={translate("back")}
+        confirmLabel={translate("addressesDelete")}
+        busy={deleteMutation.isPending}
+        destructive
+      />
+      {deleteMutation.isError ? <UiText tone="danger">{translate("addressesDeleteError")}</UiText> : null}
+    </CustomerScreen>
+  );
 }
 
-function Field({ label, value, onChangeText, styles, keyboardType }: {
+function Field({
+  label,
+  value,
+  onChangeText,
+  styles,
+  keyboardType
+}: {
   label: string;
   value: string;
   onChangeText: (value: string) => void;
   styles: ReturnType<typeof createStyles>;
   keyboardType?: "default" | "phone-pad";
 }) {
-  return <View style={styles.field}>
-    <TextField label={label} value={value} onChangeText={onChangeText} keyboardType={keyboardType ?? "default"} maxLength={240} style={styles.input} textAlign="right" />
-  </View>;
+  return (
+    <View style={styles.field}>
+      <TextField
+        label={label}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType ?? "default"}
+        maxLength={240}
+        style={styles.input}
+        textAlign="right"
+      />
+    </View>
+  );
 }
 
-function Action({ label, onPress, disabled = false, danger = false }: { label: string; onPress: () => void; disabled?: boolean; danger?: boolean }) {
+function Action({
+  label,
+  onPress,
+  disabled = false,
+  danger = false
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+}) {
   return <Button label={label} onPress={onPress} disabled={disabled} variant={danger ? "danger" : "outline"} size="sm" />;
 }
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
-    empty: { padding: 24, borderRadius: 16, backgroundColor: theme.colors.surface, alignItems: "center", gap: 8 },
-    emptyTitle: { color: theme.colors.foreground, fontWeight: "900", fontSize: 15 },
-    emptyHint: { color: theme.colors.muted, fontSize: 12, textAlign: "center" },
-    card: { padding: 15, borderRadius: 16, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border, gap: 7 },
     cardHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-    addressLabel: { color: theme.colors.foreground, fontSize: 14, fontWeight: "900" },
-    recipient: { color: theme.colors.foreground, fontWeight: "800", textAlign: "right" },
-    detail: { color: theme.colors.muted, fontSize: 12, textAlign: "right", lineHeight: 19 },
     actions: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7, marginTop: 7 },
     backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: 15 },
     modalPanel: { maxHeight: "92%", backgroundColor: theme.colors.surface, borderRadius: 18, padding: 16 },
     pickerPanel: { maxHeight: "78%", backgroundColor: theme.colors.surface, borderRadius: 18, padding: 16, gap: 10 },
-    confirmPanel: { backgroundColor: theme.colors.surface, borderRadius: 18, padding: 18, gap: 12 },
-    modalTitle: { color: theme.colors.foreground, fontSize: 16, fontWeight: "900", textAlign: "right", marginBottom: 14 },
-    field: { gap: 6, marginBottom: 11 },
+    formContent: { gap: 12, paddingBottom: 8 },
+    field: { gap: 6, marginBottom: 3 },
     label: { color: theme.colors.foreground, fontSize: 12, fontWeight: "800", textAlign: "right", marginBottom: 6 },
     input: { minHeight: 47, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 11, paddingHorizontal: 12, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: 13 },
     inputText: { color: theme.colors.foreground, fontSize: 13, textAlign: "right" },
-    pickerOption: { minHeight: 44, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border },
-    error: { color: theme.colors.danger, fontSize: 11, textAlign: "right", marginVertical: 7 },
-    cancelButton: { minHeight: 43, alignItems: "center", justifyContent: "center", marginTop: 5 },
-    cancelText: { color: theme.colors.muted, fontWeight: "800" },
+    pickerOption: { minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border }
   });
 }
