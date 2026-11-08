@@ -21,6 +21,7 @@ import { getFavorites } from "@/lib/favorites";
 import { translate } from "@/lib/i18n";
 import { fetchMyOrders } from "@/lib/orders";
 import { getProfileDisplayName } from "@/lib/profile-state";
+import { fetchMyReviews } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function ProfileScreen() {
@@ -47,6 +48,12 @@ export default function ProfileScreen() {
     queryKey: ["local-favorites"],
     queryFn: getFavorites,
     enabled: Boolean(user.data)
+  });
+  const reviews = useQuery({
+    queryKey: ["my-reviews"],
+    queryFn: fetchMyReviews,
+    enabled: Boolean(user.data),
+    retry: false
   });
 
   if (user.isPending) {
@@ -131,7 +138,7 @@ export default function ProfileScreen() {
                 />
               </View>
             </Card>
-            <Card contentStyle={styles.statCard}>
+            <Card style={styles.statCardOuter} contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
                 <Icon name="heart" size={19} />
                 <StatCard
@@ -141,58 +148,27 @@ export default function ProfileScreen() {
                 />
               </View>
             </Card>
+            <Card style={styles.statCardOuter} contentStyle={styles.statCard}>
+              <View style={styles.statHeader}>
+                <Icon name="star" size={19} />
+                <StatCard
+                  label={translate("myReviewsTitle")}
+                  value={reviews.isPending ? "…" : reviews.isError ? "—" : String(reviews.data?.length ?? 0)}
+                  style={styles.stat}
+                />
+              </View>
+            </Card>
           </View>
 
-          {orders.isError || favorites.isError ? (
+          {orders.isError || favorites.isError || reviews.isError ? (
             <ErrorState
               title={translate("profileStatsLoadError")}
               retryLabel={translate("retry")}
-              onRetry={() => { void orders.refetch(); void favorites.refetch(); }}
+              onRetry={() => { void orders.refetch(); void favorites.refetch(); void reviews.refetch(); }}
             />
           ) : null}
 
-          <Card contentStyle={styles.menuContent}>
-            <ProfileMenuItem
-              label={translate("profileEditDetails")}
-              hint={translate("profileEditDetailsHint")}
-              onPress={() => router.push("/delivery-profile")}
-            />
-            <ProfileMenuItem
-              label={translate("profileAddresses")}
-              hint={translate("profileAddressesHint")}
-              onPress={() => router.push("/addresses")}
-            />
-            <ProfileMenuItem
-              label={translate("profileOrders")}
-              hint={translate("profileOrdersHint")}
-              onPress={() => router.push("/orders")}
-            />
-            <ProfileMenuItem
-              label={translate("profileFavorites")}
-              hint={translate("profileFavoritesHint")}
-              onPress={() => router.push("/favorites")}
-            />
-            <ProfileMenuItem
-              label={translate("profileNotifications")}
-              hint={translate("profileNotificationsHint")}
-              onPress={() => router.push("/notifications")}
-            />
-            <ProfileMenuItem
-              label={translate("myReviewsTitle")}
-              hint={translate("myReviewsSubtitle")}
-              onPress={() => router.push("/my-reviews")}
-            />
-            <ProfileMenuItem
-              label={translate("profileSettings")}
-              hint={translate("profileSettingsHint")}
-              onPress={() => router.push("/settings")}
-            />
-            <ProfileMenuItem
-              label={translate("profileBusiness")}
-              hint={translate("profileBusinessHint")}
-              onPress={() => router.push("/merchant")}
-            />
-          </Card>
+
         </>
       )}
     </CustomerScreen>
@@ -229,11 +205,9 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: "rgba(128, 128, 128, 0.25)"
   },
-  stats: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
+  stats: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
   statCardOuter: { flex: 1, minWidth: 0 },
   statCard: { padding: designTokens.spacing.md },
   statHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.sm },
   stat: { flex: 1, minWidth: 0, padding: 0, backgroundColor: "transparent" },
-  menuContent: { gap: 0, padding: 0 },
-  menuCopy: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs }
 });
