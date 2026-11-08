@@ -161,7 +161,7 @@ export function RadioGroup({
             disabled={option.disabled}
             onPress={() => onChange(option.value)}
             style={({ pressed }) => [
-              { minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: option.disabled ? 0.45 : pressed ? 0.75 : 1 }
+              { minHeight: theme.dimensions.controlHeight.md, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: option.disabled ? 0.45 : pressed ? 0.75 : 1 }
             ]}
           >
             <View style={{ width: theme.dimensions.iconSize.md, height: theme.dimensions.iconSize.md, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
@@ -235,7 +235,7 @@ export function Select({
         disabled={disabled}
         onPress={() => setOpen(true)}
         style={({ pressed }) => [
-          { minHeight: 48, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.pill, paddingHorizontal: designTokens.spacing.lg, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", backgroundColor: theme.colors.surface, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
+          { minHeight: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.pill, paddingHorizontal: designTokens.spacing.lg, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", backgroundColor: theme.colors.surface, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
           style
         ]}
       >
@@ -256,7 +256,7 @@ export function Select({
                 onChange(option.value);
                 setOpen(false);
               }}
-              style={{ minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: option.disabled ? 0.45 : 1 }}
+              style={{ minHeight: theme.dimensions.controlHeight.lg, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: option.disabled ? 0.45 : 1 }}
             >
               <UiText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? theme.fontWeights.bold : theme.fontWeights.regular }}>
                 {option.label}
@@ -346,7 +346,7 @@ export function InputOTP({
 
 export function FormLabel({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
   const theme = useAppTheme();
-  return <UiText style={[{ color: theme.colors.foreground, fontSize: theme.typography.caption + 2, fontWeight: "700", textAlign: "right" }, style]}>{children}</UiText>;
+  return <UiText style={[{ color: theme.colors.foreground, fontSize: theme.typography.caption + 2, fontWeight: theme.fontWeights.bold, textAlign: "right" }, style]}>{children}</UiText>;
 }
 
 export function FormError({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
@@ -390,7 +390,7 @@ export function Radio({
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="radio" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
+    <Pressable accessibilityRole="radio" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: theme.dimensions.controlHeight.md, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
       <View style={{ width: 22, height: 22, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
       <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</UiText>
     </Pressable>
@@ -449,11 +449,11 @@ export function DatePicker({
   return (
     <View accessibilityLabel={accessibilityLabel} style={[{ gap: designTokens.spacing.md }, style]}>
       <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={previousMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month - 1, 1))} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={previousMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month - 1, 1))} hitSlop={8} style={{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" }}>
           <UiText style={{ color: theme.colors.foreground }}>‹</UiText>
         </Pressable>
-        <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: "700" }}>{monthLabel(year, month)}</UiText>
-        <Pressable accessibilityRole="button" accessibilityLabel={nextMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month + 1, 1))} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
+        <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: theme.fontWeights.bold }}>{monthLabel(year, month)}</UiText>
+        <Pressable accessibilityRole="button" accessibilityLabel={nextMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month + 1, 1))} hitSlop={8} style={{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" }}>
           <UiText style={{ color: theme.colors.foreground }}>›</UiText>
         </Pressable>
       </View>
