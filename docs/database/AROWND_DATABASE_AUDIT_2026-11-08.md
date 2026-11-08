@@ -149,3 +149,71 @@ This is a reconciliation task, not a list of migrations to apply. Some files may
 - No table, column, row, function, policy, bucket or migration history was changed.
 - No migrations were applied.
 - No tests were run.
+
+
+---
+
+## 10. Second verification pass — 2026-11-08
+
+A second read-only pass re-queried the live project and the same branch. The counts and key missing objects below were reconfirmed.
+
+### Confirmed inventory
+
+- Exactly 31 tables in `public` and 3 in `private`.
+- All 34 inspected tables have RLS enabled.
+- Two public views exist: `approved_delivery_companies` and `public_personal_profiles`; both read from private backing tables.
+- Public table policies exist on 31 of 34 tables. The three zero-policy tables are:
+  - `public.checkout_idempotency`
+  - `public.schema_migrations`
+  - `private.wallet_transaction_decisions`
+- The first and third should remain deny-by-default for direct client access. The legacy public migration ledger needs ownership and operational-script review.
+- Three Storage buckets were reconfirmed: `store-media`, `product-media`, `receipts`.
+
+### Corrections and stronger findings
+
+1. The earlier row counts are inventory snapshots, not proof that a table is unused. In particular, all zero-row delivery, audit, wallet and governance tables remain KEEP/REVIEW until feature scope and dependencies are confirmed.
+2. The live privilege audit reconfirmed broad table-level privileges for `authenticated`:
+   - `store_offers`: INSERT and UPDATE are granted at table level.
+   - `notifications`: INSERT, UPDATE and DELETE are granted at table level.
+   RLS policies may constrain row access, but these grants still violate the intended column-level allowlist. This is a security blocker, not a cleanup/deletion candidate.
+3. `profiles` has table-level DELETE grant for `authenticated`. Review whether deletion should be exclusively through the account-deletion RPC and remove direct DELETE if not required. Do not infer safety from RLS alone.
+4. Many SECURITY DEFINER functions still use `search_path=public` or `public, storage` rather than an empty/strict path. This includes legacy archive, order cancellation, reservation, merchant fulfillment, shipment, and notification functions. Review each function's qualified object references, identity checks, EXECUTE grants and trigger-vs-RPC use before changing it.
+5. The Advisor's 33 SECURITY DEFINER findings are warnings about callable functions, not 33 confirmed exploitable vulnerabilities. A function-by-function security review remains outstanding.
+6. Several trigger entries appear more than once in the information_schema trigger listing because trigger metadata is emitted per triggering event. This output alone does not prove duplicate trigger objects. Verify from `pg_trigger` before attempting deduplication.
+
+### Second-pass object checks
+
+| Object | Live state | Decision |
+|---|---|---|
+| `user_addresses` | Missing | Required by current Native address screens; create only after backup and migration reconciliation |
+| `set_my_default_address(uuid)` | Missing | Required by Native address flow |
+| `create_merchant_product_offer` | Missing | Required by Native merchant product flow |
+| `update_merchant_product_details` | Missing | Required by Native merchant product flow |
+| `get_my_store_analytics` | Missing | Required by Native merchant analytics screen |
+| `submit_review` | Exists, old definition | Replace/reconcile; do not create duplicate function |
+| `create_order_with_delivery` | Exists, old wrapper delegates to legacy unkeyed implementation | Reconcile with current checkout contract; do not replace blindly |
+
+### Migration comparison — confirmed by exact migration names
+
+- Repository: 83 migration files.
+- Live Supabase ledger: 78 entries.
+- Repository-only names (15): `require_mfa_for_admin_role`, `direct_merchant_fulfillment`, `checkout_support_merchant_managed_delivery`, `atomic_merchant_product_creation`, `update_merchant_product_details`, `personal_user_addresses`, `verified_review_submission`, `secure_personal_profile_updates`, `profile_column_write_allowlist`, `serialize_default_address_updates`, `restrict_notification_updates`, `restrict_store_owner_update_columns`, `merchant_store_analytics`, `restrict_merchant_offer_updates`, `allow_store_taxonomy_updates`.
+- Ledger-only names (10): `optimize_rls_and_index_cleanup`, `remove_redundant_public_read_policies`, `optimize_merchant_tracking_rls_auth_lookup`, `restrict_product_view_counter_rpc`, `delivery_company_assignment_security`, `platform_admin_app_metadata_mfa`, `admin_delivery_company_approval`, `secure_wallet_transaction_permissions`, `admin_wallet_transaction_review`, `move_wallet_review_to_private_schema`.
+
+Name mismatch is not proof of unapplied SQL. A migration may have been renamed or manually applied. The next step is SQL-effect reconciliation, not replaying all 15 files.
+
+### Updated priority order
+
+1. **P0 — Security:** tighten authenticated table/column grants for `store_offers` and `notifications`; review direct `profiles` DELETE; audit callable SECURITY DEFINER functions and search_path.
+2. **P0 — Checkout correctness:** reconcile live order wrapper with payment/delivery/idempotency contract.
+3. **P1 — Native feature availability:** reconcile the five missing address, merchant-product and analytics objects.
+4. **P1 — Review integrity:** replace old `submit_review` with verified-activity eligibility logic.
+5. **P2 — Data minimization:** review `public.schema_migrations`, legacy duplicate views/functions, unused indexes and obsolete columns only after dependency scans.
+6. **P3 — Performance:** assess unused indexes and foreign-key indexes with real query workload; do not bulk-drop.
+
+### Verification limits
+
+- Read-only metadata, catalog and source-file inspection only.
+- No database writes, DDL, grants, policy changes, migration applications or row deletions.
+- No runtime integration tests or restore drill were performed.
+- Full web/mobile reference scan and per-function SECURITY DEFINER code review are not yet complete.
