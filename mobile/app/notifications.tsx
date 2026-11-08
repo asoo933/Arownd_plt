@@ -17,7 +17,7 @@ import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRea
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 function typeLabel(type: AppNotification["type"]): string {
   const labels: Record<AppNotification["type"], string> = {
@@ -162,7 +162,7 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
   card: { position: "relative" },
-  cardContent: { gap: 8, padding: 14 },
-  cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  cardContent: { gap: designTokens.spacing.sm, padding: designTokens.spacing.lg },
+  cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
   unreadDot: { position: "absolute", top: 12, start: 12, width: 8, height: 8, borderRadius: 4 }
 });
