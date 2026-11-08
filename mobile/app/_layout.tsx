@@ -70,7 +70,7 @@ function RootLayoutContent() {
 
   useEffect(() => {
     if ((fontsLoaded || fontError) && themeReady) {
-      void SplashScreen.hideAsync();
+      void SplashScreen.hideAsync().catch(() => undefined);
     }
   }, [fontError, fontsLoaded, themeReady]);
 
