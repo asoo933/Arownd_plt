@@ -91,11 +91,11 @@ export function QuantityStepper({
 
 const styles = StyleSheet.create({
   field: { gap: designTokens.spacing.xs },
-  fieldLabel: { fontSize: 13, fontWeight: "700", textAlign: "right" },
-  textInput: { minHeight: 50, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
-  fieldError: { fontSize: 12, textAlign: "right" },
+  fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "right" },
+  textInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
+  fieldError: { fontSize: designTokens.typography.caption, textAlign: "right" },
   stepper: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
-  stepButton: { width: 40, height: 40, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
-  stepSymbol: { fontSize: 21, lineHeight: 24, fontWeight: "700" },
-  quantity: { minWidth: 28, textAlign: "center", fontSize: designTokens.typography.body, fontWeight: "800", fontVariant: ["tabular-nums"] }
+  stepButton: { width: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
+  stepSymbol: { fontSize: designTokens.dimensions.iconSize.md, lineHeight: 24, fontWeight: "700" },
+  quantity: { minWidth: 28, textAlign: "center", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, fontVariant: ["tabular-nums"] }
 });
