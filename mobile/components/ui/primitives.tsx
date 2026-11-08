@@ -47,15 +47,7 @@ export function Surface({
           borderRadius: theme.radius[radius],
           padding
         },
-        elevated
-          ? {
-              shadowColor: "#000000",
-              shadowOpacity: theme.mode === "dark" ? 0.28 : 0.06,
-              shadowRadius: 12,
-              shadowOffset: { width: 0, height: 5 },
-              elevation: 2
-            }
-          : undefined,
+        elevated ? theme.shadows.md : undefined,
         style
       ]}
     >
