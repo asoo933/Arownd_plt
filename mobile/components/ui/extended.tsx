@@ -64,7 +64,10 @@ export function SearchField({
           minHeight: theme.dimensions.controlHeight.lg,
           color: theme.colors.foreground,
           fontSize: theme.typography.body,
-          textAlign: "right"
+          fontWeight: theme.fontWeights.regular,
+          fontFamily: theme.fontFamilies.arabic,
+          textAlign: "right",
+          includeFontPadding: false
         }}
       />
     </View>
