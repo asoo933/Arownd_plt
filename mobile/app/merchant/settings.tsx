@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Modal, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader, Button, Card, ErrorState, Icon, IconButton, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
@@ -273,8 +273,6 @@ function createStyles(theme: AppTheme) {
     logoPreview: { width: 76, height: 76, borderRadius: 14, alignSelf: "flex-end" },
     coverPreview: { width: "100%", height: 76, borderRadius: 14 },
     imagePlaceholder: { alignItems: "center", justifyContent: "center" },
-    modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 12 },
-    modalCard: { maxHeight: "78%", borderWidth: 1, borderRadius: 18, padding: 15, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
     sectionTitle: { fontSize: 14, fontWeight: "900" },
     wilayaList: { maxHeight: 480 },
