@@ -35,15 +35,15 @@ export default function MerchantAnalyticsScreen() {
   const data = analytics.data;
   const maxDaily = Math.max(1, ...data.daily_delivered.map((item) => item.amount));
   const cards = [
-    { label: translate("merchantAnalyticsOrders"), value: String(data.orders_total), tone: theme.colors.foreground },
-    { label: translate("merchantAnalyticsDelivered"), value: String(data.delivered_orders), tone: theme.colors.success },
-    { label: translate("merchantAnalyticsActive"), value: String(data.active_orders), tone: theme.colors.warning },
-    { label: translate("merchantAnalyticsCancelled"), value: String(data.cancelled_orders), tone: theme.colors.danger },
-    { label: translate("merchantAnalyticsRevenue"), value: formatDZD(data.delivered_revenue), tone: theme.colors.accentMuted },
-    { label: translate("merchantAnalyticsAverage"), value: formatDZD(data.average_delivered_order), tone: theme.colors.foreground },
-    { label: translate("merchantAnalyticsProducts"), value: String(data.product_count), tone: theme.colors.foreground },
-    { label: translate("merchantAnalyticsLowStock"), value: String(data.low_stock_count), tone: theme.colors.warning },
-    { label: translate("merchantAnalyticsOutOfStock"), value: String(data.out_of_stock_count), tone: theme.colors.danger },
+    { label: translate("merchantAnalyticsOrders"), value: String(data.orders_total), tone: "default" },
+    { label: translate("merchantAnalyticsDelivered"), value: String(data.delivered_orders), tone: "success" },
+    { label: translate("merchantAnalyticsActive"), value: String(data.active_orders), tone: "warning" },
+    { label: translate("merchantAnalyticsCancelled"), value: String(data.cancelled_orders), tone: "danger" },
+    { label: translate("merchantAnalyticsRevenue"), value: formatDZD(data.delivered_revenue), tone: "accent" },
+    { label: translate("merchantAnalyticsAverage"), value: formatDZD(data.average_delivered_order), tone: "default" },
+    { label: translate("merchantAnalyticsProducts"), value: String(data.product_count), tone: "default" },
+    { label: translate("merchantAnalyticsLowStock"), value: String(data.low_stock_count), tone: "warning" },
+    { label: translate("merchantAnalyticsOutOfStock"), value: String(data.out_of_stock_count), tone: "danger" },
   ];
 
   return (
