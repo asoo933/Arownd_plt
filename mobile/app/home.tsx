@@ -43,18 +43,18 @@ export default function CustomerHomeScreen() {
           <PressableSurface
             accessibilityLabel={translate("homeLocation")}
             onPress={() => router.push("/stores")}
-            style={styles.location}
+            style={[styles.location, { backgroundColor: theme.colors.accent }]}
           >
-            <UiText style={styles.locationText}>{translate("homeLocation")}</UiText>
+            <UiText style={[styles.locationText, { color: theme.colors.accentForeground }]}>{translate("homeLocation")}</UiText>
             <Icon name="map-pin" size={17} color="#0A0A0A" />
           </PressableSurface>
         }
       />
 
-      <View style={styles.hero}>
-        <UiText style={styles.heroEyebrow}>{translate("homeEyebrow")}</UiText>
-        <UiText style={styles.heroTitle}>{translate("homeTitle")}</UiText>
-        <UiText style={styles.heroSubtitle}>{translate("homeSubtitle")}</UiText>
+      <View style={[styles.hero, { backgroundColor: theme.colors.surfaceMuted }]}>
+        <UiText tone="accentMuted" style={styles.heroEyebrow}>{translate("homeEyebrow")}</UiText>
+        <UiText style={[styles.heroTitle, { color: theme.colors.foreground, fontSize: theme.typography.title }]} >{translate("homeTitle")}</UiText>
+        <UiText tone="muted" style={styles.heroSubtitle}>{translate("homeSubtitle")}</UiText>
         <CustomerSearch value={search} onChangeText={setSearch} placeholder={translate("homeSearchPlaceholder")} />
         <Button
           label={translate("homeSearchAction")}
@@ -118,14 +118,14 @@ export default function CustomerHomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  location: { flexDirection: "row-reverse", alignItems: "center", gap: 7, backgroundColor: "#C6F135", borderRadius: 12, paddingHorizontal: 11, minHeight: 40 },
-  locationText: { color: "#0A0A0A", fontSize: 11, fontWeight: "800" },
-  hero: { backgroundColor: "#111A0A", borderRadius: 24, padding: 19, gap: 10 },
-  heroEyebrow: { color: "#C6F135", fontSize: 11, fontWeight: "800", textAlign: "right" },
-  heroTitle: { color: "#FFFFFF", fontSize: 24, lineHeight: 35, fontWeight: "900", textAlign: "right" },
-  heroSubtitle: { color: "#D0D7C7", fontSize: 12, lineHeight: 21, textAlign: "right" },
-  searchButton: { minHeight: 43, borderRadius: 13, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  searchButtonText: { color: "#0A0A0A", fontSize: 13, fontWeight: "900" },
+  location: { flexDirection: "row-reverse", alignItems: "center", gap: 7, borderRadius: 12, paddingHorizontal: 11, minHeight: 40 },
+  locationText: { fontSize: 11, fontWeight: "800" },
+  hero: { borderRadius: 24, padding: 19, gap: 10 },
+  heroEyebrow: { fontSize: 11, fontWeight: "800", textAlign: "right" },
+  heroTitle: { lineHeight: 35, fontWeight: "900", textAlign: "right" },
+  heroSubtitle: { fontSize: 12, lineHeight: 21, textAlign: "right" },
+  searchButton: { minHeight: 48, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  searchButtonText: { fontSize: 13, fontWeight: "900" },
   categoryRail: { flexDirection: "row-reverse", gap: 9, paddingBottom: 3 },
   category: { width: 93, minHeight: 94, borderRadius: 17, alignItems: "center", justifyContent: "center", gap: 8, padding: 9 },
   categoryIcon: { fontSize: 25 },
