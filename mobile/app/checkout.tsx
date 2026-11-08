@@ -150,7 +150,8 @@ export default function CheckoutScreen() {
     return <CustomerScreen>
       <Card style={[styles.successPanel, { backgroundColor: theme.colors.surface }]} contentStyle={styles.successContent}>
         <UiText style={styles.successMark}>✓</UiText>
-        <AppHeader title={translate("checkoutSuccessTitle")} />\n        <UiText style={styles.hint}>{translate("checkoutSuccessMessage")}</UiText>
+        <AppHeader title={translate("checkoutSuccessTitle")} />
+        <UiText style={styles.hint}>{translate("checkoutSuccessMessage")}</UiText>
         <UiText style={styles.orderLabel}>{translate("checkoutOrderNumber")}</UiText>
         <UiText selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</UiText>
         <UiText style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</UiText>
