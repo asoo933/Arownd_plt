@@ -19,7 +19,7 @@ export type TextComponentProps = TextProps & {
 export function Text({
   children,
   tone = "foreground",
-  weight = "400",
+  weight,
   align = "right",
   style,
   ...props
@@ -33,7 +33,7 @@ export function Text({
         {
           color: theme.colors[tone],
           fontSize: theme.typography.body,
-          fontWeight: weight,
+          fontWeight: weight ?? theme.fontWeights.regular,
           textAlign: align,
           includeFontPadding: false
         },
@@ -61,7 +61,7 @@ export function Heading({ level = 2, style, ...props }: HeadingProps) {
     <Text
       {...props}
       accessibilityRole="header"
-      weight="800"
+      weight={theme.fontWeights.extrabold}
       style={[{ fontSize: sizes[level] }, style]}
     />
   );
@@ -72,7 +72,7 @@ export function Label(props: TextComponentProps) {
   return (
     <Text
       {...props}
-      weight={props.weight ?? "700"}
+      weight={props.weight ?? theme.fontWeights.bold}
       style={[{ fontSize: theme.typography.caption + 2 }, props.style]}
     />
   );
@@ -93,7 +93,7 @@ export function PriceText({
   value,
   previousValue,
   tone = "foreground",
-  weight = "800",
+  weight,
   align = "right",
   style,
   ...props
@@ -107,7 +107,7 @@ export function PriceText({
         {
           color: theme.colors[tone],
           fontSize: theme.typography.title,
-          fontWeight: weight,
+          fontWeight: weight ?? theme.fontWeights.extrabold,
           fontVariant: ["tabular-nums"],
           textAlign: align,
           includeFontPadding: false
@@ -136,7 +136,7 @@ export function BadgeText({
   children,
   style,
   tone = "accent",
-  weight = "700",
+  weight,
   align = "right",
   ...props
 }: TextComponentProps & { tone?: "accent" | "success" | "warning" | "danger" }) {
@@ -162,7 +162,7 @@ export function BadgeText({
           backgroundColor: palette.backgroundColor,
           color: palette.color,
           fontSize: theme.typography.caption,
-          fontWeight: weight,
+          fontWeight: weight ?? theme.fontWeights.bold,
           textAlign: align,
           includeFontPadding: false
         },
