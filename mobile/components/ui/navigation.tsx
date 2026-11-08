@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   segment: {
     flex: 1,
-    minHeight: designTokens.dimensions.controlHeight.sm,
+    minHeight: designTokens.dimensions.controlHeight.md,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: designTokens.spacing.sm,
