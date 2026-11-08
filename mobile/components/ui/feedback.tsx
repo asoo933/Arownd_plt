@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Icon } from "./icon";
 
 export type FeedbackTone = "info" | "success" | "warning" | "danger";
 
@@ -118,7 +119,7 @@ export function SuccessState({
   return (
     <View style={{ minHeight: 144, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.xl }}>
       <View style={{ width: 48, height: 48, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.successSurface }}>
-        <NativeText style={{ color: theme.colors.success, fontSize: 24, fontWeight: "800" }}>✓</NativeText>
+        <Icon name="check" size={24} color={theme.colors.success} accessibilityHidden />
       </View>
       <NativeText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "center" }}>{title}</NativeText>
       {description ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "center" }}>{description}</NativeText> : null}
