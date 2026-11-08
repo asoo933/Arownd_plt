@@ -18,7 +18,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { AppHeader, Button, PressableSurface, StatusBadge } from "@/components/ui";
+import { AppHeader, Button, MerchantMetricCard, PressableSurface, StatusBadge } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
@@ -163,31 +163,10 @@ export default function MerchantEntryScreen() {
         </View>
 
         <View style={styles.metricsGrid}>
-          <MetricCard
-            theme={theme}
-            label={translate("merchantMetricProducts")}
-            value={String(data.productCount)}
-            hint={translate("merchantMetricProductsHint")}
-          />
-          <MetricCard
-            theme={theme}
-            label={translate("merchantMetricNeedsAction")}
-            value={String(data.pendingOrderCount)}
-            hint={translate("merchantMetricNeedsActionHint")}
-            tone="warning"
-          />
-          <MetricCard
-            theme={theme}
-            label={translate("merchantMetricQuoted")}
-            value={String(data.quotedOrderCount)}
-            hint={translate("merchantMetricQuotedHint")}
-          />
-          <MetricCard
-            theme={theme}
-            label={translate("merchantMetricOrders")}
-            value={String(data.orders.length)}
-            hint={translate("merchantMetricOrdersHint")}
-          />
+          <MerchantMetricCard label={translate("merchantMetricProducts")} value={String(data.productCount)} hint={translate("merchantMetricProductsHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
+          <MerchantMetricCard label={translate("merchantMetricNeedsAction")} value={String(data.pendingOrderCount)} hint={translate("merchantMetricNeedsActionHint")} valueTone="warning" style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
+          <MerchantMetricCard label={translate("merchantMetricQuoted")} value={String(data.quotedOrderCount)} hint={translate("merchantMetricQuotedHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
+          <MerchantMetricCard label={translate("merchantMetricOrders")} value={String(data.orders.length)} hint={translate("merchantMetricOrdersHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
         </View>
 
         <View style={styles.sectionHeading}>
@@ -288,28 +267,6 @@ function OrderStatus({ order, theme }: { order: MerchantDashboardOrder; theme: A
   return (
     <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 }}>
       <Text style={{ color: tone, fontSize: 10, fontWeight: "900" }}>{translate(key)}</Text>
-    </View>
-  );
-}
-
-function MetricCard({
-  theme,
-  label,
-  value,
-  hint,
-  tone = "normal"
-}: {
-  theme: AppTheme;
-  label: string;
-  value: string;
-  hint: string;
-  tone?: "normal" | "warning";
-}) {
-  return (
-    <View style={[stylesForScreen.metricCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-      <Text style={[stylesForScreen.metricLabel, { color: theme.colors.muted }]}>{label}</Text>
-      <Text style={[stylesForScreen.metricValue, { color: tone === "warning" ? theme.colors.warning : theme.colors.foreground }]}>{value}</Text>
-      <Text style={[stylesForScreen.metricHint, { color: theme.colors.subtle }]}>{hint}</Text>
     </View>
   );
 }
