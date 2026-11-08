@@ -12,14 +12,23 @@ export function MerchantMetricCard({
   label,
   value,
   trend,
+  valueTone = "default",
   style
 }: {
   label: string;
   value: string;
   trend?: MetricTrend;
+  valueTone?: "default" | "success" | "warning" | "danger" | "accent";
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
+  const valueColor = {
+    default: theme.colors.foreground,
+    success: theme.colors.success,
+    warning: theme.colors.warning,
+    danger: theme.colors.danger,
+    accent: theme.colors.accentMuted
+  }[valueTone];
 
   return (
     <Surface style={[{ flex: 1, gap: theme.spacing.sm }, style]}>
@@ -29,7 +38,7 @@ export function MerchantMetricCard({
       <Text
         numberOfLines={1}
         adjustsFontSizeToFit
-        style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: "800", textAlign: "right" }}
+        style={{ color: valueColor, fontSize: theme.typography.title, fontWeight: "800", textAlign: "right" }}
       >
         {value}
       </Text>
