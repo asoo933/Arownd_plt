@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { fetchMerchantAccess } from "@/lib/merchant";
@@ -134,9 +134,7 @@ export default function MerchantStoreSettingsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Pressable onPress={() => router.back()} style={styles.back}>
-          <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("back")}</Text>
-        </Pressable>
+        <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
         <Text style={[styles.title, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsTitle")}</Text>
         <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantStoreSettingsSubtitle")}</Text>
         <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
@@ -144,16 +142,28 @@ export default function MerchantStoreSettingsScreen() {
             <View style={styles.brandingItem}>
               <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreLogo")}</Text>
               {form.logo_url ? <Image source={{ uri: form.logo_url }} style={styles.logoPreview} resizeMode="cover" /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Text style={{ color: theme.colors.muted }}>A</Text></View>}
-              <Pressable accessibilityRole="button" disabled={imageBusy !== null} onPress={() => void chooseStoreImage("logo")} style={[styles.imageButton, { borderColor: theme.colors.border, opacity: imageBusy ? 0.6 : 1 }]}>
-                {imageBusy === "logo" ? <ActivityIndicator color={theme.colors.accentMuted} /> : <Text style={[styles.imageButtonText, { color: theme.colors.accentMuted }]}>{translate("merchantStoreImageUpload")}</Text>}
-              </Pressable>
+              <Button
+                label={translate("merchantStoreImageUpload")}
+                onPress={() => void chooseStoreImage("logo")}
+                loading={imageBusy === "logo"}
+                disabled={imageBusy !== null}
+                variant="outline"
+                size="sm"
+                fullWidth
+              />
             </View>
             <View style={styles.brandingItem}>
               <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreCover")}</Text>
               {form.cover_url ? <Image source={{ uri: form.cover_url }} style={styles.coverPreview} resizeMode="cover" /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Text style={{ color: theme.colors.muted }}>A</Text></View>}
-              <Pressable accessibilityRole="button" disabled={imageBusy !== null} onPress={() => void chooseStoreImage("cover")} style={[styles.imageButton, { borderColor: theme.colors.border, opacity: imageBusy ? 0.6 : 1 }]}>
-                {imageBusy === "cover" ? <ActivityIndicator color={theme.colors.accentMuted} /> : <Text style={[styles.imageButtonText, { color: theme.colors.accentMuted }]}>{translate("merchantStoreImageUpload")}</Text>}
-              </Pressable>
+              <Button
+                label={translate("merchantStoreImageUpload")}
+                onPress={() => void chooseStoreImage("cover")}
+                loading={imageBusy === "cover"}
+                disabled={imageBusy !== null}
+                variant="outline"
+                size="sm"
+                fullWidth
+              />
             </View>
           </View>
           {imageError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</Text> : null}
@@ -190,9 +200,7 @@ export default function MerchantStoreSettingsScreen() {
           <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" />
           {formError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</Text> : null}
           {mutation.isSuccess ? <Text style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreSettingsSaved")}</Text> : null}
-          <Pressable accessibilityRole="button" disabled={mutation.isPending} onPress={submit} style={[styles.save, { backgroundColor: theme.colors.accent, opacity: mutation.isPending ? 0.6 : 1 }]}>
-            {mutation.isPending ? <ActivityIndicator color={theme.colors.accentForeground} /> : <Text style={[styles.saveText, { color: theme.colors.accentForeground }]}>{translate("merchantStoreSettingsSave")}</Text>}
-          </Pressable>
+          <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} fullWidth />
         </View>
       </ScrollView>
       <Modal visible={wilayaPickerOpen} transparent animationType="slide" onRequestClose={() => setWilayaPickerOpen(false)}>
@@ -229,7 +237,7 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
   const styles = createStyles(theme);
   return <View style={styles.field}>
     <Text style={[styles.label, { color: theme.colors.foreground }]}>{label}</Text>
-    <TextInput value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={multiline ? 2000 : 300} textAlign="right" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
+    <TextField value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={multiline ? 2000 : 300} textAlign="right" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
   </View>;
 }
 
@@ -241,7 +249,7 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
     <View style={styles.message}>
       {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
       <Text style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</Text>
-      {actionLabel && onAction ? <Pressable onPress={onAction} style={[styles.save, { backgroundColor: theme.colors.accent }]}><Text style={styles.saveText}>{actionLabel}</Text></Pressable> : null}
+      {actionLabel && onAction ? <Button label={actionLabel} onPress={onAction} fullWidth /> : null}
     </View>
   </SafeAreaView>;
 }
@@ -250,7 +258,6 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 16, paddingBottom: 36, gap: 12 },
-    back: { minHeight: 42, justifyContent: "center", alignSelf: "flex-start" },
     backText: { fontSize: 12, fontWeight: "800" },
     title: { fontSize: 24, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
@@ -262,7 +269,6 @@ function createStyles(theme: AppTheme) {
     coverPreview: { width: "100%", height: 76, borderRadius: 14 },
     imagePlaceholder: { alignItems: "center", justifyContent: "center" },
     imageButton: { minHeight: 40, borderWidth: 1, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-    imageButtonText: { fontSize: 11, fontWeight: "800" },
     modalOverlay: { flex: 1, justifyContent: "flex-end", padding: 12 },
     modalCard: { maxHeight: "78%", borderWidth: 1, borderRadius: 18, padding: 15, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
