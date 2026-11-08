@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import {
   Modal,
   Pressable,
@@ -340,6 +341,132 @@ export function InputOTP({
         accessibilityLabel={accessibilityLabel}
         style={{ position: "absolute", inset: 0, opacity: 0.02 }}
       />
+    </View>
+  );
+}
+
+
+export function FormLabel({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
+  const theme = useAppTheme();
+  return <NativeText style={[{ color: theme.colors.foreground, fontSize: theme.typography.caption + 2, fontWeight: "700", textAlign: "right" }, style]}>{children}</NativeText>;
+}
+
+export function FormError({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
+  const theme = useAppTheme();
+  return <NativeText accessibilityRole="alert" style={[{ color: theme.colors.danger, fontSize: theme.typography.caption, textAlign: "right" }, style]}>{children}</NativeText>;
+}
+
+export function FormField({
+  label,
+  hint,
+  error,
+  children,
+  style
+}: {
+  label?: string;
+  hint?: string;
+  error?: string;
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+  return (
+    <View style={[{ gap: designTokens.spacing.xs }, style]}>
+      {label ? <FormLabel>{label}</FormLabel> : null}
+      {children}
+      {error ? <FormError>{error}</FormError> : hint ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{hint}</NativeText> : null}
+    </View>
+  );
+}
+
+export function Radio({
+  selected,
+  onPress,
+  label,
+  disabled = false
+}: {
+  selected: boolean;
+  onPress: () => void;
+  label: string;
+  disabled?: boolean;
+}) {
+  const theme = useAppTheme();
+  return (
+    <Pressable accessibilityRole="radio" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
+      <View style={{ width: 22, height: 22, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
+      <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</NativeText>
+    </Pressable>
+  );
+}
+
+function toDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function DatePicker({
+  value,
+  onChange,
+  accessibilityLabel,
+  monthLabel,
+  weekdayLabels,
+  previousMonthLabel,
+  nextMonthLabel,
+  minDate,
+  maxDate,
+  disabled = false,
+  style
+}: {
+  value?: string;
+  onChange: (value: string) => void;
+  accessibilityLabel: string;
+  monthLabel: (year: number, month: number) => string;
+  weekdayLabels: string[];
+  previousMonthLabel: string;
+  nextMonthLabel: string;
+  minDate?: string;
+  maxDate?: string;
+  disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const theme = useAppTheme();
+  const initial = value ? new Date(`${value}T00:00:00`) : new Date();
+  const [visibleMonth, setVisibleMonth] = useState(() => new Date(initial.getFullYear(), initial.getMonth(), 1));
+  const year = visibleMonth.getFullYear();
+  const month = visibleMonth.getMonth();
+  const days = useMemo(() => {
+    const firstWeekday = new Date(year, month, 1).getDay();
+    const count = new Date(year, month + 1, 0).getDate();
+    return [...Array.from({ length: firstWeekday }, () => null), ...Array.from({ length: count }, (_, index) => index + 1)];
+  }, [month, year]);
+
+  return (
+    <View accessibilityLabel={accessibilityLabel} style={[{ gap: designTokens.spacing.md }, style]}>
+      <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={previousMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month - 1, 1))} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
+          <NativeText style={{ color: theme.colors.foreground }}>‹</NativeText>
+        </Pressable>
+        <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: "700" }}>{monthLabel(year, month)}</NativeText>
+        <Pressable accessibilityRole="button" accessibilityLabel={nextMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month + 1, 1))} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
+          <NativeText style={{ color: theme.colors.foreground }}>›</NativeText>
+        </Pressable>
+      </View>
+      <View style={{ flexDirection: "row-reverse", flexWrap: "wrap" }}>
+        {weekdayLabels.map((label, index) => <View key={`${label}-${index}`} style={{ width: "14.2857%", minHeight: 32, alignItems: "center", justifyContent: "center" }}><NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.caption }}>{label}</NativeText></View>)}
+        {days.map((day, index) => {
+          if (day === null) return <View key={`empty-${index}`} style={{ width: "14.2857%", aspectRatio: 1 }} />;
+          const dateKey = toDateKey(new Date(year, month, day));
+          const selected = value === dateKey;
+          const unavailable = disabled || (minDate !== undefined && dateKey < minDate) || (maxDate !== undefined && dateKey > maxDate);
+          return (
+            <Pressable key={dateKey} accessibilityRole="button" accessibilityLabel={dateKey} accessibilityState={{ selected, disabled: unavailable }} disabled={unavailable} onPress={() => onChange(dateKey)} style={({ pressed }) => [{ width: "14.2857%", aspectRatio: 1, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: selected ? theme.colors.accent : "transparent", opacity: unavailable ? 0.35 : pressed ? 0.7 : 1 }]}>
+              <NativeText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? "800" : "400" }}>{day}</NativeText>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
