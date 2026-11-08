@@ -2,11 +2,10 @@ import type { ReactNode } from "react";
 import { Image, Pressable, ScrollView, Text, type ImageSourcePropType, type ImageStyle, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { QuantityStepper } from "./form-controls";
+import { QuantityStepper, TextField } from "./form-controls";
 import { Card } from "./cards";
 import { RadioGroup, type RadioOption } from "./forms";
 import { StatusBadge, type StatusBadgeTone } from "./extended";
-import { TextField } from "./form-controls";
 
 export function PriceDisplay({
   value,
