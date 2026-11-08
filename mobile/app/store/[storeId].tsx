@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } from "@/components/customer-ui";
 import { FavoriteButton } from "@/components/favorite-button";
@@ -9,7 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
-import { AppHeader, IconButton, SegmentedControl } from "@/components/ui";
+import { AppHeader, Card, Icon, IconButton, Image as UiImage, SegmentedControl, Text as UiText } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -39,21 +39,21 @@ export default function StoreDetailsScreen() {
     <CustomerScreen>
       <AppHeader
         title={details.name}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={20} />} />}
         trailing={<FavoriteButton kind="stores" id={storeId} />}
       />
       <View style={[styles.cover, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {details.cover_url ? <Image source={{ uri: details.cover_url }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
+        {details.cover_url ? <UiImage uri={details.cover_url} accessibilityLabel={details.name} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
       </View>
       <View style={styles.storeHeader}>
         <View style={[styles.logo, { backgroundColor: theme.colors.surfaceMuted }]}>
-          {details.logo_url ? <Image source={{ uri: details.logo_url }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.logoFallback, { color: theme.colors.subtle }]}>⌂</Text>}
+          {details.logo_url ? <UiImage uri={details.logo_url} accessibilityLabel={details.name} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Icon name="store" color={theme.colors.subtle} size={30} accessibilityHidden />}
         </View>
         <View style={styles.storeTitleWrap}>
-          <Text style={[styles.storeName, { color: theme.colors.foreground }]}>{details.name}</Text>
-          <Text style={[styles.metaText, { color: theme.colors.muted }]}>{details.commune || details.address_line || " "}</Text>
-          <Text style={[styles.verified, { color: details.is_verified ? theme.colors.success : theme.colors.muted }]}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</Text>
-          {details.rating != null ? <Text style={[styles.rating, { color: theme.colors.warning }]}>★ {translate("storeRating")}: {details.rating.toFixed(1)}</Text> : null}
+          <UiText style={[styles.storeName, { color: theme.colors.foreground }]}>{details.name}</UiText>
+          <UiText style={[styles.metaText, { color: theme.colors.muted }]}>{details.commune || details.address_line || " "}</UiText>
+          <UiText style={[styles.verified, { color: details.is_verified ? theme.colors.success : theme.colors.muted }]}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</UiText>
+          {details.rating != null ? <UiText style={[styles.rating, { color: theme.colors.warning }]}>★ {translate("storeRating")}: {details.rating.toFixed(1)}</UiText> : null}
         </View>
       </View>
 
@@ -83,14 +83,14 @@ export default function StoreDetailsScreen() {
           </View>
         )
       ) : (
-        <View style={[styles.aboutCard, { backgroundColor: theme.colors.surface }]}>
-          <Text style={[styles.aboutTitle, { color: theme.colors.foreground }]}>{translate("storeAboutTitle")}</Text>
-          <Text style={[styles.description, { color: theme.colors.muted }]}>{details.description || translate("storeNoDescription")}</Text>
-          <Text style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeAddress")}</Text>
-          <Text style={[styles.description, { color: theme.colors.muted }]}>{[details.address_line, details.commune].filter(Boolean).join("، ") || translate("storeNoAddress")}</Text>
-          {details.phone ? <><Text style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storePhone")}</Text><Text style={[styles.description, { color: theme.colors.muted }]}>{details.phone}</Text></> : null}
-          {details.whatsapp ? <><Text style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeWhatsApp")}</Text><Text style={[styles.description, { color: theme.colors.muted }]}>{details.whatsapp}</Text></> : null}
-        </View>
+        <Card contentStyle={styles.aboutCard}>
+          <UiText style={[styles.aboutTitle, { color: theme.colors.foreground }]}>{translate("storeAboutTitle")}</UiText>
+          <UiText style={[styles.description, { color: theme.colors.muted }]}>{details.description || translate("storeNoDescription")}</UiText>
+          <UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeAddress")}</UiText>
+          <UiText style={[styles.description, { color: theme.colors.muted }]}>{[details.address_line, details.commune].filter(Boolean).join("، ") || translate("storeNoAddress")}</UiText>
+          {details.phone ? <><UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storePhone")}</UiText><UiText style={[styles.description, { color: theme.colors.muted }]}>{details.phone}</UiText></> : null}
+          {details.whatsapp ? <><UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeWhatsApp")}</UiText><UiText style={[styles.description, { color: theme.colors.muted }]}>{details.whatsapp}</UiText></> : null}
+        </Card>
       )}
       <ReviewPanel targetType="store" targetId={storeId} />
     </CustomerScreen>
@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
   cover: { height: 150, borderRadius: 20, overflow: "hidden" },
   storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 13, marginTop: -2 },
   logo: { width: 76, height: 76, borderRadius: 20, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  logoFallback: { fontSize: 35 },
   storeTitleWrap: { flex: 1, alignItems: "flex-end", gap: 4 },
   storeName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
   metaText: { fontSize: 12, textAlign: "right" },
@@ -109,7 +108,7 @@ const styles = StyleSheet.create({
   rating: { fontSize: 11, fontWeight: "700" },
   tabs: { width: "100%" },
   productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
-  aboutCard: { borderRadius: 18, padding: 16, gap: 11 },
+  aboutCard: { padding: 16, gap: 11 },
   aboutTitle: { fontSize: 17, fontWeight: "900", textAlign: "right" },
   fieldTitle: { color: "#647D13", fontSize: 12, fontWeight: "800", textAlign: "right" },
   description: { fontSize: 13, lineHeight: 22, textAlign: "right" }
