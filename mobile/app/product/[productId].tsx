@@ -11,7 +11,7 @@ import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, format
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function ProductDetailsScreen() {
   const { productId } = useLocalSearchParams<{ productId: string }>();
@@ -165,28 +165,28 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
 }
 
 const styles = StyleSheet.create({
-  heroImage: { height: 300, borderRadius: 22, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  infoCard: { borderRadius: 18, padding: 16, gap: 10 },
-  productName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
+  heroImage: { height: 300, borderRadius: designTokens.radius.lg, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  infoCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  productName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
   priceDisplay: { justifyContent: "flex-end" },
-  price: { fontSize: 22, fontWeight: "900", textAlign: "right" },
-  metadata: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 12 },
-  metaText: { fontSize: 12, textAlign: "right" },
-  description: { fontSize: 13, lineHeight: 22, textAlign: "right" },
-  section: { gap: 12 },
-  sectionTitle: { fontSize: 17, fontWeight: "900", textAlign: "right" },
-  offerCard: { minHeight: 82, borderWidth: 1.5, borderRadius: 16, padding: 12, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  offerInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
-  offerStore: { fontSize: 14, fontWeight: "800", textAlign: "right" },
-  stock: { fontSize: 11, fontWeight: "800" },
+  price: { fontSize: designTokens.typography.title, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  metadata: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.md },
+  metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "right" },
+  description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "right" },
+  section: { gap: designTokens.spacing.md },
+  sectionTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  offerCard: { minHeight: 82, borderWidth: 1.5, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
+  offerInfo: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+  offerStore: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  stock: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   offerPriceDisplay: { justifyContent: "flex-start" },
-  offerPrice: { fontSize: 14, fontWeight: "900" },
-  purchaseCard: { borderRadius: 18, padding: 14, gap: 13 },
-  optionGroup: { gap: 8 },
-  optionLabel: { fontSize: 12, fontWeight: "800", textAlign: "right" },
-  optionValues: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 },
-  optionChip: { minWidth: 44, minHeight: 44, paddingHorizontal: 13, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  optionChipText: { fontSize: 12, fontWeight: "700" },
+  offerPrice: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
+  purchaseCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  optionGroup: { gap: designTokens.spacing.sm },
+  optionLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  optionValues: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+  optionChip: { minWidth: designTokens.dimensions.controlHeight.md, minHeight: designTokens.dimensions.controlHeight.md, paddingHorizontal: 13, borderRadius: designTokens.radius.sm, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  optionChipText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.bold },
   quantityRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  mutationError: { fontSize: 11, textAlign: "right" },
+  mutationError: { fontSize: designTokens.typography.caption, textAlign: "right" },
 });
