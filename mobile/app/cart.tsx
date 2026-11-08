@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IconButton, QuantityStepper } from "@/components/ui";
+import { Button, IconButton, PressableSurface, QuantityStepper } from "@/components/ui";
 import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem } from "@/lib/cart-state";
@@ -74,7 +74,12 @@ export default function CartScreen() {
         const blocking = (line?.issues.length ?? 0) > 0;
         const totalRequestedForOffer = cart.data.filter((entry) => entry.offerId === item.offerId).reduce((sum, entry) => sum + entry.quantity, 0);
         return <View key={key} style={style.line}>
-          <Pressable accessibilityRole="button" onPress={() => item.productId ? router.push({ pathname: "/product/[productId]", params: { productId: item.productId } }) : undefined} style={style.lineMain}>
+          <PressableSurface
+            accessibilityLabel={translate("cartOpenProduct") + ": " + (offer?.product.name ?? item.name)}
+            disabled={!item.productId}
+            onPress={item.productId ? () => router.push({ pathname: "/product/[productId]", params: { productId: item.productId as string } }) : undefined}
+            style={style.lineMain}
+          >
             <View style={style.thumb}>{image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={style.imageMark}>▧</Text>}</View>
             <View style={style.details}>
               <Text style={[style.name, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name}</Text>
@@ -83,7 +88,7 @@ export default function CartScreen() {
               <Text style={style.price}>{formatDZD(currentPrice * item.quantity)}</Text>
               {item.quantity > 1 ? <Text style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Text> : null}
             </View>
-          </Pressable>
+          </PressableSurface>
           <View style={style.controls}>
             <QuantityStepper
               value={item.quantity}
