@@ -1,9 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IdentityRow, PressableSurface } from "@/components/ui";
+import {
+  AppHeader,
+  Button,
+  Caption,
+  Card,
+  Icon,
+  IdentityRow,
+  ListItem,
+  StatCard,
+  Text
+} from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
 import { translate } from "@/lib/i18n";
@@ -14,12 +24,6 @@ import { useAppTheme } from "@/lib/theme";
 
 export default function ProfileScreen() {
   const theme = useAppTheme();
-  const colors = {
-    text: theme.colors.foreground,
-    muted: theme.colors.muted,
-    card: theme.colors.surface,
-    border: theme.colors.border
-  };
   const user = useQuery({
     queryKey: ["current-user"],
     queryFn: async () => {
@@ -64,7 +68,7 @@ export default function ProfileScreen() {
     return (
       <CustomerScreen>
         <CustomerHeading title={translate("profileTitle")} subtitle={translate("profileLoginHint")} />
-        <PrimaryAction label={translate("profileLogin")} onPress={() => router.push("/login")} />
+        <Button label={translate("profileLogin")} onPress={() => router.push("/login")} fullWidth />
       </CustomerScreen>
     );
   }
@@ -87,22 +91,33 @@ export default function ProfileScreen() {
   return (
     <CustomerScreen>
       <AppHeader title={translate("profileTitle")} />
-      <Text style={{ color: colors.muted, fontSize: 12, textAlign: "right" }}>{translate("profileSubtitle")}</Text>
+      <Caption>{translate("profileSubtitle")}</Caption>
+
       {profile.isPending ? (
         <LoadingState label={translate("stateLoading")} />
       ) : (
         <>
-          <View style={[styles.identity, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Card>
             <IdentityRow
               name={displayName}
               subtitle={[user.data.email, profile.data?.phone].filter(Boolean).join(" · ")}
               avatarSize={58}
             />
-          </View>
+          </Card>
+
           <View style={styles.stats}>
-            <StatCard label={translate("profileOrders")} value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)} colors={colors} />
-            <StatCard label={translate("profileFavorites")} value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)} colors={colors} />
+            <StatCard
+              label={translate("profileOrders")}
+              value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)}
+              style={styles.stat}
+            />
+            <StatCard
+              label={translate("profileFavorites")}
+              value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)}
+              style={styles.stat}
+            />
           </View>
+
           {orders.isError || favorites.isError ? (
             <ErrorState
               title={translate("profileStatsLoadError")}
@@ -110,62 +125,77 @@ export default function ProfileScreen() {
               onRetry={() => { void orders.refetch(); void favorites.refetch(); }}
             />
           ) : null}
-          <View style={styles.menu}>
-            <MenuAction label={translate("profileEditDetails")} hint={translate("profileEditDetailsHint")} onPress={() => router.push("/delivery-profile")} colors={colors} />
-            <MenuAction label={translate("profileAddresses")} hint={translate("profileAddressesHint")} onPress={() => router.push("/addresses")} colors={colors} />
-            <MenuAction label={translate("profileOrders")} hint={translate("profileOrdersHint")} onPress={() => router.push("/orders")} colors={colors} />
-            <MenuAction label={translate("profileFavorites")} hint={translate("profileFavoritesHint")} onPress={() => router.push("/favorites")} colors={colors} />
-            <MenuAction label={translate("profileNotifications")} hint={translate("profileNotificationsHint")} onPress={() => router.push("/notifications")} colors={colors} />
-            <MenuAction label={translate("myReviewsTitle")} hint={translate("myReviewsSubtitle")} onPress={() => router.push("/my-reviews")} colors={colors} />
-            <MenuAction label={translate("profileSettings")} hint={translate("profileSettingsHint")} onPress={() => router.push("/settings")} colors={colors} />
-            <MenuAction label={translate("profileBusiness")} hint={translate("profileBusinessHint")} onPress={() => router.push("/merchant")} colors={colors} />
-          </View>
+
+          <Card contentStyle={styles.menuContent}>
+            <ProfileMenuItem
+              label={translate("profileEditDetails")}
+              hint={translate("profileEditDetailsHint")}
+              onPress={() => router.push("/delivery-profile")}
+            />
+            <ProfileMenuItem
+              label={translate("profileAddresses")}
+              hint={translate("profileAddressesHint")}
+              onPress={() => router.push("/addresses")}
+            />
+            <ProfileMenuItem
+              label={translate("profileOrders")}
+              hint={translate("profileOrdersHint")}
+              onPress={() => router.push("/orders")}
+            />
+            <ProfileMenuItem
+              label={translate("profileFavorites")}
+              hint={translate("profileFavoritesHint")}
+              onPress={() => router.push("/favorites")}
+            />
+            <ProfileMenuItem
+              label={translate("profileNotifications")}
+              hint={translate("profileNotificationsHint")}
+              onPress={() => router.push("/notifications")}
+            />
+            <ProfileMenuItem
+              label={translate("myReviewsTitle")}
+              hint={translate("myReviewsSubtitle")}
+              onPress={() => router.push("/my-reviews")}
+            />
+            <ProfileMenuItem
+              label={translate("profileSettings")}
+              hint={translate("profileSettingsHint")}
+              onPress={() => router.push("/settings")}
+            />
+            <ProfileMenuItem
+              label={translate("profileBusiness")}
+              hint={translate("profileBusinessHint")}
+              onPress={() => router.push("/merchant")}
+            />
+          </Card>
         </>
       )}
     </CustomerScreen>
   );
 }
 
-function PrimaryAction({ label, onPress }: { label: string; onPress: () => void }) {
-  return <Button label={label} onPress={onPress} fullWidth />;
-}
-
-function StatCard({ label, value, colors }: { label: string; value: string; colors: { text: string; muted: string; card: string; border: string } }) {
-  return (
-    <View style={[styles.stat, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
-      <Text style={[styles.statLabel, { color: colors.muted }]}>{label}</Text>
-    </View>
-  );
-}
-
-function MenuAction({ label, hint, onPress, colors }: {
+function ProfileMenuItem({ label, hint, onPress }: {
   label: string;
   hint: string;
   onPress: () => void;
-  colors: { text: string; muted: string; card: string; border: string };
 }) {
   return (
-    <PressableSurface accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} onPress={onPress} style={[styles.menuAction, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <ListItem
+      onPress={onPress}
+      accessibilityLabel={label}
+      leading={<Icon name="chevron-left" color="muted" size={20} />}
+    >
       <View style={styles.menuCopy}>
-        <Text style={[styles.menuTitle, { color: colors.text }]}>{label}</Text>
-        <Text style={[styles.menuHint, { color: colors.muted }]}>{hint}</Text>
+        <Text weight="800">{label}</Text>
+        <Caption>{hint}</Caption>
       </View>
-      <Text style={[styles.arrow, { color: colors.muted }]}>‹</Text>
-    </PressableSurface>
+    </ListItem>
   );
 }
 
 const styles = StyleSheet.create({
-  identity: { minHeight: 104, borderWidth: 1, borderRadius: 20, padding: 16, flexDirection: "row-reverse", alignItems: "center", gap: 13 },
   stats: { flexDirection: "row-reverse", gap: 10 },
-  stat: { flex: 1, borderWidth: 1, borderRadius: 17, padding: 15, alignItems: "flex-end", gap: 5 },
-  statValue: { fontSize: 22, fontWeight: "900" },
-  statLabel: { fontSize: 12, fontWeight: "700" },
-  menu: { gap: 9 },
-  menuAction: { minHeight: 72, borderWidth: 1, borderRadius: 17, paddingHorizontal: 15, paddingVertical: 12, flexDirection: "row-reverse", alignItems: "center", gap: 12 },
-  menuCopy: { flex: 1, alignItems: "flex-end", gap: 4 },
-  menuTitle: { fontSize: 14, fontWeight: "800" },
-  menuHint: { fontSize: 11, textAlign: "right" },
-  arrow: { color: "#7A7A7A", fontSize: 24 },
+  stat: { flex: 1 },
+  menuContent: { gap: 0, padding: 0 },
+  menuCopy: { flex: 1, alignItems: "flex-end", gap: 4 }
 });
