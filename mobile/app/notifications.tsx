@@ -16,6 +16,7 @@ import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRea
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
+import { useAppTheme } from "@/lib/theme";
 
 function typeLabel(type: AppNotification["type"]): string {
   const labels: Record<AppNotification["type"], string> = {
@@ -35,6 +36,7 @@ function dateLabel(value: string): string {
 }
 
 export default function NotificationsScreen() {
+  const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [actionError, setActionError] = useState(false);
   const auth = useQuery({
@@ -150,7 +152,7 @@ export default function NotificationsScreen() {
               <UiText weight="800">{item.title}</UiText>
               {item.body ? <UiText tone="muted">{item.body}</UiText> : null}
               {!item.read ? (
-                <View style={styles.unreadDot} />
+                <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} />
               ) : null}
             </NotificationCard>
           </View>
@@ -164,5 +166,5 @@ const styles = StyleSheet.create({
   cardWrapper: { position: "relative" },
   cardContent: { gap: 8, padding: 14 },
   cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  unreadDot: { position: "absolute", top: 12, start: 12, width: 8, height: 8, borderRadius: 4, backgroundColor: "#C6F135" }
+  unreadDot: { position: "absolute", top: 12, start: 12, width: 8, height: 8, borderRadius: 4 }
 });
