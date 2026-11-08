@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 import { designTokens } from "@/lib/theme";
-import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
   Button,
@@ -12,9 +12,7 @@ import {
   Icon,
   IconButton,
   IdentityRow,
-  ListItem,
-  StatCard,
-  Text
+  StatCard
 } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
@@ -62,7 +60,6 @@ export default function ProfileScreen() {
   if (user.isError) {
     return (
       <CustomerScreen>
-        <CustomerHeading title={translate("profileTitle")} />
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
@@ -74,7 +71,7 @@ export default function ProfileScreen() {
   if (!user.data) {
     return (
       <CustomerScreen>
-        <CustomerHeading title={translate("profileTitle")} subtitle={translate("profileLoginHint")} />
+        <Caption>{translate("profileLoginHint")}</Caption>
         <Button label={translate("profileLogin")} onPress={() => router.push("/login")} fullWidth />
       </CustomerScreen>
     );
@@ -167,30 +164,9 @@ export default function ProfileScreen() {
               onRetry={() => { void orders.refetch(); void favorites.refetch(); void reviews.refetch(); }}
             />
           ) : null}
-
-
         </>
       )}
     </CustomerScreen>
-  );
-}
-
-function ProfileMenuItem({ label, hint, onPress }: {
-  label: string;
-  hint: string;
-  onPress: () => void;
-}) {
-  return (
-    <ListItem
-      onPress={onPress}
-      accessibilityLabel={label}
-      leading={<Icon name="chevron-left" size={20} />}
-    >
-      <View style={styles.menuCopy}>
-        <Text weight="700">{label}</Text>
-        <Caption>{hint}</Caption>
-      </View>
-    </ListItem>
   );
 }
 
