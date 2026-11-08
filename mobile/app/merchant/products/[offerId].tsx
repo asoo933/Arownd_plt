@@ -11,7 +11,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,7 +36,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -337,24 +336,24 @@ export default function MerchantEditProductScreen() {
           showsVerticalScrollIndicator={false}
         >
           <AppHeader title={translate("merchantProductEditTitle")} leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />} />
-          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</Text>
+          <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</UiText>
 
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <View style={styles.productHeading}>
-              <Text style={[styles.productName, { color: theme.colors.foreground }]}>{offer.product.name}</Text>
+              <UiText style={[styles.productName, { color: theme.colors.foreground }]}>{offer.product.name}</UiText>
               {offer.product.brand ? (
-                <Text style={[styles.productBrand, { color: theme.colors.muted }]}>{offer.product.brand}</Text>
+                <UiText style={[styles.productBrand, { color: theme.colors.muted }]}>{offer.product.brand}</UiText>
               ) : null}
             </View>
 
             <View style={[styles.sharedDetails, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductSharedDetailsTitle")}
-              </Text>
+              </UiText>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductNameLabel")}
-                </Text>
+                </UiText>
                 <TextField
                   value={productName}
                   onChangeText={setProductName}
@@ -365,9 +364,9 @@ export default function MerchantEditProductScreen() {
                 />
               </View>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductBrandLabel")}
-                </Text>
+                </UiText>
                 <TextField
                   value={productBrand}
                   onChangeText={setProductBrand}
@@ -378,9 +377,9 @@ export default function MerchantEditProductScreen() {
                 />
               </View>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductDescriptionLabel")}
-                </Text>
+                </UiText>
                 <TextField
                   value={productDescription}
                   onChangeText={setProductDescription}
@@ -393,37 +392,37 @@ export default function MerchantEditProductScreen() {
                 />
               </View>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductCategoryLabel")}
-                </Text>
+                </UiText>
                 <PressableSurface
                   accessibilityRole="button"
                   disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
                   onPress={() => setCategoryPickerOpen(true)}
                   style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: theme.colors.border, opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
                 >
-                  <Text style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
+                  <UiText style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
                     {selectedCategory
                       ? `${selectedCategory.emoji} ${selectedCategory.label}`
                       : translate("merchantProductCategoryUnknown")}
-                  </Text>
+                  </UiText>
                 </PressableSurface>
                 {categoriesQuery.isError ? (
-                  <Text style={[styles.hint, { color: theme.colors.danger }]}>
+                  <UiText style={[styles.hint, { color: theme.colors.danger }]}>
                     {translate("merchantProductCategoriesLoadError")}
-                  </Text>
+                  </UiText>
                 ) : null}
               </View>
-              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
+              <UiText style={[styles.noteText, { color: theme.colors.muted }]}>
                 {translate("merchantProductEditSharedFieldsHint")}
-              </Text>
+              </UiText>
               <Button label={translate("merchantProductDetailsSave")} onPress={() => void saveProductDetails()} loading={detailsSaving} disabled={isBusy && !detailsSaving} fullWidth />
             </View>
 
             <View style={styles.field}>
-              <Text style={[styles.label, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                 {translate("merchantProductPriceLabel")}
-              </Text>
+              </UiText>
               <TextField
                 value={price}
                 onChangeText={setPrice}
@@ -435,9 +434,9 @@ export default function MerchantEditProductScreen() {
             </View>
 
             <View style={styles.field}>
-              <Text style={[styles.label, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                 {translate("merchantProductStockLabel")}
-              </Text>
+              </UiText>
               <TextField
                 value={stock}
                 onChangeText={setStock}
@@ -446,19 +445,19 @@ export default function MerchantEditProductScreen() {
                 accessibilityLabel={translate("merchantProductStockLabel")}
                 style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
               />
-              <Text style={[styles.hint, { color: theme.colors.subtle }]}>
+              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
                 {translate("merchantProductsStockHint")}
-              </Text>
+              </UiText>
             </View>
 
             <View style={styles.optionsSection}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductOptionsTitle")}
-              </Text>
+              </UiText>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductSizesLabel")}
-                </Text>
+                </UiText>
                 <TextField
                   value={sizes}
                   onChangeText={setSizes}
@@ -470,9 +469,9 @@ export default function MerchantEditProductScreen() {
                 />
               </View>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductColorsLabel")}
-                </Text>
+                </UiText>
                 <TextField
                   value={colors}
                   onChangeText={setColors}
@@ -483,9 +482,9 @@ export default function MerchantEditProductScreen() {
                   style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
                 />
               </View>
-              <Text style={[styles.hint, { color: theme.colors.subtle }]}>
+              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
                 {translate("merchantProductOptionsHint")}
-              </Text>
+              </UiText>
             </View>
 
             <Button label={translate("merchantProductEditSave")} onPress={() => void saveOffer()} loading={saving} disabled={isBusy && !saving} fullWidth />
@@ -494,16 +493,16 @@ export default function MerchantEditProductScreen() {
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitles}>
-                <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                   {translate("merchantProductImagesManageTitle")}
-                </Text>
-                <Text style={[styles.hint, { color: theme.colors.subtle }]}>
+                </UiText>
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
                   {translate("merchantProductImagesManageHint")}
-                </Text>
+                </UiText>
               </View>
-              <Text style={[styles.imageCount, { color: theme.colors.accentMuted }]}>
+              <UiText style={[styles.imageCount, { color: theme.colors.accentMuted }]}>
                 {offer.images.length}/{PRODUCT_IMAGE_MAX_COUNT}
-              </Text>
+              </UiText>
             </View>
 
             {offer.images.length > 0 ? (
@@ -513,9 +512,9 @@ export default function MerchantEditProductScreen() {
                     <Image source={{ uri: image.image_url }} style={styles.imagePreview} />
                     {image.is_primary ? (
                       <View style={[styles.primaryBadge, { backgroundColor: theme.colors.accent }]}>
-                        <Text style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
+                        <UiText style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
                           {translate("merchantProductImagePrimary")}
-                        </Text>
+                        </UiText>
                       </View>
                     ) : null}
                     <PressableSurface
@@ -529,7 +528,7 @@ export default function MerchantEditProductScreen() {
                       {removingImageId === image.id ? (
                         <ActivityIndicator color="#FFFFFF" size="small" />
                       ) : (
-                        <Text style={styles.imageRemoveText}>×</Text>
+                        <UiText style={styles.imageRemoveText}>×</UiText>
                       )}
                     </PressableSurface>
                   </View>
@@ -537,9 +536,9 @@ export default function MerchantEditProductScreen() {
               </View>
             ) : (
               <View style={[styles.emptyImages, { backgroundColor: theme.colors.surfaceMuted }]}>
-                <Text style={[styles.emptyText, { color: theme.colors.muted }]}>
+                <UiText style={[styles.emptyText, { color: theme.colors.muted }]}>
                   {translate("merchantProductImagesEmpty")}
-                </Text>
+                </UiText>
               </View>
             )}
 
@@ -552,26 +551,26 @@ export default function MerchantEditProductScreen() {
               {imageBusy ? (
                 <ActivityIndicator color={theme.colors.accentMuted} />
               ) : (
-                <Text style={[styles.secondaryButtonText, { color: theme.colors.accentMuted }]}>
+                <UiText style={[styles.secondaryButtonText, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductImageAdd")}
-                </Text>
+                </UiText>
               )}
             </PressableSurface>
           </View>
 
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
-              <Text style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</Text>
+              <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
             </View>
           ) : null}
           {warning ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.warningSurface, borderColor: theme.colors.warning }]}>
-              <Text style={[styles.feedbackText, { color: theme.colors.warning }]}>{warning}</Text>
+              <UiText style={[styles.feedbackText, { color: theme.colors.warning }]}>{warning}</UiText>
             </View>
           ) : null}
           {actionError ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-              <Text style={[styles.feedbackText, { color: theme.colors.danger }]}>{actionError}</Text>
+              <UiText style={[styles.feedbackText, { color: theme.colors.danger }]}>{actionError}</UiText>
             </View>
           ) : null}
         </ScrollView>
@@ -585,9 +584,9 @@ export default function MerchantEditProductScreen() {
       >
         <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
           <View style={[styles.confirmCard, styles.categoryModalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
+            <UiText style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
               {translate("merchantProductCategoryPickerTitle")}
-            </Text>
+            </UiText>
             <ScrollView style={styles.categoryList} showsVerticalScrollIndicator={false}>
               {selectableCategories.map((category) => (
                 <PressableSurface
@@ -606,15 +605,15 @@ export default function MerchantEditProductScreen() {
                     }
                   ]}
                 >
-                  <Text style={[styles.categoryOptionText, { color: theme.colors.foreground }]}>
+                  <UiText style={[styles.categoryOptionText, { color: theme.colors.foreground }]}>
                     {category.emoji} {category.label}
-                  </Text>
+                  </UiText>
                 </PressableSurface>
               ))}
               {selectableCategories.length === 0 ? (
-                <Text style={[styles.confirmHint, { color: theme.colors.muted }]}>
+                <UiText style={[styles.confirmHint, { color: theme.colors.muted }]}>
                   {translate("merchantProductCategoriesLoadError")}
-                </Text>
+                </UiText>
               ) : null}
             </ScrollView>
             <PressableSurface
@@ -622,9 +621,9 @@ export default function MerchantEditProductScreen() {
               onPress={() => setCategoryPickerOpen(false)}
               style={[styles.cancelButton, { borderColor: theme.colors.border }]}
             >
-              <Text style={[styles.cancelText, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.cancelText, { color: theme.colors.foreground }]}>
                 {translate("merchantProductCategoryClose")}
-              </Text>
+              </UiText>
             </PressableSurface>
           </View>
         </View>
@@ -638,30 +637,30 @@ export default function MerchantEditProductScreen() {
       >
         <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
           <View style={[styles.confirmCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
+            <UiText style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
               {translate("merchantProductImageRemoveConfirmTitle")}
-            </Text>
-            <Text style={[styles.confirmHint, { color: theme.colors.muted }]}>
+            </UiText>
+            <UiText style={[styles.confirmHint, { color: theme.colors.muted }]}>
               {translate("merchantProductImageRemoveConfirmHint")}
-            </Text>
+            </UiText>
             <View style={styles.confirmActions}>
               <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setPendingRemoval(null)}
                 style={[styles.cancelButton, { borderColor: theme.colors.border }]}
               >
-                <Text style={[styles.cancelText, { color: theme.colors.foreground }]}>
+                <UiText style={[styles.cancelText, { color: theme.colors.foreground }]}>
                   {translate("merchantProductCategoryClose")}
-                </Text>
+                </UiText>
               </PressableSurface>
               <PressableSurface
                 accessibilityRole="button"
                 onPress={() => void confirmRemoveImage()}
                 style={[styles.removeConfirmButton, { backgroundColor: theme.colors.danger }]}
               >
-                <Text style={styles.removeConfirmText}>
+                <UiText style={styles.removeConfirmText}>
                   {translate("merchantProductImageRemoveConfirmAction")}
-                </Text>
+                </UiText>
               </PressableSurface>
             </View>
           </View>
@@ -689,7 +688,7 @@ function MessageScreen({
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
         {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-        <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</Text>
+        <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
         {actionLabel && onAction ? (
           <Button label={actionLabel} onPress={onAction} variant="outline" />
         ) : null}
