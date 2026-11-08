@@ -83,6 +83,7 @@ export function CameraButton({
   accessibilityLabel: string;
   disabled?: boolean;
 }) {
+  const theme = useAppTheme();
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.72 : 1 })}>{children}</Pressable>;
 }
 
