@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, type PropsWithChildren } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import { useColorScheme } from "react-native";
 
 import { brandColors, extendedThemeColors, semanticColors, themeColors } from "./colors";
@@ -6,8 +7,11 @@ import { dimensions } from "./dimensions";
 import { shadows } from "./shadows";
 import { borderRadius, spacing } from "./spacing";
 import { fontFamilies, fontWeights, typography } from "./typography";
+import { isThemeMode, resolveThemeMode, type ThemeMode } from "./theme-state";
 
-export type ThemeMode = "system" | "light" | "dark";
+export type { ThemeMode } from "./theme-state";
+
+const THEME_STORAGE_KEY = "arownd:theme-mode";
 
 export type AppTheme = {
   mode: "light" | "dark";
@@ -49,7 +53,14 @@ export type AppTheme = {
   shadows: typeof shadows;
 };
 
+type ThemePreferenceContextValue = {
+  mode: ThemeMode;
+  isReady: boolean;
+  setMode: (mode: ThemeMode) => Promise<void>;
+};
+
 const ThemeContext = createContext<AppTheme | null>(null);
+const ThemePreferenceContext = createContext<ThemePreferenceContextValue | null>(null);
 
 export function getAppTheme(mode: "light" | "dark"): AppTheme {
   const palette = themeColors[mode];
@@ -97,16 +108,61 @@ export function getAppTheme(mode: "light" | "dark"): AppTheme {
 
 type ThemeProviderProps = PropsWithChildren<{ mode?: ThemeMode }>;
 
-export function ThemeProvider({ children, mode = "system" }: ThemeProviderProps) {
+export function ThemeProvider({ children, mode }: ThemeProviderProps) {
   const systemScheme = useColorScheme();
-  const resolvedMode = mode === "system" ? (systemScheme === "dark" ? "dark" : "light") : mode;
-  const theme = useMemo(() => getAppTheme(resolvedMode), [resolvedMode]);
+  const [storedMode, setStoredMode] = useState<ThemeMode>("system");
+  const [isReady, setIsReady] = useState(false);
 
-  return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;
+  useEffect(() => {
+    let active = true;
+
+    void AsyncStorage.getItem(THEME_STORAGE_KEY)
+      .then((storedValue) => {
+        if (!active) return;
+        if (isThemeMode(storedValue)) setStoredMode(storedValue);
+      })
+      .catch(() => {
+        // Keep the system preference when local storage is unavailable.
+      })
+      .finally(() => {
+        if (active) setIsReady(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const setMode = useCallback(async (nextMode: ThemeMode) => {
+    await AsyncStorage.setItem(THEME_STORAGE_KEY, nextMode);
+    setStoredMode(nextMode);
+  }, []);
+
+  const preference = mode ?? storedMode;
+  const resolvedMode = resolveThemeMode(preference, systemScheme);
+  const theme = useMemo(() => getAppTheme(resolvedMode), [resolvedMode]);
+  const preferenceValue = useMemo(
+    () => ({ mode: preference, isReady, setMode }),
+    [preference, isReady, setMode]
+  );
+
+  return (
+    <ThemePreferenceContext.Provider value={preferenceValue}>
+      <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
+    </ThemePreferenceContext.Provider>
+  );
 }
 
 export function useAppTheme(): AppTheme {
   const context = useContext(ThemeContext);
   const systemScheme = useColorScheme();
   return context ?? getAppTheme(systemScheme === "dark" ? "dark" : "light");
+}
+
+export function useThemePreference(): ThemePreferenceContextValue {
+  const context = useContext(ThemePreferenceContext);
+  if (!context) {
+    throw new Error("useThemePreference must be used within ThemeProvider");
+  }
+  return context;
 }
