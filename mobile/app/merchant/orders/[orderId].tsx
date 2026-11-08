@@ -8,7 +8,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,6 +26,7 @@ import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { Button, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -143,9 +143,7 @@ export default function MerchantOrderDetailsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
-          <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantOrderDetailBack")}</Text>
-        </Pressable>
+        <Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />
 
         <View style={styles.header}>
           <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</Text>
@@ -207,7 +205,7 @@ export default function MerchantOrderDetailsScreen() {
             {deliveryType === "desk" ? (
               <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantQuotePickupHint")}</Text>
             ) : (
-              <TextInput
+              <TextField
                 value={shippingFee}
                 onChangeText={setShippingFee}
                 keyboardType="number-pad"
@@ -217,13 +215,9 @@ export default function MerchantOrderDetailsScreen() {
                 textAlign="right"
               />
             )}
-            <Pressable accessibilityRole="button" disabled={quoteMutation.isPending} onPress={sendQuote} style={[styles.primaryButton, { backgroundColor: theme.colors.accent }, quoteMutation.isPending && styles.disabled]}>
-              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.accentForeground} /> : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate("merchantQuoteSend")}</Text>}
-            </Pressable>
+            <Button label={translate("merchantQuoteSend")} onPress={sendQuote} loading={quoteMutation.isPending} fullWidth />
             {canReject ? (
-              <Pressable accessibilityRole="button" onPress={() => setConfirmAction("reject")} style={[styles.dangerButton, { borderColor: theme.colors.dangerBorder }]}>
-                <Text style={[styles.dangerButtonText, { color: theme.colors.danger }]}>{translate("merchantOrderReject")}</Text>
-              </Pressable>
+              <Button label={translate("merchantOrderReject")} onPress={() => setConfirmAction("reject")} variant="danger" fullWidth />
             ) : null}
           </View>
         ) : null}
@@ -262,18 +256,7 @@ export default function MerchantOrderDetailsScreen() {
                 ? translate("merchantMarkPickupDeliveredHint")
                 : translate("merchantMarkShippedHint")}
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              disabled={statusMutation.isPending}
-              onPress={() => statusMutation.mutate(nextStatus)}
-              style={[styles.primaryButton, { backgroundColor: theme.colors.accent }, statusMutation.isPending && styles.disabled]}
-            >
-              {statusMutation.isPending
-                ? <ActivityIndicator color={theme.colors.accentForeground} />
-                : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
-                    {translate("merchantTrackingAdvance")}: {translate(nextStatusLabel)}
-                  </Text>}
-            </Pressable>
+            <Button label={translate("merchantTrackingAdvance") + ": " + translate(nextStatusLabel)} onPress={() => statusMutation.mutate(nextStatus)} loading={statusMutation.isPending} fullWidth />
           </View>
         ) : null}
 
@@ -282,9 +265,7 @@ export default function MerchantOrderDetailsScreen() {
             <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantCodTitle")}</Text>
             <Text style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</Text>
             <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantCodPickupHint")}</Text>
-            <Pressable accessibilityRole="button" onPress={() => setConfirmAction("collect")} style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}>
-              <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate("merchantCodCollect")}</Text>
-            </Pressable>
+            <Button label={translate("merchantCodCollect")} onPress={() => setConfirmAction("collect")} fullWidth />
           </View>
         ) : null}
 
@@ -311,17 +292,8 @@ export default function MerchantOrderDetailsScreen() {
               {confirmAction === "reject" ? translate("merchantRejectConfirmHint") : translate("merchantCodConfirmHint")}
             </Text>
             <View style={styles.confirmActions}>
-              <Pressable accessibilityRole="button" onPress={() => setConfirmAction(null)} style={[styles.secondaryButton, { borderColor: theme.colors.border }]}>
-                <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>{translate("merchantModalClose")}</Text>
-              </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                disabled={actionMutation.isPending}
-                onPress={() => confirmAction && actionMutation.mutate(confirmAction)}
-                style={[styles.primaryButton, { backgroundColor: confirmAction === "reject" ? theme.colors.danger : theme.colors.accent }, actionMutation.isPending && styles.disabled]}
-              >
-                {actionMutation.isPending ? <ActivityIndicator color={theme.colors.accentForeground} /> : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate("merchantConfirmAction")}</Text>}
-              </Pressable>
+              <Button label={translate("merchantModalClose")} onPress={() => setConfirmAction(null)} variant="outline" style={{ flex: 1 }} />
+              <Button label={translate("merchantConfirmAction")} onPress={() => confirmAction && actionMutation.mutate(confirmAction)} loading={actionMutation.isPending} variant={confirmAction === "reject" ? "danger" : "primary"} style={{ flex: 1 }} />
             </View>
           </View>
         </View>
@@ -387,9 +359,7 @@ function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppThem
     <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
         <Text style={{ color: theme.colors.foreground, fontSize: 14, fontWeight: "800", textAlign: "center" }}>{title}</Text>
-        <Pressable accessibilityRole="button" onPress={onAction} style={[stylesForComponents.primaryButton, { backgroundColor: theme.colors.accent }]}>
-          <Text style={{ color: theme.colors.accentForeground, fontWeight: "900" }}>{actionLabel}</Text>
-        </Pressable>
+        <Button label={actionLabel} onPress={onAction} />
       </View>
     </SafeAreaView>
   );
