@@ -118,9 +118,9 @@ type ButtonProps = Pick<PressableProps, "accessibilityHint" | "testID"> & {
 };
 
 const buttonMetrics: Record<ButtonSize, { minHeight: number; paddingX: number; fontSize: number }> = {
-  sm: { minHeight: 40, paddingX: 14, fontSize: 12 },
-  md: { minHeight: 48, paddingX: 18, fontSize: 14 },
-  lg: { minHeight: 54, paddingX: 22, fontSize: 16 }
+  sm: { minHeight: designTokens.dimensions.controlHeight.sm, paddingX: designTokens.spacing.sm, fontSize: designTokens.typography.caption },
+  md: { minHeight: designTokens.dimensions.controlHeight.md, paddingX: designTokens.spacing.md, fontSize: designTokens.typography.body },
+  lg: { minHeight: designTokens.dimensions.controlHeight.lg, paddingX: designTokens.spacing.lg, fontSize: designTokens.typography.subtitle }
 };
 
 export function Button({
