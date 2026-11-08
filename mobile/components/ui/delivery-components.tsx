@@ -11,7 +11,7 @@ export function DeliveryOrderCard(props: { children: ReactNode; actions?: ReactN
   return <Card {...props} />;
 }
 
-export function DeliveryPartnerCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void }) {
+export function DeliveryPartnerCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void; accessibilityLabel?: string }) {
   return <Card {...props} />;
 }
 
