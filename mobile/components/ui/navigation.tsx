@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { Text as UiText } from "./typography";
 
 import { useAppTheme } from "@/lib/theme";
 
@@ -19,13 +20,13 @@ export function AppHeader({
   return (
     <View style={[styles.header, { gap: theme.spacing.md }, style]}>
       <View style={styles.slot}>{leading}</View>
-      <Text
+      <UiText
         accessibilityRole="header"
         numberOfLines={1}
         style={[styles.headerTitle, { color: theme.colors.foreground, fontSize: theme.typography.title }]}
       >
         {title}
-      </Text>
+      </UiText>
       <View style={[styles.slot, styles.trailing]}>{trailing}</View>
     </View>
   );
@@ -83,7 +84,7 @@ export function SegmentedControl({
               }
             ]}
           >
-            <Text
+            <UiText
               numberOfLines={1}
               style={{
                 color: selected ? theme.colors.foreground : theme.colors.muted,
@@ -92,7 +93,7 @@ export function SegmentedControl({
               }}
             >
               {option.label}
-            </Text>
+            </UiText>
           </Pressable>
         );
       })}
