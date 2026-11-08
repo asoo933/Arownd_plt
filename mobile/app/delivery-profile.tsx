@@ -179,8 +179,8 @@ export default function DeliveryProfileScreen() {
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   panel: { borderRadius: designTokens.radius.md, padding: 0 },
   label: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  input: { minHeight: 48, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 13, fontSize: designTokens.typography.body - 1 },
-  picker: { minHeight: 48, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 13, justifyContent: "center" },
+  input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body - 1 },
+  picker: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center" },
   pickerText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
   suggestionButton: { alignSelf: "flex-start", minHeight: 34, justifyContent: "center" },
   suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
