@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Image, Pressable, ScrollView, Text, type ImageSourcePropType, type ImageStyle, type StyleProp, type ViewStyle } from "react-native";
+import { Image, Pressable, ScrollView, Text, View, type ImageSourcePropType, type ImageStyle, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { QuantityStepper, TextField } from "./form-controls";
