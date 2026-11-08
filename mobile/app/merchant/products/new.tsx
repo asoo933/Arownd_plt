@@ -13,7 +13,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,6 +36,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { Button, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -223,11 +223,7 @@ export default function MerchantNewProductScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-              {translate("merchantProductCreateBack")}
-            </Text>
-          </Pressable>
+          <Button label={translate("merchantProductCreateBack")} onPress={() => router.back()} variant="ghost" size="sm" />
 
           <View style={styles.header}>
             <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
@@ -243,7 +239,7 @@ export default function MerchantNewProductScreen() {
 
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <FormField label={translate("merchantProductNameLabel")} theme={theme}>
-              <TextInput
+              <TextField
                 value={form.name}
                 onChangeText={(value) => update("name", value)}
                 placeholder={translate("merchantProductNamePlaceholder")}
@@ -258,7 +254,7 @@ export default function MerchantNewProductScreen() {
             <View style={styles.row}>
               <View style={styles.half}>
                 <FormField label={translate("merchantProductPriceLabel")} theme={theme}>
-                  <TextInput
+                  <TextField
                     value={form.price}
                     onChangeText={(value) => update("price", value)}
                     placeholder={translate("merchantProductPricePlaceholder")}
@@ -270,7 +266,7 @@ export default function MerchantNewProductScreen() {
               </View>
               <View style={styles.half}>
                 <FormField label={translate("merchantProductStockLabel")} theme={theme}>
-                  <TextInput
+                  <TextField
                     value={form.stock}
                     onChangeText={(value) => update("stock", value)}
                     placeholder={translate("merchantProductStockPlaceholder")}
@@ -297,7 +293,7 @@ export default function MerchantNewProductScreen() {
             </FormField>
 
             <FormField label={translate("merchantProductBrandLabel")} theme={theme}>
-              <TextInput
+              <TextField
                 value={form.brand}
                 onChangeText={(value) => update("brand", value)}
                 placeholder={translate("merchantProductBrandPlaceholder")}
@@ -313,7 +309,7 @@ export default function MerchantNewProductScreen() {
               hint={translate("merchantProductOptionsHint")}
               theme={theme}
             >
-              <TextInput
+              <TextField
                 value={form.sizes}
                 onChangeText={(value) => update("sizes", value)}
                 placeholder={translate("merchantProductSizesPlaceholder")}
@@ -325,7 +321,7 @@ export default function MerchantNewProductScreen() {
             </FormField>
 
             <FormField label={translate("merchantProductColorsLabel")} theme={theme}>
-              <TextInput
+              <TextField
                 value={form.colors}
                 onChangeText={(value) => update("colors", value)}
                 placeholder={translate("merchantProductColorsPlaceholder")}
@@ -337,7 +333,7 @@ export default function MerchantNewProductScreen() {
             </FormField>
 
             <FormField label={translate("merchantProductDescriptionLabel")} theme={theme}>
-              <TextInput
+              <TextField
                 value={form.description}
                 onChangeText={(value) => update("description", value)}
                 placeholder={translate("merchantProductDescriptionPlaceholder")}
@@ -412,20 +408,7 @@ export default function MerchantNewProductScreen() {
               </View>
             ) : null}
 
-            <Pressable
-              accessibilityRole="button"
-              disabled={submitting || imagePickerBusy}
-              onPress={() => void submit()}
-              style={[styles.submitButton, { backgroundColor: theme.colors.accent, opacity: submitting || imagePickerBusy ? 0.6 : 1 }]}
-            >
-              {submitting ? (
-                <ActivityIndicator color={theme.colors.accentForeground} />
-              ) : (
-                <Text style={[styles.submitText, { color: theme.colors.accentForeground }]}>
-                  {translate("merchantProductCreateSubmit")}
-                </Text>
-              )}
-            </Pressable>
+            <Button label={translate("merchantProductCreateSubmit")} onPress={() => void submit()} loading={submitting} disabled={imagePickerBusy} fullWidth />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -577,9 +560,7 @@ function MessageScreen({
         {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
         <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</Text>
         {actionLabel && onAction ? (
-          <Pressable onPress={onAction} style={[styles.retryButton, { backgroundColor: theme.colors.accent }]}>
-            <Text style={[styles.retryText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
-          </Pressable>
+          <Button label={actionLabel} onPress={onAction} />
         ) : null}
       </View>
     </SafeAreaView>
