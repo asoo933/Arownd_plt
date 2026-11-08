@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Image, Pressable, ScrollView, Text, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from "react-native";
+import { Image, Pressable, ScrollView, Text, type ImageSourcePropType, type ImageStyle, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { QuantityStepper } from "./form-controls";
@@ -166,7 +166,7 @@ export function ProductImageGallery({
   selectedIndex?: number;
   onSelect: (index: number) => void;
   accessibilityLabel: string;
-  imageStyle?: StyleProp<ViewStyle>;
+  imageStyle?: StyleProp<ImageStyle>;
 }) {
   const theme = useAppTheme();
   const selected = images[selectedIndex];
