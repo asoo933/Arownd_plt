@@ -41,6 +41,19 @@ function statusLabel(status: string): string {
   return labels[status] ?? translate("orderStatusUnknown");
 }
 
+function OrderStatusBadge({ status }: { status: string }) {
+  const statusTone = getOrderStatusTone(status);
+  const tone = statusTone === "success"
+    ? "success"
+    : statusTone === "danger"
+      ? "danger"
+      : statusTone === "pending"
+        ? "warning"
+        : "neutral";
+
+  return <StatusBadge label={statusLabel(status)} tone={tone} />;
+}
+
 function dateLabel(value: string | null | undefined): string {
   if (!value) return "";
   const date = new Date(value);
@@ -138,7 +151,7 @@ export default function OrderDetailsScreen() {
 
     {showParentTimeline ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderProgress")}</Text>
-      {parentCancelled ? <Text style={styles.cancelled}>{statusLabel(order.status)}</Text> : STEPS.map((step, index) => {
+      {parentCancelled ? <OrderStatusBadge status={order.status} /> : STEPS.map((step, index) => {
         const complete = index <= activeStep;
         return <View key={step.status} style={styles.step}>
           <View style={[styles.stepDot, complete && styles.stepDone]}><Text style={[styles.stepNumber, complete && styles.stepNumberDone]}>{complete ? "✓" : String(index + 1)}</Text></View>
@@ -218,7 +231,7 @@ export default function OrderDetailsScreen() {
         </> : null}
         {(query.data.trackingEvents.find((entry) => entry.merchantOrderId === merchantOrder.id)?.events ?? []).map((event) => (
           <View key={event.id} style={styles.trackingEvent}>
-            <Text style={styles.shipmentStatus}>{statusLabel(event.status)}</Text>
+            <OrderStatusBadge status={event.status} />
             <Text style={styles.meta}>{dateLabel(event.created_at)}</Text>
             {event.note ? <Text style={styles.meta}>{event.note}</Text> : null}
           </View>
@@ -240,7 +253,7 @@ export default function OrderDetailsScreen() {
     {query.data.shipments.length > 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</Text>
       {query.data.shipments.map((shipment) => <View key={shipment.id} style={styles.shipment}>
-        <Text style={styles.shipmentStatus}>{statusLabel(shipment.status)}</Text>
+        <OrderStatusBadge status={shipment.status} />
         {shipment.updated_at ? <Text style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at)}</Text> : null}
         {shipment.notes ? <Text style={styles.meta}>{shipment.notes}</Text> : null}
       </View>)}
@@ -331,7 +344,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   recipient: { fontSize: 13, fontWeight: "900", textAlign: "right" },
   shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 5 },
   trackingEvent: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 4 },
-  shipmentStatus: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900", textAlign: "right" },
   secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: theme.colors.border, justifyContent: "center", alignItems: "center" },
   secondaryText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   quoteActions: { flexDirection: "row-reverse", gap: 8 },
