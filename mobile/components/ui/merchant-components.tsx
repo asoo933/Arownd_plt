@@ -11,7 +11,7 @@ export function MerchantProfileCard(props: { children: ReactNode; style?: StyleP
   return <Card {...props} />;
 }
 
-export function MerchantStoreCard(props: { children: ReactNode; media?: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void }) {
+export function MerchantStoreCard(props: { children: ReactNode; media?: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void; accessibilityLabel?: string }) {
   return <Card {...props} />;
 }
 
