@@ -161,13 +161,13 @@ export default function AddressesScreen() {
       />
 
       {addresses.data.length === 0 ? (
-        <Card contentStyle={{ alignItems: "center", paddingVertical: 28 }}>
+        <Card contentStyle={{ alignItems: "center", paddingVertical: designTokens.spacing.xxl }}>
           <Icon name="map-pin" size={30} color={theme.colors.muted} />
           <Heading level={3}>{translate("addressesEmpty")}</Heading>
           <Caption align="center">{translate("addressesEmptyHint")}</Caption>
         </Card>
       ) : addresses.data.map((address) => (
-        <Card key={address.id} contentStyle={{ gap: 9 }}>
+        <Card key={address.id} contentStyle={{ gap: designTokens.spacing.sm }}>
           <View style={styles.cardHeader}>
             <UiText weight="800">
               {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
