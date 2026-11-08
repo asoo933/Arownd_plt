@@ -209,18 +209,20 @@ export function Drawer({
   visible,
   onRequestClose,
   children,
-  width = "86%"
+  width = "86%",
+  closeAccessibilityLabel
 }: {
   visible: boolean;
   onRequestClose: () => void;
   children: ReactNode;
+  closeAccessibilityLabel: string;
   width?: ViewStyle["width"];
 }) {
   const theme = useAppTheme();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
       <View style={{ flex: 1, flexDirection: "row-reverse", backgroundColor: theme.colors.overlay }}>
-        <Pressable onPress={onRequestClose} style={{ flex: 1 }} accessibilityRole="button" accessibilityLabel="Close drawer" />
+        <Pressable onPress={onRequestClose} style={{ flex: 1 }} accessibilityRole="button" accessibilityLabel={closeAccessibilityLabel} />
         <View style={{ width, maxWidth: "90%", height: "100%", padding: designTokens.spacing.lg, backgroundColor: theme.colors.surface }}>
           <ScrollView>{children}</ScrollView>
         </View>
