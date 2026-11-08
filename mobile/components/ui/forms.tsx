@@ -245,24 +245,24 @@ export function Select({
       </Pressable>
       <BottomSheet visible={open} onRequestClose={() => setOpen(false)} maxHeight="70%">
         <ScrollView>
-              {options.map((option) => (
-                <Pressable
-                  key={option.value}
-                  disabled={option.disabled}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: option.value === value, disabled: option.disabled }}
-                  onPress={() => {
-                    onChange(option.value);
-                    setOpen(false);
-                  }}
-                  style={{ minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: option.disabled ? 0.45 : 1 }}
-                >
-                  <NativeText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? "700" : "400" }}>
-                    {option.label}
-                  </NativeText>
-                </Pressable>
-              ))}
-            <
+          {options.map((option) => (
+            <Pressable
+              key={option.value}
+              disabled={option.disabled}
+              accessibilityRole="button"
+              accessibilityState={{ selected: option.value === value, disabled: option.disabled }}
+              onPress={() => {
+                onChange(option.value);
+                setOpen(false);
+              }}
+              style={{ minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: option.disabled ? 0.45 : 1 }}
+            >
+              <NativeText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? "700" : "400" }}>
+                {option.label}
+              </NativeText>
+            </Pressable>
+          ))}
+        </ScrollView>
       </BottomSheet>
     </>
   );
