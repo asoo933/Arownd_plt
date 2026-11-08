@@ -42,7 +42,7 @@ export function MerchantMetricCard({
       <UiText
         numberOfLines={1}
         adjustsFontSizeToFit
-        style={{ color: valueColor, fontSize: theme.typography.title, fontWeight: "800", textAlign: "right" }}
+        style={{ color: valueColor, fontSize: theme.typography.title, fontWeight: theme.fontWeights.extrabold, textAlign: "right" }}
       >
         {value}
       </UiText>
