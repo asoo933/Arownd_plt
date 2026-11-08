@@ -87,7 +87,7 @@ export default function SettingsScreen() {
         </PressableSurface>
         <PressableSurface accessibilityRole="button" accessibilityLabel={translate("forgotPassword")} onPress={() => router.push("/forgot-password")} style={styles.linkRow}>
           <Text style={[styles.linkText, { color: colors.text }]}>{translate("forgotPassword")}</Text>
-          <Text style={styles.arrow}>‹</Text>
+          <Text style={[styles.arrow, { color: theme.colors.muted }]}>‹</Text>
         </PressableSurface>
       </View>
       <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -99,7 +99,7 @@ export default function SettingsScreen() {
           <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("settingsSignOutConfirmTitle")}</Text>
             <Text style={[styles.hint, { color: theme.colors.muted }]}>{translate("settingsSignOutConfirmHint")}</Text>
-            {signOutError ? <Text accessibilityRole="alert" style={styles.error}>{translate("settingsSignOutError")}</Text> : null}
+            {signOutError ? <Text accessibilityRole="alert" style={[styles.error, { color: theme.colors.danger }]}>{translate("settingsSignOutError")}</Text> : null}
             <View style={styles.modalActions}>
               <Button label={translate("back")} onPress={() => setSignOutConfirmOpen(false)} disabled={signOutMutation.isPending} variant="outline" style={{ flex: 1 }} />
               <Button label={signOutMutation.isPending ? translate("settingsSigningOut") : translate("settingsSignOutConfirmAction")} onPress={() => { setSignOutError(false); signOutMutation.mutate(); }} loading={signOutMutation.isPending} variant="danger" style={{ flex: 1 }} />
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   input: { minHeight: 48, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, textAlign: "right", fontSize: 14 },
   error: { color: "#D94848", fontSize: 12, textAlign: "right" },
   success: { color: "#668414", fontSize: 12, textAlign: "right", fontWeight: "700" },
-  linkRow: { minHeight: 45, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+  linkRow: { minHeight: 48, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
   linkText: { fontSize: 13, fontWeight: "700" },
   arrow: { color: "#7A7A7A", fontSize: 22 },
   modalBackdrop: { flex: 1, justifyContent: "center", padding: 22 },
