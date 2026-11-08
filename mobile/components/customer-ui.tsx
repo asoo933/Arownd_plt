@@ -69,9 +69,14 @@ export function SectionTitle({ title, action, onAction }: {
     <View style={styles.sectionTitle}>
       <Text style={[styles.sectionText, { color: theme.colors.foreground }]}>{title}</Text>
       {action && onAction ? (
-        <Pressable accessibilityRole="button" onPress={onAction} hitSlop={8}>
-          <Text style={[styles.sectionAction, { color: theme.colors.accentMuted }]}>{action}</Text>
-        </Pressable>
+        <Button
+          label={action}
+          onPress={onAction}
+          variant="ghost"
+          size="sm"
+          textStyle={[styles.sectionAction, { color: theme.colors.accentMuted }]}
+          style={{ minHeight: 36, paddingHorizontal: 8 }}
+        />
       ) : null}
     </View>
   );
