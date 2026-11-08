@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { CustomerScreen } from "@/components/customer-ui";
