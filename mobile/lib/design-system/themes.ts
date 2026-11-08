@@ -52,7 +52,6 @@ export type AppTheme = {
 const ThemeContext = createContext<AppTheme | null>(null);
 
 export function getAppTheme(mode: "light" | "dark"): AppTheme {
-  const dark = mode === "dark";
   const palette = themeColors[mode];
   const semanticPalette = extendedThemeColors[mode];
   return {
