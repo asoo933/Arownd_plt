@@ -3,7 +3,6 @@ import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,7 +18,7 @@ import {
 import { translate, type TranslationKey } from "@/lib/i18n";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { Button, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, PressableSurface } from "@/components/ui";
 
 type OrderFilter = "all" | "pending" | "quoted" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -94,19 +93,12 @@ export default function MerchantOrdersScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Button label={translate("merchantOrdersBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />
-
-        <View style={styles.heading}>
-          <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
-            {dashboard.data.store.name}
-          </Text>
-          <Text style={[styles.title, { color: theme.colors.foreground }]}>
-            {translate("merchantOrdersPageTitle")}
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
-            {translate("merchantOrdersPageSubtitle")}
-          </Text>
-        </View>
+        <AppHeader
+          title={translate("merchantOrdersPageTitle")}
+          leading={<Button label={translate("merchantOrdersBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />}
+        />
+        <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{dashboard.data.store.name}</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantOrdersPageSubtitle")}</Text>
 
         <ScrollView
           horizontal
@@ -116,7 +108,7 @@ export default function MerchantOrdersScreen() {
           {FILTERS.map((item) => {
             const selected = filter === item.value;
             return (
-              <Pressable
+              <PressableSurface
                 key={item.value}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
@@ -135,7 +127,7 @@ export default function MerchantOrdersScreen() {
                 ]}>
                   {translate(item.label)}
                 </Text>
-              </Pressable>
+              </PressableSurface>
             );
           })}
         </ScrollView>
