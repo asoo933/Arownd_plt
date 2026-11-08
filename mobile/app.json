@@ -16,7 +16,8 @@
           "cameraPermission": false,
           "microphonePermission": false
         }
-      ]
+      ],
+      "./plugins/with-optional-camera-feature"
     ],
     "experiments": {
       "typedRoutes": true
