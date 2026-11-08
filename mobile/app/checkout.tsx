@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, TextField } from "@/components/ui";
+import { Button, PressableSurface, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -242,7 +242,14 @@ export default function CheckoutScreen() {
             <Pressable onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutManageAddresses")}</Text></Pressable>
           </View>
           {savedAddresses.data.map((address) => (
-            <Pressable key={address.id} onPress={() => applySavedAddress(address)} style={[styles.savedAddress, selectedAddressId === address.id && styles.savedAddressSelected]}>
+            <PressableSurface
+              key={address.id}
+              accessibilityRole="radio"
+              accessibilityLabel={address.recipient_name + "، " + address.commune}
+              accessibilityState={{ selected: selectedAddressId === address.id }}
+              onPress={() => applySavedAddress(address)}
+              style={[styles.savedAddress, selectedAddressId === address.id && styles.savedAddressSelected]}
+            >
               <View style={styles.savedAddressTop}>
                 <Text style={styles.savedAddressName}>{address.recipient_name}</Text>
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
@@ -251,21 +258,33 @@ export default function CheckoutScreen() {
               <Text style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}</Text>
               <Text style={styles.fieldHint}>{address.address_line}</Text>
               {address.is_default ? <Text style={styles.savedDefault}>{translate("addressesDefault")}</Text> : null}
-            </Pressable>
+            </PressableSurface>
           ))}
         </View>
       ) : (
         <Pressable onPress={() => router.push("/addresses")}><Text style={styles.retryText}>{translate("checkoutAddSavedAddress")}</Text></Pressable>
       )}
       <View style={styles.deliveryOptions}>
-        <Pressable onPress={() => setDeliveryType("home")} style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}>
+        <PressableSurface
+          accessibilityRole="radio"
+          accessibilityLabel={translate("checkoutHomeDelivery")}
+          accessibilityState={{ selected: deliveryType === "home" }}
+          onPress={() => setDeliveryType("home")}
+          style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}
+        >
           <Text style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</Text>
           <Text style={styles.deliveryHint}>{translate("checkoutHomeDeliveryHint")}</Text>
-        </Pressable>
-        <Pressable onPress={() => setDeliveryType("desk")} style={[styles.deliveryOption, deliveryType === "desk" && styles.deliverySelected]}>
+        </PressableSurface>
+        <PressableSurface
+          accessibilityRole="radio"
+          accessibilityLabel={translate("checkoutStorePickup")}
+          accessibilityState={{ selected: deliveryType === "desk" }}
+          onPress={() => setDeliveryType("desk")}
+          style={[styles.deliveryOption, deliveryType === "desk" && styles.deliverySelected]}
+        >
           <Text style={[styles.deliveryTitle, deliveryType === "desk" && styles.deliveryTextSelected]}>{translate("checkoutStorePickup")}</Text>
           <Text style={styles.deliveryHint}>{translate("checkoutStorePickupHint")}</Text>
-        </Pressable>
+        </PressableSurface>
       </View>
 
       <Text style={styles.fieldLabel}>{translate("checkoutWilaya")}</Text>
