@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
-  Modal,
   Pressable,
   ScrollView,
   Switch,
@@ -15,6 +14,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { BottomSheet } from "./feedback";
 import { getCalendarDays, normalizeOtp } from "./forms-state";
 
 export type TextAreaProps = Omit<TextInputProps, "multiline" | "style"> & {
@@ -243,10 +243,8 @@ export function Select({
         </NativeText>
         <NativeText style={{ color: theme.colors.muted }}>⌄</NativeText>
       </Pressable>
-      <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
-        <Pressable style={{ flex: 1, justifyContent: "flex-end", backgroundColor: theme.colors.overlay }} onPress={() => setOpen(false)}>
-          <Pressable style={{ maxHeight: "70%", padding: designTokens.spacing.lg, borderTopLeftRadius: theme.radius.xl, borderTopRightRadius: theme.radius.xl, backgroundColor: theme.colors.surface }} onPress={() => undefined}>
-            <ScrollView>
+      <BottomSheet visible={open} onRequestClose={() => setOpen(false)} maxHeight="70%">
+        <ScrollView>
               {options.map((option) => (
                 <Pressable
                   key={option.value}
@@ -264,10 +262,8 @@ export function Select({
                   </NativeText>
                 </Pressable>
               ))}
-            </ScrollView>
-          </Pressable>
-        </Pressable>
-      </Modal>
+            <
+      </BottomSheet>
     </>
   );
 }
