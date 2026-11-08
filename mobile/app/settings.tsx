@@ -73,7 +73,15 @@ export default function SettingsScreen() {
   });
 
   return (
-    <CustomerScreen>
+    <CustomerScreen showNavigation={false}>
+      <PressableSurface
+        accessibilityRole="button"
+        accessibilityLabel={translate("back")}
+        onPress={() => router.back()}
+        style={styles.backButton}
+      >
+        <Icon name="chevron-right" size={22} color={theme.colors.foreground} />
+      </PressableSurface>
       <AppHeader title={translate("settingsTitle")} />
       <Caption>{translate("settingsSubtitle")}</Caption>
 
@@ -220,6 +228,14 @@ export default function SettingsScreen() {
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
+    backButton: {
+      width: 44,
+      height: 44,
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: "flex-start",
+      borderRadius: designTokens.radius.md
+    },
     sectionCard: {
       backgroundColor: theme.colors.surface,
       borderColor: theme.colors.border,
