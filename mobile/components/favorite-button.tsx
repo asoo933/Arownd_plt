@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Text } from "react-native";
 
+import { Button } from "@/components/ui";
 import { getFavorites, toggleFavorite } from "@/lib/favorites";
 import { hasFavorite, type FavoriteKind } from "@/lib/favorites-state";
 import { translate } from "@/lib/i18n";
@@ -10,7 +11,6 @@ export const FAVORITES_QUERY_KEY = ["customer-favorites"] as const;
 
 export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string }) {
   const theme = useAppTheme();
-  const style = styles(theme);
   const queryClient = useQueryClient();
   const favorites = useQuery({
     queryKey: FAVORITES_QUERY_KEY,
@@ -25,20 +25,31 @@ export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string })
   });
 
   const active = favorites.data ? hasFavorite(favorites.data, kind, id) : false;
+  const disabled = favorites.isPending || mutation.isPending || favorites.isError;
+
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={translate(active ? "favoriteRemove" : "favoriteAdd")}
-      accessibilityState={{ selected: active, disabled: favorites.isPending || mutation.isPending }}
-      disabled={favorites.isPending || mutation.isPending || favorites.isError}
+    <Button
+      label={translate(active ? "favoriteSaved" : "favoriteAdd")}
       onPress={() => mutation.mutate()}
-      style={[style.button, active && style.active]}
-    >
-      <Text style={[style.icon, active && style.activeIcon]}>{active ? "♥" : "♡"}</Text>
-      <Text style={[style.label, active && style.activeIcon]}>
-        {translate(active ? "favoriteSaved" : "favoriteAdd")}
-      </Text>
-    </Pressable>
+      variant="outline"
+      size="sm"
+      disabled={disabled}
+      startIcon={
+        <Text style={{
+          color: active ? theme.colors.accentMuted : theme.colors.muted,
+          fontSize: 19,
+          fontWeight: "900"
+        }}>{active ? "♥" : "♡"}</Text>
+      }
+      textStyle={{ color: active ? theme.colors.accentMuted : theme.colors.foreground, fontSize: 11 }}
+      style={{
+        minHeight: 44,
+        minWidth: 112,
+        borderRadius: 13,
+        backgroundColor: active ? theme.colors.successSurface : theme.colors.surface,
+        borderColor: active ? theme.colors.accentMuted : theme.colors.border
+      }}
+    />
   );
 }
 
