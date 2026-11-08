@@ -161,13 +161,13 @@ export default function AddressesScreen() {
       />
 
       {addresses.data.length === 0 ? (
-        <Card contentStyle={{ alignItems: "center", paddingVertical: designTokens.spacing.xxl }}>
+        <Card style={styles.addressCard} contentStyle={{ alignItems: "center", paddingVertical: designTokens.spacing.xxl }}>
           <Icon name="map-pin" size={30} color={theme.colors.muted} />
           <Heading level={3}>{translate("addressesEmpty")}</Heading>
           <Caption align="center">{translate("addressesEmptyHint")}</Caption>
         </Card>
       ) : addresses.data.map((address) => (
-        <Card key={address.id} contentStyle={{ gap: designTokens.spacing.sm }}>
+        <Card key={address.id} style={styles.addressCard} contentStyle={styles.addressCardContent}>
           <View style={styles.cardHeader}>
             <UiText weight="800">
               {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
@@ -246,7 +246,7 @@ export default function AddressesScreen() {
                     setCommune("");
                     setPickerOpen(false);
                   }}
-                  style={styles.pickerOption}
+                  style={[styles.pickerOption, wilayaId === item.id && styles.pickerOptionSelected]}
                 >
                   <UiText>{String(item.id).padStart(2, "0")} - {item.name_ar}</UiText>
                 </PressableSurface>
@@ -317,11 +317,52 @@ function Action({
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
-    cardHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-    actions: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm, marginTop: 7 },
-    formContent: { gap: designTokens.spacing.md, paddingBottom: 8 },
-    field: { gap: designTokens.spacing.xs, marginBottom: 3 },
-    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: designTokens.typography.body - 1 },
-    pickerOption: { minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border }
+    addressCard: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.xl
+    },
+    addressCardContent: {
+      gap: designTokens.spacing.md,
+      padding: designTokens.spacing.lg
+    },
+    cardHeader: {
+      flexDirection: "row-reverse",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: designTokens.spacing.sm
+    },
+    actions: {
+      flexDirection: "row-reverse",
+      flexWrap: "wrap",
+      gap: designTokens.spacing.sm,
+      marginTop: designTokens.spacing.xs,
+      paddingTop: designTokens.spacing.md,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: theme.colors.border
+    },
+    formContent: { gap: designTokens.spacing.md, paddingBottom: designTokens.spacing.lg },
+    field: { gap: designTokens.spacing.xs, marginBottom: designTokens.spacing.xs },
+    input: {
+      minHeight: designTokens.dimensions.controlHeight.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radius.md,
+      paddingHorizontal: designTokens.spacing.md,
+      justifyContent: "center",
+      color: theme.colors.foreground,
+      backgroundColor: theme.colors.background,
+      fontSize: designTokens.typography.body - 1
+    },
+    pickerOption: {
+      minHeight: 54,
+      paddingHorizontal: designTokens.spacing.md,
+      justifyContent: "center",
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border
+    },
+    pickerOptionSelected: {
+      backgroundColor: theme.colors.surfaceMuted
+    }
   });
 }
