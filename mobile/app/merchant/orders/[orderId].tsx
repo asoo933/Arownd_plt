@@ -25,7 +25,7 @@ import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, TextField } from "@/components/ui";
+import { AppHeader, Button, StatusBadge, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -149,7 +149,7 @@ export default function MerchantOrderDetailsScreen() {
         <View style={styles.card}>
           <View style={styles.summaryRow}>
             <Text style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</Text>
-            <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} theme={theme} />
+            <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} />
           </View>
           <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderItems")}</Text>
           {detail.data.items.length === 0 ? (
@@ -308,7 +308,7 @@ function translateError(error: string): string {
   return translate("merchantActionGenericError");
 }
 
-function StatusPill({ status, deliveryType, theme }: { status: string; deliveryType: string; theme: AppTheme }) {
+function StatusPill({ status, deliveryType }: { status: string; deliveryType: string }) {
   const keyByStatus: Record<string, TranslationKey> = {
     pending: "merchantOrderStatusPending",
     quoted: "merchantOrderStatusQuoted",
@@ -317,14 +317,17 @@ function StatusPill({ status, deliveryType, theme }: { status: string; deliveryT
     delivered: "merchantOrderStatusDelivered",
     cancelled: "merchantOrderStatusCancelled"
   };
-  const tone = status === "delivered" ? theme.colors.success : status === "cancelled" ? theme.colors.danger : status === "pending" || status === "quoted" ? theme.colors.warning : theme.colors.muted;
-  const background = status === "delivered" ? theme.colors.successSurface : status === "cancelled" ? theme.colors.dangerSurface : status === "pending" || status === "quoted" ? theme.colors.warningSurface : theme.colors.surfaceMuted;
-  const displayKey = status === "shipped" && deliveryType === "desk" ? "merchantOrderStatusPrepared" : keyByStatus[status] ?? "merchantOrderStatusUnknown";
-  return (
-    <View style={[stylesForComponents.pill, { backgroundColor: background }]}>
-      <Text style={{ color: tone, fontSize: 10, fontWeight: "900" }}>{translate(displayKey)}</Text>
-    </View>
-  );
+  const tone = status === "delivered"
+    ? "success"
+    : status === "cancelled"
+      ? "danger"
+      : status === "pending" || status === "quoted"
+        ? "warning"
+        : "neutral";
+  const displayKey = status === "shipped" && deliveryType === "desk"
+    ? "merchantOrderStatusPrepared"
+    : keyByStatus[status] ?? "merchantOrderStatusUnknown";
+  return <StatusBadge label={translate(displayKey)} tone={tone} />;
 }
 
 function InfoRow({ label, value, theme }: { label: string; value: string; theme: AppTheme }) {
@@ -362,7 +365,6 @@ const stylesForComponents = StyleSheet.create({
   safe: { flex: 1 },
   center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: 14 },
   primaryButton: { minHeight: 46, borderRadius: 13, paddingHorizontal: 16, alignItems: "center", justifyContent: "center" },
-  pill: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
   infoRow: { minHeight: 35, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 12 }
 });
 
