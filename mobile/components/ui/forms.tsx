@@ -71,8 +71,7 @@ export function NumberField({ onChangeText, ...props }: NumberFieldProps) {
       {...props}
       keyboardType="numeric"
       onChangeText={handleChange}
-      accessibilityRole="none"
-    />
+"    />
   );
 }
 
