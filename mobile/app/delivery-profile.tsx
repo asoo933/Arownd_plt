@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton, PressableSurface, Text as UiText, TextField } from "@/components/ui";
@@ -118,7 +118,7 @@ export default function DeliveryProfileScreen() {
   };
 
   return <CustomerScreen>
-    <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
+    <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" size={20} />} />} />
     <Caption>{translate("deliveryProfileSubtitle")}</Caption>
     <Card style={styles.panel} contentStyle={{ gap: 10, padding: 16 }}>
       <Heading level={3}>{translate("deliveryProfileTitle")}</Heading>
@@ -152,9 +152,9 @@ export default function DeliveryProfileScreen() {
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <Text style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</Text>
+          <UiText weight="800" style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</UiText>
           {picker === "commune" && communes.isPending ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-          {picker === "commune" && communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
+          {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
           <ScrollView style={styles.options}>
             {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {
@@ -166,10 +166,10 @@ export default function DeliveryProfileScreen() {
               }
               setPicker(null);
             }} style={styles.option}>
-              <Text style={[styles.optionText, { color: theme.colors.foreground }]}>{item.label}</Text>
+              <UiText style={styles.optionText}>{item.label}</UiText>
             </PressableSurface>)}
           </ScrollView>
-          <PressableSurface onPress={() => setPicker(null)} style={styles.closeButton}><Text style={styles.closeText}>{translate("back")}</Text></PressableSurface>
+          <PressableSurface onPress={() => setPicker(null)} style={styles.closeButton}><UiText weight="800" style={styles.closeText}>{translate("back")}</UiText></PressableSurface>
         </View>
       </View>
     </Modal>
