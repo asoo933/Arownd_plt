@@ -8,7 +8,7 @@ export type CardProps = {
   children: ReactNode;
   media?: ReactNode;
   actions?: ReactNode;
-  onPress?: () => void;
+  onPress?: (() => void) | undefined;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
