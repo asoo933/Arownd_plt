@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { designTokens } from "@/lib/theme";
 import { CustomerScreen } from "@/components/customer-ui";
 import {
   AppHeader,
@@ -158,7 +159,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  sectionContent: { gap: 12, padding: 16 },
+  sectionContent: { gap: designTokens.spacing.md, padding: designTokens.spacing.lg },
   input: { minHeight: 48, textAlign: "right" },
   linkRow: { minHeight: 48, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }
 });
