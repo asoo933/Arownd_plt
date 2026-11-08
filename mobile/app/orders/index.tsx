@@ -130,7 +130,10 @@ export default function OrdersScreen() {
       accessibilityLabel={translate("ordersTitle")}
       options={TABS.map((item) => ({ key: item.id, label: translate(item.key) }))}
       value={tab}
-      onChange={(value) => setTab(value as OrdersTab)}
+      onChange={(value) => {
+        const nextTab = TABS.find((item) => item.id === value);
+        if (nextTab) setTab(nextTab.id);
+      }}
       style={styles.tabs}
     />
     {filtered.length === 0 ? <EmptyState title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
@@ -162,21 +165,11 @@ export default function OrdersScreen() {
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   tabs: { width: "100%" },
-  tab: { minHeight: 44, borderRadius: 13, borderWidth: 1, borderColor: theme.colors.border, paddingHorizontal: 12, justifyContent: "center" },
-  tabActive: { backgroundColor: theme.colors.accent, borderColor: theme.colors.accent },
-  tabText: { color: theme.colors.muted, fontSize: 11, fontWeight: "800" },
-  tabTextActive: { color: theme.colors.foreground },
   card: { borderRadius: 18, padding: 14, gap: 10 },
   cardHeader: { flexDirection: "row-reverse", alignItems: "flex-start", justifyContent: "space-between", gap: 8 },
   cardHeading: { flex: 1, alignItems: "flex-end", gap: 4 },
   orderCode: { fontSize: 13, fontWeight: "900" },
   date: { color: theme.colors.muted, fontSize: 10 },
-  status: { borderRadius: 10, paddingHorizontal: 9, paddingVertical: 6 },
-  statusSuccess: { backgroundColor: theme.colors.successSurface },
-  statusDanger: { backgroundColor: theme.colors.dangerSurface },
-  statusPending: { backgroundColor: theme.colors.warningSurface },
-  statusMuted: { backgroundColor: theme.colors.border },
-  statusText: { color: theme.colors.foreground, fontSize: 10, fontWeight: "800" },
   storeName: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900", textAlign: "right" },
   meta: { fontSize: 11, textAlign: "right" },
   cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 10 },
