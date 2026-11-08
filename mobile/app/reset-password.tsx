@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 
+import { designTokens } from "@/lib/theme";
 import { ActionButton, AuthField, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
 import { getSupabaseClient } from "@/lib/supabase";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/auth-validation";
@@ -61,21 +62,21 @@ export default function ResetPasswordScreen() {
   return (
     <AuthLayout title={translate("resetTitle")} subtitle={translate("resetSubtitle")} showBack>
       {state === "loading" ? (
-        <View style={{ paddingVertical: 20 }}>
+        <View style={{ paddingVertical: designTokens.spacing.xl }}>
           <FormError message={translate("callbackLoading")} />
         </View>
       ) : state === "invalid" ? (
-        <View style={{ gap: 18 }}>
+        <View style={{ gap: designTokens.spacing.xl }}>
           <FormError message={translate("resetLinkInvalid")} />
           <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/forgot-password")} />
         </View>
       ) : state === "updated" ? (
-        <View style={{ gap: 18 }}>
+        <View style={{ gap: designTokens.spacing.xl }}>
           <SuccessPanel title={translate("resetTitle")} message={translate("resetSuccess")} />
           <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/login")} />
         </View>
       ) : (
-        <View style={{ gap: 16 }}>
+        <View style={{ gap: designTokens.spacing.lg }}>
           <Controller control={control} name="password" render={({ field: { onChange, onBlur, value } }) => (
             <AuthField
               label={translate("newPassword")}
