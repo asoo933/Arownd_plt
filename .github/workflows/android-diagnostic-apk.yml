@@ -2,6 +2,11 @@ name: Android diagnostic APK
 
 # APK generation is manual-only until the Android work is explicitly resumed.
 on:
+  push:
+    branches:
+      - Arownd-native-v2
+    paths:
+      - ".github/workflows/android-diagnostic-apk.yml"
   workflow_dispatch:
 
 permissions:
