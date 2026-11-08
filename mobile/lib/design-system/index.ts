@@ -1,4 +1,4 @@
-export { brandColors, commerceColors, deliveryColors, semanticColors, themeColors } from "./colors";
+export { brandColors, commerceColors, deliveryColors, extendedThemeColors, semanticColors, themeColors } from "./colors";
 export { dimensions } from "./dimensions";
 export { shadows } from "./shadows";
 export { borderRadius, spacing } from "./spacing";
