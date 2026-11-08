@@ -226,6 +226,7 @@ export default function MerchantNewProductScreen() {
               <TextField
                 value={form.name}
                 onChangeText={(value) => update("name", value)}
+                accessibilityLabel={translate("merchantProductNameLabel")}
                 placeholder={translate("merchantProductNamePlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={120}
@@ -241,6 +242,7 @@ export default function MerchantNewProductScreen() {
                   <TextField
                     value={form.price}
                     onChangeText={(value) => update("price", value)}
+                    accessibilityLabel={translate("merchantProductPriceLabel")}
                     placeholder={translate("merchantProductPricePlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     keyboardType="number-pad"
@@ -253,6 +255,7 @@ export default function MerchantNewProductScreen() {
                   <TextField
                     value={form.stock}
                     onChangeText={(value) => update("stock", value)}
+                    accessibilityLabel={translate("merchantProductStockLabel")}
                     placeholder={translate("merchantProductStockPlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     keyboardType="number-pad"
@@ -265,6 +268,7 @@ export default function MerchantNewProductScreen() {
             <FormField label={translate("merchantProductCategoryLabel")} theme={theme}>
               <PressableSurface
                 accessibilityRole="button"
+                accessibilityLabel={translate("merchantProductCategoryLabel")}
                 onPress={() => setCategoryPickerOpen(true)}
                 style={[styles.selectButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
               >
@@ -280,6 +284,7 @@ export default function MerchantNewProductScreen() {
               <TextField
                 value={form.brand}
                 onChangeText={(value) => update("brand", value)}
+                accessibilityLabel={translate("merchantProductBrandLabel")}
                 placeholder={translate("merchantProductBrandPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={80}
@@ -296,6 +301,7 @@ export default function MerchantNewProductScreen() {
               <TextField
                 value={form.sizes}
                 onChangeText={(value) => update("sizes", value)}
+                accessibilityLabel={translate("merchantProductSizesLabel")}
                 placeholder={translate("merchantProductSizesPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={850}
@@ -308,6 +314,7 @@ export default function MerchantNewProductScreen() {
               <TextField
                 value={form.colors}
                 onChangeText={(value) => update("colors", value)}
+                accessibilityLabel={translate("merchantProductColorsLabel")}
                 placeholder={translate("merchantProductColorsPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={850}
@@ -320,6 +327,7 @@ export default function MerchantNewProductScreen() {
               <TextField
                 value={form.description}
                 onChangeText={(value) => update("description", value)}
+                accessibilityLabel={translate("merchantProductDescriptionLabel")}
                 placeholder={translate("merchantProductDescriptionPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={3000}
@@ -338,6 +346,7 @@ export default function MerchantNewProductScreen() {
             >
               <PressableSurface
                 accessibilityRole="button"
+                accessibilityLabel={translate("merchantProductImagesChoose")}
                 disabled={imagePickerBusy || submitting || selectedImages.length >= PRODUCT_IMAGE_MAX_COUNT}
                 onPress={() => void pickProductImages()}
                 style={[styles.imagePickerButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background, opacity: imagePickerBusy ? 0.6 : 1 }]}
@@ -402,7 +411,7 @@ export default function MerchantNewProductScreen() {
               <UiText style={[styles.modalTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductChooseCategory")}
               </UiText>
-              <PressableSurface onPress={() => setCategoryPickerOpen(false)} hitSlop={10}>
+              <PressableSurface accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setCategoryPickerOpen(false)} hitSlop={10}>
                 <UiText style={[styles.modalClose, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductCategoryClose")}
                 </UiText>
@@ -471,6 +480,7 @@ function CategoryOption({
   return (
     <PressableSurface
       accessibilityRole="button"
+      accessibilityLabel={category.label}
       accessibilityState={{ selected }}
       onPress={onSelect}
       style={[
