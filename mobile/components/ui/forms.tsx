@@ -15,6 +15,7 @@ import {
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { BottomSheet } from "./feedback";
+import { Icon } from "./icon";
 import { getCalendarDays, normalizeOtp } from "./forms-state";
 
 export type TextAreaProps = Omit<TextInputProps, "multiline" | "style"> & {
@@ -241,7 +242,7 @@ export function Select({
         <NativeText numberOfLines={1} style={{ color: selected ? theme.colors.foreground : theme.colors.placeholder, fontSize: theme.typography.body }}>
           {selected?.label ?? placeholder}
         </NativeText>
-        <NativeText style={{ color: theme.colors.muted }}>⌄</NativeText>
+        <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
       </Pressable>
       <BottomSheet visible={open} onRequestClose={() => setOpen(false)} maxHeight="70%">
         <ScrollView>
