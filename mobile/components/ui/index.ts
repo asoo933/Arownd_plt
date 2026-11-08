@@ -14,3 +14,8 @@ export type { AvatarProps } from "./identity";
 export { getIdentityInitials } from "./identity-state";
 export { MerchantMetricCard } from "./merchant";
 export type { MetricTrend } from "./merchant";
+
+export { BottomSheet, Toast } from "./feedback";
+export type { ToastTone } from "./feedback";
+export { AppHeader, SegmentedControl } from "./navigation";
+export type { SegmentedOption } from "./navigation";
