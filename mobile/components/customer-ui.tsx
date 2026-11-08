@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, SearchField, Text as UiText } from "@/components/ui";
+import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, RatingStars, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
@@ -126,8 +126,8 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
       </View>
       <View style={styles.storeInfo}>
         <UiText numberOfLines={1} weight="800" >{name}</UiText>
-        <Caption numberOfLines={1}>{commune || description || " "}</Caption>
-        {rating != null ? <UiText tone="warning" weight="700" >★ {rating.toFixed(1)}</UiText> : null}
+        <Caption numberOfLines={1}>{commune || description || translate("storeNoDescription")}</Caption>
+        {rating != null ? <RatingStars value={rating} size={14} showValue /> : null}
       </View>
       {verified ? <Icon name="check" size={18} color={theme.colors.success} accessibilityLabel={translate("storeVerified")} /> : null}
     </PressableSurface>
