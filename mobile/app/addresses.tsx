@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { Modal, ScrollView, StyleSheet, Text as NativeText, View } from "react-native";
+import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
@@ -11,6 +11,7 @@ import {
   Caption,
   ConfirmDialog,
   Heading,
+  FormLabel,
   Icon,
   IconButton,
   PressableSurface,
@@ -197,7 +198,7 @@ export default function AddressesScreen() {
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.formContent}>
               <Heading level={3}>{translate(editor?.address ? "addressesEditTitle" : "addressesAddTitle")}</Heading>
 
-              <NativeText style={styles.label}>{translate("addressesType")}</NativeText>
+              <FormLabel>{translate("addressesType")}</FormLabel>
               <SegmentedControl
                 accessibilityLabel={translate("addressesType")}
                 value={label}
@@ -214,13 +215,13 @@ export default function AddressesScreen() {
               <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
               <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
 
-              <NativeText style={styles.label}>{translate("checkoutWilaya")}</NativeText>
+              <FormLabel>{translate("checkoutWilaya")}</FormLabel>
               <PressableSurface
                 onPress={() => setPickerOpen(true)}
                 style={styles.input}
                 accessibilityLabel={translate("checkoutChooseWilaya")}
               >
-                <NativeText style={styles.inputText}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</NativeText>
+                <UiText>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</UiText>
               </PressableSurface>
 
               <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
@@ -251,7 +252,7 @@ export default function AddressesScreen() {
                   }}
                   style={styles.pickerOption}
                 >
-                  <NativeText style={styles.inputText}>{String(item.id).padStart(2, "0")} - {item.name_ar}</NativeText>
+                  <UiText>{String(item.id).padStart(2, "0")} - {item.name_ar}</UiText>
                 </PressableSurface>
               ))}
             </ScrollView>
@@ -329,9 +330,7 @@ function createStyles(theme: AppTheme) {
     pickerPanel: { maxHeight: "78%", backgroundColor: theme.colors.surface, borderRadius: 18, padding: 16, gap: 10 },
     formContent: { gap: 12, paddingBottom: 8 },
     field: { gap: 6, marginBottom: 3 },
-    label: { color: theme.colors.foreground, fontSize: 12, fontWeight: "800", textAlign: "right", marginBottom: 6 },
     input: { minHeight: 47, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 11, paddingHorizontal: 12, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: 13 },
-    inputText: { color: theme.colors.foreground, fontSize: 13, textAlign: "right" },
     pickerOption: { minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border }
   });
 }
