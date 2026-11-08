@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
 import { translate } from "@/lib/i18n";
@@ -126,7 +127,7 @@ export default function ProfileScreen() {
 }
 
 function PrimaryAction({ label, onPress }: { label: string; onPress: () => void }) {
-  return <Pressable accessibilityRole="button" onPress={onPress} style={styles.primary}><Text style={styles.primaryText}>{label}</Text></Pressable>;
+  return <Button label={label} onPress={onPress} fullWidth />;
 }
 
 function StatCard({ label, value, colors }: { label: string; value: string; colors: { text: string; muted: string; card: string; border: string } }) {
@@ -173,6 +174,4 @@ const styles = StyleSheet.create({
   menuTitle: { fontSize: 14, fontWeight: "800" },
   menuHint: { fontSize: 11, textAlign: "right" },
   arrow: { color: "#7A7A7A", fontSize: 24 },
-  primary: { minHeight: 48, borderRadius: 14, backgroundColor: "#C6F135", alignItems: "center", justifyContent: "center" },
-  primaryText: { color: "#0A0A0A", fontWeight: "900" }
 });
