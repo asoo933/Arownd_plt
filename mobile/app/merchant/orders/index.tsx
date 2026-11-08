@@ -252,11 +252,7 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 17, paddingBottom: 35, gap: 16 },
-    backButton: { minHeight: 43, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
-    backText: { fontSize: 12, fontWeight: "800" },
-    heading: { alignItems: "flex-end", gap: 7 },
     eyebrow: { fontSize: 11, fontWeight: "900" },
-    title: { fontSize: 24, lineHeight: 32, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 19, textAlign: "right" },
     filters: { paddingVertical: 3 },
     listHeading: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
