@@ -152,7 +152,7 @@ export default function DeliveryProfileScreen() {
     <Caption>{translate("deliveryProfileDefaultAreaNote")}</Caption>
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
+        <View accessibilityViewIsModal style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <UiText weight="800" style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</UiText>
           {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
