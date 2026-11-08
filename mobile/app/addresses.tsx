@@ -111,7 +111,7 @@ export default function AddressesScreen() {
       title={translate("addressesTitle")}
       leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
     />
-    <CustomerHeading title={translate("addressesTitle")} subtitle={translate("addressesSubtitle")} />
+    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("addressesSubtitle")}</Text>
     {defaultMutation.isError ? <Text style={styles.error}>{translate("addressesDefaultError")}</Text> : null}
     <Button label={"＋ " + translate("addressesAdd")} onPress={() => openEditor(null)} fullWidth />
     {addresses.data.length === 0 ? (
