@@ -120,7 +120,7 @@ export default function DeliveryProfileScreen() {
   return <CustomerScreen>
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
     <Caption>{translate("deliveryProfileSubtitle")}</Caption>
-    <Card style={styles.panel} contentStyle={{ gap: 10 }}>
+    <Card style={styles.panel} contentStyle={{ gap: 10, padding: 16 }}>
       <Heading level={3}>{translate("deliveryProfileTitle")}</Heading>
       <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
       <TextField value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
@@ -177,7 +177,7 @@ export default function DeliveryProfileScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  panel: { borderRadius: 18, padding: 16, gap: 10 },
+  panel: { borderRadius: 18, padding: 0 },
   label: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, fontSize: 13 },
   picker: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, justifyContent: "center" },
