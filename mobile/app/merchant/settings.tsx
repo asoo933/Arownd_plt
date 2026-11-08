@@ -2,10 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, IconButton } from "@/components/ui";
+import { AppHeader, IconButton, PressableSurface } from "@/components/ui";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsset } from "@/lib/merchant-store-images";
@@ -178,9 +178,9 @@ export default function MerchantStoreSettingsScreen() {
           <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} />
           <View style={styles.field}>
             <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</Text>
-            <Pressable accessibilityRole="button" onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+            <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
               <Text style={{ color: theme.colors.foreground, fontSize: 13, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</Text>
-            </Pressable>
+            </PressableSurface>
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} />
@@ -193,9 +193,9 @@ export default function MerchantStoreSettingsScreen() {
             <View style={styles.days}>
               {weekdays.map((day) => {
                 const selected = form.opening_hours.closed_days.includes(day.value);
-                return <Pressable key={day.value} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
+                return <PressableSurface key={day.value} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
                   <Text style={[styles.dayChipText, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(day.key)}</Text>
-                </Pressable>;
+                </PressableSurface>;
               })}
             </View>
           </View>
@@ -211,15 +211,15 @@ export default function MerchantStoreSettingsScreen() {
           <View style={[styles.modalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</Text>
-              <Pressable accessibilityRole="button" onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
+              <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
                 <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</Text>
-              </Pressable>
+              </PressableSurface>
             </View>
             <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
               {(wilayas.data ?? []).map((wilaya) => (
-                <Pressable key={wilaya.id} accessibilityRole="button" accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
+                <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
                   <Text style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}</Text>
-                </Pressable>
+                </PressableSurface>
               ))}
             </ScrollView>
           </View>
