@@ -11,7 +11,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,7 +34,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -223,7 +222,7 @@ export default function MerchantNewProductScreen() {
           showsVerticalScrollIndicator={false}
         >
           <AppHeader title={translate("merchantProductCreateTitle")} leading={<Button label={translate("merchantProductCreateBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
-          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductCreateSubtitle")}</Text>
+          <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductCreateSubtitle")}</UiText>
 
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <FormField label={translate("merchantProductNameLabel")} theme={theme}>
@@ -272,11 +271,11 @@ export default function MerchantNewProductScreen() {
                 onPress={() => setCategoryPickerOpen(true)}
                 style={[styles.selectButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
               >
-                <Text style={[styles.selectText, { color: selectedCategory ? theme.colors.foreground : theme.colors.placeholder }]}>
+                <UiText style={[styles.selectText, { color: selectedCategory ? theme.colors.foreground : theme.colors.placeholder }]}>
                   {selectedCategory
                     ? `${selectedCategory.emoji} ${selectedCategory.label}`
                     : translate("merchantProductCategoryPlaceholder")}
-                </Text>
+                </UiText>
               </PressableSurface>
             </FormField>
 
@@ -349,9 +348,9 @@ export default function MerchantNewProductScreen() {
                 {imagePickerBusy ? (
                   <ActivityIndicator color={theme.colors.accentMuted} />
                 ) : (
-                  <Text style={[styles.imagePickerText, { color: theme.colors.accentMuted }]}>
+                  <UiText style={[styles.imagePickerText, { color: theme.colors.accentMuted }]}>
                     {translate("merchantProductImagesChoose")}
-                  </Text>
+                  </UiText>
                 )}
               </PressableSurface>
               {selectedImages.length > 0 ? (
@@ -366,33 +365,33 @@ export default function MerchantNewProductScreen() {
                         style={[styles.imageRemove, { backgroundColor: theme.colors.danger }]}
                         hitSlop={8}
                       >
-                        <Text style={styles.imageRemoveText}>×</Text>
+                        <UiText style={styles.imageRemoveText}>×</UiText>
                       </PressableSurface>
                     </View>
                   ))}
                 </View>
               ) : (
-                <Text style={[styles.hint, { color: theme.colors.subtle }]}>
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
                   {translate("merchantProductImagesEmpty")}
-                </Text>
+                </UiText>
               )}
             </FormField>
 
             {imageError ? (
               <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-                <Text style={[styles.errorText, { color: theme.colors.danger }]}>{imageError}</Text>
+                <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{imageError}</UiText>
               </View>
             ) : null}
 
             <View style={[styles.note, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.noteText, { color: theme.colors.muted }]}>
+              <UiText style={[styles.noteText, { color: theme.colors.muted }]}>
                 {translate("merchantProductVariantsStockHint")}
-              </Text>
+              </UiText>
             </View>
 
             {submitError ? (
               <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-                <Text style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</Text>
+                <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</UiText>
               </View>
             ) : null}
 
@@ -410,13 +409,13 @@ export default function MerchantNewProductScreen() {
         <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
           <View style={[styles.modalCard, { backgroundColor: theme.colors.surface }]}>
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.modalTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductChooseCategory")}
-              </Text>
+              </UiText>
               <PressableSurface onPress={() => setCategoryPickerOpen(false)} hitSlop={10}>
-                <Text style={[styles.modalClose, { color: theme.colors.accentMuted }]}>
+                <UiText style={[styles.modalClose, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductCategoryClose")}
-                </Text>
+                </UiText>
               </PressableSurface>
             </View>
             <ScrollView contentContainerStyle={styles.categoryList}>
@@ -425,10 +424,10 @@ export default function MerchantNewProductScreen() {
                   {group.children.length > 0 ? (
                     <>
                       <View style={styles.categoryGroupHeading}>
-                        <Text style={styles.categoryEmoji}>{group.parent.emoji}</Text>
-                        <Text style={[styles.categoryGroupTitle, { color: theme.colors.foreground }]}>
+                        <UiText style={styles.categoryEmoji}>{group.parent.emoji}</UiText>
+                        <UiText style={[styles.categoryGroupTitle, { color: theme.colors.foreground }]}>
                           {group.parent.label}
-                        </Text>
+                        </UiText>
                       </View>
                       {group.children.map((category) => (
                         <CategoryOption
@@ -495,13 +494,13 @@ function CategoryOption({
       ]}
     >
       <View style={styles.categoryOptionContent}>
-        <Text style={styles.categoryEmojiSmall}>{category.emoji}</Text>
-        <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
+        <UiText style={styles.categoryEmojiSmall}>{category.emoji}</UiText>
+        <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
           {category.label}
-        </Text>
+        </UiText>
       </View>
       {selected ? (
-        <Text style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</Text>
+        <UiText style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</UiText>
       ) : null}
     </PressableSurface>
   );
@@ -521,9 +520,9 @@ function FormField({
   const styles = createStyles(theme);
   return (
     <View style={styles.field}>
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{label}</Text>
+      <UiText style={[styles.label, { color: theme.colors.foreground }]}>{label}</UiText>
       {children}
-      {hint ? <Text style={[styles.hint, { color: theme.colors.subtle }]}>{hint}</Text> : null}
+      {hint ? <UiText style={[styles.hint, { color: theme.colors.subtle }]}>{hint}</UiText> : null}
     </View>
   );
 }
@@ -546,7 +545,7 @@ function MessageScreen({
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
         {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-        <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</Text>
+        <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
         {actionLabel && onAction ? (
           <Button label={actionLabel} onPress={onAction} />
         ) : null}
