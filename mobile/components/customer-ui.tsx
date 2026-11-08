@@ -14,14 +14,14 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, RatingStars, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
-export function CustomerScreen({ children }: { children: ReactNode }) {
+export function CustomerScreen({ children, showNavigation = true }: { children: ReactNode; showNavigation?: boolean }) {
   const theme = useAppTheme();
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
-      <CustomerNavigation />
+      {showNavigation ? <CustomerNavigation /> : null}
     </SafeAreaView>
   );
 }
