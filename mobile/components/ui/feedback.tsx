@@ -231,7 +231,7 @@ export function ConfirmDialog({
           <UiText style={{ color: theme.colors.foreground, fontWeight: theme.fontWeights.bold }}>{cancelLabel}</UiText>
         </Pressable>
         <Pressable accessibilityRole="button" accessibilityLabel={confirmLabel} accessibilityState={{ disabled: busy, busy }} disabled={busy} onPress={onConfirm} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: destructive ? theme.colors.danger : theme.colors.accent, opacity: busy ? 0.5 : 1 }}>
-          {busy ? <ActivityIndicator color={destructive ? (theme.mode === "dark" ? theme.colors.accentForeground : theme.colors.surface) : theme.colors.accentForeground} /> : <UiText style={{ color: destructive ? theme.colors.surface : theme.colors.accentForeground, fontWeight: theme.fontWeights.bold }}>{confirmLabel}</UiText>}
+          {busy ? <ActivityIndicator color={destructive ? (theme.mode === "dark" ? theme.colors.accentForeground : theme.colors.surface) : theme.colors.accentForeground} /> : <UiText style={{ color: destructive ? (theme.mode === "dark" ? theme.colors.accentForeground : theme.colors.surface) : theme.colors.accentForeground, fontWeight: theme.fontWeights.bold }}>{confirmLabel}</UiText>}
         </Pressable>
       </View>
     </Dialog>
