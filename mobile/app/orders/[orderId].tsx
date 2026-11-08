@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Modal, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, Text as UiText, TrackingTimeline } from "@/components/ui";
+import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, Text as UiText, TrackingTimeline } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
@@ -259,27 +259,34 @@ export default function OrderDetailsScreen() {
     </PressableSurface> : null}
     {cancelMutation.isError ? <UiText style={styles.errorText}>{translate("orderCancelError")}</UiText> : null}
     <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
-    <Modal visible={cancelTarget !== null} transparent animationType="fade" onRequestClose={() => setCancelTarget(null)}>
-      <View style={styles.modalBackdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <UiText style={styles.sectionTitle}>{translate("orderCancelConfirmTitle")}</UiText>
-          <UiText style={styles.meta}>{translate("orderCancelConfirmHint")}</UiText>
-          {cancelMutation.isError ? <UiText style={styles.errorText}>{translate("orderCancelError")}</UiText> : null}
-          <View style={styles.quoteActions}>
-            <PressableSurface
-              disabled={cancelMutation.isPending}
-              onPress={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
-              style={styles.declineButton}
-            >
-              {cancelMutation.isPending ? <Spinner color={theme.colors.danger} size="small" /> : <UiText style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</UiText>}
-            </PressableSurface>
-            <PressableSurface accessibilityRole="button" disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
-              <UiText style={styles.acceptButtonText}>{translate("back")}</UiText>
-            </PressableSurface>
-          </View>
-        </View>
-      </View>
-    </Modal>
+    <ConfirmDialog
+      visible={cancelTarget !== null}
+      onRequestClose={() => setCancelTarget(null)}
+      onConfirm={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
+      title={translate("orderCancelConfirmTitle")}
+      description={translate("orderCancelConfirmHint")}
+      cancelLabel={translate("back")}
+      confirmLabel={translate("orderCancelConfirmAction")}
+      busy={cancelMutation.isPending}
+      destructive
+    />
+    <ConfirmDialog
+      visible={declineTarget !== null}
+      onRequestClose={() => setDeclineTarget(null)}
+      onConfirm={() => {
+        if (declineTarget) {
+          quoteMutation.mutate({ merchantOrderId: declineTarget, accept: false }, {
+            onSuccess: () => setDeclineTarget(null)
+          });
+        }
+      }}
+      title={translate("orderQuoteDeclineConfirmTitle")}
+      description={translate("orderQuoteDeclineConfirmHint")}
+      cancelLabel={translate("back")}
+      confirmLabel={translate("orderQuoteDecline")}
+      busy={quoteMutation.isPending}
+      destructive
+    />
     <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
@@ -337,7 +344,5 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   cancelButton: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
   cancelButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
   errorText: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 20 },
-  modalPanel: { borderRadius: 18, padding: 18, gap: 13 }
 }); }
 
