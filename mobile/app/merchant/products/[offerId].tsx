@@ -4,7 +4,6 @@ import type { ImagePickerAsset } from "expo-image-picker";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -35,7 +34,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -525,7 +524,7 @@ export default function MerchantEditProductScreen() {
                       hitSlop={8}
                     >
                       {removingImageId === image.id ? (
-                        <ActivityIndicator color="#FFFFFF" size="small" />
+                        <Spinner color="#FFFFFF" size="small" />
                       ) : (
                         <Icon name="x" color="#FFFFFF" size={15} accessibilityHidden />
                       )}
@@ -548,7 +547,7 @@ export default function MerchantEditProductScreen() {
               style={[styles.secondaryButton, { borderColor: theme.colors.border, opacity: isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT ? 0.55 : 1 }]}
             >
               {imageBusy ? (
-                <ActivityIndicator color={theme.colors.accentMuted} />
+                <Spinner size="small" />
               ) : (
                 <UiText style={[styles.secondaryButtonText, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductImageAdd")}
