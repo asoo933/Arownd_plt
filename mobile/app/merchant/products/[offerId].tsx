@@ -394,6 +394,7 @@ export default function MerchantEditProductScreen() {
                 </UiText>
                 <PressableSurface
                   accessibilityRole="button"
+                  accessibilityLabel={translate("merchantProductCategoryLabel")}
                   disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
                   onPress={() => setCategoryPickerOpen(true)}
                   style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: theme.colors.border, opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
@@ -541,6 +542,7 @@ export default function MerchantEditProductScreen() {
 
             <PressableSurface
               accessibilityRole="button"
+              accessibilityLabel={translate("merchantProductImageAdd")}
               disabled={isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT}
               onPress={() => void chooseAndUploadImage()}
               style={[styles.secondaryButton, { borderColor: theme.colors.border, opacity: isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT ? 0.55 : 1 }]}
@@ -582,6 +584,7 @@ export default function MerchantEditProductScreen() {
                 <PressableSurface
                   key={category.id}
                   accessibilityRole="button"
+                  accessibilityLabel={category.label}
                   accessibilityState={{ selected: productCategory === category.id }}
                   onPress={() => {
                     setProductCategory(category.id);
@@ -608,6 +611,7 @@ export default function MerchantEditProductScreen() {
             </ScrollView>
             <PressableSurface
               accessibilityRole="button"
+              accessibilityLabel={translate("merchantProductCategoryClose")}
               onPress={() => setCategoryPickerOpen(false)}
               style={[styles.cancelButton, { borderColor: theme.colors.border }]}
             >
