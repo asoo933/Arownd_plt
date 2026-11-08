@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { TextField } from "./form-controls";
+import { SearchField } from "./extended";
 import { Icon } from "./icon";
 
 export function Image({
@@ -142,7 +142,7 @@ export function ImageSearch({
   accessibilityLabel: string;
   style?: StyleProp<ViewStyle>;
 }) {
-  return <TextField value={value} onChangeText={onChangeText} placeholder={placeholder} accessibilityLabel={accessibilityLabel} containerStyle={style} />;
+  return <SearchField value={value} onChangeText={onChangeText} placeholder={placeholder} accessibilityLabel={accessibilityLabel} style={style} />;
 }
 
 export function MediaViewer({
