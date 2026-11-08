@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { FavoriteButton, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
-import { IconButton } from "@/components/ui";
+import { AppHeader, IconButton, SegmentedControl } from "@/components/ui";
 import {
   CustomerHeading,
   CustomerScreen,
@@ -64,12 +64,20 @@ export default function FavoritesScreen() {
     : count;
   return (
     <CustomerScreen>
-      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
+      <AppHeader
+        title={translate("favoritesTitle")}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+      />
       <CustomerHeading title={translate("favoritesTitle")} subtitle={translate("favoritesSubtitle")} />
-      <View style={[styles.tabs, { backgroundColor: theme.colors.surface }]}>
-        <TabButton label={`${translate("favoriteProducts")} (${favorites.data.products.length})`} active={tab === "products"} onPress={() => setTab("products")} />
-        <TabButton label={`${translate("favoriteStores")} (${favorites.data.stores.length})`} active={tab === "stores"} onPress={() => setTab("stores")} />
-      </View>
+      <SegmentedControl
+        accessibilityLabel={translate("favoritesTitle")}
+        value={tab}
+        onChange={(value) => { if (value === "products" || value === "stores") setTab(value); }}
+        options={[
+          { key: "products", label: `${translate("favoriteProducts")} (${favorites.data.products.length})` },
+          { key: "stores", label: `${translate("favoriteStores")} (${favorites.data.stores.length})` }
+        ]}
+      />
 
       {content.isPending ? <LoadingState label={translate("stateLoading")} /> : content.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void content.refetch()} />
@@ -114,20 +122,7 @@ export default function FavoritesScreen() {
   );
 }
 
-function TabButton({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  return (
-    <Pressable accessibilityRole="tab" accessibilityState={{ selected: active }} onPress={onPress} style={[styles.tab, active && styles.activeTab]}>
-      <Text style={[styles.tabText, active && styles.activeTabText]}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  tabs: { flexDirection: "row-reverse", borderRadius: 14, padding: 4 },
-  tab: { flex: 1, minHeight: 42, alignItems: "center", justifyContent: "center", borderRadius: 11 },
-  activeTab: { backgroundColor: "#C6F135" },
-  tabText: { color: "#737373", fontSize: 11, fontWeight: "800" },
-  activeTabText: { color: "#0A0A0A" },
   productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 12 },
   productItem: { width: "48%", alignItems: "center", gap: 7 },
   storeList: { gap: 12 },
