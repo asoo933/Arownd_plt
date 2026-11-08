@@ -1,7 +1,13 @@
 name: Arownd Native Android preview APK (Expo)
 
-# Manual-only: updating this workflow must never start an APK build.
+# Build the native Expo Android APK when this workflow is deliberately updated,
+# or when manually dispatched. The build runs from mobile/, never the legacy root project.
 on:
+  push:
+    branches:
+      - Arownd-native-v2
+    paths:
+      - ".github/workflows/android-diagnostic-apk.yml"
   workflow_dispatch:
 
 permissions:
