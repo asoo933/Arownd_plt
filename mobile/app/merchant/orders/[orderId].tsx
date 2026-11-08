@@ -64,7 +64,12 @@ export default function MerchantOrderDetailsScreen() {
   const merchantOrder = detail.data?.merchantOrder;
   const deliveryType = merchantOrder?.order.delivery_type;
   const trackingEvents = detail.data?.trackingEvents ?? [];
-  const latestTrackingStatus = trackingEvents[trackingEvents.length - 1]?.status ?? "confirmed";
+  const latestTrackingStatus = trackingEvents[trackingEvents.length - 1]?.status
+    ?? (merchantOrder?.status === "delivered"
+      ? "delivered"
+      : merchantOrder?.status === "shipped"
+        ? deliveryType === "desk" ? "ready_for_dispatch" : "out_for_delivery"
+        : "confirmed");
   const isCarrierManaged = deliveryType === "home" && !!detail.data?.shipment?.company_id;
   const refresh = async () => {
     await Promise.all([
