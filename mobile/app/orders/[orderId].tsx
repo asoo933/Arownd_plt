@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Modal, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, IconButton, PressableSurface } from "@/components/ui";
+import { AppHeader, IconButton, PressableSurface, StatusBadge } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
@@ -174,9 +174,10 @@ export default function OrderDetailsScreen() {
       return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.merchantHeader}>
           <Text style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</Text>
-          <View style={[styles.status, tone === "success" ? styles.statusSuccess : tone === "danger" ? styles.statusDanger : tone === "pending" ? styles.statusPending : styles.statusMuted]}>
-            <Text style={styles.statusText}>{statusLabel(merchantOrder.status)}</Text>
-          </View>
+          <StatusBadge
+            label={statusLabel(merchantOrder.status)}
+            tone={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "neutral"}
+          />
         </View>
         {merchantOrder.items.map((item) => <View key={item.id} style={styles.itemRow}>
           <View style={styles.itemInfo}>
@@ -326,12 +327,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   itemPrice: { color: theme.colors.accentMuted, fontSize: 12, fontWeight: "900" },
   merchantHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: 8 },
-  status: { borderRadius: 9, paddingHorizontal: 9, paddingVertical: 6 },
-  statusSuccess: { backgroundColor: theme.colors.successSurface },
-  statusDanger: { backgroundColor: theme.colors.dangerSurface },
-  statusPending: { backgroundColor: theme.colors.warningSurface },
-  statusMuted: { backgroundColor: theme.colors.border },
-  statusText: { color: theme.colors.foreground, fontSize: 10, fontWeight: "800" },
   notice: { color: theme.colors.warning, fontSize: 11, textAlign: "right", lineHeight: 18 },
   recipient: { fontSize: 13, fontWeight: "900", textAlign: "right" },
   shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9, gap: 5 },
