@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button, IconButton, TextField } from "@/components/ui";
+import { AppHeader, Button, IconButton, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -148,19 +148,11 @@ export default function MerchantProductsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Button label={translate("merchantProductsBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />
-
-        <View style={styles.header}>
-          <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
-            {translate("merchantDashboardEyebrow")}
-          </Text>
-          <Text style={[styles.title, { color: theme.colors.foreground }]}>
-            {translate("merchantProductsTitle")}
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
-            {translate("merchantProductsSubtitle")}
-          </Text>
-        </View>
+        <AppHeader
+          title={translate("merchantProductsTitle")}
+          leading={<Button label={translate("merchantProductsBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />}
+        />
+        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductsSubtitle")}</Text>
 
         <Button label={translate("merchantProductCreateOpen")} onPress={() => router.push("/merchant/products/new")} fullWidth />
 
