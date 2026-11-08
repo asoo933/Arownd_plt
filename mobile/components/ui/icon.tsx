@@ -1,7 +1,9 @@
 import {
   ArrowDownUp,
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   ArrowUpDown,
   Bell,
   Calendar,
@@ -55,9 +57,11 @@ import { View, type StyleProp, type ViewStyle } from "react-native";
 import { useAppTheme } from "@/lib/theme";
 
 const iconRegistry = {
+  "arrow-down": ArrowDown,
   "arrow-down-up": ArrowDownUp,
   "arrow-left": ArrowLeft,
   "arrow-right": ArrowRight,
+  "arrow-up": ArrowUp,
   "arrow-up-down": ArrowUpDown,
   bell: Bell,
   calendar: Calendar,
