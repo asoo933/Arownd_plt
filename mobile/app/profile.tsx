@@ -22,7 +22,6 @@ import { getProfileDisplayName } from "@/lib/profile-state";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function ProfileScreen() {
-  const theme = useAppTheme();
   const user = useQuery({
     queryKey: ["current-user"],
     queryFn: async () => {
