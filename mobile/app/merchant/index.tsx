@@ -13,7 +13,7 @@ import {
 } from "@/lib/merchant";
 import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
@@ -160,10 +160,10 @@ export default function MerchantEntryScreen() {
         </View>
 
         <View style={styles.metricsGrid}>
-          <MerchantMetricCard label={translate("merchantMetricProducts")} value={String(data.productCount)} hint={translate("merchantMetricProductsHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
-          <MerchantMetricCard label={translate("merchantMetricNeedsAction")} value={String(data.pendingOrderCount)} hint={translate("merchantMetricNeedsActionHint")} valueTone="warning" style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
-          <MerchantMetricCard label={translate("merchantMetricQuoted")} value={String(data.quotedOrderCount)} hint={translate("merchantMetricQuotedHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
-          <MerchantMetricCard label={translate("merchantMetricOrders")} value={String(data.orders.length)} hint={translate("merchantMetricOrdersHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 16, padding: 13, gap: 5 }} />
+          <MerchantMetricCard label={translate("merchantMetricProducts")} value={String(data.productCount)} hint={translate("merchantMetricProductsHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
+          <MerchantMetricCard label={translate("merchantMetricNeedsAction")} value={String(data.pendingOrderCount)} hint={translate("merchantMetricNeedsActionHint")} valueTone="warning" style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
+          <MerchantMetricCard label={translate("merchantMetricQuoted")} value={String(data.quotedOrderCount)} hint={translate("merchantMetricQuotedHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
+          <MerchantMetricCard label={translate("merchantMetricOrders")} value={String(data.orders.length)} hint={translate("merchantMetricOrdersHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
         </View>
 
         <View style={styles.sectionHeading}>
@@ -287,55 +287,55 @@ function MessageScreen({
 
 const stylesForScreen = StyleSheet.create({
   safe: { flex: 1 },
-  center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: 16 },
-  message: { fontSize: 14, lineHeight: 22, textAlign: "center", fontWeight: "700" },
-  action: { minHeight: 46, borderRadius: 14, paddingHorizontal: 20, alignItems: "center", justifyContent: "center" },
-  actionText: { fontSize: 13, fontWeight: "900" },
+  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
+  message: { fontSize: designTokens.typography.body, lineHeight: 22, textAlign: "center", fontWeight: designTokens.fontWeights.bold },
+  action: { minHeight: 46, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.xl, alignItems: "center", justifyContent: "center" },
+  actionText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
 });
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: 17, paddingBottom: 36, gap: 15 },
-    entryContent: { flexGrow: 1, padding: 20, gap: 18 },
-    header: { alignItems: "flex-end", gap: 7 },
+    content: { padding: designTokens.spacing.xl, paddingBottom: 36, gap: designTokens.spacing.lg },
+    entryContent: { flexGrow: 1, padding: designTokens.spacing.xl, gap: designTokens.spacing.xl },
+    header: { alignItems: "flex-end", gap: designTokens.spacing.sm },
     backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
-    backText: { fontSize: 12, fontWeight: "800" },
-    eyebrow: { fontSize: 11, fontWeight: "900" },
-    title: { fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
-    body: { fontSize: 12, lineHeight: 20, textAlign: "right" },
-    entryCard: { borderWidth: 1, borderRadius: 22, padding: 19, gap: 13 },
-    storeCard: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 14 },
-    storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
-    storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: 17, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+    backText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+    eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+    title: { fontSize: designTokens.typography.display - 4, lineHeight: 33, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    body: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" },
+    entryCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.xl, gap: designTokens.spacing.lg },
+    storeCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
+    storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
+    storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     storeImage: { width: "100%", height: "100%" },
-    storeAvatarText: { fontSize: 25, fontWeight: "900" },
-    storeInfo: { flex: 1, alignItems: "flex-end", gap: 4 },
-    storeName: { fontSize: 17, fontWeight: "900", textAlign: "right" },
-    storeMeta: { fontSize: 11, textAlign: "right" },
-    storeBadges: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 6, marginTop: 3 },
-    statusPill: { borderRadius: 999, paddingHorizontal: 9, paddingVertical: 5 },
-    statusPillText: { fontSize: 10, fontWeight: "900" },
-    secondaryButton: { minHeight: 43, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-    secondaryButtonText: { fontSize: 12, fontWeight: "800" },
-    sectionHeading: { flexDirection: "row-reverse", alignItems: "flex-end", justifyContent: "space-between", gap: 10, marginTop: 2 },
-    sectionHeadingText: { flex: 1, alignItems: "flex-end", gap: 3 },
-    sectionTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
-    sectionHint: { fontSize: 10, lineHeight: 16, textAlign: "right" },
-    metricsGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
+    storeAvatarText: { fontSize: designTokens.typography.display - 4, fontWeight: designTokens.fontWeights.extrabold },
+    storeInfo: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+    storeName: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    storeMeta: { fontSize: designTokens.typography.caption, textAlign: "right" },
+    storeBadges: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 3 },
+    statusPill: { borderRadius: designTokens.radius.pill, paddingHorizontal: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xs },
+    statusPillText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
+    secondaryButton: { minHeight: 43, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
+    secondaryButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+    sectionHeading: { flexDirection: "row-reverse", alignItems: "flex-end", justifyContent: "space-between", gap: designTokens.spacing.md, marginTop: 2 },
+    sectionHeadingText: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+    sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "right" },
+    metricsGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
     textButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 3 },
-    textButtonLabel: { fontSize: 11, fontWeight: "900" },
-    ordersCard: { borderWidth: 1, borderRadius: 17, overflow: "hidden" },
-    orderRow: { paddingHorizontal: 12, paddingVertical: 13, flexDirection: "row-reverse", alignItems: "center", gap: 10 },
-    orderMain: { flex: 1, alignItems: "flex-end", gap: 5 },
-    orderTopLine: { width: "100%", flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 7 },
-    orderCode: { fontSize: 11, fontWeight: "900" },
-    orderCustomer: { width: "100%", fontSize: 11, textAlign: "right" },
-    orderItems: { width: "100%", fontSize: 10, lineHeight: 15, textAlign: "right" },
-    orderAmount: { fontSize: 11, fontWeight: "900" },
-    emptyCard: { borderWidth: 1, borderRadius: 17, padding: 17, gap: 7, alignItems: "flex-end" },
-    emptyTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
-    primaryButton: { minHeight: 50, borderRadius: 15, alignItems: "center", justifyContent: "center", paddingHorizontal: 14 },
-    primaryButtonText: { fontSize: 13, fontWeight: "900" }
+    textButtonLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+    ordersCard: { borderWidth: 1, borderRadius: designTokens.radius.md, overflow: "hidden" },
+    orderRow: { paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
+    orderMain: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+    orderTopLine: { width: "100%", flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
+    orderCode: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+    orderCustomer: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "right" },
+    orderItems: { width: "100%", fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "right" },
+    orderAmount: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+    emptyCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-end" },
+    emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    primaryButton: { minHeight: 50, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", paddingHorizontal: designTokens.spacing.lg },
+    primaryButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
   });
 }
