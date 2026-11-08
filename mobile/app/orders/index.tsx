@@ -3,8 +3,8 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { PressableSurface, SegmentedControl, StatusBadge } from "@/components/ui";
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { AppHeader, IconButton, PressableSurface, SegmentedControl, StatusBadge } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -116,16 +116,16 @@ export default function OrdersScreen() {
 
   if (auth.isPending || (auth.data && orders.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (auth.isError || orders.isError) return <CustomerScreen>
-    <CustomerHeading title={translate("ordersTitle")} />
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void orders.refetch(); }} />
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
-    <CustomerHeading title={translate("ordersTitle")} subtitle={translate("ordersLoginHint")} />
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />\n    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersLoginHint")}</Text>
     <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.primary}><Text style={styles.primaryText}>{translate("login")}</Text></PressableSurface>
   </CustomerScreen>;
 
   return <CustomerScreen>
-    <CustomerHeading title={translate("ordersTitle")} subtitle={translate("ordersSubtitle")} />
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />\n    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersSubtitle")}</Text>
     <SegmentedControl
       accessibilityLabel={translate("ordersTitle")}
       options={TABS.map((item) => ({ key: item.id, label: translate(item.key) }))}
