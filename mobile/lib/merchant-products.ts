@@ -102,7 +102,7 @@ export async function fetchMerchantProducts(storeId: string): Promise<MerchantPr
 
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, store_id, product_id, price, old_price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, description, brand, category), images:product_images(id, image_url, is_primary)")
+    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, description, brand, category), images:product_images(id, image_url, is_primary)")
     .eq("store_id", storeId)
     .order("created_at", { ascending: false });
 
@@ -118,7 +118,7 @@ export async function fetchMerchantProductOffer(
 
   const { data, error } = await getSupabaseClient()
     .from("store_offers")
-    .select("id, store_id, product_id, price, old_price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, description, brand, category), images:product_images(id, image_url, is_primary)")
+    .select("id, store_id, product_id, price, stock_quantity, options, is_available, is_merchant_hidden, created_at, product:products!inner(id, name, description, brand, category), images:product_images(id, image_url, is_primary)")
     .eq("store_id", storeId)
     .eq("id", offerId)
     .maybeSingle();
@@ -131,7 +131,7 @@ export async function fetchMerchantProductOffer(
 async function updateOwnedOffer(
   offerId: string,
   storeId: string,
-  patch: { is_merchant_hidden: boolean }
+  patch: Partial<MerchantOfferValues> | { is_merchant_hidden: boolean }
 ): Promise<void> {
   await assertOwnedStore(storeId);
 
@@ -164,32 +164,7 @@ export async function updateMerchantProductOffer(
     }).optional()
   }).parse(values);
 
-  const { error } = await getSupabaseClient().rpc("update_merchant_product_offer", {
-    _offer_id: offerId,
-    _store_id: storeId,
-    _price: parsed.price,
-    _stock_quantity: parsed.stock_quantity,
-    _options: parsed.options ?? null
-  });
-  if (error) throw error;
-}
-
-export async function startMerchantOfferPromotion(offerId: string, storeId: string, salePrice: number): Promise<void> {
-  if (!Number.isSafeInteger(salePrice) || salePrice <= 0) throw new Error("invalid_promotion_price");
-  const { error } = await getSupabaseClient().rpc("start_merchant_offer_promotion", {
-    _offer_id: offerId,
-    _store_id: storeId,
-    _sale_price: salePrice
-  });
-  if (error) throw error;
-}
-
-export async function endMerchantOfferPromotion(offerId: string, storeId: string): Promise<void> {
-  const { error } = await getSupabaseClient().rpc("end_merchant_offer_promotion", {
-    _offer_id: offerId,
-    _store_id: storeId
-  });
-  if (error) throw error;
+  await updateOwnedOffer(offerId, storeId, { price: parsed.price, stock_quantity: parsed.stock_quantity, ...(parsed.options ? { options: parsed.options } : {}) });
 }
 
 export async function updateMerchantProductDetails(
