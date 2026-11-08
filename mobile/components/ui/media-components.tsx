@@ -4,7 +4,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Text,
   View,
   type ImageSourcePropType,
   type ImageStyle,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { SearchField } from "./extended";
 import { Icon } from "./icon";
 
@@ -124,7 +124,7 @@ export function FileUploader({
     <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border, gap: designTokens.spacing.sm }, style]}>
       {children}
       {safeProgress !== undefined ? <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: safeProgress }} style={{ height: 6, borderRadius: theme.radius.pill, backgroundColor: theme.colors.border, overflow: "hidden" }}><View style={{ width: `${safeProgress}%`, height: "100%", backgroundColor: theme.colors.accentMuted }} /></View> : null}
-      {onCancel && cancelLabel ? <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} onPress={onCancel} hitSlop={8}><Text style={{ color: theme.colors.danger, textAlign: "right" }}>{cancelLabel}</Text></Pressable> : null}
+      {onCancel && cancelLabel ? <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} onPress={onCancel} hitSlop={8}><UiText style={{ color: theme.colors.danger, textAlign: "right" }}>{cancelLabel}</UiText></Pressable> : null}
     </View>
   );
 }
