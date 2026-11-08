@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { designTokens } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { FavoriteButton as FavoriteToggle, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
 import {
   AppHeader,
@@ -33,6 +33,8 @@ import { translate } from "@/lib/i18n";
 type FavoriteTab = FavoriteKind;
 
 export default function FavoritesScreen() {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
   const [tab, setTab] = useState<FavoriteTab>("products");
   const favorites = useQuery({ queryKey: FAVORITES_QUERY_KEY, queryFn: getFavorites });
   const content = useQuery({
@@ -97,6 +99,7 @@ export default function FavoritesScreen() {
           {content.data.products.map(({ id, offer }) => (
             <View key={id} style={styles.productItem}>
               <ProductCard
+                style={styles.productCard}
                 onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: id } })}
                 accessibilityLabel={offer.product.name}
                 contentStyle={styles.productContent}
@@ -126,6 +129,7 @@ export default function FavoritesScreen() {
           {content.data.stores.map(({ id, store }) => store ? (
             <StoreCard
               key={id}
+              style={styles.storeCard}
               onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: id } })}
               accessibilityLabel={store.name}
               contentStyle={styles.storeContent}
@@ -139,10 +143,12 @@ export default function FavoritesScreen() {
               }
               actions={<View style={styles.storeFavorite}><FavoriteToggle kind="stores" id={id} /></View>}
             >
-              <Heading level={3}>{store.name}</Heading>
-              {store.commune ? <Caption>{store.commune}</Caption> : null}
-              {store.description ? <UiText tone="muted" numberOfLines={2}>{store.description}</UiText> : null}
-              {store.rating != null ? <RatingStars value={store.rating} size={14} showValue /> : null}
+              <View style={styles.storeInfo}>
+                <Heading level={3}>{store.name}</Heading>
+                {store.commune ? <Caption>{store.commune}</Caption> : null}
+                {store.description ? <UiText tone="muted" numberOfLines={2}>{store.description}</UiText> : null}
+                {store.rating != null ? <RatingStars value={store.rating} size={14} showValue /> : null}
+              </View>
             </StoreCard>
           ) : null)}
         </View>
@@ -151,15 +157,48 @@ export default function FavoritesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
-  productItem: { width: "48%" },
-  productContent: { gap: designTokens.spacing.xs, padding: designTokens.spacing.md },
-  productMedia: { position: "relative" },
-  productImage: { borderRadius: 0 },
-  favoriteOverlay: { position: "absolute", top: 7, end: 7 },
-  storeList: { gap: designTokens.spacing.md },
-  storeContent: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
-  storeLogo: { width: 76, aspectRatio: 1, borderRadius: designTokens.radius.sm },
-  storeFavorite: { alignSelf: "center" }
-});
+function createStyles(theme: AppTheme) {
+  return StyleSheet.create({
+    productGrid: {
+      flexDirection: "row-reverse",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      gap: designTokens.spacing.md
+    },
+    productItem: { width: "48%" },
+    productCard: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: designTokens.radius.lg
+    },
+    productContent: { gap: designTokens.spacing.xs, padding: designTokens.spacing.md },
+    productMedia: { position: "relative", backgroundColor: theme.colors.surfaceMuted },
+    productImage: { borderRadius: 0 },
+    favoriteOverlay: { position: "absolute", top: 7, end: 7 },
+    storeList: { gap: designTokens.spacing.md },
+    storeCard: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: designTokens.radius.lg
+    },
+    storeContent: {
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: designTokens.spacing.md,
+      padding: designTokens.spacing.md
+    },
+    storeInfo: {
+      flex: 1,
+      minWidth: 0,
+      alignItems: "flex-end",
+      gap: designTokens.spacing.xs
+    },
+    storeLogo: {
+      width: 76,
+      aspectRatio: 1,
+      borderRadius: designTokens.radius.md,
+      backgroundColor: theme.colors.surfaceMuted
+    },
+    storeFavorite: { alignSelf: "center" }
+  });
+}
