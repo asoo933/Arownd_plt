@@ -188,7 +188,7 @@ export default function OrderDetailsScreen() {
         <View style={styles.totalRow}><Text style={styles.label}>{translate("orderStoreSubtotal")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.subtotal)}</Text></View>
         {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</Text></View> : null}
         {!cancelled ? <View style={styles.totalRow}><Text style={styles.sectionTitle}>{translate("orderStoreTotal")}</Text><Text style={styles.total}>{formatDZD(subTotal)}</Text></View> : null}
-        {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <Pressable
+        {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <PressableSurface
           disabled={cancelMutation.isPending}
           onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })}
           style={styles.cancelButton}
@@ -198,14 +198,14 @@ export default function OrderDetailsScreen() {
         {merchantOrder.status === "quoted" ? <>
           <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text>
           <View style={styles.quoteActions}>
-            <Pressable
+            <PressableSurface
               disabled={quoteMutation.isPending}
               onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
               style={styles.acceptButton}
             >
               {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</Text>}
             </PressableSurface>
-            <Pressable
+            <PressableSurface
               disabled={quoteMutation.isPending}
               onPress={() => setDeclineTarget(merchantOrder.id)}
               style={styles.declineButton}
@@ -244,7 +244,7 @@ export default function OrderDetailsScreen() {
         {shipment.notes ? <Text style={styles.meta}>{shipment.notes}</Text> : null}
       </View>)}
     </View> : null}
-    {canCancelLegacyOrder(order.status, merchantOrders.length > 0, query.data.shipments.map((shipment) => shipment.status)) ? <Pressable
+    {canCancelLegacyOrder(order.status, merchantOrders.length > 0, query.data.shipments.map((shipment) => shipment.status)) ? <PressableSurface
       disabled={cancelMutation.isPending}
       onPress={() => setCancelTarget({ type: "order", id: order.id })}
       style={styles.cancelButton}
@@ -260,7 +260,7 @@ export default function OrderDetailsScreen() {
           <Text style={styles.meta}>{translate("orderCancelConfirmHint")}</Text>
           {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
           <View style={styles.quoteActions}>
-            <Pressable
+            <PressableSurface
               disabled={cancelMutation.isPending}
               onPress={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
               style={styles.declineButton}
@@ -281,7 +281,7 @@ export default function OrderDetailsScreen() {
           <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
           {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
           <View style={styles.quoteActions}>
-            <Pressable
+            <PressableSurface
               disabled={quoteMutation.isPending}
               onPress={() => {
                 if (declineTarget) {
