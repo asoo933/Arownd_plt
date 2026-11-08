@@ -43,7 +43,7 @@ export default function ExploreScreen() {
       ) : (
         <View style={styles.grid}>
           {products.data.map((item) => (
-            <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} oldPrice={item.old_price != null && item.old_price > item.price ? formatDZD(item.old_price) : null} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} />
+            <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} />
           ))}
         </View>
       )}
