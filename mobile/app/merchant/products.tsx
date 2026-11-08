@@ -2,14 +2,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, Card, FilterBar, FilterChip, Image as UiImage, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -186,14 +185,14 @@ export default function MerchantProductsScreen() {
         ) : null}
 
         {allOffers.length === 0 ? (
-          <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.emptyCard}>
             <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsEmpty")}</UiText>
             <UiText style={[styles.emptyHint, { color: theme.colors.muted }]}>{translate("merchantProductsEmptyHint")}</UiText>
-          </View>
+          </Card>
         ) : visibleOffers.length === 0 ? (
-          <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.emptyCard}>
             <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsNoResults")}</UiText>
-          </View>
+          </Card>
         ) : (
           <View style={styles.offerList}>
             {visibleOffers.map((offer) => (
@@ -367,9 +366,13 @@ function MessageScreen({
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.messageContainer}>
-        {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-        <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{title ?? label ?? ""}</UiText>
-        {onAction && actionLabel ? <Button label={actionLabel} onPress={onAction} /> : null}
+        {loading ? (
+          <LoadingState label={label ?? ""} />
+        ) : onAction && actionLabel ? (
+          <ErrorState title={title ?? label ?? ""} retryLabel={actionLabel} onRetry={onAction} />
+        ) : (
+          <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{title ?? label ?? ""}</UiText>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -391,11 +394,11 @@ function createStyles(theme: AppTheme) {
     filterLabel: { fontSize: 11, fontWeight: "900" },
     feedback: { borderWidth: 1, borderRadius: 13, padding: 11 },
     feedbackText: { fontSize: 11, lineHeight: 18, fontWeight: "800", textAlign: "right" },
-    emptyCard: { borderWidth: 1, borderRadius: 16, padding: 18, gap: 7, alignItems: "flex-end" },
+    emptyCard: { gap: 7, alignItems: "flex-end" },
     emptyTitle: { fontSize: 14, fontWeight: "900", textAlign: "right" },
     emptyHint: { fontSize: 11, lineHeight: 18, textAlign: "right" },
     offerList: { gap: 12 },
-    offerCard: { borderWidth: 1, borderRadius: 18, padding: 13, gap: 13 },
+    offerCard: { padding: 13, gap: 13 },
     productHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: 11 },
     productImage: { width: 76, height: 76, borderRadius: 15, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     image: { width: "100%", height: "100%" },
