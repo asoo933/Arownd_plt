@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, PressableSurface, TextField } from "@/components/ui";
+import { Button, PressableSurface, SearchField } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
@@ -43,21 +43,14 @@ export function CustomerSearch({ value, onChangeText, placeholder }: {
   onChangeText: (value: string) => void;
   placeholder: string;
 }) {
-  const theme = useAppTheme();
   return (
-    <View style={[styles.search, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-      <Text style={[styles.searchIcon, { color: theme.colors.muted }]}>⌕</Text>
-      <TextField
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        containerStyle={styles.searchInputContainer}
-        style={styles.searchInput}
-        textAlign="right"
-        returnKeyType="search"
-        accessibilityLabel={placeholder}
-      />
-    </View>
+    <SearchField
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      accessibilityLabel={placeholder}
+      style={{ borderRadius: designTokens.radius.lg }}
+    />
   );
 }
 
@@ -150,10 +143,6 @@ const styles = StyleSheet.create({
   heading: { gap: designTokens.spacing.xs, alignItems: "flex-end" },
   headingTitle: { fontSize: designTokens.typography.title, fontWeight: "900", textAlign: "right" },
   subtitle: { fontSize: designTokens.typography.caption + 1, textAlign: "right", lineHeight: 19 },
-  search: { minHeight: 50, borderRadius: designTokens.radius.lg, borderWidth: 1, flexDirection: "row-reverse", alignItems: "center", paddingHorizontal: designTokens.spacing.md, gap: designTokens.spacing.sm },
-  searchIcon: { fontSize: 24 },
-  searchInputContainer: { flex: 1 },
-  searchInput: { minHeight: 48, borderWidth: 0, borderRadius: 0, paddingHorizontal: 0, backgroundColor: "transparent", fontSize: designTokens.typography.body },
   sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
   sectionText: { fontSize: designTokens.typography.subtitle, fontWeight: "900", textAlign: "right" },
   sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
