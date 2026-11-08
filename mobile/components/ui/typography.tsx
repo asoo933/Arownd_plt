@@ -98,6 +98,7 @@ export function PriceText({
   tone = "foreground",
   weight,
   align = "right",
+  fontFamily,
   style,
   ...props
 }: TextComponentProps & { value: string; previousValue?: string }) {
@@ -111,7 +112,7 @@ export function PriceText({
           color: theme.colors[tone],
           fontSize: theme.typography.title,
           fontWeight: weight ?? theme.fontWeights.extrabold,
-          fontFamily: theme.fontFamilies.latin,
+          fontFamily: fontFamily ?? theme.fontFamilies.latin,
           fontVariant: ["tabular-nums"],
           textAlign: align,
           includeFontPadding: false
@@ -142,6 +143,7 @@ export function BadgeText({
   tone = "accent",
   weight,
   align = "right",
+  fontFamily,
   ...props
 }: TextComponentProps & { tone?: "accent" | "success" | "warning" | "danger" }) {
   const theme = useAppTheme();
@@ -167,7 +169,7 @@ export function BadgeText({
           color: palette.color,
           fontSize: theme.typography.caption,
           fontWeight: weight ?? theme.fontWeights.bold,
-          fontFamily: theme.fontFamilies.arabic,
+          fontFamily: fontFamily ?? theme.fontFamilies.arabic,
           textAlign: align,
           includeFontPadding: false
         },
