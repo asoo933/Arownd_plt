@@ -120,7 +120,7 @@ export function Checkbox({
           justifyContent: "center"
         }}
       >
-        {checked ? <NativeText style={{ color: theme.colors.accentForeground, fontWeight: "900" }}>✓</NativeText> : null}
+        {checked ? <Icon name="check" size={14} color={theme.colors.accentForeground} accessibilityHidden /> : null}
       </View>
       {label ? <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{label}</NativeText> : null}
     </Pressable>
