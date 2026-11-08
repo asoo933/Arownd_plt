@@ -9,6 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
+import { IconButton } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -36,9 +37,7 @@ export default function StoreDetailsScreen() {
   const details = store.data;
   return (
     <CustomerScreen>
-      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
-        <Text style={styles.backText}>{translate("back")}</Text>
-      </Pressable>
+      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
       <View style={[styles.cover, { backgroundColor: theme.colors.surfaceMuted }]}>
         {details.cover_url ? <Image source={{ uri: details.cover_url }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
       </View>
@@ -92,8 +91,6 @@ export default function StoreDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  back: { minHeight: 38, justifyContent: "center", alignItems: "flex-end" },
-  backText: { color: "#647D13", fontSize: 13, fontWeight: "800" },
   cover: { height: 150, borderRadius: 20, overflow: "hidden" },
   storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 13, marginTop: -2 },
   logo: { width: 76, height: 76, borderRadius: 20, overflow: "hidden", alignItems: "center", justifyContent: "center" },
