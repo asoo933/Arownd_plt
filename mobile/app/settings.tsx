@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { router } from "expo-router";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, StyleSheet, Text, View } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { CustomerHeading, CustomerScreen } from "@/components/customer-ui";
-import { Button, TextField } from "@/components/ui";
+import { Button, PressableSurface, TextField } from "@/components/ui";
 import { translate } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -75,24 +75,24 @@ export default function SettingsScreen() {
         <Text style={[styles.hint, { color: colors.muted }]}>{translate("settingsPasswordHint")}</Text>
         <TextField value={password} onChangeText={setPassword} placeholder={translate("newPassword")} secureTextEntry autoCapitalize="none" textContentType="newPassword" style={fieldStyle} />
         <TextField value={confirmPassword} onChangeText={setConfirmPassword} placeholder={translate("confirmPassword")} secureTextEntry autoCapitalize="none" textContentType="newPassword" style={fieldStyle} />
-        {formError ? <Text accessibilityRole="alert" style={styles.error}>{formError}</Text> : null}
-        {message ? <Text accessibilityRole="text" style={styles.success}>{message}</Text> : null}
+        {formError ? <Text accessibilityRole="alert" style={[styles.error, { color: theme.colors.danger }]}>{formError}</Text> : null}
+        {message ? <Text accessibilityRole="text" style={[styles.success, { color: theme.colors.success }]}>{message}</Text> : null}
         <Button label={passwordMutation.isPending ? translate("settingsSaving") : translate("settingsPasswordSave")} onPress={() => passwordMutation.mutate()} loading={passwordMutation.isPending} fullWidth />
       </View>
       <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>{translate("settingsAccountTitle")}</Text>
-        <Pressable accessibilityRole="button" onPress={() => router.push("/delivery-profile")} style={styles.linkRow}>
+        <PressableSurface accessibilityRole="button" accessibilityLabel={translate("profileEditDetails")} onPress={() => router.push("/delivery-profile")} style={styles.linkRow}>
           <Text style={[styles.linkText, { color: colors.text }]}>{translate("profileEditDetails")}</Text>
           <Text style={[styles.arrow, { color: theme.colors.muted }]}>‹</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" onPress={() => router.push("/forgot-password")} style={styles.linkRow}>
+        </PressableSurface>
+        <PressableSurface accessibilityRole="button" accessibilityLabel={translate("forgotPassword")} onPress={() => router.push("/forgot-password")} style={styles.linkRow}>
           <Text style={[styles.linkText, { color: colors.text }]}>{translate("forgotPassword")}</Text>
           <Text style={styles.arrow}>‹</Text>
-        </Pressable>
+        </PressableSurface>
       </View>
       <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Button label={signOutMutation.isPending ? translate("settingsSigningOut") : translate("settingsSignOut")} onPress={() => { setSignOutError(false); setSignOutConfirmOpen(true); }} disabled={signOutMutation.isPending} variant="danger" fullWidth />
-        {signOutError ? <Text accessibilityRole="alert" style={styles.error}>{translate("settingsSignOutError")}</Text> : null}
+        {signOutError ? <Text accessibilityRole="alert" style={[styles.error, { color: theme.colors.danger }]}>{translate("settingsSignOutError")}</Text> : null}
       </View>
       <Modal visible={signOutConfirmOpen} transparent animationType="fade" onRequestClose={() => { if (!signOutMutation.isPending) setSignOutConfirmOpen(false); }}>
         <View style={[styles.modalBackdrop, { backgroundColor: theme.colors.overlay }]}>
