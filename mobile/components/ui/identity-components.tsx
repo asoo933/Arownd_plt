@@ -92,7 +92,7 @@ export function RatingSelector({
         const rating = index + 1;
         const selected = rating <= value;
         return (
-          <Pressable key={rating} accessibilityRole="radio" accessibilityLabel={String(rating)} accessibilityState={{ checked: value === rating, disabled }} disabled={disabled} onPress={() => onChange(rating)} hitSlop={4} style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
+          <Pressable key={rating} accessibilityRole="radio" accessibilityLabel={`${accessibilityLabel} ${rating}`} accessibilityState={{ checked: value === rating, disabled }} disabled={disabled} onPress={() => onChange(rating)} hitSlop={4} style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
             <Icon name="star" size={size * 0.72} color={selected ? theme.colors.warning : theme.colors.border} fill={selected ? theme.colors.warning : "none"} accessibilityHidden />
           </Pressable>
         );
