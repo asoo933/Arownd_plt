@@ -6,12 +6,11 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -149,14 +148,14 @@ export default function CheckoutScreen() {
 
   if (createdOrderId) {
     return <CustomerScreen>
-      <View style={[styles.successPanel, { backgroundColor: theme.colors.surface }]}>
+      <Card style={[styles.successPanel, { backgroundColor: theme.colors.surface }]} contentStyle={styles.successContent}>
         <UiText style={styles.successMark}>✓</UiText>
         <AppHeader title={translate("checkoutSuccessTitle")} />\n        <UiText style={styles.hint}>{translate("checkoutSuccessMessage")}</UiText>
         <UiText style={styles.orderLabel}>{translate("checkoutOrderNumber")}</UiText>
         <UiText selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</UiText>
         <UiText style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</UiText>
         <Button label={translate("checkoutBackHome")} onPress={() => router.replace("/home")} fullWidth />
-      </View>
+      </Card>
     </CustomerScreen>;
   }
 
@@ -406,7 +405,8 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingTop: 8 },
   total: { color: theme.colors.accentMuted, fontSize: 19, fontWeight: "900" },
   errorText: { color: theme.colors.danger, fontSize: 12, fontWeight: "800", textAlign: "right", lineHeight: 18 },
-  successPanel: { borderRadius: 20, padding: 20, gap: 16, alignItems: "center" },
+  successPanel: { borderRadius: 20 },
+  successContent: { padding: 20, gap: 16, alignItems: "center" },
   successMark: { width: 58, height: 58, overflow: "hidden", borderRadius: 29, backgroundColor: theme.colors.accent, color: theme.colors.foreground, textAlign: "center", textAlignVertical: "center", fontSize: 30, fontWeight: "900" },
   orderLabel: { color: theme.colors.muted, fontSize: 12, fontWeight: "700" },
   orderId: { fontSize: 12, fontWeight: "800", textAlign: "center" },
