@@ -19,6 +19,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
+import { Button, PressableSurface } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
@@ -61,11 +62,7 @@ export default function MerchantEntryScreen() {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
         <ScrollView contentContainerStyle={styles.entryContent}>
-          <Pressable onPress={() => router.replace("/profile")} style={styles.backButton}>
-            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-              {translate("merchantBackToProfile")}
-            </Text>
-          </Pressable>
+          <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />
           <View style={[styles.entryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("businessTitle")}</Text>
             <Text style={[styles.title, { color: theme.colors.foreground }]}>
@@ -76,15 +73,7 @@ export default function MerchantEntryScreen() {
                 ? translate("merchantStatusPersonalHint")
                 : translate("merchantStatusSetupHint")}
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push("/merchant/onboarding")}
-              style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
-            >
-              <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
-                {translate("merchantStartOnboarding")}
-              </Text>
-            </Pressable>
+            <Button label={translate("merchantStartOnboarding")} onPress={() => router.push("/merchant/onboarding")} fullWidth />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -128,11 +117,7 @@ export default function MerchantEntryScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Pressable onPress={() => router.replace("/profile")} style={styles.backButton}>
-            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-              {translate("merchantBackToProfile")}
-            </Text>
-          </Pressable>
+          <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />
           <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
             {translate("merchantDashboardEyebrow")}
           </Text>
@@ -176,42 +161,10 @@ export default function MerchantEntryScreen() {
               </View>
             </View>
           </View>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } })}
-            style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
-          >
-            <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
-              {translate("merchantPreviewStore")}
-            </Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push("/merchant/products")}
-            style={[styles.secondaryButton, { borderColor: theme.colors.border, marginTop: 9 }]}
-          >
-            <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
-              {translate("merchantProductsTitle")}
-            </Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push("/merchant/settings")}
-            style={[styles.secondaryButton, { borderColor: theme.colors.border, marginTop: 9 }]}
-          >
-            <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
-              {translate("merchantStoreSettingsTitle")}
-            </Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push("/merchant/analytics")}
-            style={[styles.secondaryButton, { borderColor: theme.colors.border, marginTop: 9 }]}
-          >
-            <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
-              {translate("merchantAnalyticsTitle")}
-            </Text>
-          </Pressable>
+          <Button label={translate("merchantPreviewStore")} onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } })} variant="outline" fullWidth style={{}} />
+          <Button label={translate("merchantProductsTitle")} onPress={() => router.push("/merchant/products")} variant="outline" fullWidth style={{marginTop: 9}} />
+          <Button label={translate("merchantStoreSettingsTitle")} onPress={() => router.push("/merchant/settings")} variant="outline" fullWidth style={{marginTop: 9}} />
+          <Button label={translate("merchantAnalyticsTitle")} onPress={() => router.push("/merchant/analytics")} variant="outline" fullWidth style={{marginTop: 9}} />
         </View>
 
         <View style={styles.sectionHeading}>
@@ -260,15 +213,7 @@ export default function MerchantEntryScreen() {
               {translate("merchantRecentOrdersHint")}
             </Text>
           </View>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push("/merchant/orders")}
-            style={styles.textButton}
-          >
-            <Text style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
-              {translate("merchantViewAllOrders")}
-            </Text>
-          </Pressable>
+          <Button label={translate("merchantViewAllOrders")} onPress={() => router.push("/merchant/orders")} variant="ghost" size="sm" />
         </View>
 
         {recentOrders.length === 0 ? (
@@ -283,7 +228,7 @@ export default function MerchantEntryScreen() {
         ) : (
           <View style={[styles.ordersCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             {recentOrders.map((order, index) => (
-              <Pressable
+              <PressableSurface
                 key={order.id}
                 accessibilityRole="button"
                 onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
@@ -314,30 +259,14 @@ export default function MerchantEntryScreen() {
                 <Text style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
                   {translate("merchantOrderDetailTitle")} ←
                 </Text>
-              </Pressable>
+              </PressableSurface>
             ))}
           </View>
         )}
 
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.push("/merchant/orders")}
-          style={[styles.primaryButton, { backgroundColor: theme.colors.accent }]}
-        >
-          <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
-            {translate("merchantManageOrders")}
-          </Text>
-        </Pressable>
+        <Button label={translate("merchantManageOrders")} onPress={() => router.push("/merchant/orders")} fullWidth />
 
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.push("/merchant/products")}
-          style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
-        >
-          <Text style={[styles.secondaryButtonText, { color: theme.colors.foreground }]}>
-            {translate("merchantManageProducts")}
-          </Text>
-        </Pressable>
+        <Button label={translate("merchantManageProducts")} onPress={() => router.push("/merchant/products")} variant="outline" fullWidth />
       </ScrollView>
     </SafeAreaView>
   );
@@ -425,13 +354,7 @@ function MessageScreen({
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onAction}
-          style={[stylesForScreen.action, { backgroundColor: theme.colors.accent }]}
-        >
-          <Text style={[stylesForScreen.actionText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
-        </Pressable>
+        <Button label={actionLabel} onPress={onAction} />
       </View>
     </SafeAreaView>
   );
