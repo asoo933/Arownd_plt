@@ -2,6 +2,7 @@ import { Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { useAppTheme } from "@/lib/theme";
 import { Surface } from "./primitives";
+import { Icon } from "./icon";
 
 export type MetricTrend = {
   label: string;
@@ -51,9 +52,7 @@ export function MerchantMetricCard({
       ) : null}
       {trend ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing.xs }}>
-          <Text style={{ color: trend.positive ? theme.colors.success : theme.colors.danger, fontSize: theme.typography.caption, fontWeight: "700" }}>
-            {trend.positive ? "▲" : "▼"}
-          </Text>
+          <Icon name={trend.positive ? "arrow-up" : "arrow-down"} size={14} color={trend.positive ? theme.colors.success : theme.colors.danger} accessibilityHidden />
           <Text style={{ color: trend.positive ? theme.colors.success : theme.colors.danger, fontSize: theme.typography.caption }}>
             {trend.label}
           </Text>
