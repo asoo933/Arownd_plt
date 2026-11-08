@@ -8,6 +8,7 @@ on:
       - completed
     branches:
       - Arownd-native-v2
+      - cleanup/remove-legacy-web
 
 permissions:
   contents: read
@@ -19,7 +20,7 @@ concurrency:
 jobs:
   build-preview-apk:
     name: Build Expo Native preview APK
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'Arownd-native-v2' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.head_branch == 'Arownd-native-v2' || github.event.workflow_run.head_branch == 'cleanup/remove-legacy-web') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     defaults:
