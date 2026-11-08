@@ -3,11 +3,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile } from "@/components/customer-ui";
+import { CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { useAppTheme } from "@/lib/theme";
-import { IconButton } from "@/components/ui";
+import { AppHeader, IconButton } from "@/components/ui";
 
 export default function ExploreScreen() {
   const theme = useAppTheme();
@@ -34,8 +34,11 @@ export default function ExploreScreen() {
 
   return (
     <CustomerScreen>
-      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
-      <CustomerHeading title={translate("exploreTitle")} subtitle={translate("exploreSubtitle")} />
+      <AppHeader
+        title={translate("exploreTitle")}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+      />
+      <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("exploreSubtitle")}</Text>
       <CustomerSearch value={query} onChangeText={setQuery} placeholder={translate("homeSearchPlaceholder")} />
       {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void products.refetch()} />
@@ -54,6 +57,7 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
+  subtitle: { fontSize: 12, lineHeight: 19, textAlign: "right" },
   grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
   footer: { fontSize: 11, textAlign: "center", padding: 14 }
 });
