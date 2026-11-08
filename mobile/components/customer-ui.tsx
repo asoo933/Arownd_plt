@@ -27,7 +27,6 @@ export function CustomerScreen({ children }: { children: ReactNode }) {
 }
 
 export function CustomerHeading({ title, subtitle }: { title: string; subtitle?: string }) {
-  const theme = useAppTheme();
   return (
     <View style={styles.heading}>
       <Heading level={2}>{title}</Heading>
