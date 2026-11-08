@@ -3,7 +3,8 @@ export { dimensions } from "./dimensions";
 export { shadows } from "./shadows";
 export { borderRadius, spacing } from "./spacing";
 export { fontFamilies, fontWeights, typography } from "./typography";
-export { getAppTheme, ThemeProvider, useAppTheme } from "./themes";
+export { getAppTheme, ThemeProvider, useAppTheme, useThemePreference } from "./themes";
+export { isThemeMode, resolveThemeMode } from "./theme-state";
 export type { AppTheme, ThemeMode } from "./themes";
 
 import { brandColors, commerceColors, deliveryColors, extendedThemeColors, semanticColors, themeColors } from "./colors";
