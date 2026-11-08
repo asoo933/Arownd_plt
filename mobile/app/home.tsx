@@ -20,12 +20,12 @@ import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 const categories = [
-  { id: "fashion", icon: "👗", label: "categoryFashion" },
-  { id: "electronics", icon: "📱", label: "categoryElectronics" },
-  { id: "beauty", icon: "💄", label: "categoryBeauty" },
-  { id: "home", icon: "🛋️", label: "categoryHome" },
-  { id: "kids", icon: "🧸", label: "categoryKids" },
-  { id: "food", icon: "🍰", label: "categoryFood" }
+  { id: "fashion", icon: "shirt", label: "categoryFashion" },
+  { id: "electronics", icon: "smartphone", label: "categoryElectronics" },
+  { id: "beauty", icon: "sparkles", label: "categoryBeauty" },
+  { id: "home", icon: "house", label: "categoryHome" },
+  { id: "kids", icon: "baby", label: "categoryKids" },
+  { id: "food", icon: "cake-slice", label: "categoryFood" }
 ] as const;
 
 export default function CustomerHomeScreen() {
@@ -76,7 +76,7 @@ export default function CustomerHomeScreen() {
               onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })}
               style={[styles.category, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}
             >
-              <UiText style={styles.categoryIcon}>{category.icon}</UiText>
+              <Icon name={category.icon} size={26} color={theme.colors.accentMuted} accessibilityHidden />
               <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</UiText>
             </PressableSurface>
           ))}
@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   searchButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
   categoryRail: { flexDirection: "row-reverse", gap: designTokens.spacing.sm, paddingBottom: 3 },
   category: { width: 93, minHeight: 94, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
-  categoryIcon: { fontSize: designTokens.typography.subtitle + 9 },
   categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   productRail: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
   storeList: { gap: designTokens.spacing.sm },
