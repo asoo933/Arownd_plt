@@ -19,6 +19,7 @@ import {
 import { translate, type TranslationKey } from "@/lib/i18n";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { Button, PressableSurface } from "@/components/ui";
 
 type OrderFilter = "all" | "pending" | "quoted" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -93,15 +94,7 @@ export default function MerchantOrdersScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.replace("/merchant")}
-          style={styles.backButton}
-        >
-          <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-            {translate("merchantOrdersBack")}
-          </Text>
-        </Pressable>
+        <Button label={translate("merchantOrdersBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />
 
         <View style={styles.heading}>
           <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
@@ -196,7 +189,7 @@ function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; t
   const location = [order.commune, order.wilayaName].filter(Boolean).join("، ");
 
   return (
-    <Pressable
+    <PressableSurface
       accessibilityRole="button"
       onPress={onPress}
       style={[style.orderCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
@@ -229,7 +222,7 @@ function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; t
       <Text style={{ color: theme.colors.accentMuted, fontSize: 10, fontWeight: "900", textAlign: "right" }}>
         {translate("merchantOrderDetailTitle")} ←
       </Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
@@ -296,13 +289,7 @@ function MessageScreen({
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onAction}
-          style={[stylesForScreen.action, { backgroundColor: theme.colors.accent }]}
-        >
-          <Text style={[stylesForScreen.actionText, { color: theme.colors.accentForeground }]}>{actionLabel}</Text>
-        </Pressable>
+        <Button label={actionLabel} onPress={onAction} />
       </View>
     </SafeAreaView>
   );
