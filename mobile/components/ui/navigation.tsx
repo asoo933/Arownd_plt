@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { Text as UiText } from "./typography";
 
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 export function AppHeader({
   title,
@@ -89,7 +89,7 @@ export function SegmentedControl({
               style={{
                 color: selected ? theme.colors.foreground : theme.colors.muted,
                 fontSize: theme.typography.body,
-                fontWeight: selected ? "700" : "500"
+                fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.medium
               }}
             >
               {option.label}
@@ -103,37 +103,37 @@ export function SegmentedControl({
 
 const styles = StyleSheet.create({
   header: {
-    minHeight: 48,
+    minHeight: designTokens.dimensions.controlHeight.lg,
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between"
   },
   slot: {
-    minWidth: 40,
+    minWidth: designTokens.dimensions.controlHeight.sm,
     alignItems: "center",
     justifyContent: "center"
   },
   trailing: {
     flexDirection: "row",
-    gap: 8
+    gap: designTokens.spacing.sm
   },
   headerTitle: {
     flex: 1,
     textAlign: "right",
-    fontWeight: "800"
+    fontWeight: designTokens.fontWeights.extrabold
   },
   segmented: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    padding: 4,
-    gap: 4
+    padding: designTokens.spacing.xs,
+    gap: designTokens.spacing.xs
   },
   segment: {
     flex: 1,
-    minHeight: 40,
+    minHeight: designTokens.dimensions.controlHeight.sm,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 8
+    paddingHorizontal: designTokens.spacing.sm,
+    paddingVertical: designTokens.spacing.sm
   }
 });
