@@ -294,7 +294,7 @@ export function MultiSelect({
             accessibilityState={{ checked: selected, disabled: option.disabled }}
             disabled={option.disabled}
             onPress={() => onChange(selected ? value.filter((item) => item !== option.value) : [...value, option.value])}
-            style={{ minHeight: 40, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
+            style={{ minHeight: theme.dimensions.controlHeight.sm, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
           >
             <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>
               {option.label}
@@ -324,7 +324,7 @@ export function InputOTP({
   return (
     <View accessibilityRole="group" accessibilityLabel={accessibilityLabel} style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
       {Array.from({ length }, (_, index) => (
-        <View key={index} style={{ flex: 1, minWidth: 0, height: 54, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface }}>
+        <View key={index} style={{ flex: 1, minWidth: 0, height: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface }}>
           <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: theme.fontWeights.bold }}>
             {value[index] ?? ""}
           </UiText>
@@ -458,7 +458,7 @@ export function DatePicker({
         </Pressable>
       </View>
       <View style={{ flexDirection: "row-reverse", flexWrap: "wrap" }}>
-        {weekdayLabels.map((label, index) => <View key={`${label}-${index}`} style={{ width: "14.2857%", minHeight: 32, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption }}>{label}</UiText></View>)}
+        {weekdayLabels.map((label, index) => <View key={`${label}-${index}`} style={{ width: "14.2857%", minHeight: theme.dimensions.avatarSize.sm, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption }}>{label}</UiText></View>)}
         {days.map((day, index) => {
           if (day === null) return <View key={`empty-${index}`} style={{ width: "14.2857%", aspectRatio: 1 }} />;
           const dateKey = toDateKey(new Date(year, month, day));
