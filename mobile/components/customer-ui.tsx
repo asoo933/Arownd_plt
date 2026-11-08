@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, Caption, Heading, Icon, Image as UiImage, PriceText, PressableSurface, SearchField, Text as UiText } from "@/components/ui";
+import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
@@ -84,20 +84,22 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
 }) {
   const theme = useAppTheme();
   return (
-    <PressableSurface
-      accessibilityRole="button"
-      accessibilityLabel={`${name}، ${store}، ${price}`}
+    <ProductCard
       onPress={onPress}
       disabled={!onPress}
+      accessibilityLabel={`${name}، ${store}، ${price}`}
       style={[styles.productTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }, style]}
+      media={
+        <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
+          {imageUrl ? <UiImage uri={imageUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={32} color={theme.colors.subtle} accessibilityHidden />}
+        </View>
+      }
+      contentStyle={styles.productContent}
     >
-      <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {imageUrl ? <UiImage uri={imageUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={32} color={theme.colors.subtle} accessibilityHidden />}
-      </View>
       <UiText numberOfLines={2} weight="800" style={styles.productName}>{name}</UiText>
       <Caption numberOfLines={1}>{store}</Caption>
-      <PriceText value={price} />
-    </PressableSurface>
+      <PriceDisplay value={price} />
+    </ProductCard>
   );
 }
 
@@ -140,7 +142,8 @@ const styles = StyleSheet.create({
   heading: { gap: designTokens.spacing.xs, alignItems: "flex-end" },
   sectionTitle: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
   sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "800" },
-  productTile: { width: 158, borderRadius: designTokens.radius.lg, borderWidth: 1, padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
+  productTile: { width: 158 },
+  productContent: { padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
   productImage: { height: 132, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   productName: { minHeight: 38 },
   storeTile: { minHeight: 82, borderWidth: 1, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md - 1 },
