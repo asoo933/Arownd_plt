@@ -2,9 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { ActionButton, AuthField, AuthLayout, FormError, InlineLink } from "@/components/auth-ui";
+import { Text as UiText } from "@/components/ui";
 import { signIn } from "@/lib/auth-service";
 import { loginSchema, type LoginInput } from "@/lib/auth-validation";
 import { translate } from "@/lib/i18n";
@@ -73,7 +74,7 @@ export default function LoginScreen() {
             loading={isSubmitting}
           />
           <View style={styles.signupRow}>
-            <Text style={styles.secondaryText}>{translate("noAccount")}</Text>
+            <UiText style={styles.secondaryText}>{translate("noAccount")}</UiText>
             <Link href="/account-type" style={styles.link}>{translate("createAccount")}</Link>
           </View>
       </View>
