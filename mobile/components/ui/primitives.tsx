@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  StyleSheet,
   Text,
   View,
   type PressableProps,
@@ -64,31 +63,6 @@ export function Surface({
     </View>
   );
 }
-
-export function Divider({
-  vertical = false,
-  style
-}: {
-  vertical?: boolean;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const theme = useAppTheme();
-
-  return (
-    <View
-      accessibilityElementsHidden
-      importantForAccessibility="no"
-      style={[
-        vertical
-          ? { width: StyleSheet.hairlineWidth, alignSelf: "stretch" }
-          : { height: StyleSheet.hairlineWidth, alignSelf: "stretch" },
-        { backgroundColor: theme.colors.border },
-        style
-      ]}
-    />
-  );
-}
-
 
 type PressableSurfaceProps = Pick<PressableProps, "accessibilityHint" | "accessibilityLabel" | "accessibilityRole" | "accessibilityState" | "hitSlop" | "onPress" | "testID"> & {
   children: ReactNode;
@@ -221,7 +195,6 @@ export function Button({
     </Pressable>
   );
 }
-
 
 type IconButtonProps = Pick<PressableProps, "accessibilityHint" | "testID"> & {
   icon: ReactNode;
