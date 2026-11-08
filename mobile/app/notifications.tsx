@@ -161,8 +161,27 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: { position: "relative" },
-  cardContent: { gap: designTokens.spacing.sm, padding: designTokens.spacing.lg },
-  cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
-  unreadDot: { position: "absolute", top: 12, start: 12, width: 8, height: 8, borderRadius: 4 }
+  card: {
+    position: "relative",
+    borderRadius: designTokens.radius.lg
+  },
+  cardContent: {
+    gap: designTokens.spacing.md,
+    padding: designTokens.spacing.lg
+  },
+  cardHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: designTokens.spacing.sm,
+    paddingBottom: designTokens.spacing.xs
+  },
+  unreadDot: {
+    position: "absolute",
+    top: designTokens.spacing.lg,
+    start: designTokens.spacing.lg,
+    width: 8,
+    height: 8,
+    borderRadius: designTokens.radius.pill
+  }
 });
