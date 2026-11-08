@@ -169,7 +169,7 @@ function createStyles(theme: AppTheme) {
     productCard: {
       backgroundColor: theme.colors.surface,
       borderColor: theme.colors.border,
-      borderRadius: designTokens.radius.lg
+      borderRadius: designTokens.radius.xl
     },
     productContent: { gap: designTokens.spacing.xs, padding: designTokens.spacing.md },
     productMedia: { position: "relative", backgroundColor: theme.colors.surfaceMuted },
@@ -179,7 +179,7 @@ function createStyles(theme: AppTheme) {
     storeCard: {
       backgroundColor: theme.colors.surface,
       borderColor: theme.colors.border,
-      borderRadius: designTokens.radius.lg
+      borderRadius: designTokens.radius.xl
     },
     storeContent: {
       flexDirection: "row-reverse",
