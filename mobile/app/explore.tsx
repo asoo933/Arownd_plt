@@ -51,8 +51,7 @@ export default function ExploreScreen() {
         </View>
         <IconButton
           accessibilityLabel={translate("notificationsTitle")}
-          onPress={() => undefined}
-          disabled
+          onPress={() => router.push("/notifications")}
           icon={<Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />}
         />
       </View>
