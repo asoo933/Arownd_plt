@@ -59,7 +59,7 @@ export function Avatar({
             style={{
               color: theme.colors.foreground,
               fontSize: Math.max(12, size * 0.32),
-              fontWeight: "700"
+              fontWeight: theme.fontWeights.bold
             }}
           >
             {getIdentityInitials(name)}
@@ -129,7 +129,7 @@ export function IdentityRow({
       <View style={{ flex: 1, gap: theme.spacing.xs }}>
         <UiText
           numberOfLines={1}
-          style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "700", textAlign: "right" }}
+          style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.bold, textAlign: "right" }}
         >
           {name}
         </UiText>
