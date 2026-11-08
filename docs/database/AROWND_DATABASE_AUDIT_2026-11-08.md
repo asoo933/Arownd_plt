@@ -217,3 +217,91 @@ Name mismatch is not proof of unapplied SQL. A migration may have been renamed o
 - No database writes, DDL, grants, policy changes, migration applications or row deletions.
 - No runtime integration tests or restore drill were performed.
 - Full web/mobile reference scan and per-function SECURITY DEFINER code review are not yet complete.
+
+
+---
+
+## 11. SECURITY DEFINER review — second workstream (2026-11-08)
+
+This pass queried all live `SECURITY DEFINER` routines in `public` and `private`, their ACLs, effective execute privileges, function configuration and trigger bindings.
+
+### Inventory counts
+
+- 58 SECURITY DEFINER functions total across `public` and `private`.
+- 43 do not explicitly set an empty `search_path` (this includes functions with an explicit `public` path and a few trigger-only routines with a controlled schema path).
+- 35 non-trigger functions are executable by `authenticated`.
+- 24 authenticated-callable functions have a non-empty or default search_path.
+- No non-trigger SECURITY DEFINER function in these schemas is executable by `anon`.
+- 17 SECURITY DEFINER trigger functions are attached to enabled triggers. Trigger functions are not RPC entry points; evaluate their trigger bindings and ACLs separately.
+
+These counts are a hardening queue, not a claim that all listed functions are exploitable. Explicitly schema-qualified SQL plus a locked-down search path is the desired pattern. Trigger-only routines can reasonably use a narrow trusted path when fully qualified references are not used, but should not expose unnecessary EXECUTE grants.
+
+### Confirmed high-priority behavior defects
+
+#### P0 — Checkout wrapper is stale
+
+Live `public.create_order_with_delivery`:
+- correctly requires an idempotency key and locks by user/key;
+- stores a request hash and returns the prior order for a matching retry;
+- delegates to `public.create_order_with_delivery_unkeyed`.
+
+The unkeyed implementation currently rejects every payment method except `cod` and rejects both a receipt URL and a delivery-company ID. Therefore BaridiMob receipt checkout and carrier-assigned checkout cannot pass through this live wrapper. This is a confirmed live contract mismatch, not merely a search_path warning.
+
+#### P0 — Review RPC approves submissions directly
+
+Live `public.submit_review`:
+- checks legacy `orders` + `order_items` for delivered product/store purchases;
+- checks collected reservations for store reviews;
+- writes `status='approved'` immediately;
+- does not check `merchant_orders` delivery state and does not implement the repository's pending moderation contract.
+
+This creates a mismatch with the Native UI/repository migration and can auto-publish reviews. Replace/reconcile only after validating legacy review compatibility and existing rows.
+
+#### P1 — Shipment state transitions need a formal state machine
+
+Live `public.update_shipment_status` checks authentication, approved-company ownership (or admin role), locks parent order and shipment, and updates aggregates when delivered. However, it accepts any value from the allowed status list without validating the transition from the current status. For example, the code does not itself prevent moving from a terminal state to another allowed state. Add explicit transition rules and actor-specific permissions in a new migration after mapping actual workflow transitions.
+
+#### P1 — Helper RPC exposure/search_path
+
+The owner/relationship helpers `is_store_owner`, `is_offer_owner`, `is_order_owner`, and `is_order_merchant` are executable by authenticated and use `search_path=public`. Their identity checks must remain correct, but they should be hardened with `SET search_path TO ''` and fully qualified references. Verify every RLS policy and function dependency before changing signatures or grants.
+
+#### P1 — Legacy order/reservation functions
+
+`cancel_my_order`, `cancel_reservation`, and `archive_my_activity` are authenticated-callable SECURITY DEFINER functions using `search_path=public`. Their definitions use owner predicates and status guards, but should be hardened to empty search_path and reviewed against the newer merchant-suborder lifecycle so legacy order cancellation cannot bypass the newer rules.
+
+#### P1 — Merchant and delivery mutation RPCs
+
+Reviewed examples:
+- `merchant_submit_order_quote`: checks store ownership/admin, order status and delivery type; updates quote and parent totals.
+- `merchant_assign_delivery_company`: checks store ownership/admin, confirmed state, company approval and coverage area; creates/assigns shipment.
+- `merchant_update_merchant_order_status`: checks store ownership/admin and confirmed status before marking delivered.
+- `collect_merchant_order_cod`: checks delivery completion and carrier/company or store ownership before recording COD.
+- `link_order_shipment`: allows order owner or merchant relationship and verifies shipment belongs to the parent order; it should be reviewed for legacy multi-merchant compatibility and whether direct RPC use is still required.
+
+These functions have substantive authorization checks in the inspected definitions, but their `search_path=public` should be hardened. This is not a recommendation to delete them.
+
+### Trigger functions and grants
+
+- 17 trigger functions are bound to enabled triggers. They include profile synchronization, approved delivery directory synchronization, merchant-order synchronization, order/shipment status guards, rating aggregates, notification creation and push dispatch.
+- `private.dispatch_notification_push()` is bound only to `notifications_send_push` on `public.notifications`. Its catalog privileges resolve as executable by anon/authenticated through default PUBLIC execute. Because it is a trigger function, it is not callable as an ordinary RPC, but its EXECUTE ACL should still be explicitly revoked from PUBLIC/anon/authenticated and granted only as required for trigger operation.
+- Other trigger functions mostly have ACLs limited to postgres/service_role or postgres. Do not remove or duplicate triggers based on event-level metadata; verify the single trigger binding first.
+
+### Functions to retain
+
+Do not delete SECURITY DEFINER routines simply because they appear in the advisor. The inspected functions support essential capabilities: checkout, stock and reservations, merchant order fulfillment, delivery, COD, account lifecycle, profile visibility, reviews, notifications, wallet review, audit logging, and RLS ownership checks.
+
+### Remediation order
+
+1. Fix checkout contract and review moderation behavior in new migrations, preserving idempotency and legacy compatibility.
+2. Define and enforce shipment transition matrix, including admin/carrier/merchant actors.
+3. Harden authenticated-callable functions to empty search_path using fully qualified objects.
+4. Explicitly tighten trigger function ACLs where safe; preserve trigger execution.
+5. Re-audit RLS policies and function grants after changes.
+6. Only after feature and dependency verification, identify truly obsolete RPCs for archival/removal.
+
+### Scope and limitations
+
+- This is a catalog and function-definition review, not a penetration test.
+- The 58 routines were inventoried. Definitions were inspected in detail for checkout, reviews, shipment status, reservation cancellation, COD collection, delivery-company assignment, merchant quote/status updates and shipment linking. Other definitions still need individual code-level review.
+- No SQL writes, function changes, grants, trigger changes, migrations, or row updates were performed.
+- No runtime integration tests or test-user role simulations were run.
