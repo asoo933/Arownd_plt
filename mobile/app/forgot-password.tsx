@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View } from "react-native";
 
+import { designTokens } from "@/lib/theme";
 import { ActionButton, AuthField, AuthLayout, FormError, InlineLink, SuccessPanel } from "@/components/auth-ui";
 import { requestPasswordRecovery } from "@/lib/auth-service";
 import { recoverySchema, type RecoveryInput } from "@/lib/auth-validation";
@@ -35,12 +36,12 @@ export default function ForgotPasswordScreen() {
   return (
     <AuthLayout title={translate("forgotTitle")} subtitle={translate("forgotSubtitle")} showBack>
       {sent ? (
-        <View style={{ gap: 18 }}>
+        <View style={{ gap: designTokens.spacing.xl }}>
           <SuccessPanel title={translate("forgotTitle")} message={translate("recoverySuccess")} />
           <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/login")} />
         </View>
       ) : (
-        <View style={{ gap: 18 }}>
+        <View style={{ gap: designTokens.spacing.xl }}>
           <Controller control={control} name="email" render={({ field: { onChange, onBlur, value } }) => (
             <AuthField label={translate("email")} value={value} onChangeText={onChange} onBlur={onBlur} keyboardType="email-address" autoComplete="email" placeholder={translate("emailPlaceholder")} error={errors.email ? translate(errors.email.message as "required" | "invalidEmail") : undefined} />
           )} />
