@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { FavoriteButton, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
+import { IconButton } from "@/components/ui";
 import {
   CustomerHeading,
   CustomerScreen,
@@ -63,9 +64,7 @@ export default function FavoritesScreen() {
     : count;
   return (
     <CustomerScreen>
-      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
-        <Text style={styles.backText}>{translate("back")}</Text>
-      </Pressable>
+      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
       <CustomerHeading title={translate("favoritesTitle")} subtitle={translate("favoritesSubtitle")} />
       <View style={[styles.tabs, { backgroundColor: theme.colors.surface }]}>
         <TabButton label={`${translate("favoriteProducts")} (${favorites.data.products.length})`} active={tab === "products"} onPress={() => setTab("products")} />
@@ -124,8 +123,6 @@ function TabButton({ label, active, onPress }: { label: string; active: boolean;
 }
 
 const styles = StyleSheet.create({
-  back: { minHeight: 38, justifyContent: "center", alignItems: "flex-end" },
-  backText: { color: "#647D13", fontSize: 13, fontWeight: "800" },
   tabs: { flexDirection: "row-reverse", borderRadius: 14, padding: 4 },
   tab: { flex: 1, minHeight: 42, alignItems: "center", justifyContent: "center", borderRadius: 11 },
   activeTab: { backgroundColor: "#C6F135" },
