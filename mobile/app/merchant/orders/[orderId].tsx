@@ -25,7 +25,7 @@ import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { Button, TextField } from "@/components/ui";
+import { AppHeader, Button, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -142,15 +142,9 @@ export default function MerchantOrderDetailsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />
-
-        <View style={styles.header}>
-          <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</Text>
-          <Text style={[styles.title, { color: theme.colors.foreground }]}>{translate("merchantOrderDetailTitle")}</Text>
-          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
-            {new Date(customerOrder.created_at).toLocaleString("ar-DZ")}
-          </Text>
-        </View>
+        <AppHeader title={translate("merchantOrderDetailTitle")} leading={<Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
+        <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString("ar-DZ")}</Text>
 
         <View style={styles.card}>
           <View style={styles.summaryRow}>
