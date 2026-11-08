@@ -38,7 +38,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { Button, TextField } from "@/components/ui";
+import { AppHeader, Button, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -337,19 +337,8 @@ export default function MerchantEditProductScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />
-
-          <View style={styles.header}>
-            <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
-              {translate("merchantDashboardEyebrow")}
-            </Text>
-            <Text style={[styles.title, { color: theme.colors.foreground }]}>
-              {translate("merchantProductEditTitle")}
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
-              {translate("merchantProductEditSubtitle")}
-            </Text>
-          </View>
+          <AppHeader title={translate("merchantProductEditTitle")} leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />} />
+          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</Text>
 
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <View style={styles.productHeading}>
