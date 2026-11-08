@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, IconButton, TextField } from "@/components/ui";
+import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
+import { AppHeader, Button, IconButton, PressableSurface, TextField } from "@/components/ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
@@ -68,7 +68,7 @@ export default function DeliveryProfileScreen() {
   }
   if (profile.isError || wilayas.isError) {
     return <CustomerScreen>
-      <CustomerHeading title={translate("deliveryProfileTitle")} />
+      <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
       <ErrorState title={translate("deliveryProfileLoadError")} retryLabel={translate("retry")} onRetry={() => { void profile.refetch(); void wilayas.refetch(); }} />
     </CustomerScreen>;
   }
@@ -126,9 +126,9 @@ export default function DeliveryProfileScreen() {
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutPhonePlaceholder")}</Text>
       <TextField value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" />
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutWilaya")}</Text>
-      <Pressable onPress={() => setPicker("wilaya")} style={pickerStyle}>
+      <PressableSurface onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <Text style={[styles.pickerText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</Text>
-      </Pressable>
+      </PressableSurface>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("checkoutCommune")}</Text>
       <TextField
         value={commune}
@@ -139,9 +139,9 @@ export default function DeliveryProfileScreen() {
         style={[...fieldStyle, wilayaId === null && styles.disabled]}
         textAlign="right"
       />
-      {(communes.data?.length ?? 0) > 0 ? <Pressable onPress={() => setPicker("commune")} style={styles.suggestionButton}>
+      {(communes.data?.length ?? 0) > 0 ? <PressableSurface onPress={() => setPicker("commune")} style={styles.suggestionButton}>
         <Text style={styles.suggestionText}>{translate("checkoutChooseCommune")}</Text>
-      </Pressable> : null}
+      </PressableSurface> : null}
       {communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
       {formError ? <Text style={styles.error}>{formError}</Text> : null}
       <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} fullWidth />
@@ -155,7 +155,7 @@ export default function DeliveryProfileScreen() {
           {picker === "commune" && communes.isPending ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
           {picker === "commune" && communes.isError ? <Text style={styles.error}>{translate("deliveryProfileCommunesError")}</Text> : null}
           <ScrollView style={styles.options}>
-            {pickerItems.map((item) => <Pressable key={item.id} onPress={() => {
+            {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {
                 setWilayaId(item.wilaya.id);
                 setCommune("");
@@ -166,9 +166,9 @@ export default function DeliveryProfileScreen() {
               setPicker(null);
             }} style={styles.option}>
               <Text style={[styles.optionText, { color: theme.colors.foreground }]}>{item.label}</Text>
-            </Pressable>)}
+            </PressableSurface>)}
           </ScrollView>
-          <Pressable onPress={() => setPicker(null)} style={styles.closeButton}><Text style={styles.closeText}>{translate("back")}</Text></Pressable>
+          <PressableSurface onPress={() => setPicker(null)} style={styles.closeButton}><Text style={styles.closeText}>{translate("back")}</Text></PressableSurface>
         </View>
       </View>
     </Modal>
