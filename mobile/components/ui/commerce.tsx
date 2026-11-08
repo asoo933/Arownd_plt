@@ -73,7 +73,7 @@ export function CartButton({
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
       {children}
-      {count !== undefined && count > 0 ? <View style={{ position: "absolute", top: 0, end: 0, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.danger }}><UiText style={{ color: theme.colors.surface, fontSize: 10, fontWeight: "800" }}>{count > 99 ? "99+" : count}</UiText></View> : null}
+      {count !== undefined && count > 0 ? <View style={{ position: "absolute", top: 0, end: 0, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.danger }}><UiText style={{ color: theme.colors.surface, fontSize: 10, fontWeight: theme.fontWeights.extrabold }}>{count > 99 ? "99+" : count}</UiText></View> : null}
     </Pressable>
   );
 }
@@ -133,7 +133,7 @@ export function CouponInput({
     <View style={[{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm }, style]}>
       <TextField value={value} onChangeText={onChangeText} placeholder={placeholder} editable={!disabled} containerStyle={{ flex: 1 }} />
       <Pressable accessibilityRole="button" accessibilityLabel={applyLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onApply} style={{ minHeight: theme.dimensions.controlHeight.lg, justifyContent: "center", paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, opacity: disabled ? 0.5 : 1 }}>
-        <UiText style={{ color: theme.colors.accentForeground, fontWeight: "700" }}>{applyLabel}</UiText>
+        <UiText style={{ color: theme.colors.accentForeground, fontWeight: theme.fontWeights.bold }}>{applyLabel}</UiText>
       </Pressable>
     </View>
   );
