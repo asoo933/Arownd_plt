@@ -14,6 +14,7 @@ import {
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { TextField } from "./form-controls";
+import { Icon } from "./icon";
 
 export function Image({
   uri,
@@ -156,5 +157,5 @@ export function MediaViewer({
   closeLabel: string;
 }) {
   const theme = useAppTheme();
-  return <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}><View style={{ flex: 1, padding: designTokens.spacing.md, backgroundColor: theme.colors.overlay, justifyContent: "center" }}><Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onRequestClose} style={{ alignSelf: "flex-end", minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><Text style={{ color: theme.colors.surface }}>×</Text></Pressable>{children}</View></Modal>;
+  return <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}><View style={{ flex: 1, padding: designTokens.spacing.md, backgroundColor: theme.colors.overlay, justifyContent: "center" }}><Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onRequestClose} style={{ alignSelf: "flex-end", minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><Icon name="x" size={22} color={theme.colors.surface} accessibilityHidden /></Pressable>{children}</View></Modal>;
 }
