@@ -18,7 +18,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { Button, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, StatusBadge } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   const theme = useAppTheme();
@@ -115,18 +115,11 @@ export default function MerchantEntryScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />
-          <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
-            {translate("merchantDashboardEyebrow")}
-          </Text>
-          <Text style={[styles.title, { color: theme.colors.foreground }]}>
-            {translate("merchantDashboardTitle")}
-          </Text>
-          <Text style={[styles.body, { color: theme.colors.muted }]}>
-            {translate("merchantDashboardSubtitle")}
-          </Text>
-        </View>
+        <AppHeader
+          title={translate("merchantDashboardTitle")}
+          leading={<Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />}
+        />
+        <Text style={[styles.body, { color: theme.colors.muted }]}>{translate("merchantDashboardSubtitle")}</Text>
 
         <View style={[styles.storeCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
           <View style={styles.storeHeader}>
@@ -145,13 +138,7 @@ export default function MerchantEntryScreen() {
                 {data.store.commune || translate("merchantStoreLocationMissing")}
               </Text>
               <View style={styles.storeBadges}>
-                <View style={[styles.statusPill, { backgroundColor: data.store.is_verified ? theme.colors.successSurface : theme.colors.warningSurface }]}>
-                  <Text style={[styles.statusPillText, { color: data.store.is_verified ? theme.colors.success : theme.colors.warning }]}>
-                    {data.store.is_verified
-                      ? translate("merchantStoreVerified")
-                      : translate("merchantStoreNotVerified")}
-                  </Text>
-                </View>
+                <StatusBadge label={data.store.is_verified ? translate("merchantStoreVerified") : translate("merchantStoreNotVerified")} tone={data.store.is_verified ? "success" : "warning"} />
                 <View style={[styles.statusPill, { backgroundColor: theme.colors.surfaceMuted }]}>
                   <Text style={[styles.statusPillText, { color: theme.colors.muted }]}>
                     {translate("merchantStoreRating")}: {data.store.rating == null ? "—" : data.store.rating.toFixed(1)}
