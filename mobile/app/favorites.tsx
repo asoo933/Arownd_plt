@@ -23,7 +23,7 @@ import {
   ErrorState,
   LoadingState
 } from "@/components/customer-ui";
-import { fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { chooseBestProductOffer, fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { getFavorites } from "@/lib/favorites";
 import type { FavoriteKind } from "@/lib/favorites-state";
 import { translate } from "@/lib/i18n";
@@ -42,11 +42,7 @@ export default function FavoritesScreen() {
       const [productResults, storeResults] = await Promise.all([
         Promise.all(ids.products.map(async (id) => {
           const offers = await fetchProductOffers(id);
-          const available = offers.filter((offer) => offer.is_available && offer.stock_quantity > 0);
-          const best = (available.length ? available : offers).reduce(
-            (current, offer) => !current || offer.price < current.price ? offer : current,
-            null as (typeof offers)[number] | null
-          );
+          const best = chooseBestProductOffer(offers);
           return best ? { id, offer: best } : null;
         })),
         Promise.all(ids.stores.map(async (id) => ({ id, store: await fetchStoreDetails(id) })))
