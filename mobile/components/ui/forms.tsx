@@ -55,12 +55,9 @@ export function TextArea({
   );
 }
 
-export type NumberFieldProps = Omit<TextInputProps, "keyboardType"> & {
-  min?: number;
-  max?: number;
-};
+export type NumberFieldProps = Omit<TextInputProps, "keyboardType">;
 
-export function NumberField({ min, max, onChangeText, ...props }: NumberFieldProps) {
+export function NumberField({ onChangeText, ...props }: NumberFieldProps) {
   const handleChange = (raw: string) => {
     const normalized = raw.replace(/[^0-9٠-٩٫.,-]/g, "");
     if (onChangeText) onChangeText(normalized);
