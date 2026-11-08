@@ -12,7 +12,7 @@ import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsse
 import { fetchMyMerchantStoreSettings, updateMyMerchantStoreSettings } from "@/lib/merchant-store-settings";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 import { translate } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 export default function MerchantStoreSettingsScreen() {
   const theme = useAppTheme();
@@ -179,7 +179,7 @@ export default function MerchantStoreSettingsScreen() {
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
             <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
-              <UiText style={{ color: theme.colors.foreground, fontSize: 13, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</UiText>
+              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
@@ -263,32 +263,32 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: 16, paddingBottom: 36, gap: 12 },
-    backText: { fontSize: 12, fontWeight: "800" },
-    subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
-    card: { padding: 15, gap: 13 },
+    content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.md },
+    backText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+    subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" },
+    card: { padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     select: { justifyContent: "center" },
-    brandingRow: { flexDirection: "row-reverse", gap: 12 },
-    brandingItem: { flex: 1, gap: 8 },
-    logoPreview: { width: 76, height: 76, borderRadius: 14, alignSelf: "flex-end" },
-    coverPreview: { width: "100%", height: 76, borderRadius: 14 },
+    brandingRow: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
+    brandingItem: { flex: 1, gap: designTokens.spacing.sm },
+    logoPreview: { width: 76, height: 76, borderRadius: designTokens.radius.md, alignSelf: "flex-end" },
+    coverPreview: { width: "100%", height: 76, borderRadius: designTokens.radius.md },
     imagePlaceholder: { alignItems: "center", justifyContent: "center" },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-    sectionTitle: { fontSize: 14, fontWeight: "900" },
+    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
     wilayaList: { maxHeight: 480 },
-    wilayaOption: { minHeight: 48, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth, paddingHorizontal: 8 },
-    wilayaText: { textAlign: "right", fontSize: 13, fontWeight: "700" },
-    field: { gap: 6, flex: 1 },
-    label: { fontSize: 11, fontWeight: "800", textAlign: "right" },
-    input: { minHeight: 47, borderWidth: 1, borderRadius: 11, paddingHorizontal: 12, fontSize: 13 },
+    wilayaOption: { minHeight: designTokens.dimensions.controlHeight.lg, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth, paddingHorizontal: designTokens.spacing.sm },
+    wilayaText: { textAlign: "right", fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
+    field: { gap: designTokens.spacing.xs, flex: 1 },
+    label: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    input: { minHeight: 47, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body - 1 },
     textarea: { minHeight: 92, paddingTop: 12 },
-    row: { flexDirection: "row-reverse", gap: 10 },
+    row: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
     half: { flex: 1 },
-    days: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7 },
-    dayChip: { minHeight: 38, minWidth: 65, paddingHorizontal: 9, borderWidth: 1, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-    dayChipText: { fontSize: 10, fontWeight: "800" },
-    error: { fontSize: 11, textAlign: "right" },
-    success: { fontSize: 11, textAlign: "right", fontWeight: "800" },
-    message: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, gap: 14 }
+    days: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+    dayChip: { minHeight: 38, minWidth: 65, paddingHorizontal: designTokens.spacing.sm, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
+    dayChipText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
+    error: { fontSize: designTokens.typography.caption, textAlign: "right" },
+    success: { fontSize: designTokens.typography.caption, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
+    message: { flex: 1, justifyContent: "center", alignItems: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg }
   });
 }
