@@ -25,7 +25,8 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           {
             backgroundColor: theme.colors.surface,
             borderColor: error ? theme.colors.danger : theme.colors.border,
-            color: theme.colors.foreground
+            color: theme.colors.foreground,
+            fontFamily: theme.fontFamilies.arabic
           },
           style
         ]}
