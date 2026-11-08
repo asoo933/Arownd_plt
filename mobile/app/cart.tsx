@@ -70,7 +70,7 @@ export default function CartScreen() {
   };
 
   return <CustomerScreen>
-    <AppHeader title={translate("cartTitle")} trailing={<UiText tone="muted" style={{ fontSize: 12 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</UiText>} />
+    <AppHeader title={translate("cartTitle")} trailing={<UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</UiText>} />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
     {mutation.isError ? <Alert tone="danger" description={translate("genericError")} /> : null}
