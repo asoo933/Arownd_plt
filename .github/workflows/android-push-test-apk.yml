@@ -1,5 +1,6 @@
-name: Android push test APK
+name: Arownd Native Android debug APK (Expo)
 
+# Manual-only debug build for device testing. Uses mobile/ Expo project, never root android/.
 on:
   workflow_dispatch:
 
@@ -7,68 +8,64 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-push-test-${{ github.ref }}
-  cancel-in-progress: true
+  group: arownd-expo-android-debug-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build-debug-apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
-      - name: Setup Java
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      - name: Validate Firebase Android configuration
+      - name: Validate Supabase configuration
+        shell: bash
         run: |
           set -euo pipefail
-          test -s android/app/google-services.json
-          grep -q '"project_id": "arownd-271d1"' android/app/google-services.json
-          grep -q '"package_name": "com.arownd.app"' android/app/google-services.json
+          test -n "$EXPO_PUBLIC_SUPABASE_URL" || { echo "::error::Missing secret EXPO_PUBLIC_SUPABASE_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY" || { echo "::error::Missing secret EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"; exit 1; }
+          node --input-type=module -e 'const u = new URL(process.env.EXPO_PUBLIC_SUPABASE_URL); if (u.protocol !== "https:") process.exit(1);'
 
-      - name: Verify Capacitor CLI and Android platform dependencies
+      - name: Install Expo mobile dependencies
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Validate Expo configuration
+        run: npm run doctor
+
+      - name: Generate clean native Android project
+        run: npx expo prebuild --platform android --clean --no-install --non-interactive
+
+      - name: Assemble debug APK
+        working-directory: mobile/android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Verify debug APK
         run: |
-          node -e "const p=require('./package.json'); const has=(name)=>Boolean(p.dependencies?.[name] || p.devDependencies?.[name]); const missing=['@capacitor/cli','@capacitor/android'].filter((name)=>!has(name)); if(missing.length){console.error('Missing declared native build dependencies: '+missing.join(', ')); process.exit(1)}"
-      - name: Install dependencies
-        # Keep this native-only workflow buildable while package.json's Capacitor deps are being reconciled with the workspace lockfile.
-        run: pnpm install --no-frozen-lockfile
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK" || { echo "::error::Expected native Android debug APK is missing or empty: mobile/$APK"; exit 1; }
 
-      - name: Build Capacitor web assets
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: |
-          test -n "$VITE_SUPABASE_URL"
-          test -n "$VITE_SUPABASE_PUBLISHABLE_KEY"
-          pnpm run build:capacitor
-
-      - name: Sync native Android plugins
-        run: pnpm exec cap sync android
-
-      - name: Build debug APK
-        working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
-
-      - name: Upload debug APK
+      - name: Upload native Android debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: arownd-android-push-test-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: arownd-react-native-debug-apk-${{ github.run_number }}
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
