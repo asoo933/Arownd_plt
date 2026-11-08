@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
+import { designTokens } from "@/lib/theme";
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
@@ -192,8 +193,8 @@ function ProfileMenuItem({ label, hint, onPress }: {
 }
 
 const styles = StyleSheet.create({
-  stats: { flexDirection: "row-reverse", gap: 10 },
+  stats: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
   stat: { flex: 1 },
   menuContent: { gap: 0, padding: 0 },
-  menuCopy: { flex: 1, alignItems: "flex-end", gap: 4 }
+  menuCopy: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs }
 });
