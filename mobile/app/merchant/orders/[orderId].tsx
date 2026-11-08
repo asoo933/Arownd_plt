@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   View
@@ -23,7 +22,7 @@ import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, ConfirmDialog, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, ConfirmDialog, ErrorState, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -336,8 +335,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
-        <ActivityIndicator color={theme.colors.accentMuted} />
-        <UiText style={{ color: theme.colors.muted, fontSize: 13 }}>{label}</UiText>
+        <LoadingState label={label} />
       </View>
     </SafeAreaView>
   );
@@ -347,8 +345,7 @@ function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppThem
   return (
     <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
-        <UiText style={{ color: theme.colors.foreground, fontSize: 14, fontWeight: "800", textAlign: "center" }}>{title}</UiText>
-        <Button label={actionLabel} onPress={onAction} />
+        <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
     </SafeAreaView>
   );
