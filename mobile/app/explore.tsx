@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { useAppTheme } from "@/lib/theme";
-import { AppHeader, IconButton } from "@/components/ui";
+import { AppHeader, Icon, IconButton, Text as UiText } from "@/components/ui";
 
 export default function ExploreScreen() {
   const theme = useAppTheme();
@@ -36,9 +36,9 @@ export default function ExploreScreen() {
     <CustomerScreen>
       <AppHeader
         title={translate("exploreTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />}
       />
-      <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("exploreSubtitle")}</Text>
+      <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("exploreSubtitle")}</UiText>
       <CustomerSearch value={query} onChangeText={setQuery} placeholder={translate("homeSearchPlaceholder")} />
       {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void products.refetch()} />
@@ -51,7 +51,7 @@ export default function ExploreScreen() {
           ))}
         </View>
       )}
-      <Text style={[styles.footer, { color: theme.colors.muted }]}>{translate("exploreFooter")}</Text>
+      <UiText style={[styles.footer, { color: theme.colors.muted }]}>{translate("exploreFooter")}</UiText>
     </CustomerScreen>
   );
 }
