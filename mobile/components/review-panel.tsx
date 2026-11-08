@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { Button, TextField } from "@/components/ui";
@@ -114,8 +114,6 @@ function createStyles(theme: AppTheme) {
     stars: { flexDirection: "row-reverse", justifyContent: "flex-start", gap: 8 },
     starButton: { minWidth: 42, minHeight: 44, alignItems: "center", justifyContent: "center" },
     input: { minHeight: 88, borderWidth: 1, borderRadius: 13, padding: 12, textAlignVertical: "top", fontSize: 13 },
-    submit: { minHeight: 46, borderRadius: 13, alignItems: "center", justifyContent: "center", paddingHorizontal: 12 },
-    submitText: { fontSize: 12, fontWeight: "900" },
     error: { fontSize: 11, textAlign: "right" },
     ownReview: { borderRadius: 13, padding: 12, gap: 6 },
     ownTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
