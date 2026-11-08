@@ -27,7 +27,7 @@ export function CustomerNavigation() {
 
   return (
     <BottomNavigation
-      accessibilityLabel={translate("navHome")}
+      accessibilityLabel={translate("navMain")}
       value={activeTab}
       onChange={(key) => {
         const destination = tabs.find((tab) => tab.id === key)?.path;
