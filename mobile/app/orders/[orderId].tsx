@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Modal, StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, IconButton, PressableSurface, StatusBadge } from "@/components/ui";
+import { AppHeader, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TrackingTimeline } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
@@ -51,7 +51,7 @@ function OrderStatusBadge({ status }: { status: string }) {
         ? "warning"
         : "neutral";
 
-  return <StatusBadge label={statusLabel(status)} tone={tone} />;
+  return <UiOrderStatusBadge label={statusLabel(status)} tone={tone} />;
 }
 
 function dateLabel(value: string | null | undefined): string {
@@ -120,7 +120,7 @@ export default function OrderDetailsScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersLoginHint")} />
-    <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("login")}</Text></PressableSurface>
+    <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
   if (!query.data) return <CustomerScreen>
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
@@ -129,7 +129,7 @@ export default function OrderDetailsScreen() {
   if (!order) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <EmptyState title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
-    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></PressableSurface>
+    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
 
   </CustomerScreen>;
 
@@ -140,44 +140,40 @@ export default function OrderDetailsScreen() {
   const orderCode = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
 
   return <CustomerScreen>
-    <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
-    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersCode") + ": " + orderCode}</Text>
+    <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
+    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersCode") + ": " + orderCode}</UiText>
 
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("orderSummary")}</Text>
-      <View style={styles.totalRow}><Text style={styles.label}>{translate("orderTotal")}</Text><Text style={styles.total}>{formatDZD(order.total)}</Text></View>
-      <Text style={styles.meta}>{dateLabel(order.created_at)}</Text>
+      <UiText style={styles.sectionTitle}>{translate("orderSummary")}</UiText>
+      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderTotal")}</UiText><PriceDisplay value={formatDZD(order.total)} style={styles.priceDisplay} /></View>
+      <UiText style={styles.meta}>{dateLabel(order.created_at)}</UiText>
     </View>
 
     {showParentTimeline ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("orderProgress")}</Text>
-      {parentCancelled ? <OrderStatusBadge status={order.status} /> : STEPS.map((step, index) => {
-        const complete = index <= activeStep;
-        return <View key={step.status} style={styles.step}>
-          <View style={[styles.stepDot, complete && styles.stepDone]}><Text style={[styles.stepNumber, complete && styles.stepNumberDone]}>{complete ? "✓" : String(index + 1)}</Text></View>
-          <View style={styles.stepContent}>
-            <Text style={[styles.stepTitle, { color: theme.colors.foreground }]}>{translate(step.title)}</Text>
-            <Text style={styles.meta}>{translate(step.hint)}</Text>
-          </View>
-        </View>;
-      })}
+      <UiText style={styles.sectionTitle}>{translate("orderProgress")}</UiText>
+      {parentCancelled ? <OrderStatusBadge status={order.status} /> : <TrackingTimeline steps={STEPS.map((step, index) => ({
+        key: step.status,
+        title: translate(step.title),
+        description: translate(step.hint),
+        status: index < activeStep ? "complete" as const : index === activeStep ? "current" as const : "upcoming" as const
+      }))} />}
     </View> : <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("orderPerStoreProgress")}</Text>
-      <Text style={styles.meta}>{translate("orderPerStoreHint")}</Text>
+      <UiText style={styles.sectionTitle}>{translate("orderPerStoreProgress")}</UiText>
+      <UiText style={styles.meta}>{translate("orderPerStoreHint")}</UiText>
     </View>}
 
     {merchantOrders.length === 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("orderItemsTitle")}</Text>
+      <UiText style={styles.sectionTitle}>{translate("orderItemsTitle")}</UiText>
       {order.items.map((item) => <View key={item.id} style={styles.itemRow}>
         <View style={styles.itemInfo}>
-          <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
-          <Text style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</Text>
-          {Object.entries(readCartOptions(item.options)).length > 0 ? <Text style={styles.meta}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</Text> : null}
+          <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</UiText>
+          <UiText style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</UiText>
+          {Object.entries(readCartOptions(item.options)).length > 0 ? <UiText style={styles.meta}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</UiText> : null}
         </View>
-        <Text style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</Text>
+        <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
       </View>)}
-      <View style={styles.totalRow}><Text style={styles.label}>{translate("orderSubtotal")}</Text><Text style={styles.label}>{formatDZD(order.subtotal)}</Text></View>
-      <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(order.shipping_fee)}</Text></View>
+      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(order.subtotal)}</UiText></View>
+      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(order.shipping_fee)}</UiText></View>
     </View> : null}
 
     {merchantOrders.map((merchantOrder) => {
@@ -186,7 +182,7 @@ export default function OrderDetailsScreen() {
       const subTotal = cancelled ? 0 : merchantOrder.subtotal + merchantOrder.shipping_fee;
       return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.merchantHeader}>
-          <Text style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</Text>
+          <UiText style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</UiText>
           <StatusBadge
             label={statusLabel(merchantOrder.status)}
             tone={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "neutral"}
@@ -194,68 +190,68 @@ export default function OrderDetailsScreen() {
         </View>
         {merchantOrder.items.map((item) => <View key={item.id} style={styles.itemRow}>
           <View style={styles.itemInfo}>
-            <Text style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</Text>
+            <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</UiText>
             
           </View>
-          <Text style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</Text>
+          <UiText style={styles.itemPrice}>{formatDZD(item.unit_price * item.quantity)}</UiText>
         </View>)}
-        <View style={styles.totalRow}><Text style={styles.label}>{translate("orderStoreSubtotal")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.subtotal)}</Text></View>
-        {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><Text style={styles.label}>{translate("orderShipping")}</Text><Text style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</Text></View> : null}
-        {!cancelled ? <View style={styles.totalRow}><Text style={styles.sectionTitle}>{translate("orderStoreTotal")}</Text><Text style={styles.total}>{formatDZD(subTotal)}</Text></View> : null}
+        <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderStoreSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.subtotal)}</UiText></View>
+        {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</UiText></View> : null}
+        {!cancelled ? <View style={styles.totalRow}><UiText style={styles.sectionTitle}>{translate("orderStoreTotal")}</UiText><UiText style={styles.total}>{formatDZD(subTotal)}</UiText></View> : null}
         {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <PressableSurface
           disabled={cancelMutation.isPending}
           onPress={() => setCancelTarget({ type: "merchant", id: merchantOrder.id })}
           style={styles.cancelButton}
         >
-          <Text style={styles.cancelButtonText}>{translate("orderCancelStore")}</Text>
+          <UiText style={styles.cancelButtonText}>{translate("orderCancelStore")}</UiText>
         </PressableSurface> : null}
         {merchantOrder.status === "quoted" ? <>
-          <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text>
+          <UiText style={styles.notice}>{translate("orderQuoteAwaiting")}</UiText>
           <View style={styles.quoteActions}>
             <PressableSurface
               disabled={quoteMutation.isPending}
               onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
               style={styles.acceptButton}
             >
-              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</Text>}
+              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
             </PressableSurface>
             <PressableSurface
               disabled={quoteMutation.isPending}
               onPress={() => setDeclineTarget(merchantOrder.id)}
               style={styles.declineButton}
             >
-              <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>
+              <UiText style={styles.declineButtonText}>{translate("orderQuoteDecline")}</UiText>
             </PressableSurface>
           </View>
-          {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
+          {quoteMutation.isError ? <UiText style={styles.errorText}>{translate("orderQuoteResponseError")}</UiText> : null}
         </> : null}
         {(query.data.trackingEvents.find((entry) => entry.merchantOrderId === merchantOrder.id)?.events ?? []).map((event) => (
           <View key={event.id} style={styles.trackingEvent}>
             <OrderStatusBadge status={event.status} />
-            <Text style={styles.meta}>{dateLabel(event.created_at)}</Text>
-            {event.note ? <Text style={styles.meta}>{event.note}</Text> : null}
+            <UiText style={styles.meta}>{dateLabel(event.created_at)}</UiText>
+            {event.note ? <UiText style={styles.meta}>{event.note}</UiText> : null}
           </View>
         ))}
-        {order.delivery_type === "desk" && merchantOrder.store?.address_line ? <Text style={styles.meta}>{translate("orderPickupAddress")}: {merchantOrder.store.address_line} · {merchantOrder.store.commune ?? ""}</Text> : null}
+        {order.delivery_type === "desk" && merchantOrder.store?.address_line ? <UiText style={styles.meta}>{translate("orderPickupAddress")}: {merchantOrder.store.address_line} · {merchantOrder.store.commune ?? ""}</UiText> : null}
       </View>;
     })}
 
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("orderRecipientTitle")}</Text>
-      <Text style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</Text>
-      <Text style={styles.meta}>{order.wilaya?.name_ar ?? ""} · {order.commune ?? ""}</Text>
-      {order.delivery_type === "home" && order.address_line ? <Text style={styles.meta}>{order.address_line}</Text> : null}
-      <Text style={styles.meta}>{order.phone ?? ""}</Text>
-      <Text style={styles.meta}>{order.delivery_type === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")}</Text>
-      <Text style={styles.meta}>{translate("orderPayment")}: {order.payment_method === "cod" ? translate("checkoutCodNote") : order.payment_method ?? ""}</Text>
+      <UiText style={styles.sectionTitle}>{translate("orderRecipientTitle")}</UiText>
+      <UiText style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</UiText>
+      <UiText style={styles.meta}>{order.wilaya?.name_ar ?? ""} · {order.commune ?? ""}</UiText>
+      {order.delivery_type === "home" && order.address_line ? <UiText style={styles.meta}>{order.address_line}</UiText> : null}
+      <UiText style={styles.meta}>{order.phone ?? ""}</UiText>
+      <UiText style={styles.meta}>{order.delivery_type === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")}</UiText>
+      <UiText style={styles.meta}>{translate("orderPayment")}: {order.payment_method === "cod" ? translate("checkoutCodNote") : order.payment_method ?? ""}</UiText>
     </View>
 
     {query.data.shipments.length > 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
-      <Text style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</Text>
+      <UiText style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</UiText>
       {query.data.shipments.map((shipment) => <View key={shipment.id} style={styles.shipment}>
         <OrderStatusBadge status={shipment.status} />
-        {shipment.updated_at ? <Text style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at)}</Text> : null}
-        {shipment.notes ? <Text style={styles.meta}>{shipment.notes}</Text> : null}
+        {shipment.updated_at ? <UiText style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at)}</UiText> : null}
+        {shipment.notes ? <UiText style={styles.meta}>{shipment.notes}</UiText> : null}
       </View>)}
     </View> : null}
     {canCancelLegacyOrder(order.status, merchantOrders.length > 0, query.data.shipments.map((shipment) => shipment.status)) ? <PressableSurface
@@ -263,26 +259,26 @@ export default function OrderDetailsScreen() {
       onPress={() => setCancelTarget({ type: "order", id: order.id })}
       style={styles.cancelButton}
     >
-      <Text style={styles.cancelButtonText}>{translate("orderCancel")}</Text>
+      <UiText style={styles.cancelButtonText}>{translate("orderCancel")}</UiText>
     </PressableSurface> : null}
-    {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
-    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></PressableSurface>
+    {cancelMutation.isError ? <UiText style={styles.errorText}>{translate("orderCancelError")}</UiText> : null}
+    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
     <Modal visible={cancelTarget !== null} transparent animationType="fade" onRequestClose={() => setCancelTarget(null)}>
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <Text style={styles.sectionTitle}>{translate("orderCancelConfirmTitle")}</Text>
-          <Text style={styles.meta}>{translate("orderCancelConfirmHint")}</Text>
-          {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
+          <UiText style={styles.sectionTitle}>{translate("orderCancelConfirmTitle")}</UiText>
+          <UiText style={styles.meta}>{translate("orderCancelConfirmHint")}</UiText>
+          {cancelMutation.isError ? <UiText style={styles.errorText}>{translate("orderCancelError")}</UiText> : null}
           <View style={styles.quoteActions}>
             <PressableSurface
               disabled={cancelMutation.isPending}
               onPress={() => { if (cancelTarget) cancelMutation.mutate(cancelTarget); }}
               style={styles.declineButton}
             >
-              {cancelMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <Text style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</Text>}
+              {cancelMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <UiText style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</UiText>}
             </PressableSurface>
             <PressableSurface accessibilityRole="button" disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
-              <Text style={styles.acceptButtonText}>{translate("back")}</Text>
+              <UiText style={styles.acceptButtonText}>{translate("back")}</UiText>
             </PressableSurface>
           </View>
         </View>
@@ -291,9 +287,9 @@ export default function OrderDetailsScreen() {
     <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <Text style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</Text>
-          <Text style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</Text>
-          {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
+          <UiText style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</UiText>
+          <UiText style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</UiText>
+          {quoteMutation.isError ? <UiText style={styles.errorText}>{translate("orderQuoteResponseError")}</UiText> : null}
           <View style={styles.quoteActions}>
             <PressableSurface
               disabled={quoteMutation.isPending}
@@ -306,10 +302,10 @@ export default function OrderDetailsScreen() {
               }}
               style={styles.declineButton}
             >
-              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>}
+              {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <UiText style={styles.declineButtonText}>{translate("orderQuoteDecline")}</UiText>}
             </PressableSurface>
             <PressableSurface accessibilityRole="button" disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
-              <Text style={styles.acceptButtonText}>{translate("back")}</Text>
+              <UiText style={styles.acceptButtonText}>{translate("back")}</UiText>
             </PressableSurface>
           </View>
         </View>
@@ -326,6 +322,8 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   totalRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 9 },
   label: { color: theme.colors.muted, fontSize: 12, fontWeight: "700" },
   total: { color: theme.colors.accentMuted, fontSize: 18, fontWeight: "900" },
+  priceDisplay: { justifyContent: "flex-start" },
+  itemPriceDisplay: { justifyContent: "flex-start" },
   meta: { color: theme.colors.muted, fontSize: 11, lineHeight: 18, textAlign: "right" },
   step: { flexDirection: "row-reverse", gap: 11, alignItems: "flex-start" },
   stepDot: { width: 29, height: 29, borderRadius: 15, borderWidth: 1, borderColor: theme.colors.border, alignItems: "center", justifyContent: "center" },
