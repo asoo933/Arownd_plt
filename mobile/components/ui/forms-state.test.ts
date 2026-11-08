@@ -18,7 +18,7 @@ describe("getCalendarDays", () => {
 
     expect(days.slice(0, 4)).toEqual([null, null, null, null]);
     expect(days[4]).toBe(1);
-    expect(days.at(-1)).toBe(29);
+    expect(days[days.length - 1]).toBe(29);
   });
 
   it("supports a custom first weekday", () => {
