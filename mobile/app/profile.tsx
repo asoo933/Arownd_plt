@@ -121,7 +121,7 @@ export default function ProfileScreen() {
           </Card>
 
           <View style={styles.stats}>
-            <Card contentStyle={styles.statCard}>
+            <Card style={styles.statCardOuter} contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
                 <Icon name="package" size={19} />
                 <StatCard
@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(128, 128, 128, 0.25)"
   },
   stats: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
+  statCardOuter: { flex: 1, minWidth: 0 },
   statCard: { padding: designTokens.spacing.md },
   statHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.sm },
   stat: { flex: 1, minWidth: 0, padding: 0, backgroundColor: "transparent" },
