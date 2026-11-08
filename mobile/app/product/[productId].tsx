@@ -165,8 +165,7 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
 }
 
 const styles = StyleSheet.create({
-  heroImage: { height: 300, borderRadius: 22, backgroundColor: "#ECEFE4", overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  imageFallback: { color: "#8A9B55", fontSize: 46 },
+  heroImage: { height: 300, borderRadius: 22, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   infoCard: { borderRadius: 18, padding: 16, gap: 10 },
   productName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
   priceDisplay: { justifyContent: "flex-end" },
@@ -189,5 +188,5 @@ const styles = StyleSheet.create({
   optionChip: { minWidth: 44, minHeight: 44, paddingHorizontal: 13, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   optionChipText: { fontSize: 12, fontWeight: "700" },
   quantityRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  mutationError: { color: "#B42318", fontSize: 11, textAlign: "right" },
+  mutationError: { fontSize: 11, textAlign: "right" },
 });
