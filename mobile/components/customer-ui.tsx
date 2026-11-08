@@ -67,7 +67,7 @@ export function SectionTitle({ title, action, onAction }: {
           variant="ghost"
           size="sm"
           textStyle={[styles.sectionAction, { color: theme.colors.accentMuted }]}
-          style={{ minHeight: 36, paddingHorizontal: 8 }}
+          style={{ minHeight: designTokens.dimensions.controlHeight.md, paddingHorizontal: 8 }}
         />
       ) : null}
     </View>
