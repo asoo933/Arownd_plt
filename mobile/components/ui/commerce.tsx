@@ -98,7 +98,7 @@ export function ProductQuantitySelector({
   onChange: (value: number) => void;
   decreaseLabel: string;
   increaseLabel: string;
-  disabled?: boolean;
+  disabled?: boolean | undefined;
 }) {
   return <QuantityStepper value={value} min={min} max={max} onChange={onChange} decreaseLabel={decreaseLabel} increaseLabel={increaseLabel} disabled={disabled} />;
 }
