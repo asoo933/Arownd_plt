@@ -14,6 +14,11 @@ describe("getCustomerTab", () => {
     expect(getCustomerTab("/product/abc")).toBe("explore");
     expect(getCustomerTab("/store/abc")).toBe("stores");
     expect(getCustomerTab("/orders/abc")).toBe("profile");
+    expect(getCustomerTab("/addresses")).toBe("profile");
+    expect(getCustomerTab("/notifications")).toBe("profile");
+    expect(getCustomerTab("/my-reviews")).toBe("profile");
+    expect(getCustomerTab("/delivery-profile")).toBe("profile");
+    expect(getCustomerTab("/settings")).toBe("profile");
   });
 
   it("hides the tab bar outside the main customer navigation", () => {
