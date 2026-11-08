@@ -333,7 +333,7 @@ export function InputOTP({
       ))}
       <TextInput
         value={value}
-        onChangeText={(next) => onChange(next.replace(/\\D/g, "").slice(0, length))}
+        onChangeText={(next) => onChange(next.replace(/\D/g, "").slice(0, length))}
         keyboardType="number-pad"
         maxLength={length}
         editable={!disabled}
