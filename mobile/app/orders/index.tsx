@@ -120,12 +120,14 @@ export default function OrdersScreen() {
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void orders.refetch(); }} />
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
-    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />\n    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersLoginHint")}</UiText>
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
+    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersLoginHint")}</UiText>
     <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
 
   return <CustomerScreen>
-    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />\n    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersSubtitle")}</UiText>
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
+    <UiText style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("ordersSubtitle")}</UiText>
     <SegmentedControl
       accessibilityLabel={translate("ordersTitle")}
       options={TABS.map((item) => ({ key: item.id, label: translate(item.key) }))}
@@ -172,7 +174,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   meta: { fontSize: 11, textAlign: "right" },
   cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 10 },
   openLabel: { color: theme.colors.accentMuted, fontSize: 11, fontWeight: "900" },
-  total: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900" },
   primary: { minHeight: 48, borderRadius: 14, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
   primaryText: { color: theme.colors.foreground, fontWeight: "900" }
 }); }
