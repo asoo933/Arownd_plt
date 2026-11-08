@@ -20,7 +20,7 @@ export function PriceDisplay({
   const theme = useAppTheme();
   return (
     <View style={[{ flexDirection: "row-reverse", alignItems: "baseline", flexWrap: "wrap", gap: designTokens.spacing.sm }, style]}>
-      <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: "800", fontVariant: ["tabular-nums"] }}>{value}</UiText>
+      <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: theme.fontWeights.extrabold, fontVariant: ["tabular-nums"] }}>{value}</UiText>
       {previousValue ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textDecorationLine: "line-through" }}>{previousValue}</UiText> : null}
     </View>
   );
@@ -28,7 +28,7 @@ export function PriceDisplay({
 
 export function DiscountBadge({ label }: { label: string }) {
   const theme = useAppTheme();
-  return <UiText style={{ alignSelf: "flex-start", overflow: "hidden", paddingHorizontal: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xs, borderRadius: theme.radius.pill, backgroundColor: theme.colors.dangerSurface, color: theme.colors.danger, fontSize: theme.typography.caption, fontWeight: "700" }}>{label}</UiText>;
+  return <UiText style={{ alignSelf: "flex-start", overflow: "hidden", paddingHorizontal: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xs, borderRadius: theme.radius.pill, backgroundColor: theme.colors.dangerSurface, color: theme.colors.danger, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold }}>{label}</UiText>;
 }
 
 export function StockBadge({ label, tone = "success" }: { label: string; tone?: Extract<StatusBadgeTone, "success" | "warning" | "danger" | "neutral"> }) {
@@ -71,7 +71,7 @@ export function CartButton({
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
       {children}
       {count !== undefined && count > 0 ? <View style={{ position: "absolute", top: 0, end: 0, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.danger }}><UiText style={{ color: theme.colors.surface, fontSize: 10, fontWeight: "800" }}>{count > 99 ? "99+" : count}</UiText></View> : null}
     </Pressable>
@@ -132,7 +132,7 @@ export function CouponInput({
   return (
     <View style={[{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm }, style]}>
       <TextField value={value} onChangeText={onChangeText} placeholder={placeholder} editable={!disabled} containerStyle={{ flex: 1 }} />
-      <Pressable accessibilityRole="button" accessibilityLabel={applyLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onApply} style={{ minHeight: 48, justifyContent: "center", paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, opacity: disabled ? 0.5 : 1 }}>
+      <Pressable accessibilityRole="button" accessibilityLabel={applyLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onApply} style={{ minHeight: theme.dimensions.controlHeight.lg, justifyContent: "center", paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, opacity: disabled ? 0.5 : 1 }}>
         <UiText style={{ color: theme.colors.accentForeground, fontWeight: "700" }}>{applyLabel}</UiText>
       </Pressable>
     </View>
