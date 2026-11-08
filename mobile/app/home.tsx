@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CartButton } from "@/components/cart-button";
-import { Button } from "@/components/ui";
+import { Button, PressableSurface } from "@/components/ui";
 import {
   CustomerScreen,
   CustomerSearch,
@@ -66,10 +66,16 @@ export default function CustomerHomeScreen() {
         <SectionTitle title={translate("homeCategories")} action={translate("homeSeeAll")} onAction={() => router.push("/explore")} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRail}>
           {categories.map((category) => (
-            <Pressable key={category.id} accessibilityRole="button" onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })} style={[styles.category, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}>
+            <PressableSurface
+              key={category.id}
+              accessibilityRole="button"
+              accessibilityLabel={translate(category.label)}
+              onPress={() => router.push({ pathname: "/explore", params: { category: category.id } })}
+              style={[styles.category, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1 }]}
+            >
               <Text style={styles.categoryIcon}>{category.icon}</Text>
               <Text style={[styles.categoryLabel, { color: theme.colors.foreground }]}>{translate(category.label)}</Text>
-            </Pressable>
+            </PressableSurface>
           ))}
         </ScrollView>
       </View>
