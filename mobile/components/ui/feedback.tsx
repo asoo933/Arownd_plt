@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  Text as NativeText,
   View,
   type StyleProp,
   type ViewStyle
@@ -11,6 +10,7 @@ import {
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Icon } from "./icon";
+import { Text as UiText } from "./typography";
 
 export type FeedbackTone = "info" | "success" | "warning" | "danger";
 
@@ -36,8 +36,8 @@ export function Alert({
 
   return (
     <View accessibilityRole="alert" style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, gap: designTokens.spacing.xs }, style]}>
-      {title ? <NativeText style={{ color: colors.foreground, fontWeight: "700", fontSize: theme.typography.body, textAlign: "right" }}>{title}</NativeText> : null}
-      <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{description}</NativeText>
+      {title ? <UiText style={{ color: colors.foreground, fontWeight: "700", fontSize: theme.typography.body, textAlign: "right" }}>{title}</UiText> : null}
+      <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText>
     </View>
   );
 }
@@ -121,8 +121,8 @@ export function SuccessState({
       <View style={{ width: 48, height: 48, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.successSurface }}>
         <Icon name="check" size={24} color={theme.colors.success} accessibilityHidden />
       </View>
-      <NativeText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "center" }}>{title}</NativeText>
-      {description ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "center" }}>{description}</NativeText> : null}
+      <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "center" }}>{title}</UiText>
+      {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "center" }}>{description}</UiText> : null}
       {action}
     </View>
   );
@@ -146,8 +146,8 @@ export function Dialog({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
       <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, backgroundColor: theme.colors.overlay }}>
         <Pressable onPress={() => undefined} style={{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
-          {title ? <NativeText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "right" }}>{title}</NativeText> : null}
-          {description ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "right" }}>{description}</NativeText> : null}
+          {title ? <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "right" }}>{title}</UiText> : null}
+          {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText> : null}
           {children}
         </Pressable>
       </Pressable>
@@ -194,7 +194,7 @@ export function Toast({
   return (
     <View accessibilityRole="alert" pointerEvents="box-none" style={{ position: "absolute", start: designTokens.spacing.md, end: designTokens.spacing.md, bottom: designTokens.spacing.xl, alignItems: "center" }}>
       <View style={{ minHeight: 48, maxWidth: "100%", flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
-        <NativeText style={{ color: theme.colors.surface, flex: 1, textAlign: "right" }}>{message}</NativeText>
+        <UiText style={{ color: theme.colors.surface, flex: 1, textAlign: "right" }}>{message}</UiText>
         {action}
       </View>
     </View>
@@ -228,10 +228,10 @@ export function ConfirmDialog({
     <Dialog visible={visible} onRequestClose={onRequestClose} title={title} description={description}>
       <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
         <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} disabled={busy} onPress={onRequestClose} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.colors.border, opacity: busy ? 0.5 : 1 }}>
-          <NativeText style={{ color: theme.colors.foreground, fontWeight: "700" }}>{cancelLabel}</NativeText>
+          <UiText style={{ color: theme.colors.foreground, fontWeight: "700" }}>{cancelLabel}</UiText>
         </Pressable>
         <Pressable accessibilityRole="button" accessibilityLabel={confirmLabel} accessibilityState={{ disabled: busy, busy }} disabled={busy} onPress={onConfirm} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: destructive ? theme.colors.danger : theme.colors.accent, opacity: busy ? 0.5 : 1 }}>
-          {busy ? <ActivityIndicator color={destructive ? theme.colors.surface : theme.colors.accentForeground} /> : <NativeText style={{ color: destructive ? theme.colors.surface : theme.colors.accentForeground, fontWeight: "700" }}>{confirmLabel}</NativeText>}
+          {busy ? <ActivityIndicator color={destructive ? theme.colors.surface : theme.colors.accentForeground} /> : <UiText style={{ color: destructive ? theme.colors.surface : theme.colors.accentForeground, fontWeight: "700" }}>{confirmLabel}</UiText>}
         </Pressable>
       </View>
     </Dialog>
