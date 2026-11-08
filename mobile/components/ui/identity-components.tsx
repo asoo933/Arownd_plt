@@ -3,6 +3,7 @@ import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-nat
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Avatar, type AvatarProps } from "./identity";
+import { Icon } from "./icon";
 
 export function AvatarGroup({
   people,
@@ -38,7 +39,7 @@ export function VerifiedBadge({ label, children }: { label: string; children?: R
   return (
     <View accessibilityRole="text" accessibilityLabel={label} style={{ minHeight: 20, flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
       <View style={{ width: 16, height: 16, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ color: theme.colors.accentForeground, fontSize: 10, fontWeight: "900" }}>✓</Text>
+        <Icon name="check" size={10} color={theme.colors.accentForeground} accessibilityHidden />
       </View>
       {children}
     </View>
