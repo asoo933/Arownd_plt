@@ -185,7 +185,7 @@ function ProfileMenuItem({ label, hint, onPress }: {
       leading={<Icon name="chevron-left" size={20} />}
     >
       <View style={styles.menuCopy}>
-        <Text weight="800">{label}</Text>
+        <Text weight="700">{label}</Text>
         <Caption>{hint}</Caption>
       </View>
     </ListItem>
