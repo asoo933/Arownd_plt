@@ -334,7 +334,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   stepNumberDone: { color: theme.colors.foreground },
   stepContent: { flex: 1, gap: 3, alignItems: "flex-end" },
   stepTitle: { fontSize: 12, fontWeight: "900", textAlign: "right" },
-  cancelled: { color: theme.colors.danger, fontSize: 13, fontWeight: "900", textAlign: "right" },
   itemRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   itemInfo: { flex: 1, alignItems: "flex-end", gap: 3 },
   itemName: { fontSize: 12, fontWeight: "800", textAlign: "right" },
