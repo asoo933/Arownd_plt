@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, View } from "react-native";
+import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton, PressableSurface, Spinner, Text as UiText, TextField } from "@/components/ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
@@ -153,7 +153,7 @@ export default function DeliveryProfileScreen() {
       <View style={styles.backdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <UiText weight="800" style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</UiText>
-          {picker === "commune" && communes.isPending ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
+          {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
           <ScrollView style={styles.options}>
             {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
