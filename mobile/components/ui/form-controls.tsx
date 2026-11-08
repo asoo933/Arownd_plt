@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { getQuantityStepState } from "./form-controls-state";
 
 type TextFieldProps = Omit<TextInputProps, "style"> & {
@@ -14,7 +15,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
 
   return (
     <View style={[styles.field, containerStyle]}>
-      {label ? <Text style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</Text> : null}
+      {label ? <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</UiText> : null}
       <TextInput
         {...props}
         accessibilityLabel={accessibilityLabel ?? label}
@@ -29,7 +30,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           style
         ]}
       />
-      {error ? <Text accessibilityRole="alert" style={[styles.fieldError, { color: theme.colors.danger }]}>{error}</Text> : null}
+      {error ? <UiText accessibilityRole="alert" style={[styles.fieldError, { color: theme.colors.danger }]}>{error}</UiText> : null}
     </View>
   );
 }
@@ -70,9 +71,9 @@ export function QuantityStepper({
         hitSlop={6}
         style={({ pressed }) => [styles.stepButton, buttonStyle, { opacity: disabled || !state.canDecrease ? 0.4 : pressed ? 0.7 : 1 }]}
       >
-        <Text style={[styles.stepSymbol, { color: theme.colors.foreground }]}>−</Text>
+        <UiText style={[styles.stepSymbol, { color: theme.colors.foreground }]}>−</UiText>
       </Pressable>
-      <Text accessibilityLiveRegion="polite" style={[styles.quantity, { color: theme.colors.foreground }]}>{value}</Text>
+      <UiText accessibilityLiveRegion="polite" style={[styles.quantity, { color: theme.colors.foreground }]}>{value}</UiText>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={increaseLabel}
@@ -82,7 +83,7 @@ export function QuantityStepper({
         hitSlop={6}
         style={({ pressed }) => [styles.stepButton, buttonStyle, { opacity: disabled || !state.canIncrease ? 0.4 : pressed ? 0.7 : 1 }]}
       >
-        <Text style={[styles.stepSymbol, { color: theme.colors.foreground }]}>+</Text>
+        <UiText style={[styles.stepSymbol, { color: theme.colors.foreground }]}>+</UiText>
       </Pressable>
     </View>
   );
