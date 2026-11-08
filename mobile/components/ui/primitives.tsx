@@ -108,16 +108,19 @@ export function PressableSurface({
   style,
   disabled = false
 }: PressableSurfaceProps) {
+  const unavailable = disabled || !onPress || accessibilityState?.disabled === true;
+
   return (
     <Pressable
+      accessibilityHint={accessibilityHint}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
-      accessibilityState={{ ...accessibilityState, disabled }}
+      accessibilityState={{ ...accessibilityState, disabled: unavailable }}
       onPress={onPress}
       testID={testID}
       hitSlop={hitSlop}
-      disabled={disabled || !onPress}
-      style={({ pressed }) => [style, { opacity: disabled ? 0.5 : pressed ? 0.82 : 1 }]}
+      disabled={unavailable}
+      style={({ pressed }) => [style, { opacity: unavailable ? 0.5 : pressed ? 0.82 : 1 }]}
     >
       {children}
     </Pressable>
