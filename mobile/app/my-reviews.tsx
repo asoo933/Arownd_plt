@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
+import { designTokens } from "@/lib/theme";
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
@@ -100,7 +101,7 @@ function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void
 }
 
 const styles = StyleSheet.create({
-  cardContent: { gap: 9, padding: 14 },
+  cardContent: { gap: designTokens.spacing.sm, padding: designTokens.spacing.lg },
   rowHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
   rowFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }
 });
