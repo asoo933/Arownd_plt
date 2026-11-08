@@ -6,7 +6,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { FavoriteButton, FAVORITES_QUERY_KEY } from "@/components/favorite-button";
 import { AppHeader, IconButton, SegmentedControl } from "@/components/ui";
 import {
-  CustomerHeading,
   CustomerScreen,
   EmptyState,
   ErrorState,
@@ -68,7 +67,7 @@ export default function FavoritesScreen() {
         title={translate("favoritesTitle")}
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
       />
-      <CustomerHeading title={translate("favoritesTitle")} subtitle={translate("favoritesSubtitle")} />
+      <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("favoritesSubtitle")}</Text>
       <SegmentedControl
         accessibilityLabel={translate("favoritesTitle")}
         value={tab}
