@@ -48,8 +48,7 @@ import {
   Upload,
   User,
   Wallet,
-  X,
-  type LucideIcon
+  X
 } from "lucide-react-native";
 import { View, type StyleProp, type ViewStyle } from "react-native";
 
@@ -106,7 +105,7 @@ const iconRegistry = {
   user: User,
   wallet: Wallet,
   x: X
-} satisfies Record<string, LucideIcon>;
+} as const;
 
 export type IconName = keyof typeof iconRegistry;
 
