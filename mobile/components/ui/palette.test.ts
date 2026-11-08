@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { brandColors } from "@/lib/design-system";
 import { getAppTheme } from "@/lib/theme";
 import { getButtonPalette } from "./palette";
 
@@ -29,7 +30,7 @@ describe("getButtonPalette", () => {
     const theme = getAppTheme("dark");
     expect(getButtonPalette(theme, "danger")).toEqual({
       backgroundColor: theme.colors.danger,
-      foregroundColor: "#FFFFFF"
+      foregroundColor: brandColors.white
     });
   });
 });
