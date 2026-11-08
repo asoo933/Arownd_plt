@@ -13,6 +13,7 @@ import {
   Image,
   PriceText,
   ProductCard,
+  RatingStars,
   SegmentedControl,
   StoreCard,
   Text as UiText
@@ -140,7 +141,7 @@ export default function FavoritesScreen() {
               <Heading level={3}>{store.name}</Heading>
               {store.commune ? <Caption>{store.commune}</Caption> : null}
               {store.description ? <UiText tone="muted" numberOfLines={2}>{store.description}</UiText> : null}
-              {store.rating != null ? <UiText tone="warning" weight="700">★ {store.rating.toFixed(1)}</UiText> : null}
+              {store.rating != null ? <RatingStars value={store.rating} size={14} showValue /> : null}
             </StoreCard>
           ) : null)}
         </View>
