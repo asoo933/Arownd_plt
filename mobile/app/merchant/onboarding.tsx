@@ -289,6 +289,7 @@ export default function MerchantOnboardingScreen() {
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
+                    accessibilityLabel={translate("merchantStoreCommuneLabel")}
                     placeholder={translate("merchantStoreCommunePlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     style={styles.input}
@@ -312,6 +313,7 @@ export default function MerchantOnboardingScreen() {
                     value={field.value}
                     onChangeText={field.onChange}
                     onBlur={field.onBlur}
+                    accessibilityLabel={translate("merchantStoreAddressLabel")}
                     placeholder={translate("merchantStoreAddressPlaceholder")}
                     placeholderTextColor={theme.colors.placeholder}
                     style={[styles.input, styles.multiline]}
@@ -440,6 +442,7 @@ export default function MerchantOnboardingScreen() {
                       value={field.value}
                       onChangeText={field.onChange}
                       onBlur={field.onBlur}
+                      accessibilityLabel={translate("merchantStoreOpenLabel")}
                       style={[styles.input, styles.timeInput]}
                       keyboardType="numbers-and-punctuation"
                       maxLength={5}
@@ -462,6 +465,7 @@ export default function MerchantOnboardingScreen() {
                       value={field.value}
                       onChangeText={field.onChange}
                       onBlur={field.onBlur}
+                      accessibilityLabel={translate("merchantStoreCloseLabel")}
                       style={[styles.input, styles.timeInput]}
                       keyboardType="numbers-and-punctuation"
                       maxLength={5}
