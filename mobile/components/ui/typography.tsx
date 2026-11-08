@@ -121,7 +121,7 @@ export function PriceText({
           style={{
             color: theme.colors.muted,
             fontSize: theme.typography.caption,
-            fontWeight: "400",
+            fontWeight: theme.fontWeights.regular,
             textDecorationLine: "line-through"
           }}
         >
