@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -36,7 +35,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, TextField } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -268,7 +267,7 @@ export default function MerchantNewProductScreen() {
             </View>
 
             <FormField label={translate("merchantProductCategoryLabel")} theme={theme}>
-              <Pressable
+              <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setCategoryPickerOpen(true)}
                 style={[styles.selectButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
@@ -278,7 +277,7 @@ export default function MerchantNewProductScreen() {
                     ? `${selectedCategory.emoji} ${selectedCategory.label}`
                     : translate("merchantProductCategoryPlaceholder")}
                 </Text>
-              </Pressable>
+              </PressableSurface>
             </FormField>
 
             <FormField label={translate("merchantProductBrandLabel")} theme={theme}>
@@ -341,7 +340,7 @@ export default function MerchantNewProductScreen() {
               hint={translate("merchantProductImagesHint")}
               theme={theme}
             >
-              <Pressable
+              <PressableSurface
                 accessibilityRole="button"
                 disabled={imagePickerBusy || submitting || selectedImages.length >= PRODUCT_IMAGE_MAX_COUNT}
                 onPress={() => void pickProductImages()}
@@ -354,13 +353,13 @@ export default function MerchantNewProductScreen() {
                     {translate("merchantProductImagesChoose")}
                   </Text>
                 )}
-              </Pressable>
+              </PressableSurface>
               {selectedImages.length > 0 ? (
                 <View style={styles.imageGrid}>
                   {selectedImages.map((asset) => (
                     <View key={asset.assetId ?? asset.uri} style={styles.imageItem}>
                       <Image source={{ uri: asset.uri }} style={styles.imagePreview} />
-                      <Pressable
+                      <PressableSurface
                         accessibilityRole="button"
                         accessibilityLabel={translate("merchantProductImageRemove")}
                         onPress={() => removeProductImage(asset.uri)}
@@ -368,7 +367,7 @@ export default function MerchantNewProductScreen() {
                         hitSlop={8}
                       >
                         <Text style={styles.imageRemoveText}>×</Text>
-                      </Pressable>
+                      </PressableSurface>
                     </View>
                   ))}
                 </View>
@@ -414,11 +413,11 @@ export default function MerchantNewProductScreen() {
               <Text style={[styles.modalTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductChooseCategory")}
               </Text>
-              <Pressable onPress={() => setCategoryPickerOpen(false)} hitSlop={10}>
+              <PressableSurface onPress={() => setCategoryPickerOpen(false)} hitSlop={10}>
                 <Text style={[styles.modalClose, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductCategoryClose")}
                 </Text>
-              </Pressable>
+              </PressableSurface>
             </View>
             <ScrollView contentContainerStyle={styles.categoryList}>
               {categoryGroups.map((group) => (
@@ -482,7 +481,7 @@ function CategoryOption({
   const styles = createStyles(theme);
 
   return (
-    <Pressable
+    <PressableSurface
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onSelect}
@@ -504,7 +503,7 @@ function CategoryOption({
       {selected ? (
         <Text style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</Text>
       ) : null}
-    </Pressable>
+    </PressableSurface>
   );
 }
 
