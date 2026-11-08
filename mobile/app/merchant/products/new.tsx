@@ -5,7 +5,6 @@ import { Redirect, router } from "expo-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
