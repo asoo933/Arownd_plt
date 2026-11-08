@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate } from "@/lib/i18n";
 import { useAppTheme } from "@/lib/theme";
+import { IconButton } from "@/components/ui";
 
 export default function ExploreScreen() {
   const theme = useAppTheme();
@@ -33,7 +34,7 @@ export default function ExploreScreen() {
 
   return (
     <CustomerScreen>
-      <Pressable accessibilityRole="button" accessibilityLabel={translate("back")} onPress={() => router.back()} style={styles.back}><Text style={{ color: theme.colors.accentMuted, fontWeight: "800", fontSize: 13 }}>{translate("back")}</Text></Pressable>
+      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
       <CustomerHeading title={translate("exploreTitle")} subtitle={translate("exploreSubtitle")} />
       <CustomerSearch value={query} onChangeText={setQuery} placeholder={translate("homeSearchPlaceholder")} />
       {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
@@ -53,7 +54,6 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  back: { minHeight: 44, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 4 },
   grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
   footer: { fontSize: 11, textAlign: "center", padding: 14 }
 });
