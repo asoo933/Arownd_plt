@@ -3,8 +3,6 @@ import { Redirect, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
-  Modal,
   ScrollView,
   StyleSheet,
   View
