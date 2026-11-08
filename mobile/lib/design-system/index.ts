@@ -18,6 +18,7 @@ export const designTokens = {
   commerce: commerceColors,
   delivery: deliveryColors,
   colors: themeColors,
+  semanticTheme: extendedThemeColors,
   spacing,
   radius: borderRadius,
   dimensions,
