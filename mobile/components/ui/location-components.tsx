@@ -1,7 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { Dialog } from "./feedback";
 import { RadioGroup, type RadioOption, Select } from "./forms";
 import { TextField } from "./form-controls";
@@ -54,7 +55,7 @@ export function LocationPicker({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
-  return <View style={[{ gap: designTokens.spacing.md }, style]}>{map}<View style={{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>{value}<Pressable accessibilityRole="button" accessibilityLabel={confirmLabel} onPress={onConfirm} style={{ minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent }}><Text style={{ color: theme.colors.accentForeground, fontSize: theme.typography.body, fontWeight: "700" }}>{confirmLabel}</Text></Pressable></View></View>;
+  return <View style={[{ gap: designTokens.spacing.md }, style]}>{map}<View style={{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>{value}<Pressable accessibilityRole="button" accessibilityLabel={confirmLabel} onPress={onConfirm} style={{ minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent }}><UiText style={{ color: theme.colors.accentForeground, fontSize: theme.typography.body, fontWeight: "700" }}>{confirmLabel}</UiText></Pressable></View></View>;
 }
 
 export function DirectionsButton({
