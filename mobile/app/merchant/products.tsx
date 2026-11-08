@@ -7,12 +7,11 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, IconButton, MerchantMetricCard, PressableSurface, StatusBadge, TextField } from "@/components/ui";
+import { AppHeader, Button, FilterBar, FilterChip, IconButton, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -151,7 +150,7 @@ export default function MerchantProductsScreen() {
           title={translate("merchantProductsTitle")}
           leading={<Button label={translate("merchantProductsBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />}
         />
-        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductsSubtitle")}</Text>
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductsSubtitle")}</UiText>
 
         <Button label={translate("merchantProductCreateOpen")} onPress={() => router.push("/merchant/products/new")} fullWidth />
 
@@ -170,32 +169,32 @@ export default function MerchantProductsScreen() {
           style={[styles.searchInput, { color: theme.colors.foreground, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
         />
 
-        <View style={styles.filters}>
-          <FilterButton value="all" selected={filter === "all"} label={translate("merchantProductsFilterAll")} theme={theme} onPress={setFilter} />
-          <FilterButton value="low" selected={filter === "low"} label={translate("merchantProductsFilterLow")} theme={theme} onPress={setFilter} />
-          <FilterButton value="out" selected={filter === "out"} label={translate("merchantProductsFilterOut")} theme={theme} onPress={setFilter} />
-          <FilterButton value="hidden" selected={filter === "hidden"} label={translate("merchantProductsHidden")} theme={theme} onPress={setFilter} />
-        </View>
+        <FilterBar style={styles.filters}>
+          <FilterChip label={translate("merchantProductsFilterAll")} selected={filter === "all"} onPress={() => setFilter("all")} />
+          <FilterChip label={translate("merchantProductsFilterLow")} selected={filter === "low"} onPress={() => setFilter("low")} />
+          <FilterChip label={translate("merchantProductsFilterOut")} selected={filter === "out"} onPress={() => setFilter("out")} />
+          <FilterChip label={translate("merchantProductsHidden")} selected={filter === "hidden"} onPress={() => setFilter("hidden")} />
+        </FilterBar>
 
         {notice ? (
           <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
-            <Text style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</Text>
+            <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
           </View>
         ) : null}
         {actionError ? (
           <View style={[styles.feedback, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-            <Text style={[styles.feedbackText, { color: theme.colors.danger }]}>{actionError}</Text>
+            <UiText style={[styles.feedbackText, { color: theme.colors.danger }]}>{actionError}</UiText>
           </View>
         ) : null}
 
         {allOffers.length === 0 ? (
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsEmpty")}</Text>
-            <Text style={[styles.emptyHint, { color: theme.colors.muted }]}>{translate("merchantProductsEmptyHint")}</Text>
+            <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsEmpty")}</UiText>
+            <UiText style={[styles.emptyHint, { color: theme.colors.muted }]}>{translate("merchantProductsEmptyHint")}</UiText>
           </View>
         ) : visibleOffers.length === 0 ? (
           <View style={[styles.emptyCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsNoResults")}</Text>
+            <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsNoResults")}</UiText>
           </View>
         ) : (
           <View style={styles.offerList}>
@@ -269,43 +268,43 @@ function MerchantOfferCard({
           {image ? (
             <Image source={{ uri: image.image_url }} style={styles.image} resizeMode="cover" />
           ) : (
-            <Text style={[styles.imageFallback, { color: theme.colors.muted }]}>A</Text>
+            <UiText style={[styles.imageFallback, { color: theme.colors.muted }]}>A</UiText>
           )}
         </PressableSurface>
         <View style={styles.productInfo}>
-          <Text style={[styles.productName, { color: theme.colors.foreground }]} numberOfLines={2}>
+          <UiText style={[styles.productName, { color: theme.colors.foreground }]} numberOfLines={2}>
             {offer.product.name}
-          </Text>
+          </UiText>
           {offer.product.brand ? (
-            <Text style={[styles.productBrand, { color: theme.colors.muted }]} numberOfLines={1}>
+            <UiText style={[styles.productBrand, { color: theme.colors.muted }]} numberOfLines={1}>
               {offer.product.brand}
-            </Text>
+            </UiText>
           ) : null}
           <View style={styles.badgeRow}>
-            <StatusBadge
+            <MerchantStatusBadge
               label={inventoryLabel}
               tone={inventoryLevel === "out" ? "danger" : inventoryLevel === "low" ? "warning" : "success"}
             />
-            <StatusBadge
+            <MerchantStatusBadge
               label={offer.is_merchant_hidden ? translate("merchantProductsHidden") : translate("merchantProductsVisible")}
               tone={offer.is_merchant_hidden ? "neutral" : "accent"}
             />
           </View>
-          <Text style={[styles.currentPrice, { color: theme.colors.accentMuted }]}>{formatDZD(offer.price)}</Text>
+          <PriceDisplay value={formatDZD(offer.price)} />
         </View>
       </View>
 
       <View style={styles.inputsRow}>
         <View style={styles.inputGroup}>
-          <Text style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsPriceLabel")}</Text>
+          <UiText style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsPriceLabel")}</UiText>
           <TextField value={price} onChangeText={setPrice} keyboardType="number-pad" editable={!anyBusy} accessibilityLabel={translate("merchantProductsPriceLabel")} style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]} />
         </View>
         <View style={styles.inputGroup}>
-          <Text style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsStockLabel")}</Text>
+          <UiText style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsStockLabel")}</UiText>
           <TextField value={stock} onChangeText={setStock} keyboardType="number-pad" editable={!anyBusy} accessibilityLabel={translate("merchantProductsStockLabel")} style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]} />
-          <Text style={[styles.stockHint, { color: theme.colors.subtle }]}>
+          <UiText style={[styles.stockHint, { color: theme.colors.subtle }]}>
             {translate("merchantProductsStockHint")}
-          </Text>
+          </UiText>
         </View>
       </View>
 
@@ -332,17 +331,17 @@ function MerchantOfferCard({
         <View style={[styles.galleryOverlay, { backgroundColor: theme.colors.overlay }]}>
           <View style={[styles.galleryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <View style={styles.galleryHeader}>
-              <Text style={[styles.galleryTitle, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.galleryTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductImagesLabel")}
-              </Text>
+              </UiText>
               <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setGalleryOpen(false)}
                 hitSlop={10}
               >
-                <Text style={[styles.galleryClose, { color: theme.colors.accentMuted }]}>
+                <UiText style={[styles.galleryClose, { color: theme.colors.accentMuted }]}>
                   {translate("merchantProductCategoryClose")}
-                </Text>
+                </UiText>
               </PressableSurface>
             </View>
             <ScrollView
@@ -367,41 +366,6 @@ function MerchantOfferCard({
 }
 
 
-function FilterButton({
-  value,
-  selected,
-  label,
-  theme,
-  onPress
-}: {
-  value: MerchantInventoryFilter;
-  selected: boolean;
-  label: string;
-  theme: AppTheme;
-  onPress: (filter: MerchantInventoryFilter) => void;
-}) {
-  const styles = createStyles(theme);
-
-  return (
-    <PressableSurface
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={() => onPress(value)}
-      style={[
-        styles.filterButton,
-        {
-          backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
-          borderColor: selected ? theme.colors.accent : theme.colors.border
-        }
-      ]}
-    >
-      <Text style={[styles.filterLabel, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>
-        {label}
-      </Text>
-    </PressableSurface>
-  );
-}
-
 function MessageScreen({
   theme,
   title,
@@ -423,7 +387,7 @@ function MessageScreen({
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.messageContainer}>
         {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-        <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{title ?? label ?? ""}</Text>
+        <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{title ?? label ?? ""}</UiText>
         {onAction && actionLabel ? <Button label={actionLabel} onPress={onAction} /> : null}
       </View>
     </SafeAreaView>
