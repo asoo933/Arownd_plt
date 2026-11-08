@@ -32,7 +32,7 @@ import {
   type UserAddress
 } from "@/lib/user-address";
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 type EditorState = { address: UserAddress | null } | null;
 type AddressLabel = UserAddressInput["label"];
@@ -317,10 +317,10 @@ function Action({
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     cardHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-    actions: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 7, marginTop: 7 },
-    formContent: { gap: 12, paddingBottom: 8 },
-    field: { gap: 6, marginBottom: 3 },
-    input: { minHeight: 47, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 11, paddingHorizontal: 12, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: 13 },
+    actions: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm, marginTop: 7 },
+    formContent: { gap: designTokens.spacing.md, paddingBottom: 8 },
+    field: { gap: designTokens.spacing.xs, marginBottom: 3 },
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center", color: theme.colors.foreground, backgroundColor: theme.colors.background, fontSize: designTokens.typography.body - 1 },
     pickerOption: { minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border }
   });
 }
