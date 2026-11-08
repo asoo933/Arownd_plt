@@ -29,7 +29,7 @@ import {
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ErrorState, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { BottomSheet, AppHeader, Button, Card, ErrorState, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
   const theme = useAppTheme();
