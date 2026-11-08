@@ -186,7 +186,6 @@ export function Toast({
 }: {
   visible: boolean;
   message: string;
-  onDismiss?: () => void;
   action?: ReactNode;
 }) {
   const theme = useAppTheme();
@@ -197,7 +196,6 @@ export function Toast({
       <View style={{ minHeight: 48, maxWidth: "100%", flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
         <NativeText style={{ color: theme.colors.surface, flex: 1, textAlign: "right" }}>{message}</NativeText>
         {action}
-        {onDismiss ? <Pressable accessibilityRole="button" accessibilityLabel="Dismiss" onPress={onDismiss} hitSlop={8}><NativeText style={{ color: theme.colors.surface }}>×</NativeText></Pressable> : null}
       </View>
     </View>
   );
