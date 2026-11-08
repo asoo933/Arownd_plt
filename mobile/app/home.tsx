@@ -46,7 +46,7 @@ export default function CustomerHomeScreen() {
             style={[styles.location, { backgroundColor: theme.colors.accent }]}
           >
             <UiText style={[styles.locationText, { color: theme.colors.accentForeground }]}>{translate("homeLocation")}</UiText>
-            <Icon name="map-pin" size={17} color="#0A0A0A" />
+            <Icon name="map-pin" size={17} color={theme.colors.accentForeground} />
           </PressableSurface>
         }
       />
