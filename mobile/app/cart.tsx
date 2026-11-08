@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IconButton, PressableSurface, QuantityStepper } from "@/components/ui";
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { AppHeader, Button, IconButton, PressableSurface, QuantityStepper } from "@/components/ui";
 import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem } from "@/lib/cart-state";
@@ -33,7 +33,7 @@ export default function CartScreen() {
   if (cart.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (cart.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void cart.refetch()} /></CustomerScreen>;
   if (cart.data.length === 0) return <CustomerScreen>
-    <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartSubtitle")} />
+    <AppHeader title={translate("cartTitle")} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
     <Button label={translate("cartBrowse")} onPress={() => router.push("/explore")} fullWidth />
   </CustomerScreen>;
@@ -58,7 +58,7 @@ export default function CartScreen() {
   };
 
   return <CustomerScreen>
-    <CustomerHeading title={translate("cartTitle")} subtitle={translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)} />
+    <AppHeader title={translate("cartTitle")} trailing={<Text style={{ color: theme.colors.muted, fontSize: 12 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</Text>} />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
     {mutation.isError ? <Text style={style.warningText}>{translate("genericError")}</Text> : null}
