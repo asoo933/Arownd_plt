@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IconButton, TextField } from "@/components/ui";
+import { AppHeader, Button, IconButton, TextField } from "@/components/ui";
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
@@ -118,8 +118,8 @@ export default function DeliveryProfileScreen() {
   };
 
   return <CustomerScreen>
-    <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
-    <CustomerHeading title={translate("deliveryProfileTitle")} subtitle={translate("deliveryProfileSubtitle")} />
+    <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />} />
+    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("deliveryProfileSubtitle")}</Text>
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <Text style={[styles.label, { color: theme.colors.foreground }]}>{translate("fullNamePlaceholder")}</Text>
       <TextField value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
