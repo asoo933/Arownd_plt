@@ -14,7 +14,7 @@ import { router } from "expo-router";
 
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, TextField } from "@/components/ui";
+import { Button, IconButton, TextField } from "@/components/ui";
 
 type AuthLayoutProps = {
   title: string;
@@ -31,14 +31,13 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             {showBack ? (
-              <Pressable
-                accessibilityRole="button"
+              <IconButton
                 accessibilityLabel={translate("back")}
                 onPress={() => router.back()}
-                style={[styles.backButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-              >
-                <Text style={[styles.backText, { color: theme.colors.foreground }]}>‹</Text>
-              </Pressable>
+                icon={<Text style={{ color: theme.colors.foreground, fontSize: 28, lineHeight: 30 }}>‹</Text>}
+                variant="surface"
+                size={44}
+              />
             ) : <View style={styles.backPlaceholder} />}
             <Text style={[styles.brand, { color: theme.colors.foreground }]}>arownd</Text>
             <View style={styles.backPlaceholder} />
