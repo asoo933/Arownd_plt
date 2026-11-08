@@ -9,7 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { useAppTheme } from "@/lib/theme";
-import { AppHeader, Card, Icon, IconButton, Image as UiImage, SegmentedControl, Text as UiText } from "@/components/ui";
+import { AppHeader, Card, Icon, IconButton, Image as UiImage, RatingStars, SegmentedControl, Text as UiText } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -51,9 +51,9 @@ export default function StoreDetailsScreen() {
         </View>
         <View style={styles.storeTitleWrap}>
           <UiText style={[styles.storeName, { color: theme.colors.foreground }]}>{details.name}</UiText>
-          <UiText style={[styles.metaText, { color: theme.colors.muted }]}>{details.commune || details.address_line || " "}</UiText>
+          <UiText style={[styles.metaText, { color: theme.colors.muted }]}>{details.commune || details.address_line || translate("storeNoAddress")}</UiText>
           <UiText style={[styles.verified, { color: details.is_verified ? theme.colors.success : theme.colors.muted }]}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</UiText>
-          {details.rating != null ? <UiText style={[styles.rating, { color: theme.colors.warning }]}>★ {translate("storeRating")}: {details.rating.toFixed(1)}</UiText> : null}
+          {details.rating != null ? <RatingStars value={details.rating} showValue /> : null}
         </View>
       </View>
 
@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
   storeName: { fontSize: 20, fontWeight: "900", textAlign: "right" },
   metaText: { fontSize: 12, textAlign: "right" },
   verified: { fontSize: 11, fontWeight: "800" },
-  rating: { fontSize: 11, fontWeight: "700" },
   tabs: { width: "100%" },
   productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: 10 },
   aboutCard: { padding: 16, gap: 11 },
