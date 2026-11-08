@@ -398,14 +398,7 @@ export default function MerchantNewProductScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <Modal
-        visible={categoryPickerOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setCategoryPickerOpen(false)}
-      >
-        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.modalCard, { backgroundColor: theme.colors.surface }]}>
+      <BottomSheet visible={categoryPickerOpen} onRequestClose={() => setCategoryPickerOpen(false)} maxHeight="85%">
             <View style={styles.modalHeader}>
               <UiText style={[styles.modalTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductChooseCategory")}
@@ -455,9 +448,8 @@ export default function MerchantNewProductScreen() {
                 </View>
               ))}
             </ScrollView>
-          </View>
-        </View>
-      </Modal>
+
+      </BottomSheet>
     </SafeAreaView>
   );
 }
