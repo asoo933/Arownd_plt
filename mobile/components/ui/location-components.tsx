@@ -3,7 +3,7 @@ import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-nat
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Dialog } from "./feedback";
-import { RadioGroup, type RadioOption, Select, type SelectOption } from "./forms";
+import { RadioGroup, type RadioOption, Select } from "./forms";
 import { TextField } from "./form-controls";
 
 export function MapView({
