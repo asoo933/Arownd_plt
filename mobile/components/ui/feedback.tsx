@@ -181,7 +181,6 @@ export function BottomSheet({
 export function Toast({
   visible,
   message,
-  onDismiss,
   action
 }: {
   visible: boolean;
@@ -198,5 +197,42 @@ export function Toast({
         {action}
       </View>
     </View>
+  );
+}
+
+
+export function ConfirmDialog({
+  visible,
+  onRequestClose,
+  onConfirm,
+  title,
+  description,
+  cancelLabel,
+  confirmLabel,
+  busy = false,
+  destructive = false
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  description?: string;
+  cancelLabel: string;
+  confirmLabel: string;
+  busy?: boolean;
+  destructive?: boolean;
+}) {
+  const theme = useAppTheme();
+  return (
+    <Dialog visible={visible} onRequestClose={onRequestClose} title={title} description={description}>
+      <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} disabled={busy} onPress={onRequestClose} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.colors.border, opacity: busy ? 0.5 : 1 }}>
+          <NativeText style={{ color: theme.colors.foreground, fontWeight: "700" }}>{cancelLabel}</NativeText>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel={confirmLabel} accessibilityState={{ disabled: busy, busy }} disabled={busy} onPress={onConfirm} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: destructive ? theme.colors.danger : theme.colors.accent, opacity: busy ? 0.5 : 1 }}>
+          {busy ? <ActivityIndicator color={destructive ? theme.colors.surface : theme.colors.accentForeground} /> : <NativeText style={{ color: destructive ? theme.colors.surface : theme.colors.accentForeground, fontWeight: "700" }}>{confirmLabel}</NativeText>}
+        </Pressable>
+      </View>
+    </Dialog>
   );
 }
