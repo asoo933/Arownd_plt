@@ -139,6 +139,24 @@ export default function SettingsScreen() {
         </PressableSurface>
         <PressableSurface
           accessibilityRole="button"
+          accessibilityLabel={translate("profileAddresses")}
+          onPress={() => router.push("/addresses")}
+          style={styles.linkRow}
+        >
+          <UiText weight="700">{translate("profileAddresses")}</UiText>
+          <Icon name="chevron-left" size={19} />
+        </PressableSurface>
+        <PressableSurface
+          accessibilityRole="button"
+          accessibilityLabel={translate("settingsStoreManagement")}
+          onPress={() => router.push("/merchant")}
+          style={styles.linkRow}
+        >
+          <UiText weight="700">{translate("settingsStoreManagement")}</UiText>
+          <Icon name="chevron-left" size={19} />
+        </PressableSurface>
+        <PressableSurface
+          accessibilityRole="button"
           accessibilityLabel={translate("forgotPassword")}
           onPress={() => router.push("/forgot-password")}
           style={styles.linkRow}
