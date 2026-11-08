@@ -287,33 +287,7 @@ export default function OrderDetailsScreen() {
       busy={quoteMutation.isPending}
       destructive
     />
-    <Modal visible={declineTarget !== null} transparent animationType="fade" onRequestClose={() => setDeclineTarget(null)}>
-      <View style={styles.modalBackdrop}>
-        <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <UiText style={styles.sectionTitle}>{translate("orderQuoteDeclineConfirmTitle")}</UiText>
-          <UiText style={styles.meta}>{translate("orderQuoteDeclineConfirmHint")}</UiText>
-          {quoteMutation.isError ? <UiText style={styles.errorText}>{translate("orderQuoteResponseError")}</UiText> : null}
-          <View style={styles.quoteActions}>
-            <PressableSurface
-              disabled={quoteMutation.isPending}
-              onPress={() => {
-                if (declineTarget) {
-                  quoteMutation.mutate({ merchantOrderId: declineTarget, accept: false }, {
-                    onSuccess: () => setDeclineTarget(null)
-                  });
-                }
-              }}
-              style={styles.declineButton}
-            >
-              {quoteMutation.isPending ? <Spinner color={theme.colors.danger} size="small" /> : <UiText style={styles.declineButtonText}>{translate("orderQuoteDecline")}</UiText>}
-            </PressableSurface>
-            <PressableSurface accessibilityRole="button" disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
-              <UiText style={styles.acceptButtonText}>{translate("back")}</UiText>
-            </PressableSurface>
-          </View>
-        </View>
-      </View>
-    </Modal>
+    
   </CustomerScreen>;
 }
 
