@@ -28,7 +28,7 @@ export function AvatarGroup({
       ))}
       {remaining > 0 ? (
         <View style={{ width: size, height: size, marginStart: -size * 0.22, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surfaceMuted, borderWidth: 2, borderColor: theme.colors.surface }}>
-          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, fontWeight: "700" }}>+{remaining}</UiText>
+          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold }}>+{remaining}</UiText>
         </View>
       ) : null}
     </View>
@@ -38,7 +38,7 @@ export function AvatarGroup({
 export function VerifiedBadge({ label, children }: { label: string; children?: ReactNode }) {
   const theme = useAppTheme();
   return (
-    <View accessibilityRole="text" accessibilityLabel={label} style={{ minHeight: 20, flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
+    <View accessibilityRole="text" accessibilityLabel={label} style={{ minHeight: 20, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs }}>
       <View style={{ width: 16, height: 16, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" }}>
         <Icon name="check" size={10} color={theme.colors.accentForeground} accessibilityHidden />
       </View>
@@ -63,7 +63,7 @@ export function RatingStars({
   const theme = useAppTheme();
   const normalized = Math.min(count, Math.max(0, value));
   return (
-    <View accessibilityRole="image" accessibilityLabel={String(value)} style={[{ flexDirection: "row", alignItems: "center", gap: 2 }, style]}>
+    <View accessibilityRole="image" accessibilityLabel={String(value)} style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xxs ?? designTokens.spacing.xs }, style]}>
       {Array.from({ length: count }, (_, index) => (
         <Icon key={index} name="star" size={size} color={index < Math.round(normalized) ? theme.colors.warning : theme.colors.border} fill={index < Math.round(normalized) ? theme.colors.warning : "none"} accessibilityHidden />
       ))}
