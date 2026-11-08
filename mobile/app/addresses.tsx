@@ -127,7 +127,7 @@ export default function AddressesScreen() {
       <CustomerScreen>
         <AppHeader
           title={translate("addressesTitle")}
-          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="ChevronLeft" size={20} />} />}
+          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" size={20} />} />}
         />
         <ErrorState
           title={translate("addressesLoadError")}
@@ -155,12 +155,12 @@ export default function AddressesScreen() {
         label={translate("addressesAdd")}
         onPress={() => openEditor(null)}
         fullWidth
-        startIcon={<Icon name="Plus" size={18} />}
+        startIcon={<Icon name="plus" size={18} />}
       />
 
       {addresses.data.length === 0 ? (
         <Card contentStyle={{ alignItems: "center", paddingVertical: 28 }}>
-          <Icon name="MapPin" size={30} color={theme.colors.muted} />
+          <Icon name="map-pin" size={30} color={theme.colors.muted} />
           <Heading level={3}>{translate("addressesEmpty")}</Heading>
           <Caption align="center">{translate("addressesEmptyHint")}</Caption>
         </Card>
