@@ -6,11 +6,13 @@ import { StyleSheet, View } from "react-native";
 
 import { ActionButton, AuthField, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
 import { Text as UiText } from "@/components/ui";
+import { useAppTheme } from "@/lib/theme";
 import { signUpPersonal } from "@/lib/auth-service";
 import { personalSignupSchema, type PersonalSignupInput } from "@/lib/auth-validation";
 import { translate } from "@/lib/i18n";
 
 export default function PersonalSignupScreen() {
+  const theme = useAppTheme();
   const [serverError, setServerError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const [hasSession, setHasSession] = useState(false);
@@ -59,8 +61,8 @@ export default function PersonalSignupScreen() {
           {serverError ? <FormError message={serverError} /> : null}
           <ActionButton label={isSubmitting ? translate("signupBusy") : translate("signup")} onPress={() => void submit()} loading={isSubmitting} />
           <View style={styles.loginRow}>
-            <UiText style={styles.secondaryText}>{translate("alreadyHaveAccount")}</UiText>
-            <Link href="/login" style={styles.link}>{translate("login")}</Link>
+            <UiText tone="muted" style={styles.secondaryText}>{translate("alreadyHaveAccount")}</UiText>
+            <Link href="/login" style={[styles.link, { color: theme.colors.accentMuted }]}>{translate("login")}</Link>
           </View>
         </View>
       )}
@@ -71,6 +73,6 @@ export default function PersonalSignupScreen() {
 const styles = StyleSheet.create({
   form: { gap: 16 },
   loginRow: { flexDirection: "row-reverse", justifyContent: "center", gap: 6, marginTop: 2 },
-  secondaryText: { color: "#737373", fontSize: 13 },
-  link: { color: "#536719", fontSize: 13, fontWeight: "800" }
+  secondaryText: { fontSize: 13 },
+  link: { fontSize: 13, fontWeight: "800" }
 });
