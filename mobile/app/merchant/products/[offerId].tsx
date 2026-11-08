@@ -35,7 +35,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ConfirmDialog, ErrorState, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -527,7 +527,7 @@ export default function MerchantEditProductScreen() {
                       {removingImageId === image.id ? (
                         <ActivityIndicator color="#FFFFFF" size="small" />
                       ) : (
-                        <UiText style={styles.imageRemoveText}>×</UiText>
+                        <Icon name="x" color="#FFFFFF" size={15} accessibilityHidden />
                       )}
                     </PressableSurface>
                   </View>
