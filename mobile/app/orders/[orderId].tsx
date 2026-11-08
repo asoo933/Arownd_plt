@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Modal, StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { PressableSurface } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
@@ -106,7 +107,7 @@ export default function OrderDetailsScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersLoginHint")} />
-    <Pressable onPress={() => router.push("/login")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("login")}</Text></Pressable>
+    <PressableSurface accessibilityRole="button" onPress={() => router.push("/login")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("login")}</Text></PressableSurface>
   </CustomerScreen>;
   if (!query.data) return <CustomerScreen>
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
@@ -115,7 +116,7 @@ export default function OrderDetailsScreen() {
   if (!order) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <EmptyState title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
-    <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
+    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></PressableSurface>
 
   </CustomerScreen>;
 
@@ -126,7 +127,7 @@ export default function OrderDetailsScreen() {
   const orderCode = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
 
   return <CustomerScreen>
-    <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></Pressable>
+    <PressableSurface accessibilityRole="button" onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹ {translate("back")}</Text></PressableSurface>
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersCode") + ": " + orderCode} />
 
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
@@ -193,7 +194,7 @@ export default function OrderDetailsScreen() {
           style={styles.cancelButton}
         >
           <Text style={styles.cancelButtonText}>{translate("orderCancelStore")}</Text>
-        </Pressable> : null}
+        </PressableSurface> : null}
         {merchantOrder.status === "quoted" ? <>
           <Text style={styles.notice}>{translate("orderQuoteAwaiting")}</Text>
           <View style={styles.quoteActions}>
@@ -203,14 +204,14 @@ export default function OrderDetailsScreen() {
               style={styles.acceptButton}
             >
               {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.foreground} /> : <Text style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</Text>}
-            </Pressable>
+            </PressableSurface>
             <Pressable
               disabled={quoteMutation.isPending}
               onPress={() => setDeclineTarget(merchantOrder.id)}
               style={styles.declineButton}
             >
               <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>
-            </Pressable>
+            </PressableSurface>
           </View>
           {quoteMutation.isError ? <Text style={styles.errorText}>{translate("orderQuoteResponseError")}</Text> : null}
         </> : null}
@@ -249,9 +250,9 @@ export default function OrderDetailsScreen() {
       style={styles.cancelButton}
     >
       <Text style={styles.cancelButtonText}>{translate("orderCancel")}</Text>
-    </Pressable> : null}
+    </PressableSurface> : null}
     {cancelMutation.isError ? <Text style={styles.errorText}>{translate("orderCancelError")}</Text> : null}
-    <Pressable onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></Pressable>
+    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><Text style={styles.secondaryText}>{translate("ordersTitle")}</Text></PressableSurface>
     <Modal visible={cancelTarget !== null} transparent animationType="fade" onRequestClose={() => setCancelTarget(null)}>
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
@@ -265,10 +266,10 @@ export default function OrderDetailsScreen() {
               style={styles.declineButton}
             >
               {cancelMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <Text style={styles.declineButtonText}>{translate("orderCancelConfirmAction")}</Text>}
-            </Pressable>
-            <Pressable disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
+            </PressableSurface>
+            <PressableSurface accessibilityRole="button" disabled={cancelMutation.isPending} onPress={() => setCancelTarget(null)} style={styles.acceptButton}>
               <Text style={styles.acceptButtonText}>{translate("back")}</Text>
-            </Pressable>
+            </PressableSurface>
           </View>
         </View>
       </View>
@@ -292,10 +293,10 @@ export default function OrderDetailsScreen() {
               style={styles.declineButton}
             >
               {quoteMutation.isPending ? <ActivityIndicator color={theme.colors.danger} /> : <Text style={styles.declineButtonText}>{translate("orderQuoteDecline")}</Text>}
-            </Pressable>
-            <Pressable disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
+            </PressableSurface>
+            <PressableSurface accessibilityRole="button" disabled={quoteMutation.isPending} onPress={() => setDeclineTarget(null)} style={styles.acceptButton}>
               <Text style={styles.acceptButtonText}>{translate("back")}</Text>
-            </Pressable>
+            </PressableSurface>
           </View>
         </View>
       </View>
@@ -304,7 +305,7 @@ export default function OrderDetailsScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  back: { alignSelf: "flex-start", minHeight: 38, justifyContent: "center" },
+  back: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
   backText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   panel: { borderRadius: 18, padding: 14, gap: 12 },
   sectionTitle: { color: theme.colors.accentMuted, fontSize: 14, fontWeight: "900", textAlign: "right" },
@@ -339,11 +340,11 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   secondary: { minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: theme.colors.border, justifyContent: "center", alignItems: "center" },
   secondaryText: { color: theme.colors.accentMuted, fontSize: 13, fontWeight: "900" },
   quoteActions: { flexDirection: "row-reverse", gap: 8 },
-  acceptButton: { flex: 1, minHeight: 45, borderRadius: 12, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
+  acceptButton: { flex: 1, minHeight: 48, borderRadius: 12, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
   acceptButtonText: { color: theme.colors.foreground, fontSize: 12, fontWeight: "900" },
-  declineButton: { flex: 1, minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
+  declineButton: { flex: 1, minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
   declineButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
-  cancelButton: { minHeight: 45, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
+  cancelButton: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
   cancelButtonText: { color: theme.colors.danger, fontSize: 12, fontWeight: "900" },
   errorText: { color: theme.colors.danger, fontSize: 11, textAlign: "right" },
   modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", padding: 20 },
