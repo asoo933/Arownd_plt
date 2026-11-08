@@ -16,7 +16,7 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { BottomSheet } from "./feedback";
 import { Icon } from "./icon";
 import { Text as UiText } from "./typography";
-import { getCalendarDays, normalizeOtp } from "./forms-state";
+import { getCalendarDays } from "./forms-state";
 
 export type TextAreaProps = Omit<TextInputProps, "multiline" | "style"> & {
   style?: StyleProp<TextStyle>;
@@ -104,7 +104,7 @@ export function Checkbox({
       onPress={() => onChange(!checked)}
       hitSlop={6}
       style={({ pressed }) => [
-        { minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
+        { minHeight: theme.dimensions.controlHeight.md, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
         style
       ]}
     >
@@ -120,7 +120,7 @@ export function Checkbox({
           justifyContent: "center"
         }}
       >
-        {checked ? <Icon name="check" size={14} color={theme.colors.accentForeground} accessibilityHidden /> : null}
+        {checked ? <Icon name="check" size={theme.dimensions.iconSize.xs} color={theme.colors.accentForeground} accessibilityHidden /> : null}
       </View>
       {label ? <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{label}</UiText> : null}
     </Pressable>
@@ -164,7 +164,7 @@ export function RadioGroup({
               { minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: option.disabled ? 0.45 : pressed ? 0.75 : 1 }
             ]}
           >
-            <View style={{ width: 22, height: 22, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
+            <View style={{ width: theme.dimensions.iconSize.md, height: theme.dimensions.iconSize.md, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
             <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{option.label}</UiText>
           </Pressable>
         );
@@ -189,7 +189,7 @@ export function SwitchControl({
   const theme = useAppTheme();
 
   return (
-    <View style={[{ minHeight: 48, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }, style]}>
+    <View style={[{ minHeight: theme.dimensions.controlHeight.lg, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }, style]}>
       {label ? <UiText style={{ flex: 1, color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</UiText> : null}
       <Switch
         value={value}
@@ -258,7 +258,7 @@ export function Select({
               }}
               style={{ minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: option.disabled ? 0.45 : 1 }}
             >
-              <UiText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? "700" : "400" }}>
+              <UiText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? theme.fontWeights.bold : theme.fontWeights.regular }}>
                 {option.label}
               </UiText>
             </Pressable>
@@ -325,7 +325,7 @@ export function InputOTP({
     <View accessibilityRole="group" accessibilityLabel={accessibilityLabel} style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
       {Array.from({ length }, (_, index) => (
         <View key={index} style={{ flex: 1, minWidth: 0, height: 54, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface }}>
-          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: "700" }}>
+          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: theme.fontWeights.bold }}>
             {value[index] ?? ""}
           </UiText>
         </View>
@@ -466,7 +466,7 @@ export function DatePicker({
           const unavailable = disabled || (minDate !== undefined && dateKey < minDate) || (maxDate !== undefined && dateKey > maxDate);
           return (
             <Pressable key={dateKey} accessibilityRole="button" accessibilityLabel={dateKey} accessibilityState={{ selected, disabled: unavailable }} disabled={unavailable} onPress={() => onChange(dateKey)} style={({ pressed }) => [{ width: "14.2857%", aspectRatio: 1, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: selected ? theme.colors.accent : "transparent", opacity: unavailable ? 0.35 : pressed ? 0.7 : 1 }]}>
-              <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? "800" : "400" }}>{day}</UiText>
+              <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? theme.fontWeights.extrabold : theme.fontWeights.regular }}>{day}</UiText>
             </Pressable>
           );
         })}
