@@ -221,7 +221,7 @@ export default function CheckoutScreen() {
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("checkoutContactTitle")}</UiText>
-      <PressableSurface onPress={() => router.push("/delivery-profile")} hitSlop={8}>
+      <PressableSurface accessibilityLabel={translate("deliveryProfileManage")} onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <UiText style={styles.retryText}>{translate("deliveryProfileManage")}</UiText>
       </PressableSurface>
       <TextField value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" maxLength={120} />
@@ -231,12 +231,12 @@ export default function CheckoutScreen() {
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</UiText>
       {savedAddresses.isError ? (
-        <PressableSurface onPress={() => void savedAddresses.refetch()}><UiText style={styles.retryText}>{translate("checkoutSavedAddressesError")}</UiText></PressableSurface>
+        <PressableSurface accessibilityLabel={translate("checkoutSavedAddressesError")} onPress={() => void savedAddresses.refetch()}><UiText style={styles.retryText}>{translate("checkoutSavedAddressesError")}</UiText></PressableSurface>
       ) : savedAddresses.data && savedAddresses.data.length > 0 ? (
         <View style={styles.savedAddresses}>
           <View style={styles.savedHeader}>
             <UiText style={styles.fieldLabel}>{translate("checkoutSavedAddresses")}</UiText>
-            <PressableSurface onPress={() => router.push("/addresses")}><UiText style={styles.retryText}>{translate("checkoutManageAddresses")}</UiText></PressableSurface>
+            <PressableSurface accessibilityLabel={translate("checkoutManageAddresses")} onPress={() => router.push("/addresses")}><UiText style={styles.retryText}>{translate("checkoutManageAddresses")}</UiText></PressableSurface>
           </View>
           {savedAddresses.data.map((address) => (
             <PressableSurface
@@ -259,7 +259,7 @@ export default function CheckoutScreen() {
           ))}
         </View>
       ) : (
-        <PressableSurface onPress={() => router.push("/addresses")}><UiText style={styles.retryText}>{translate("checkoutAddSavedAddress")}</UiText></PressableSurface>
+        <PressableSurface accessibilityLabel={translate("checkoutAddSavedAddress")} onPress={() => router.push("/addresses")}><UiText style={styles.retryText}>{translate("checkoutAddSavedAddress")}</UiText></PressableSurface>
       )}
       <View style={styles.deliveryOptions}>
         <PressableSurface
@@ -285,15 +285,15 @@ export default function CheckoutScreen() {
       </View>
 
       <UiText style={styles.fieldLabel}>{translate("checkoutWilaya")}</UiText>
-      <PressableSurface onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
+      <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
         <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
         {wilayas.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
-      {wilayas.isError ? <PressableSurface onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
+      {wilayas.isError ? <PressableSurface accessibilityLabel={translate("retry")} onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
 
       <UiText style={styles.fieldLabel}>{translate("checkoutCommune")}</UiText>
       {communes.data && communes.data.length > 0 ? (
-        <PressableSurface onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]} disabled={!wilayaId}>
+        <PressableSurface accessibilityLabel={translate("checkoutCommune")} onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]} disabled={!wilayaId}>
           <UiText style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</UiText>
         </PressableSurface>
       ) : (
@@ -346,7 +346,7 @@ export default function CheckoutScreen() {
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
           <View style={styles.modalHeader}>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{modalTitle}</UiText>
-            <PressableSurface onPress={() => setPicker(null)} hitSlop={10}><UiText style={styles.back}>{translate("back")}</UiText></PressableSurface>
+            <PressableSurface accessibilityLabel={translate("back")} onPress={() => setPicker(null)} hitSlop={10}><UiText style={styles.back}>{translate("back")}</UiText></PressableSurface>
           </View>
           {((picker === "wilaya" && wilayas.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
           <ScrollView keyboardShouldPersistTaps="handled">
