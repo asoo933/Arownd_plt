@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button } from "@/components/ui";
 import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -63,14 +64,14 @@ export default function NotificationsScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("profileLoginHint")} />
-    <Pressable style={styles.action} onPress={() => router.push("/login")}><Text style={styles.actionText}>{translate("login")}</Text></Pressable>
+    <Button label={translate("login")} onPress={() => router.push("/login")} fullWidth />
   </CustomerScreen>;
   const rows = notifications.data ?? [];
   const unreadCount = countUnreadNotifications(rows);
   return <CustomerScreen>
     <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("notificationsSubtitle")} />
     {actionError ? <Text style={[styles.actionError, { color: theme.colors.danger }]}>{translate("notificationsMarkError")}</Text> : null}
-    {unreadCount > 0 ? <Pressable accessibilityRole="button" disabled={markAll.isPending} onPress={() => markAll.mutate()} style={[styles.markAll, { backgroundColor: theme.colors.accent, opacity: markAll.isPending ? 0.6 : 1 }]}><Text style={styles.markAllText}>{translate("notificationsMarkAll")} · {unreadCount}</Text></Pressable> : null}
+    {unreadCount > 0 ? <Button label={translate("notificationsMarkAll") + " · " + unreadCount} onPress={() => markAll.mutate()} loading={markAll.isPending} fullWidth /> : null}
     {rows.length === 0 ? <EmptyState title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} /> : rows.map((item) => {
       const destination = getNotificationDestination(item);
       return <Pressable key={item.id} accessibilityRole="button" onPress={() => {
@@ -88,15 +89,11 @@ export default function NotificationsScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
-  markAll: { minHeight: 44, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-  markAllText: { color: theme.colors.accentForeground, fontSize: 12, fontWeight: "900" },
   card: { borderRadius: 17, padding: 14, gap: 8 },
   cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
   type: { fontSize: 10, fontWeight: "900" }, date: { fontSize: 10 },
   title: { fontSize: 14, fontWeight: "900", textAlign: "right" },
   body: { fontSize: 12, lineHeight: 20, textAlign: "right" },
   unreadDot: { position: "absolute", top: 14, start: 12, width: 8, height: 8, borderRadius: 4 },
-  action: { minHeight: 48, borderRadius: 14, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-  actionText: { color: theme.colors.accentForeground, fontWeight: "900" },
   actionError: { fontSize: 12, textAlign: "right" }
 }); }
