@@ -371,7 +371,7 @@ export default function MerchantNewProductScreen() {
                         style={[styles.imageRemove, { backgroundColor: theme.colors.danger }]}
                         hitSlop={8}
                       >
-                        <Icon name="x" color=designTokens.brand.white size={15} accessibilityHidden />
+                        <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
                       </PressableSurface>
                     </View>
                   ))}
