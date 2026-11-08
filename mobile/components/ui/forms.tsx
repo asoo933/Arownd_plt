@@ -4,7 +4,6 @@ import {
   Pressable,
   ScrollView,
   Switch,
-  Text as NativeText,
   TextInput,
   View,
   type StyleProp,
@@ -16,6 +15,7 @@ import {
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { BottomSheet } from "./feedback";
 import { Icon } from "./icon";
+import { Text as UiText } from "./typography";
 import { getCalendarDays, normalizeOtp } from "./forms-state";
 
 export type TextAreaProps = Omit<TextInputProps, "multiline" | "style"> & {
@@ -122,7 +122,7 @@ export function Checkbox({
       >
         {checked ? <Icon name="check" size={14} color={theme.colors.accentForeground} accessibilityHidden /> : null}
       </View>
-      {label ? <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{label}</NativeText> : null}
+      {label ? <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{label}</UiText> : null}
     </Pressable>
   );
 }
@@ -165,7 +165,7 @@ export function RadioGroup({
             ]}
           >
             <View style={{ width: 22, height: 22, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
-            <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{option.label}</NativeText>
+            <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "right" }}>{option.label}</UiText>
           </Pressable>
         );
       })}
@@ -190,7 +190,7 @@ export function SwitchControl({
 
   return (
     <View style={[{ minHeight: 48, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }, style]}>
-      {label ? <NativeText style={{ flex: 1, color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</NativeText> : null}
+      {label ? <UiText style={{ flex: 1, color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</UiText> : null}
       <Switch
         value={value}
         onValueChange={onValueChange}
@@ -239,9 +239,9 @@ export function Select({
           style
         ]}
       >
-        <NativeText numberOfLines={1} style={{ color: selected ? theme.colors.foreground : theme.colors.placeholder, fontSize: theme.typography.body }}>
+        <UiText numberOfLines={1} style={{ color: selected ? theme.colors.foreground : theme.colors.placeholder, fontSize: theme.typography.body }}>
           {selected?.label ?? placeholder}
-        </NativeText>
+        </UiText>
         <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
       </Pressable>
       <BottomSheet visible={open} onRequestClose={() => setOpen(false)} maxHeight="70%">
@@ -258,9 +258,9 @@ export function Select({
               }}
               style={{ minHeight: 48, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: theme.colors.border, opacity: option.disabled ? 0.45 : 1 }}
             >
-              <NativeText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? "700" : "400" }}>
+              <UiText style={{ color: option.value === value ? theme.colors.accentMuted : theme.colors.foreground, textAlign: "right", fontSize: theme.typography.body, fontWeight: option.value === value ? "700" : "400" }}>
                 {option.label}
-              </NativeText>
+              </UiText>
             </Pressable>
           ))}
         </ScrollView>
@@ -296,9 +296,9 @@ export function MultiSelect({
             onPress={() => onChange(selected ? value.filter((item) => item !== option.value) : [...value, option.value])}
             style={{ minHeight: 40, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
           >
-            <NativeText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>
+            <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>
               {option.label}
-            </NativeText>
+            </UiText>
           </Pressable>
         );
       })}
@@ -325,9 +325,9 @@ export function InputOTP({
     <View accessibilityRole="group" accessibilityLabel={accessibilityLabel} style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
       {Array.from({ length }, (_, index) => (
         <View key={index} style={{ flex: 1, minWidth: 0, height: 54, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface }}>
-          <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: "700" }}>
+          <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: "700" }}>
             {value[index] ?? ""}
-          </NativeText>
+          </UiText>
         </View>
       ))}
       <TextInput
@@ -346,12 +346,12 @@ export function InputOTP({
 
 export function FormLabel({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
   const theme = useAppTheme();
-  return <NativeText style={[{ color: theme.colors.foreground, fontSize: theme.typography.caption + 2, fontWeight: "700", textAlign: "right" }, style]}>{children}</NativeText>;
+  return <UiText style={[{ color: theme.colors.foreground, fontSize: theme.typography.caption + 2, fontWeight: "700", textAlign: "right" }, style]}>{children}</UiText>;
 }
 
 export function FormError({ children, style }: { children: string; style?: StyleProp<TextStyle> }) {
   const theme = useAppTheme();
-  return <NativeText accessibilityRole="alert" style={[{ color: theme.colors.danger, fontSize: theme.typography.caption, textAlign: "right" }, style]}>{children}</NativeText>;
+  return <UiText accessibilityRole="alert" style={[{ color: theme.colors.danger, fontSize: theme.typography.caption, textAlign: "right" }, style]}>{children}</UiText>;
 }
 
 export function FormField({
@@ -372,7 +372,7 @@ export function FormField({
     <View style={[{ gap: designTokens.spacing.xs }, style]}>
       {label ? <FormLabel>{label}</FormLabel> : null}
       {children}
-      {error ? <FormError>{error}</FormError> : hint ? <NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{hint}</NativeText> : null}
+      {error ? <FormError>{error}</FormError> : hint ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{hint}</UiText> : null}
     </View>
   );
 }
@@ -392,7 +392,7 @@ export function Radio({
   return (
     <Pressable accessibilityRole="radio" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, opacity: disabled ? 0.45 : pressed ? 0.75 : 1 }]}>
       <View style={{ width: 22, height: 22, borderRadius: theme.radius.pill, borderWidth: selected ? 6 : 1.5, borderColor: selected ? theme.colors.accent : theme.colors.muted }} />
-      <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</NativeText>
+      <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{label}</UiText>
     </Pressable>
   );
 }
@@ -450,15 +450,15 @@ export function DatePicker({
     <View accessibilityLabel={accessibilityLabel} style={[{ gap: designTokens.spacing.md }, style]}>
       <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
         <Pressable accessibilityRole="button" accessibilityLabel={previousMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month - 1, 1))} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
-          <NativeText style={{ color: theme.colors.foreground }}>‹</NativeText>
+          <UiText style={{ color: theme.colors.foreground }}>‹</UiText>
         </Pressable>
-        <NativeText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: "700" }}>{monthLabel(year, month)}</NativeText>
+        <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: "700" }}>{monthLabel(year, month)}</UiText>
         <Pressable accessibilityRole="button" accessibilityLabel={nextMonthLabel} disabled={disabled} onPress={() => setVisibleMonth(new Date(year, month + 1, 1))} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
-          <NativeText style={{ color: theme.colors.foreground }}>›</NativeText>
+          <UiText style={{ color: theme.colors.foreground }}>›</UiText>
         </Pressable>
       </View>
       <View style={{ flexDirection: "row-reverse", flexWrap: "wrap" }}>
-        {weekdayLabels.map((label, index) => <View key={`${label}-${index}`} style={{ width: "14.2857%", minHeight: 32, alignItems: "center", justifyContent: "center" }}><NativeText style={{ color: theme.colors.muted, fontSize: theme.typography.caption }}>{label}</NativeText></View>)}
+        {weekdayLabels.map((label, index) => <View key={`${label}-${index}`} style={{ width: "14.2857%", minHeight: 32, alignItems: "center", justifyContent: "center" }}><UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption }}>{label}</UiText></View>)}
         {days.map((day, index) => {
           if (day === null) return <View key={`empty-${index}`} style={{ width: "14.2857%", aspectRatio: 1 }} />;
           const dateKey = toDateKey(new Date(year, month, day));
@@ -466,7 +466,7 @@ export function DatePicker({
           const unavailable = disabled || (minDate !== undefined && dateKey < minDate) || (maxDate !== undefined && dateKey > maxDate);
           return (
             <Pressable key={dateKey} accessibilityRole="button" accessibilityLabel={dateKey} accessibilityState={{ selected, disabled: unavailable }} disabled={unavailable} onPress={() => onChange(dateKey)} style={({ pressed }) => [{ width: "14.2857%", aspectRatio: 1, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: selected ? theme.colors.accent : "transparent", opacity: unavailable ? 0.35 : pressed ? 0.7 : 1 }]}>
-              <NativeText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? "800" : "400" }}>{day}</NativeText>
+              <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? "800" : "400" }}>{day}</UiText>
             </Pressable>
           );
         })}
