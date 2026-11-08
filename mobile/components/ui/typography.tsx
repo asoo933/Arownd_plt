@@ -64,7 +64,7 @@ export function Heading({ level = 2, style, ...props }: HeadingProps) {
     <Text
       {...props}
       accessibilityRole="header"
-      weight={theme.fontWeights.extrabold}
+      weight={theme.fontWeights.bold}
       style={[{ fontSize: sizes[level] }, style]}
     />
   );
