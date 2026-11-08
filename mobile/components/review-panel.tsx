@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, TextField } from "@/components/ui";
+import { Button, PressableSurface, TextField } from "@/components/ui";
 import { fetchApprovedReviews, fetchMyReview, submitMyReview } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
@@ -66,9 +66,9 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
           <Text style={[styles.body, { color: theme.colors.muted }]}>{translate("reviewsEligibilityHint")}</Text>
           <View style={styles.stars}>
             {[1, 2, 3, 4, 5].map(value => (
-              <Pressable key={value} accessibilityRole="button" accessibilityState={{ selected: rating === value }} onPress={() => setRating(value)} style={styles.starButton}>
+              <PressableSurface key={value} accessibilityRole="button" accessibilityState={{ selected: rating === value }} onPress={() => setRating(value)} style={styles.starButton}>
                 <Text style={{ color: value <= rating ? theme.colors.warning : theme.colors.muted, fontSize: 27 }}>★</Text>
-              </Pressable>
+              </PressableSurface>
             ))}
           </View>
           <TextField
