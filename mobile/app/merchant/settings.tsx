@@ -178,7 +178,7 @@ export default function MerchantStoreSettingsScreen() {
           <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} />
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
-            <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
               <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "right" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
           </View>
@@ -193,7 +193,7 @@ export default function MerchantStoreSettingsScreen() {
             <View style={styles.days}>
               {weekdays.map((day) => {
                 const selected = form.opening_hours.closed_days.includes(day.value);
-                return <PressableSurface key={day.value} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
+                return <PressableSurface key={day.value} accessibilityRole="button" accessibilityLabel={translate(day.key)} accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
                   <UiText style={[styles.dayChipText, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(day.key)}</UiText>
                 </PressableSurface>;
               })}
@@ -209,13 +209,13 @@ export default function MerchantStoreSettingsScreen() {
       <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
             <View style={styles.modalHeader}>
               <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
-              <PressableSurface accessibilityRole="button" onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
+              <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
                 <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</UiText>
               </PressableSurface>
             </View>
             <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
               {(wilayas.data ?? []).map((wilaya) => (
-                <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
+                <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + wilaya.name_ar} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
                   <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}</UiText>
                 </PressableSurface>
               ))}
@@ -237,7 +237,7 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
   const styles = createStyles(theme);
   return <View style={styles.field}>
     <UiText style={[styles.label, { color: theme.colors.foreground }]}>{label}</UiText>
-    <TextField value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={multiline ? 2000 : 300} textAlign="right" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
+    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={multiline ? 2000 : 300} textAlign="right" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
   </View>;
 }
 
