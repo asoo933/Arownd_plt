@@ -35,6 +35,20 @@ describe("design system theme tokens", () => {
     expect(getAppTheme("dark").shadows).toEqual(designTokens.shadows);
   });
 
+  it("resolves semantic component colors from the centralized light and dark palettes", () => {
+    for (const mode of ["light", "dark"] as const) {
+      const theme = getAppTheme(mode);
+      const tokens = designTokens.semanticTheme[mode];
+      expect(theme.colors.surfaceMuted).toBe(tokens.surfaceMuted);
+      expect(theme.colors.accentMuted).toBe(tokens.accentMuted);
+      expect(theme.colors.dangerSurface).toBe(tokens.dangerSurface);
+      expect(theme.colors.successSurface).toBe(tokens.successSurface);
+      expect(theme.colors.warningSurface).toBe(tokens.warningSurface);
+      expect(theme.colors.placeholder).toBe(tokens.placeholder);
+      expect(theme.colors.overlay).toBe(tokens.overlay);
+    }
+  });
+
   it("keeps semantic, commerce and delivery colors centralized", () => {
     expect(designTokens.semantic.success).toBe("#16A34A");
     expect(designTokens.commerce.discount).toBe("#DC2626");
