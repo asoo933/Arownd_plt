@@ -6,6 +6,7 @@ import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/componen
 import {
   Alert,
   AppHeader,
+  BackButton,
   Button,
   Card,
   CartItem,
@@ -70,7 +71,11 @@ export default function CartScreen() {
   };
 
   return <CustomerScreen>
-    <AppHeader title={translate("cartTitle")} trailing={<UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</UiText>} />
+    <AppHeader
+      title={translate("cartTitle")}
+      leading={<BackButton accessibilityLabel={translate("back")} onPress={() => { if (router.canGoBack()) router.back(); else router.replace("/home"); }}><Icon name="arrow-right" size={20} accessibilityHidden /></BackButton>}
+      trailing={<UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</UiText>}
+    />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
     {mutation.isError ? <Alert tone="danger" description={translate("genericError")} /> : null}
