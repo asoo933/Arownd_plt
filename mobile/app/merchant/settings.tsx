@@ -269,7 +269,7 @@ function createStyles(theme: AppTheme) {
     content: { padding: 16, paddingBottom: 36, gap: 12 },
     backText: { fontSize: 12, fontWeight: "800" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
-    card: { borderWidth: 1, borderRadius: 18, padding: 15, gap: 13 },
+    card: { padding: 15, gap: 13 },
     select: { justifyContent: "center" },
     brandingRow: { flexDirection: "row-reverse", gap: 12 },
     brandingItem: { flex: 1, gap: 8 },
