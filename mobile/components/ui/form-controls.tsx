@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type TextStyle } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { getQuantityStepState } from "./form-controls-state";
 
@@ -7,13 +7,14 @@ type TextFieldProps = Omit<TextInputProps, "style"> & {
   label?: string;
   error?: string;
   style?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
-export function TextField({ label, error, style, accessibilityLabel, ...props }: TextFieldProps) {
+export function TextField({ label, error, style, containerStyle, accessibilityLabel, ...props }: TextFieldProps) {
   const theme = useAppTheme();
 
   return (
-    <View style={styles.field}>
+    <View style={[styles.field, containerStyle]}>
       {label ? <Text style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</Text> : null}
       <TextInput
         {...props}
