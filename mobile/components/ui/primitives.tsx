@@ -181,3 +181,64 @@ export function Button({
     </Pressable>
   );
 }
+
+
+type IconButtonProps = Pick<PressableProps, "accessibilityHint" | "testID"> & {
+  icon: ReactNode;
+  accessibilityLabel: string;
+  onPress: () => void;
+  variant?: "surface" | "accent" | "ghost";
+  size?: number;
+  disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
+};
+
+export function IconButton({
+  icon,
+  accessibilityLabel,
+  onPress,
+  variant = "surface",
+  size = 44,
+  disabled = false,
+  style,
+  accessibilityHint,
+  testID
+}: IconButtonProps) {
+  const theme = useAppTheme();
+  const backgroundColor =
+    variant === "accent"
+      ? theme.colors.accent
+      : variant === "surface"
+        ? theme.colors.surface
+        : "transparent";
+  const borderColor = variant === "surface" ? theme.colors.border : "transparent";
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={8}
+      testID={testID}
+      style={({ pressed }) => [
+        {
+          width: size,
+          height: size,
+          borderRadius: theme.radius.pill,
+          borderWidth: variant === "surface" ? 1 : 0,
+          borderColor,
+          backgroundColor,
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: disabled ? 0.5 : pressed ? 0.78 : 1
+        },
+        style
+      ]}
+    >
+      {icon}
+    </Pressable>
+  );
+}
