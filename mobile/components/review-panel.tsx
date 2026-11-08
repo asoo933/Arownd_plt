@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { Button } from "@/components/ui";
 import { fetchApprovedReviews, fetchMyReview, submitMyReview } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
@@ -71,15 +72,17 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
             ))}
           </View>
           <TextInput value={comment} onChangeText={setComment} multiline maxLength={1000} placeholder={translate("reviewsCommentPlaceholder")} placeholderTextColor={theme.colors.muted} textAlign="right" style={[styles.input, { color: theme.colors.foreground, borderColor: theme.colors.border }]} />
-          <Pressable accessibilityRole="button" disabled={submit.isPending} onPress={() => submit.mutate()} style={[styles.submit, { backgroundColor: theme.colors.accent, opacity: submit.isPending ? 0.6 : 1 }]}>
-            <Text style={[styles.submitText, { color: theme.colors.accentForeground }]}>{submit.isPending ? translate("reviewsSubmitting") : translate("reviewsSubmit")}</Text>
-          </Pressable>
+          <Button
+            label={translate("reviewsSubmit")}
+            onPress={() => submit.mutate()}
+            loading={submit.isPending}
+            disabled={submit.isPending}
+            fullWidth
+          />
           {submit.isError ? <Text style={[styles.error, { color: theme.colors.danger }]}>{submit.error.message.includes("review_not_verified") ? translate("reviewsNotEligible") : translate("reviewsSubmitError")}</Text> : null}
         </View>
       ) : auth.isSuccess ? (
-        <Pressable accessibilityRole="button" onPress={() => router.push("/login")} style={[styles.submit, { backgroundColor: theme.colors.accent }]}>
-          <Text style={[styles.submitText, { color: theme.colors.accentForeground }]}>{translate("login")}</Text>
-        </Pressable>
+        <Button label={translate("login")} onPress={() => router.push("/login")} fullWidth />
       ) : null}
       {reviews.data?.length ? reviews.data.map(item => (
         <View key={item.id} style={[styles.review, { borderTopColor: theme.colors.border }]}>
