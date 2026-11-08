@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Text } from "react-native";
 
-import { Button } from "@/components/ui";
+import { Button, Icon } from "@/components/ui";
 import { getFavorites, toggleFavorite } from "@/lib/favorites";
 import { hasFavorite, type FavoriteKind } from "@/lib/favorites-state";
 import { translate } from "@/lib/i18n";
@@ -35,11 +34,7 @@ export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string })
       size="sm"
       disabled={disabled}
       startIcon={
-        <Text style={{
-          color: active ? theme.colors.accentMuted : theme.colors.muted,
-          fontSize: 19,
-          fontWeight: "900"
-        }}>{active ? "♥" : "♡"}</Text>
+        <Icon name="heart" size={19} color={active ? theme.colors.danger : theme.colors.muted} accessibilityHidden />
       }
       textStyle={{ color: active ? theme.colors.accentMuted : theme.colors.foreground, fontSize: 11 }}
       style={{
