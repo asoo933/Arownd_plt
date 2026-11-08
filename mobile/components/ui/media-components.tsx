@@ -22,7 +22,7 @@ export function Image({
   resizeMode = "cover",
   style
 }: {
-  uri?: string;
+  uri?: string | undefined;
   source?: ImageSourcePropType;
   accessibilityLabel: string;
   aspectRatio?: number;
