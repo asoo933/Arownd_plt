@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { formatDZD } from "@/lib/catalog";
@@ -8,7 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, MerchantMetricCard } from "@/components/ui";
+import { AppHeader, Button, ChartCard, ErrorState, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const theme = useAppTheme();
@@ -53,7 +53,7 @@ export default function MerchantAnalyticsScreen() {
           title={translate("merchantAnalyticsTitle")}
           leading={<Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />}
         />
-        <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantAnalyticsSubtitle")}</Text>
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantAnalyticsSubtitle")}</UiText>
         <View style={styles.grid}>
           {cards.map((card) => (
             <MerchantMetricCard
@@ -65,21 +65,21 @@ export default function MerchantAnalyticsScreen() {
             />
           ))}
         </View>
-        <View style={[styles.chartCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantAnalyticsLastSevenDays")}</Text>
+        <ChartCard style={styles.chartCard}>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantAnalyticsLastSevenDays")}</UiText>
           {data.daily_delivered.every((item) => item.amount === 0) ? (
-            <Text style={[styles.empty, { color: theme.colors.muted }]}>{translate("merchantAnalyticsNoSales")}</Text>
+            <UiText style={[styles.empty, { color: theme.colors.muted }]}>{translate("merchantAnalyticsNoSales")}</UiText>
           ) : data.daily_delivered.map((item) => (
             <View key={item.day} style={styles.dayRow}>
-              <Text style={[styles.dayLabel, { color: theme.colors.muted }]}>{new Intl.DateTimeFormat("ar-DZ", { day: "numeric", month: "short" }).format(new Date(item.day + "T12:00:00"))}</Text>
+              <UiText style={[styles.dayLabel, { color: theme.colors.muted }]}>{new Intl.DateTimeFormat("ar-DZ", { day: "numeric", month: "short" }).format(new Date(item.day + "T12:00:00"))}</UiText>
               <View style={[styles.track, { backgroundColor: theme.colors.surfaceMuted }]}>
                 <View style={[styles.bar, { backgroundColor: theme.colors.accent, width: Math.max(item.amount > 0 ? 3 : 0, item.amount / maxDaily * 100) + "%" }]} />
               </View>
-              <Text style={[styles.amount, { color: theme.colors.foreground }]}>{formatDZD(item.amount)}</Text>
+              <UiText style={[styles.amount, { color: theme.colors.foreground }]}>{formatDZD(item.amount)}</UiText>
             </View>
           ))}
-        </View>
-        <Text style={[styles.note, { color: theme.colors.muted }]}>{translate("merchantAnalyticsRevenueNote")}</Text>
+        </ChartCard>
+        <UiText style={[styles.note, { color: theme.colors.muted }]}>{translate("merchantAnalyticsRevenueNote")}</UiText>
       </ScrollView>
     </SafeAreaView>
   );
@@ -89,20 +89,25 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
   theme: AppTheme; label: string; loading?: boolean; actionLabel?: string; onAction?: () => void;
 }) {
   const styles = createStyles(theme);
-  return <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-    <View style={styles.message}>
-      {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-      <Text style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</Text>
-      {actionLabel && onAction ? <Button label={actionLabel} onPress={onAction} /> : null}
-    </View>
-  </SafeAreaView>;
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.message}>
+        {loading ? (
+          <LoadingState label={label} />
+        ) : actionLabel && onAction ? (
+          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+        ) : (
+          <UiText style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</UiText>
+        )}
+      </View>
+    </SafeAreaView>
+  );
 }
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: 16, paddingBottom: 36, gap: 12 },
-    title: { fontSize: 24, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     grid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
     metricCard: { width: "48%", flexGrow: 1, minHeight: 88 },
