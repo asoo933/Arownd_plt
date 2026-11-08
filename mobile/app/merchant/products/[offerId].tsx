@@ -13,7 +13,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,6 +38,7 @@ import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { Button, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const theme = useAppTheme();
@@ -337,11 +337,7 @@ export default function MerchantEditProductScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Pressable onPress={() => router.replace("/merchant/products")} style={styles.backButton}>
-            <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
-              {translate("merchantProductEditBack")}
-            </Text>
-          </Pressable>
+          <Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />
 
           <View style={styles.header}>
             <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
@@ -371,7 +367,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductNameLabel")}
                 </Text>
-                <TextInput
+                <TextField
                   value={productName}
                   onChangeText={setProductName}
                   editable={!isBusy}
@@ -384,7 +380,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductBrandLabel")}
                 </Text>
-                <TextInput
+                <TextField
                   value={productBrand}
                   onChangeText={setProductBrand}
                   editable={!isBusy}
@@ -397,7 +393,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductDescriptionLabel")}
                 </Text>
-                <TextInput
+                <TextField
                   value={productDescription}
                   onChangeText={setProductDescription}
                   editable={!isBusy}
@@ -433,27 +429,14 @@ export default function MerchantEditProductScreen() {
               <Text style={[styles.noteText, { color: theme.colors.muted }]}>
                 {translate("merchantProductEditSharedFieldsHint")}
               </Text>
-              <Pressable
-                accessibilityRole="button"
-                disabled={isBusy}
-                onPress={() => void saveProductDetails()}
-                style={[styles.primaryButton, { backgroundColor: theme.colors.accent, opacity: isBusy ? 0.55 : 1 }]}
-              >
-                {detailsSaving ? (
-                  <ActivityIndicator color={theme.colors.accentForeground} />
-                ) : (
-                  <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
-                    {translate("merchantProductDetailsSave")}
-                  </Text>
-                )}
-              </Pressable>
+              <Button label={translate("merchantProductDetailsSave")} onPress={() => void saveProductDetails()} loading={detailsSaving} disabled={isBusy && !detailsSaving} fullWidth />
             </View>
 
             <View style={styles.field}>
               <Text style={[styles.label, { color: theme.colors.foreground }]}>
                 {translate("merchantProductPriceLabel")}
               </Text>
-              <TextInput
+              <TextField
                 value={price}
                 onChangeText={setPrice}
                 editable={!isBusy}
@@ -467,7 +450,7 @@ export default function MerchantEditProductScreen() {
               <Text style={[styles.label, { color: theme.colors.foreground }]}>
                 {translate("merchantProductStockLabel")}
               </Text>
-              <TextInput
+              <TextField
                 value={stock}
                 onChangeText={setStock}
                 editable={!isBusy}
@@ -488,7 +471,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductSizesLabel")}
                 </Text>
-                <TextInput
+                <TextField
                   value={sizes}
                   onChangeText={setSizes}
                   editable={!isBusy}
@@ -502,7 +485,7 @@ export default function MerchantEditProductScreen() {
                 <Text style={[styles.label, { color: theme.colors.foreground }]}>
                   {translate("merchantProductColorsLabel")}
                 </Text>
-                <TextInput
+                <TextField
                   value={colors}
                   onChangeText={setColors}
                   editable={!isBusy}
@@ -517,20 +500,7 @@ export default function MerchantEditProductScreen() {
               </Text>
             </View>
 
-            <Pressable
-              accessibilityRole="button"
-              disabled={isBusy}
-              onPress={() => void saveOffer()}
-              style={[styles.primaryButton, { backgroundColor: theme.colors.accent, opacity: isBusy ? 0.55 : 1 }]}
-            >
-              {saving ? (
-                <ActivityIndicator color={theme.colors.accentForeground} />
-              ) : (
-                <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
-                  {translate("merchantProductEditSave")}
-                </Text>
-              )}
-            </Pressable>
+            <Button label={translate("merchantProductEditSave")} onPress={() => void saveOffer()} loading={saving} disabled={isBusy && !saving} fullWidth />
           </View>
 
           <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
@@ -733,15 +703,7 @@ function MessageScreen({
         {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
         <Text style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</Text>
         {actionLabel && onAction ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={onAction}
-            style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
-          >
-            <Text style={[styles.secondaryButtonText, { color: theme.colors.accentMuted }]}>
-              {actionLabel}
-            </Text>
-          </Pressable>
+          <Button label={actionLabel} onPress={onAction} variant="outline" />
         ) : null}
       </View>
     </SafeAreaView>
