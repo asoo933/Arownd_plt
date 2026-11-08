@@ -574,14 +574,7 @@ export default function MerchantEditProductScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <Modal
-        visible={categoryPickerOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setCategoryPickerOpen(false)}
-      >
-        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
-          <View style={[styles.confirmCard, styles.categoryModalCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+      <BottomSheet visible={categoryPickerOpen} onRequestClose={() => setCategoryPickerOpen(false)} maxHeight="85%">
             <UiText style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
               {translate("merchantProductCategoryPickerTitle")}
             </UiText>
@@ -623,9 +616,8 @@ export default function MerchantEditProductScreen() {
                 {translate("merchantProductCategoryClose")}
               </UiText>
             </PressableSurface>
-          </View>
-        </View>
-      </Modal>
+
+      </BottomSheet>
 
       <ConfirmDialog
         visible={pendingRemoval !== null}
@@ -716,9 +708,7 @@ function createStyles(theme: AppTheme) {
     secondaryButtonText: { fontSize: 11, fontWeight: "900" },
     feedback: { borderWidth: 1, borderRadius: 12, padding: 11 },
     feedbackText: { fontSize: 11, lineHeight: 17, textAlign: "right", fontWeight: "800" },
-    modalOverlay: { flex: 1, justifyContent: "center", padding: 18 },
     confirmCard: { borderWidth: 1, borderRadius: 18, padding: 16, gap: 12 },
-    categoryModalCard: { maxHeight: "80%" },
     categoryList: { maxHeight: 420 },
     categoryOption: { minHeight: 46, borderWidth: 1, borderRadius: 11, justifyContent: "center", paddingHorizontal: 12, marginBottom: 8 },
     categoryOptionText: { fontSize: 12, fontWeight: "800", textAlign: "right" },
