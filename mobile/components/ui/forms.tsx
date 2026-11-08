@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Modal,
@@ -417,6 +417,7 @@ export function DatePicker({
   nextMonthLabel,
   minDate,
   maxDate,
+  weekStartsOn = 0,
   disabled = false,
   style
 }: {
@@ -429,15 +430,24 @@ export function DatePicker({
   nextMonthLabel: string;
   minDate?: string;
   maxDate?: string;
+  weekStartsOn?: number;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
-  const initial = value ? new Date(`${value}T00:00:00`) : new Date();
-  const [visibleMonth, setVisibleMonth] = useState(() => new Date(initial.getFullYear(), initial.getMonth(), 1));
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const parsed = value ? new Date(`${value}T00:00:00`) : new Date();
+    const initial = Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+    return new Date(initial.getFullYear(), initial.getMonth(), 1);
+  });
+  useEffect(() => {
+    if (!value) return;
+    const parsed = new Date(`${value}T00:00:00`);
+    if (!Number.isNaN(parsed.getTime())) setVisibleMonth(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
+  }, [value]);
   const year = visibleMonth.getFullYear();
   const month = visibleMonth.getMonth();
-  const days = useMemo(() => getCalendarDays(year, month), [month, year]);
+  const days = useMemo(() => getCalendarDays(year, month, weekStartsOn), [month, weekStartsOn, year]);
 
   return (
     <View accessibilityLabel={accessibilityLabel} style={[{ gap: designTokens.spacing.md }, style]}>
