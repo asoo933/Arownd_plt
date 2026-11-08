@@ -33,7 +33,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Image as UiImage, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -223,7 +223,7 @@ export default function MerchantNewProductScreen() {
           <AppHeader title={translate("merchantProductCreateTitle")} leading={<Button label={translate("merchantProductCreateBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductCreateSubtitle")}</UiText>
 
-          <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <Card contentStyle={styles.card}>
             <FormField label={translate("merchantProductNameLabel")} theme={theme}>
               <TextField
                 value={form.name}
@@ -395,7 +395,7 @@ export default function MerchantNewProductScreen() {
             ) : null}
 
             <Button label={translate("merchantProductCreateSubmit")} onPress={() => void submit()} loading={submitting} disabled={imagePickerBusy} fullWidth />
-          </View>
+          </Card>
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -543,11 +543,13 @@ function MessageScreen({
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
-        {loading ? <ActivityIndicator color={theme.colors.accentMuted} /> : null}
-        <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
-        {actionLabel && onAction ? (
-          <Button label={actionLabel} onPress={onAction} />
-        ) : null}
+        {loading ? (
+          <LoadingState label={label} />
+        ) : actionLabel && onAction ? (
+          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+        ) : (
+          <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -564,7 +566,7 @@ function createStyles(theme: AppTheme) {
     eyebrow: { fontSize: 10, fontWeight: "900" },
     title: { width: "100%", fontSize: 25, lineHeight: 33, fontWeight: "900", textAlign: "right" },
     subtitle: { width: "100%", fontSize: 12, lineHeight: 20, textAlign: "right" },
-    card: { borderWidth: 1, borderRadius: 18, padding: 14, gap: 15 },
+    card: { padding: 14, gap: 15 },
     row: { flexDirection: "row-reverse", gap: 10 },
     half: { flex: 1 },
     field: { gap: 6 },
