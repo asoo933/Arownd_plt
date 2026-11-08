@@ -5,7 +5,7 @@ import { getStoreImageStoragePath, validateStoreImageAsset } from "@/lib/merchan
 describe("merchant store images", () => {
   it("accepts supported image formats within the upload limit", () => {
     expect(validateStoreImageAsset({ mimeType: "image/jpeg", fileName: "logo.jpg", fileSize: 1024 })).toBe(true);
-    expect(validateStoreImageAsset({ mimeType: "image/webp", fileName: "cover.webp", fileSize: null })).toBe(true);
+    expect(validateStoreImageAsset({ mimeType: "image/webp", fileName: "cover.webp" })).toBe(true);
   });
 
   it("rejects unsupported formats and oversized or empty files", () => {
