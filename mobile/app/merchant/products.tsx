@@ -523,8 +523,6 @@ function createStyles(theme: AppTheme) {
     stockHint: { fontSize: 9, lineHeight: 14, textAlign: "right" },
     valueInput: { minHeight: 46, borderWidth: 1, borderRadius: 12, paddingHorizontal: 11, textAlign: "right", fontSize: 14, fontWeight: "800" },
     actionsRow: { flexDirection: "row-reverse", gap: 8 },
-    manageButton: { minHeight: 41, borderWidth: 1, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-    manageButtonText: { fontSize: 11, fontWeight: "900" },
     messageContainer: { flex: 1, padding: 24, justifyContent: "center", alignItems: "center", gap: 15 },
     messageText: { fontSize: 13, lineHeight: 21, fontWeight: "800", textAlign: "center" }
   });
