@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+
 import { Redirect } from "expo-router";
 
 import { getSupabaseClient } from "@/lib/supabase";
-import { useAppTheme } from "@/lib/theme";
+import { LoadingState } from "@/components/ui";
+import { translate } from "@/lib/i18n";
 
 type Destination = "/login" | "/home";
 
 export default function IndexRoute() {
-  const theme = useAppTheme();
   const [destination, setDestination] = useState<Destination | null>(null);
 
   useEffect(() => {
@@ -28,9 +28,5 @@ export default function IndexRoute() {
 
   if (destination) return <Redirect href={destination} />;
 
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.background }}>
-      <ActivityIndicator color={theme.colors.accentMuted} />
-    </View>
-  );
+  return <LoadingState label={translate("stateLoading")} />;
 }
