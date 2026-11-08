@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { designTokens } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
@@ -24,6 +24,7 @@ import { fetchMyReviews } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function ProfileScreen() {
+  const theme = useAppTheme();
   const user = useQuery({
     queryKey: ["current-user"],
     queryFn: async () => {
@@ -124,7 +125,7 @@ export default function ProfileScreen() {
               style={styles.identityRow}
             />
             {profile.data?.phone ? (
-              <View style={styles.phoneRow}>
+              <View style={[styles.phoneRow, { borderTopColor: theme.colors.border }]}>
                 <Caption>{profile.data.phone}</Caption>
                 <Icon name="phone" size={16} />
               </View>
@@ -140,7 +141,7 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <Icon name="package" size={19} />
+                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="package" size={designTokens.dimensions.iconSize.sm} /></View>
                 <StatCard
                   label={translate("profileOrders")}
                   value={orders.isPending ? "…" : orders.isError ? "—" : String(orders.data?.length ?? 0)}
@@ -157,7 +158,7 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <Icon name="heart" size={19} />
+                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="heart" size={designTokens.dimensions.iconSize.sm} /></View>
                 <StatCard
                   label={translate("profileFavorites")}
                   value={favorites.isPending ? "…" : favorites.isError ? "—" : String(favoriteCount)}
@@ -174,7 +175,7 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <Icon name="star" size={19} />
+                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="star" size={designTokens.dimensions.iconSize.sm} /></View>
                 <StatCard
                   label={translate("myReviewsTitle")}
                   value={reviews.isPending ? "…" : reviews.isError ? "—" : String(reviews.data?.length ?? 0)}
@@ -208,11 +209,12 @@ const styles = StyleSheet.create({
     gap: designTokens.spacing.sm,
     paddingTop: designTokens.spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "rgba(128, 128, 128, 0.25)"
+    borderTopColor: "transparent"
   },
   stats: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
   statCardOuter: { flex: 1, minWidth: 0 },
   statCard: { padding: designTokens.spacing.md },
-  statHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.sm },
+  statHeader: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
+  statIcon: { width: 34, height: 34, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
   stat: { flex: 1, minWidth: 0, padding: 0, backgroundColor: "transparent" },
 });
