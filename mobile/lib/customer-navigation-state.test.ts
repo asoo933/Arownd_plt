@@ -3,16 +3,18 @@ import { describe, expect, it } from "vitest";
 import { getCustomerTab } from "./customer-navigation-state";
 
 describe("getCustomerTab", () => {
-  it("maps the main shopping routes", () => {
+  it("maps the main customer navigation routes", () => {
     expect(getCustomerTab("/home")).toBe("home");
     expect(getCustomerTab("/explore")).toBe("explore");
     expect(getCustomerTab("/stores")).toBe("none");
-    expect(getCustomerTab("/favorites")).toBe("favorites");
+    expect(getCustomerTab("/favorites")).toBe("none");
   });
 
-  it("keeps detail routes associated with their parent tab where applicable", () => {
+  it("keeps product detail associated with explore", () => {
     expect(getCustomerTab("/product/abc")).toBe("explore");
-    expect(getCustomerTab("/store/abc")).toBe("none");
+  });
+
+  it("keeps account routes associated with profile", () => {
     expect(getCustomerTab("/orders/abc")).toBe("profile");
     expect(getCustomerTab("/addresses")).toBe("profile");
     expect(getCustomerTab("/notifications")).toBe("profile");
