@@ -240,6 +240,7 @@ export default function AddressesScreen() {
               {wilayas.data.map((item: Wilaya) => (
                 <PressableSurface
                   key={item.id}
+                  accessibilityLabel={String(item.id).padStart(2, "0") + " - " + item.name_ar}
                   onPress={() => {
                     setWilayaId(item.id);
                     setCommune("");
