@@ -20,14 +20,22 @@ import {
   fetchMerchantOrderDetails,
   rejectMerchantOrder,
   submitMerchantOrderQuote,
-  updateMerchantOrderStatus
+  updateMerchantOrderTracking,
+  type MerchantTrackingStatus
 } from "@/lib/merchant";
-import { getNextMerchantOrderStatus } from "@/lib/merchant-dashboard-state";
+import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
 
 type ConfirmAction = "reject" | "collect" | null;
+
+const trackingTranslationKeys: Record<MerchantTrackingStatus, TranslationKey> = {
+  preparing: "merchantTrackingPreparing",
+  ready_for_dispatch: "merchantTrackingReady",
+  out_for_delivery: "merchantTrackingOutForDelivery",
+  delivered: "merchantTrackingDelivered"
+};
 
 export default function MerchantOrderDetailsScreen() {
   const theme = useAppTheme();
@@ -55,6 +63,8 @@ export default function MerchantOrderDetailsScreen() {
 
   const merchantOrder = detail.data?.merchantOrder;
   const deliveryType = merchantOrder?.order.delivery_type;
+  const trackingEvents = detail.data?.trackingEvents ?? [];
+  const latestTrackingStatus = trackingEvents[trackingEvents.length - 1]?.status ?? "confirmed";
   const refresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["merchant-order-detail", storeId, orderId] }),
@@ -85,7 +95,7 @@ export default function MerchantOrderDetailsScreen() {
   });
 
   const statusMutation = useMutation({
-    mutationFn: (status: "shipped" | "delivered") => updateMerchantOrderStatus(orderId ?? "", status),
+    mutationFn: (status: MerchantTrackingStatus) => updateMerchantOrderTracking(orderId ?? "", status),
     onSuccess: async () => {
       setActionError(null);
       await refresh();
@@ -108,10 +118,8 @@ export default function MerchantOrderDetailsScreen() {
   const order = detail.data.merchantOrder;
   const customerOrder = order.order;
   const total = order.subtotal + order.shipping_fee;
-  const nextStatus = getNextMerchantOrderStatus(order.status, deliveryType ?? "");
-  const nextStatusLabel = nextStatus === "shipped"
-    ? deliveryType === "desk" ? "merchantMarkPickupReady" : "merchantMarkShipped"
-    : nextStatus === "delivered" ? "merchantMarkPickupDelivered" : null;
+  const nextStatus = getNextMerchantTrackingStatus(latestTrackingStatus, deliveryType ?? "");
+  const nextStatusLabel = nextStatus ? trackingTranslationKeys[nextStatus] : null;
   const canCollectCod = deliveryType === "desk" && order.status === "delivered" && order.payment_status !== "paid";
   const canQuote = order.status === "pending" && !order.quoted_at;
   const canReject = canQuote;
@@ -220,13 +228,25 @@ export default function MerchantOrderDetailsScreen() {
           </View>
         ) : null}
 
+        <View style={styles.card}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantTrackingTitle")}</Text>
+          {trackingEvents.length === 0 ? (
+            <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantTrackingEmpty")}</Text>
+          ) : trackingEvents.map((event) => (
+            <View key={event.id} style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
+              <Text style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</Text>
+              <Text style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString("ar-DZ")}</Text>
+            </View>
+          ))}
+        </View>
+
         {nextStatus && nextStatusLabel ? (
           <View style={styles.card}>
             <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantFulfillmentTitle")}</Text>
             <Text style={[styles.mutedText, { color: theme.colors.muted }]}>
-              {nextStatus === "shipped"
-                ? translate("merchantMarkShippedHint")
-                : translate("merchantMarkPickupDeliveredHint")}
+              {nextStatus === "delivered" && deliveryType === "desk"
+                ? translate("merchantMarkPickupDeliveredHint")
+                : translate("merchantMarkShippedHint")}
             </Text>
             <Pressable
               accessibilityRole="button"
@@ -236,18 +256,10 @@ export default function MerchantOrderDetailsScreen() {
             >
               {statusMutation.isPending
                 ? <ActivityIndicator color={theme.colors.accentForeground} />
-                : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>{translate(nextStatusLabel as TranslationKey)}</Text>}
+                : <Text style={[styles.primaryButtonText, { color: theme.colors.accentForeground }]}>
+                    {translate("merchantTrackingAdvance")}: {translate(nextStatusLabel)}
+                  </Text>}
             </Pressable>
-          </View>
-        ) : null}
-
-        {order.status === "shipped" && deliveryType === "home" ? (
-          <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
-            <Text style={[styles.noticeText, { color: theme.colors.warning }]}>
-              {detail.data.shipment?.company_id
-                ? translate("merchantTrackingCarrierCompletesDelivery")
-                : translate("merchantHomeDeliveryCarrierMissing")}
-            </Text>
           </View>
         ) : null}
 
