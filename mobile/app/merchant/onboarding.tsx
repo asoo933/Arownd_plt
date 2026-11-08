@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -33,7 +32,7 @@ import {
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, TextField } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
   const theme = useAppTheme();
@@ -260,7 +259,7 @@ export default function MerchantOnboardingScreen() {
                   label={translate("merchantStoreWilayaLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <Pressable
+                  <PressableSurface
                     accessibilityRole="button"
                     onPress={() => setWilayaPickerOpen(true)}
                     style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}
@@ -271,7 +270,7 @@ export default function MerchantOnboardingScreen() {
                         : translate("merchantStoreChooseWilaya")}
                     </Text>
                     <Text style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</Text>
-                  </Pressable>
+                  </PressableSurface>
                 </FormField>
               )}
             />
@@ -343,7 +342,7 @@ export default function MerchantOnboardingScreen() {
             ) : (
               <View style={styles.categoryGrid}>
                 {mainCategories.map((category) => (
-                  <Pressable
+                  <PressableSurface
                     key={category.id}
                     accessibilityRole="button"
                     accessibilityState={{ selected: categoryId === category.id }}
@@ -362,7 +361,7 @@ export default function MerchantOnboardingScreen() {
                     <Text style={[styles.categoryText, { color: theme.colors.foreground }]}>
                       {category.label}
                     </Text>
-                  </Pressable>
+                  </PressableSurface>
                 ))}
               </View>
             )}
@@ -386,7 +385,7 @@ export default function MerchantOnboardingScreen() {
                     {subcategories.map((category) => {
                       const selected = selectedSubcategories.includes(category.id);
                       return (
-                        <Pressable
+                        <PressableSurface
                           key={category.id}
                           accessibilityRole="button"
                           accessibilityState={{ selected }}
@@ -407,7 +406,7 @@ export default function MerchantOnboardingScreen() {
                           <Text style={[styles.chipText, { color: theme.colors.foreground }]}>
                             {category.label}
                           </Text>
-                        </Pressable>
+                        </PressableSurface>
                       );
                     })}
                   </View>
@@ -496,7 +495,7 @@ export default function MerchantOnboardingScreen() {
               <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantStoreChooseWilaya")}
               </Text>
-              <Pressable
+              <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setWilayaPickerOpen(false)}
                 style={styles.modalClose}
@@ -504,7 +503,7 @@ export default function MerchantOnboardingScreen() {
                 <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
                   {translate("merchantModalClose")}
                 </Text>
-              </Pressable>
+              </PressableSurface>
             </View>
             <ScrollView keyboardShouldPersistTaps="handled">
               {(wilayas.data ?? []).map((wilaya) => (
@@ -596,7 +595,7 @@ function WilayaOption({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <PressableSurface
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
@@ -605,7 +604,7 @@ function WilayaOption({
       <Text style={[stylesForScreen.wilayaText, { color: selected ? theme.colors.accentMuted : theme.colors.foreground }]}>
         {String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}
       </Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
