@@ -33,7 +33,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ErrorState, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -364,7 +364,7 @@ export default function MerchantNewProductScreen() {
                         style={[styles.imageRemove, { backgroundColor: theme.colors.danger }]}
                         hitSlop={8}
                       >
-                        <UiText style={styles.imageRemoveText}>×</UiText>
+                        <Icon name="x" color="#FFFFFF" size={15} accessibilityHidden />
                       </PressableSurface>
                     </View>
                   ))}
@@ -499,7 +499,7 @@ function CategoryOption({
         </UiText>
       </View>
       {selected ? (
-        <UiText style={[styles.categorySelected, { color: theme.colors.accentMuted }]}>✓</UiText>
+        <Icon name="check" color={theme.colors.accentMuted} size={18} accessibilityHidden />
       ) : null}
     </PressableSurface>
   );
