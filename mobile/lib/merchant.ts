@@ -264,7 +264,7 @@ const MerchantShipmentSchema = z.object({
 
 const MerchantTrackingEventSchema = z.object({
   id: z.string().uuid(),
-  status: z.string(),
+  status: z.enum(["preparing", "ready_for_dispatch", "out_for_delivery", "delivered"]),
   note: z.string().nullable(),
   created_at: z.string()
 }).passthrough();
@@ -273,6 +273,7 @@ export type MerchantOrderDetail = {
   merchantOrder: z.infer<typeof MerchantOrderDetailSchema>;
   items: z.infer<typeof MerchantOrderItemDetailSchema>[];
   shipment: z.infer<typeof MerchantShipmentSchema> | null;
+  trackingEvents: MerchantTrackingEvent[];
 };
 
 export type MerchantTrackingEvent = z.infer<typeof MerchantTrackingEventSchema>;
@@ -309,7 +310,7 @@ export async function fetchMerchantOrderDetails(
   if (!merchantOrderData) throw new Error("merchant_order_not_found");
 
   const merchantOrder = MerchantOrderDetailSchema.parse(merchantOrderData as unknown);
-  const [itemsResult, shipmentResult] = await Promise.all([
+  const [itemsResult, shipmentResult, trackingEvents] = await Promise.all([
     client
       .from("order_items")
       .select("id, product_name, quantity, unit_price, options")
@@ -321,7 +322,8 @@ export async function fetchMerchantOrderDetails(
       .from("shipments")
       .select("id, status, company_id, fee, updated_at, notes")
       .eq("merchant_order_id", merchantOrderId)
-      .maybeSingle()
+      .maybeSingle(),
+    fetchMerchantOrderTracking(merchantOrderId)
   ]);
 
   if (itemsResult.error) throw itemsResult.error;
@@ -332,7 +334,8 @@ export async function fetchMerchantOrderDetails(
     items: MerchantOrderItemDetailSchema.array().parse(itemsResult.data as unknown),
     shipment: shipmentResult.data
       ? MerchantShipmentSchema.parse(shipmentResult.data as unknown)
-      : null
+      : null,
+    trackingEvents: [...trackingEvents].sort((first, second) => Date.parse(first.created_at) - Date.parse(second.created_at))
   };
 }
 
