@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -662,8 +661,6 @@ function createStyles(theme: AppTheme) {
     halfField: { flex: 1 },
     timeInput: { minWidth: 0 },
     submitError: { borderWidth: 1, borderRadius: 14, padding: 12 },
-    modalBackdrop: { flex: 1, justifyContent: "flex-end", paddingTop: 50 },
-    modalPanel: { maxHeight: "78%", minHeight: "48%", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 17, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
     modalClose: { minHeight: 40, justifyContent: "center", paddingHorizontal: 4 }
   });
