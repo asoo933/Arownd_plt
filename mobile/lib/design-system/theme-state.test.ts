@@ -15,6 +15,7 @@ describe("theme preference state", () => {
     expect(resolveThemeMode("system", "dark")).toBe("dark");
     expect(resolveThemeMode("system", "light")).toBe("light");
     expect(resolveThemeMode("system", null)).toBe("light");
+    expect(resolveThemeMode("system", "unspecified")).toBe("light");
   });
 
   it("preserves an explicit light or dark preference", () => {
