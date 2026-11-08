@@ -1,177 +1,112 @@
-name: Android diagnostic APK
+name: Arownd Native Android preview APK (Expo)
 
-# APK generation is manual-only until the Android work is explicitly resumed.
+# Manual-only: updating this workflow must never start an APK build.
 on:
-  push:
-    branches:
-      - Arownd-native-v2
-    paths:
-      - ".github/workflows/android-diagnostic-apk.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: android-diagnostic-${{ github.ref }}
-  cancel-in-progress: true
+  group: arownd-expo-android-preview-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build-apk:
+  build-preview-apk:
+    name: Validate and build React Native Android APK
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: npm
+          cache-dependency-path: mobile/package.json
 
-      - name: Setup Java
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      - name: Verify Capacitor CLI and Android platform dependencies
+      - name: Validate Expo app identity and Supabase configuration
+        shell: bash
         run: |
-          node -e "const p=require('./package.json'); const has=(name)=>Boolean(p.dependencies?.[name] || p.devDependencies?.[name]); const missing=['@capacitor/cli','@capacitor/android'].filter((name)=>!has(name)); if(missing.length){console.error('Missing declared native build dependencies: '+missing.join(', ')); process.exit(1)}"
-
-      - name: Regenerate pnpm lockfile for declared dependencies
-        run: pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts
-
-      - name: Commit lockfile synchronization
-        run: |
-          if ! git diff --quiet -- pnpm-lock.yaml; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add pnpm-lock.yaml
-            git commit -m "fix(deps): synchronize pnpm lockfile"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          else
-            echo "pnpm-lock.yaml is already synchronized."
-          fi
-
-      - name: Install dependencies from synchronized lockfile
-        run: pnpm install --frozen-lockfile
-
-      # Run repository quality gates before environment validation so missing
-      # deployment configuration cannot hide TypeScript, lint, UI or test failures.
-      - name: TypeScript
-        run: pnpm run typecheck
-
-      - name: ESLint
-        run: pnpm run lint
-
-      - name: Unified design-system checks
-        run: pnpm run ui:check
-
-      - name: Unit and component tests
-        run: pnpm run test
-
-      - name: Validate public Supabase build configuration
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: |
-          node --input-type=module <<'NODE'
-          const required = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"];
-          const missing = required.filter((name) => !process.env[name]?.trim());
-          if (missing.length) {
-            console.error("::error::Missing GitHub Actions secrets: " + missing.join(", "));
-            console.error("Add these values in Settings > Secrets and variables > Actions. Do not commit them to the repository.");
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require("node:fs");
+          const app = JSON.parse(fs.readFileSync("app.json", "utf8")).expo;
+          const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const errors = [];
+          if (app?.android?.package !== "com.arownd.app") errors.push("android.package must be com.arownd.app");
+          if (app?.scheme !== "com.arownd.app") errors.push("scheme must be com.arownd.app");
+          if (pkg?.main !== "expo-router/entry") errors.push("package main must be expo-router/entry");
+          if (!pkg?.dependencies?.expo || !pkg?.dependencies?.["react-native"]) errors.push("Expo and React Native must be declared in mobile/package.json");
+          if (pkg?.dependencies?.["@capacitor/android"] || pkg?.dependencies?.["@capacitor/core"]) errors.push("The native mobile app must not depend on Capacitor");
+          if (errors.length) {
+            for (const error of errors) console.error("::error::" + error);
             process.exit(1);
           }
-          let url;
-          try {
-            url = new URL(process.env.VITE_SUPABASE_URL);
-          } catch {
-            console.error("::error::VITE_SUPABASE_URL must be a valid HTTPS URL.");
-            process.exit(1);
-          }
-          if (url.protocol !== "https:") {
-            console.error("::error::VITE_SUPABASE_URL must use HTTPS.");
-            process.exit(1);
-          }
-          if (process.env.VITE_SUPABASE_PUBLISHABLE_KEY.trim().length < 20) {
-            console.error("::error::VITE_SUPABASE_PUBLISHABLE_KEY looks incomplete.");
-            process.exit(1);
-          }
-          console.log("Supabase public build configuration is present and structurally valid.");
+          console.log("Expo / React Native app identity is valid.");
           NODE
 
-      - name: Build Capacitor web assets
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: pnpm run build:capacitor
+          test -n "$EXPO_PUBLIC_SUPABASE_URL" || { echo "::error::Missing secret EXPO_PUBLIC_SUPABASE_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY" || { echo "::error::Missing secret EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"; exit 1; }
+          node --input-type=module <<'NODE'
+          const url = new URL(process.env.EXPO_PUBLIC_SUPABASE_URL);
+          if (url.protocol !== "https:") {
+            console.error("::error::EXPO_PUBLIC_SUPABASE_URL must use HTTPS.");
+            process.exit(1);
+          }
+          if (process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY.trim().length < 20) {
+            console.error("::error::EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY looks incomplete.");
+            process.exit(1);
+          }
+          console.log("Supabase public mobile configuration is valid.");
+          NODE
 
-      - name: Sync Android project
-        run: pnpm exec cap sync android
+      - name: Install Expo mobile dependencies
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
-      - name: Verify Android Gradle tasks and assemble APK
-        working-directory: android
-        run: ./gradlew lint testDebugUnitTest assembleDebug --no-daemon --stacktrace
+      - name: TypeScript
+        run: npm run typecheck
 
-      - name: Verify merged Android runtime permissions
-        working-directory: android
+      - name: ESLint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Expo Doctor
+        run: npm run doctor
+
+      - name: Generate clean native Android project
+        run: npx expo prebuild --platform android --clean --no-install --non-interactive
+
+      - name: Verify Android Gradle tasks and assemble release APK
+        working-directory: mobile/android
+        run: ./gradlew lint testDebugUnitTest assembleRelease --no-daemon --stacktrace
+
+      - name: Verify release APK
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import sys
-          import xml.etree.ElementTree as ET
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK" || { echo "::error::Expected native Android APK is missing or empty: mobile/$APK"; exit 1; }
+          ls -lh "$APK"
 
-          android_ns = "{http://schemas.android.com/apk/res/android}"
-          manifests = [
-              path for path in Path("app/build/intermediates").rglob("AndroidManifest.xml")
-              if "merged_manifest" in str(path) or "merged_manifests" in str(path)
-          ]
-          if not manifests:
-              print("::error::No merged debug AndroidManifest.xml was produced.")
-              sys.exit(1)
-
-          manifest = max(manifests, key=lambda path: path.stat().st_mtime)
-          root = ET.parse(manifest).getroot()
-          permissions = {
-              node.attrib.get(android_ns + "name")
-              for node in root
-              if node.tag in {"uses-permission", "uses-permission-sdk-23"}
-          }
-          required = {
-              "android.permission.CAMERA",
-              "android.permission.ACCESS_COARSE_LOCATION",
-              "android.permission.ACCESS_FINE_LOCATION",
-              "android.permission.POST_NOTIFICATIONS",
-          }
-          missing = sorted(required - permissions)
-          print(f"Verified merged manifest: {manifest}")
-          print("Merged permissions:")
-          for permission in sorted(permissions):
-              print(f"  - {permission}")
-          if missing:
-              print("::error::Missing expected Android permissions: " + ", ".join(missing))
-              sys.exit(1)
-          PY
-
-      - name: Verify APK artifact exists
-        run: |
-          test -s android/app/build/outputs/apk/debug/app-debug.apk || {
-            echo "::error::Expected debug APK was not generated or is empty."
-            exit 1
-          }
-
-      - name: Upload APK
+      - name: Upload native Android preview APK
         uses: actions/upload-artifact@v4
         with:
-          name: arownd-diagnostic-apk-${{ github.run_number }}
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: arownd-react-native-preview-apk-${{ github.run_number }}
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
