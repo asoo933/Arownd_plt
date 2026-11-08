@@ -6,13 +6,13 @@ describe("getCustomerTab", () => {
   it("maps the main shopping routes", () => {
     expect(getCustomerTab("/home")).toBe("home");
     expect(getCustomerTab("/explore")).toBe("explore");
-    expect(getCustomerTab("/stores")).toBe("stores");
+    expect(getCustomerTab("/stores")).toBe("none");
     expect(getCustomerTab("/favorites")).toBe("favorites");
   });
 
-  it("keeps detail routes associated with their parent tab", () => {
+  it("keeps detail routes associated with their parent tab where applicable", () => {
     expect(getCustomerTab("/product/abc")).toBe("explore");
-    expect(getCustomerTab("/store/abc")).toBe("stores");
+    expect(getCustomerTab("/store/abc")).toBe("none");
     expect(getCustomerTab("/orders/abc")).toBe("profile");
     expect(getCustomerTab("/addresses")).toBe("profile");
     expect(getCustomerTab("/notifications")).toBe("profile");
