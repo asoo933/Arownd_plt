@@ -5,13 +5,11 @@ import { useState, type ReactNode } from "react";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle
@@ -32,7 +30,7 @@ import {
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
   const theme = useAppTheme();
@@ -163,12 +161,12 @@ export default function MerchantOnboardingScreen() {
           showsVerticalScrollIndicator={false}
         >
           <AppHeader title={translate("merchantOnboardingTitle")} leading={<Button label={translate("merchantOnboardingBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
-          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantOnboardingSubtitle")}</Text>
+          <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantOnboardingSubtitle")}</UiText>
 
-          <View style={[styles.section, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+          <Card contentStyle={styles.section}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantStoreDetailsTitle")}
-            </Text>
+            </UiText>
 
             <Controller
               control={control}
@@ -243,12 +241,12 @@ export default function MerchantOnboardingScreen() {
                 </FormField>
               )}
             />
-          </View>
+          </Card>
 
-          <View style={[styles.section, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+          <Card contentStyle={styles.section}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantStoreLocationTitle")}
-            </Text>
+            </UiText>
 
             <Controller
               control={control}
@@ -264,12 +262,12 @@ export default function MerchantOnboardingScreen() {
                     onPress={() => setWilayaPickerOpen(true)}
                     style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}
                   >
-                    <Text style={[styles.selectText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>
+                    <UiText style={[styles.selectText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>
                       {selectedWilaya
                         ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}`
                         : translate("merchantStoreChooseWilaya")}
-                    </Text>
-                    <Text style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</Text>
+                    </UiText>
+                    <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
                   </PressableSurface>
                 </FormField>
               )}
@@ -322,23 +320,23 @@ export default function MerchantOnboardingScreen() {
                 </FormField>
               )}
             />
-            <Text style={[styles.hint, { color: theme.colors.muted }]}>
+            <UiText style={[styles.hint, { color: theme.colors.muted }]}>
               {translate("merchantStoreLocationHint")}
-            </Text>
-          </View>
+            </UiText>
+          </Card>
 
-          <View style={[styles.section, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+          <Card contentStyle={styles.section}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantStoreCategoryLabel")}
-            </Text>
-            <Text style={[styles.hint, { color: theme.colors.muted }]}>
+            </UiText>
+            <UiText style={[styles.hint, { color: theme.colors.muted }]}>
               {translate("merchantStoreCategoryHint")}
-            </Text>
+            </UiText>
 
             {mainCategories.length === 0 ? (
-              <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+              <UiText style={[styles.errorText, { color: theme.colors.danger }]}>
                 {translate("merchantNoCategories")}
-              </Text>
+              </UiText>
             ) : (
               <View style={styles.categoryGrid}>
                 {mainCategories.map((category) => (
@@ -358,28 +356,28 @@ export default function MerchantOnboardingScreen() {
                       }
                     ]}
                   >
-                    <Text style={[styles.categoryText, { color: theme.colors.foreground }]}>
+                    <UiText style={[styles.categoryText, { color: theme.colors.foreground }]}>
                       {category.label}
-                    </Text>
+                    </UiText>
                   </PressableSurface>
                 ))}
               </View>
             )}
             {fieldError(errors.category?.message) ? (
-              <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+              <UiText style={[styles.errorText, { color: theme.colors.danger }]}>
                 {fieldError(errors.category?.message)}
-              </Text>
+              </UiText>
             ) : null}
 
             {categoryId ? (
               <View style={styles.subcategoryGroup}>
-                <Text style={[styles.fieldLabel, { color: theme.colors.muted }]}>
+                <UiText style={[styles.fieldLabel, { color: theme.colors.muted }]}>
                   {translate("merchantStoreSubcategoriesLabel")}
-                </Text>
+                </UiText>
                 {subcategories.length === 0 ? (
-                  <Text style={[styles.hint, { color: theme.colors.muted }]}>
+                  <UiText style={[styles.hint, { color: theme.colors.muted }]}>
                     {translate("merchantNoSubcategories")}
-                  </Text>
+                  </UiText>
                 ) : (
                   <View style={styles.chipList}>
                     {subcategories.map((category) => {
@@ -403,25 +401,25 @@ export default function MerchantOnboardingScreen() {
                             }
                           ]}
                         >
-                          <Text style={[styles.chipText, { color: theme.colors.foreground }]}>
+                          <UiText style={[styles.chipText, { color: theme.colors.foreground }]}>
                             {category.label}
-                          </Text>
+                          </UiText>
                         </PressableSurface>
                       );
                     })}
                   </View>
                 )}
-                <Text style={[styles.hint, { color: theme.colors.muted }]}>
+                <UiText style={[styles.hint, { color: theme.colors.muted }]}>
                   {translate("merchantStoreSubcategoriesHint")}
-                </Text>
+                </UiText>
               </View>
             ) : null}
-          </View>
+          </Card>
 
-          <View style={[styles.section, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+          <Card contentStyle={styles.section}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantStoreHoursTitle")}
-            </Text>
+            </UiText>
             <View style={styles.hoursRow}>
               <Controller
                 control={control}
@@ -468,14 +466,14 @@ export default function MerchantOnboardingScreen() {
                 )}
               />
             </View>
-            <Text style={[styles.hint, { color: theme.colors.muted }]}>
+            <UiText style={[styles.hint, { color: theme.colors.muted }]}>
               {translate("merchantStoreHoursHint")}
-            </Text>
-          </View>
+            </UiText>
+          </Card>
 
           {submitError ? (
             <View style={[styles.submitError, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-              <Text style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</Text>
+              <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</UiText>
             </View>
           ) : null}
 
@@ -492,17 +490,17 @@ export default function MerchantOnboardingScreen() {
         <View style={[styles.modalBackdrop, { backgroundColor: theme.colors.overlay }]}>
           <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
             <View style={styles.modalHeader}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantStoreChooseWilaya")}
-              </Text>
+              </UiText>
               <PressableSurface
                 accessibilityRole="button"
                 onPress={() => setWilayaPickerOpen(false)}
                 style={styles.modalClose}
               >
-                <Text style={[styles.backText, { color: theme.colors.accentMuted }]}>
+                <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>
                   {translate("merchantModalClose")}
-                </Text>
+                </UiText>
               </PressableSurface>
             </View>
             <ScrollView keyboardShouldPersistTaps="handled">
@@ -530,8 +528,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <ActivityIndicator color={theme.colors.accentMuted} />
-        <Text style={[stylesForScreen.message, { color: theme.colors.muted }]}>{label}</Text>
+        <LoadingState label={label} />
       </View>
     </SafeAreaView>
   );
@@ -551,8 +548,7 @@ function MessageScreen({
   return (
     <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <Text style={[stylesForScreen.message, { color: theme.colors.foreground }]}>{title}</Text>
-        <Button label={actionLabel} onPress={onAction} fullWidth />
+        <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
     </SafeAreaView>
   );
@@ -575,10 +571,10 @@ function FormField({
 }) {
   return (
     <View style={[stylesForScreen.field, containerStyle]}>
-      <Text style={[stylesForScreen.fieldLabel, { color: theme.colors.muted }]}>{label}</Text>
+      <UiText style={[stylesForScreen.fieldLabel, { color: theme.colors.muted }]}>{label}</UiText>
       {children}
-      {hint ? <Text style={[stylesForScreen.hint, { color: theme.colors.muted }]}>{hint}</Text> : null}
-      {error ? <Text style={[stylesForScreen.error, { color: theme.colors.danger }]}>{error}</Text> : null}
+      {hint ? <UiText style={[stylesForScreen.hint, { color: theme.colors.muted }]}>{hint}</UiText> : null}
+      {error ? <UiText style={[stylesForScreen.error, { color: theme.colors.danger }]}>{error}</UiText> : null}
     </View>
   );
 }
@@ -601,9 +597,9 @@ function WilayaOption({
       onPress={onPress}
       style={[stylesForScreen.wilayaOption, { borderBottomColor: theme.colors.border }]}
     >
-      <Text style={[stylesForScreen.wilayaText, { color: selected ? theme.colors.accentMuted : theme.colors.foreground }]}>
+      <UiText style={[stylesForScreen.wilayaText, { color: selected ? theme.colors.accentMuted : theme.colors.foreground }]}>
         {String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}
-      </Text>
+      </UiText>
     </PressableSurface>
   );
 }
@@ -612,8 +608,6 @@ const stylesForScreen = StyleSheet.create({
   safe: { flex: 1 },
   center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: 16 },
   message: { fontSize: 14, lineHeight: 22, textAlign: "center", fontWeight: "700" },
-  action: { minHeight: 46, borderRadius: 14, paddingHorizontal: 20, alignItems: "center", justifyContent: "center" },
-  actionText: { fontSize: 13, fontWeight: "900" },
   field: { gap: 7 },
   fieldLabel: { fontSize: 12, fontWeight: "800", textAlign: "right" },
   hint: { fontSize: 11, lineHeight: 17, textAlign: "right" },
@@ -627,11 +621,7 @@ function createStyles(theme: AppTheme) {
     safe: { flex: 1 },
     flex: { flex: 1 },
     content: { padding: 18, paddingBottom: 38, gap: 14 },
-    header: { alignItems: "flex-end", gap: 8, marginBottom: 4 },
-    backButton: { minHeight: 44, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 4 },
     backText: { fontSize: 13, fontWeight: "800" },
-    eyebrow: { fontSize: 11, fontWeight: "900" },
-    title: { fontSize: 24, lineHeight: 32, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 13, lineHeight: 21, textAlign: "right" },
     section: { borderWidth: 1, borderRadius: 20, padding: 15, gap: 14 },
     sectionTitle: { fontSize: 15, fontWeight: "900", textAlign: "right" },
@@ -680,9 +670,6 @@ function createStyles(theme: AppTheme) {
     halfField: { flex: 1 },
     timeInput: { minWidth: 0 },
     submitError: { borderWidth: 1, borderRadius: 14, padding: 12 },
-    submitButton: { minHeight: 53, borderRadius: 15, alignItems: "center", justifyContent: "center", paddingHorizontal: 16, marginTop: 4 },
-    submitText: { fontSize: 14, fontWeight: "900" },
-    disabled: { opacity: 0.5 },
     modalBackdrop: { flex: 1, justifyContent: "flex-end", paddingTop: 50 },
     modalPanel: { maxHeight: "78%", minHeight: "48%", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 17, gap: 12 },
     modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
