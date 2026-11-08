@@ -15,7 +15,7 @@ import {
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { getButtonPalette, type ButtonVariant } from "./palette";
 
-type SurfaceProps = Pick<ViewProps, "accessibilityLabel" | "accessibilityRole" | "testID"> & {
+type SurfaceProps = Pick<ViewProps, "accessibilityHint" | "accessibilityLabel" | "accessibilityRole" | "testID"> & {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   elevated?: boolean;
@@ -29,6 +29,7 @@ export function Surface({
   elevated = true,
   padding = designTokens.spacing.md,
   radius = "lg",
+  accessibilityHint,
   accessibilityLabel,
   accessibilityRole,
   testID
