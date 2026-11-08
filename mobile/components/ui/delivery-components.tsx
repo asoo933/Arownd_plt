@@ -36,9 +36,9 @@ export function TrackingStep({ step, isLast = false }: { step: TrackingStepItem;
   const active = step.status !== "upcoming";
   return (
     <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.md, minHeight: isLast ? 44 : 68 }}>
-      <View style={{ alignItems: "center", width: 36 }}>
-        <View style={{ width: 36, height: 36, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
-          {step.icon ?? (step.status === "complete" ? <Icon name="check" size={16} color={theme.colors.success} accessibilityHidden /> : <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: active ? theme.colors.foreground : theme.colors.muted }} />)}
+      <View style={{ alignItems: "center", width: theme.dimensions.avatarSize.md }}>
+        <View style={{ width: theme.dimensions.avatarSize.md, height: theme.dimensions.avatarSize.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
+          {step.icon ?? (step.status === "complete" ? <Icon name="check" size={theme.dimensions.iconSize.xs + 2} color={theme.colors.success} accessibilityHidden /> : <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: active ? theme.colors.foreground : theme.colors.muted }} />)}
         </View>
         {!isLast ? <View style={{ width: 2, flex: 1, minHeight: 24, backgroundColor: step.status === "complete" ? theme.colors.success : theme.colors.border }} /> : null}
       </View>
