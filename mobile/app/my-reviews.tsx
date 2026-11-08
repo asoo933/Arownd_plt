@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { designTokens } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
@@ -65,6 +65,8 @@ export default function MyReviewsScreen() {
 }
 
 function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void }) {
+  const theme = useAppTheme();
+  const styles = createReviewStyles(theme);
   const status = review.status === "approved"
     ? translate("myReviewsApproved")
     : review.status === "rejected"
@@ -82,13 +84,14 @@ function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void
     <Card
       onPress={onPress}
       accessibilityLabel={target}
+      style={styles.card}
       contentStyle={styles.cardContent}
     >
       <View style={styles.rowHeader}>
-        <UiText weight="800">{target}</UiText>
+        <UiText weight="800" style={styles.targetLabel}>{target}</UiText>
         <RatingStars value={review.rating} size={15} showValue />
       </View>
-      {review.comment ? <UiText tone="muted">{review.comment}</UiText> : null}
+      {review.comment ? <UiText tone="muted" style={styles.comment}>{review.comment}</UiText> : null}
       <View style={styles.rowFooter}>
         <StatusBadge
           label={status}
@@ -100,8 +103,33 @@ function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void
   );
 }
 
-const styles = StyleSheet.create({
-  cardContent: { gap: designTokens.spacing.sm, padding: designTokens.spacing.lg },
-  rowHeader: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-  rowFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }
-});
+function createReviewStyles(theme: AppTheme) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: designTokens.radius.lg
+    },
+    cardContent: {
+      gap: designTokens.spacing.md,
+      padding: designTokens.spacing.lg
+    },
+    rowHeader: {
+      flexDirection: "row-reverse",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: designTokens.spacing.md
+    },
+    targetLabel: { color: theme.colors.foreground },
+    comment: { lineHeight: designTokens.typography.body * 1.6 },
+    rowFooter: {
+      flexDirection: "row-reverse",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: designTokens.spacing.md,
+      paddingTop: designTokens.spacing.sm,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: theme.colors.border
+    }
+  });
+}
