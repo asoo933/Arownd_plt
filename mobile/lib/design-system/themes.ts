@@ -2,8 +2,10 @@ import { createContext, useContext, useMemo, type PropsWithChildren } from "reac
 import { useColorScheme } from "react-native";
 
 import { brandColors, semanticColors, themeColors } from "./colors";
+import { dimensions } from "./dimensions";
+import { shadows } from "./shadows";
 import { borderRadius, spacing } from "./spacing";
-import { typography } from "./typography";
+import { fontFamilies, fontWeights, typography } from "./typography";
 
 export type ThemeMode = "system" | "light" | "dark";
 
@@ -41,6 +43,10 @@ export type AppTheme = {
   spacing: typeof spacing;
   radius: typeof borderRadius;
   typography: typeof typography;
+  fontFamilies: typeof fontFamilies;
+  fontWeights: typeof fontWeights;
+  dimensions: typeof dimensions;
+  shadows: typeof shadows;
 };
 
 const ThemeContext = createContext<AppTheme | null>(null);
@@ -81,7 +87,11 @@ export function getAppTheme(mode: "light" | "dark"): AppTheme {
     },
     spacing,
     radius: borderRadius,
-    typography
+    typography,
+    fontFamilies,
+    fontWeights,
+    dimensions,
+    shadows
   };
 }
 
