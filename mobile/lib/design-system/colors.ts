@@ -52,3 +52,38 @@ export const themeColors = {
     input: "#171717"
   }
 } as const;
+
+export const extendedThemeColors = {
+  light: {
+    surfaceMuted: "#ECEFE4",
+    subtle: "#8A8A8A",
+    accentMuted: "#647D13",
+    danger: "#B42318",
+    dangerSurface: "#FEECEB",
+    dangerBorder: "#F7C8C4",
+    success: "#3F6212",
+    successSurface: "#F7FBEA",
+    successBorder: "#D7E9A1",
+    warning: "#9A6700",
+    warningSurface: "#FFF7E0",
+    warningBorder: "#F0D99A",
+    placeholder: "#A3A3A3",
+    overlay: "rgba(0,0,0,0.42)"
+  },
+  dark: {
+    surfaceMuted: "#202020",
+    subtle: "#858585",
+    accentMuted: brandColors.lime,
+    danger: "#F97066",
+    dangerSurface: "#321A19",
+    dangerBorder: "#71312D",
+    success: "#B9E65A",
+    successSurface: "#1C2410",
+    successBorder: "#4B5C20",
+    warning: "#FBBF24",
+    warningSurface: "#302510",
+    warningBorder: "#70551D",
+    placeholder: "#737373",
+    overlay: "rgba(0,0,0,0.72)"
+  }
+} as const;
