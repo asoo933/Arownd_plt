@@ -195,7 +195,7 @@ export default function MerchantOrderDetailsScreen() {
             {deliveryType === "desk" ? (
               <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantQuotePickupHint")}</UiText>
             ) : (
-              <UiTextField
+              <TextField
                 value={shippingFee}
                 onChangeText={setShippingFee}
                 keyboardType="number-pad"
