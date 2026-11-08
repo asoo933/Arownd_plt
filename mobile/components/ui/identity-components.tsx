@@ -63,7 +63,7 @@ export function RatingStars({
   const theme = useAppTheme();
   const normalized = Math.min(count, Math.max(0, value));
   return (
-    <View accessibilityRole="image" accessibilityLabel={String(value)} style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xxs ?? designTokens.spacing.xs }, style]}>
+    <View accessibilityRole="image" accessibilityLabel={String(value)} style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs }, style]}>
       {Array.from({ length: count }, (_, index) => (
         <Icon key={index} name="star" size={size} color={index < Math.round(normalized) ? theme.colors.warning : theme.colors.border} fill={index < Math.round(normalized) ? theme.colors.warning : "none"} accessibilityHidden />
       ))}
