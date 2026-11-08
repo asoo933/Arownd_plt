@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { router } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { designTokens } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { isThemeMode, useThemePreference } from "@/lib/design-system";
 import { CustomerScreen } from "@/components/customer-ui";
 import {
@@ -24,6 +24,8 @@ import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function SettingsScreen() {
+  const theme = useAppTheme();
+  const styles = createStyles(theme);
   const queryClient = useQueryClient();
   const { mode: themeMode, setMode: setThemeMode } = useThemePreference();
   const [appearanceError, setAppearanceError] = useState(false);
@@ -75,7 +77,7 @@ export default function SettingsScreen() {
       <AppHeader title={translate("settingsTitle")} />
       <Caption>{translate("settingsSubtitle")}</Caption>
 
-      <Card contentStyle={styles.sectionContent}>
+      <Card style={styles.sectionCard} contentStyle={styles.sectionContent}>
         <Heading level={3}>{translate("settingsAppearanceTitle")}</Heading>
         <Caption>{translate("settingsAppearanceHint")}</Caption>
         <SegmentedControl
@@ -134,8 +136,11 @@ export default function SettingsScreen() {
           onPress={() => router.push("/delivery-profile")}
           style={styles.linkRow}
         >
-          <UiText weight="700">{translate("profileEditDetails")}</UiText>
-          <Icon name="chevron-left" size={19} />
+          <View style={styles.linkLabel}>
+            <Icon name="user" size={19} color={theme.colors.foregroundSecondary} />
+            <UiText weight="700">{translate("profileEditDetails")}</UiText>
+          </View>
+          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
         </PressableSurface>
         <PressableSurface
           accessibilityRole="button"
@@ -143,8 +148,11 @@ export default function SettingsScreen() {
           onPress={() => router.push("/addresses")}
           style={styles.linkRow}
         >
-          <UiText weight="700">{translate("profileAddresses")}</UiText>
-          <Icon name="chevron-left" size={19} />
+          <View style={styles.linkLabel}>
+            <Icon name="map-pin" size={19} color={theme.colors.foregroundSecondary} />
+            <UiText weight="700">{translate("profileAddresses")}</UiText>
+          </View>
+          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
         </PressableSurface>
         <PressableSurface
           accessibilityRole="button"
@@ -152,8 +160,11 @@ export default function SettingsScreen() {
           onPress={() => router.push("/merchant")}
           style={styles.linkRow}
         >
-          <UiText weight="700">{translate("settingsStoreManagement")}</UiText>
-          <Icon name="chevron-left" size={19} />
+          <View style={styles.linkLabel}>
+            <Icon name="store" size={19} color={theme.colors.foregroundSecondary} />
+            <UiText weight="700">{translate("settingsStoreManagement")}</UiText>
+          </View>
+          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
         </PressableSurface>
         <PressableSurface
           accessibilityRole="button"
@@ -161,8 +172,11 @@ export default function SettingsScreen() {
           onPress={() => router.push("/forgot-password")}
           style={styles.linkRow}
         >
-          <UiText weight="700">{translate("forgotPassword")}</UiText>
-          <Icon name="chevron-left" size={19} />
+          <View style={styles.linkLabel}>
+            <Icon name="lock" size={19} color={theme.colors.foregroundSecondary} />
+            <UiText weight="700">{translate("forgotPassword")}</UiText>
+          </View>
+          <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
         </PressableSurface>
       </Card>
 
@@ -200,8 +214,35 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContent: { gap: designTokens.spacing.md, padding: designTokens.spacing.lg },
-  input: { minHeight: 48, textAlign: "right" },
-  linkRow: { minHeight: 48, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }
-});
+function createStyles(theme: AppTheme) {
+  return StyleSheet.create({
+    sectionCard: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: designTokens.radius.lg
+    },
+    sectionContent: {
+      gap: designTokens.spacing.md,
+      padding: designTokens.spacing.lg
+    },
+    input: {
+      minHeight: 48,
+      textAlign: "right"
+    },
+    linkRow: {
+      minHeight: 54,
+      paddingVertical: designTokens.spacing.xs,
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: designTokens.spacing.md
+    },
+    linkLabel: {
+      flex: 1,
+      minWidth: 0,
+      flexDirection: "row-reverse",
+      alignItems: "center",
+      gap: designTokens.spacing.md
+    }
+  });
+}
