@@ -8,7 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { Button } from "@/components/ui";
+import { AppHeader, Button, MerchantMetricCard } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const theme = useAppTheme();
@@ -49,15 +49,20 @@ export default function MerchantAnalyticsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />
-        <Text style={[styles.title, { color: theme.colors.foreground }]}>{translate("merchantAnalyticsTitle")}</Text>
+        <AppHeader
+          title={translate("merchantAnalyticsTitle")}
+          leading={<Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
         <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantAnalyticsSubtitle")}</Text>
         <View style={styles.grid}>
           {cards.map((card) => (
-            <View key={card.label} style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-              <Text style={[styles.cardLabel, { color: theme.colors.muted }]}>{card.label}</Text>
-              <Text style={[styles.cardValue, { color: card.tone }]} numberOfLines={1}>{card.value}</Text>
-            </View>
+            <MerchantMetricCard
+              key={card.label}
+              label={card.label}
+              value={card.value}
+              valueTone={card.tone}
+              style={styles.metricCard}
+            />
           ))}
         </View>
         <View style={[styles.chartCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
@@ -100,9 +105,7 @@ function createStyles(theme: AppTheme) {
     title: { fontSize: 24, fontWeight: "900", textAlign: "right" },
     subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
     grid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
-    card: { width: "48%", flexGrow: 1, minHeight: 88, borderWidth: 1, borderRadius: 15, padding: 12, justifyContent: "space-between", gap: 8 },
-    cardLabel: { fontSize: 10, textAlign: "right", fontWeight: "700" },
-    cardValue: { fontSize: 18, textAlign: "right", fontWeight: "900" },
+    metricCard: { width: "48%", flexGrow: 1, minHeight: 88 },
     chartCard: { borderWidth: 1, borderRadius: 16, padding: 14, gap: 15 },
     sectionTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
     dayRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
