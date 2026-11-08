@@ -53,22 +53,3 @@ export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string })
   );
 }
 
-const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
-  button: {
-    minHeight: 44,
-    minWidth: 112,
-    borderRadius: 13,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 7,
-    paddingHorizontal: 12
-  },
-  active: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
-  icon: { color: theme.colors.muted, fontSize: 19, fontWeight: "900" },
-  label: { color: theme.colors.foreground, fontSize: 11, fontWeight: "800" },
-  activeIcon: { color: theme.colors.accentMuted }
-});
