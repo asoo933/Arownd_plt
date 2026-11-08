@@ -4,7 +4,7 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { CustomerHeading, CustomerScreen } from "@/components/customer-ui";
-import { Button, PressableSurface, TextField } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, TextField } from "@/components/ui";
 import { translate } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -69,7 +69,8 @@ export default function SettingsScreen() {
 
   return (
     <CustomerScreen>
-      <CustomerHeading title={translate("settingsTitle")} subtitle={translate("settingsSubtitle")} />
+      <AppHeader title={translate("settingsTitle")} />
+      <Text style={[styles.hint, { color: colors.muted }]}>{translate("settingsSubtitle")}</Text>
       <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>{translate("settingsSecurityTitle")}</Text>
         <Text style={[styles.hint, { color: colors.muted }]}>{translate("settingsPasswordHint")}</Text>
