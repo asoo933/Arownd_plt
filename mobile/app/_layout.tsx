@@ -2,10 +2,19 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+
+import { ThemeProvider, useAppTheme } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
-import { useAppTheme } from "@/lib/theme";
 
 export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutContent />
+    </ThemeProvider>
+  );
+}
+
+function RootLayoutContent() {
   const [queryClient] = useState(
     () =>
       new QueryClient({
