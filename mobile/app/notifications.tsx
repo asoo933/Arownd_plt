@@ -3,8 +3,9 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
+  Alert,
   AppHeader,
   Button,
   Caption,
@@ -93,7 +94,7 @@ export default function NotificationsScreen() {
   if (auth.isError || notifications.isError) {
     return (
       <CustomerScreen>
-        <CustomerHeading title={translate("notificationsTitle")} />
+        <AppHeader title={translate("notificationsTitle")} />
         <ErrorState
           title={translate("notificationsLoadError")}
           retryLabel={translate("retry")}
@@ -105,7 +106,7 @@ export default function NotificationsScreen() {
   if (!auth.data) {
     return (
       <CustomerScreen>
-        <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("profileLoginHint")} />
+        <AppHeader title={translate("notificationsTitle")} trailing={<Caption>{translate("profileLoginHint")}</Caption>} />
         <Button label={translate("login")} onPress={() => router.push("/login")} fullWidth />
       </CustomerScreen>
     );
@@ -121,7 +122,7 @@ export default function NotificationsScreen() {
         trailing={unreadCount > 0 ? <StatusBadge label={String(unreadCount)} tone="accent" /> : undefined}
       />
       <Caption>{translate("notificationsSubtitle")}</Caption>
-      {actionError ? <UiText tone="danger">{translate("notificationsMarkError")}</UiText> : null}
+      {actionError ? <Alert tone="danger" description={translate("notificationsMarkError")} /> : null}
       {unreadCount > 0 ? (
         <Button
           label={translate("notificationsMarkAll") + " · " + unreadCount}
@@ -135,27 +136,24 @@ export default function NotificationsScreen() {
       ) : rows.map((item) => {
         const destination = getNotificationDestination(item);
         return (
-          <View key={item.id} style={styles.cardWrapper}>
-            <NotificationCard
-              onPress={() => {
-                if (!item.read) markOne.mutate(item.id);
-                if (destination) router.push(destination as never);
-              }}
-              accessibilityLabel={item.title}
-              style={{ opacity: item.read ? 0.78 : 1 }}
-              contentStyle={styles.cardContent}
-            >
-              <View style={styles.cardHeader}>
-                <Caption tone="accentMuted" weight="800">{typeLabel(item.type)}</Caption>
-                <Caption>{dateLabel(item.created_at)}</Caption>
-              </View>
-              <UiText weight="800">{item.title}</UiText>
-              {item.body ? <UiText tone="muted">{item.body}</UiText> : null}
-              {!item.read ? (
-                <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} />
-              ) : null}
-            </NotificationCard>
-          </View>
+          <NotificationCard
+            key={item.id}
+            style={styles.card}
+            contentStyle={styles.cardContent}
+            onPress={() => {
+              if (!item.read) markOne.mutate(item.id);
+              if (destination) router.push(destination as never);
+            }}
+            accessibilityLabel={item.title}
+          >
+            <View style={styles.cardHeader}>
+              <Caption tone="accentMuted" weight="800">{typeLabel(item.type)}</Caption>
+              <Caption>{dateLabel(item.created_at)}</Caption>
+            </View>
+            <UiText weight="800">{item.title}</UiText>
+            {item.body ? <UiText tone="muted">{item.body}</UiText> : null}
+            {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} /> : null}
+          </NotificationCard>
         );
       })}
     </CustomerScreen>
@@ -163,7 +161,7 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  cardWrapper: { position: "relative" },
+  card: { position: "relative" },
   cardContent: { gap: 8, padding: 14 },
   cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
   unreadDot: { position: "absolute", top: 12, start: 12, width: 8, height: 8, borderRadius: 4 }
