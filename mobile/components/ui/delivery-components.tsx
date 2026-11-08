@@ -4,6 +4,7 @@ import { Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Card } from "./cards";
 import { StatusBadge, type StatusBadgeTone } from "./extended";
+import { Icon } from "./icon";
 
 export function DeliveryOrderCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void }) {
   return <Card {...props} />;
@@ -36,7 +37,7 @@ export function TrackingStep({ step, isLast = false }: { step: TrackingStepItem;
     <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.md, minHeight: isLast ? 44 : 68 }}>
       <View style={{ alignItems: "center", width: 36 }}>
         <View style={{ width: 36, height: 36, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
-          {step.icon ?? <Text style={{ color: active ? theme.colors.foreground : theme.colors.muted, fontWeight: "800" }}>{step.status === "complete" ? "✓" : "•"}</Text>}
+          {step.icon ?? (step.status === "complete" ? <Icon name="check" size={16} color={theme.colors.success} accessibilityHidden /> : <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: active ? theme.colors.foreground : theme.colors.muted }} />)}
         </View>
         {!isLast ? <View style={{ width: 2, flex: 1, minHeight: 24, backgroundColor: step.status === "complete" ? theme.colors.success : theme.colors.border }} /> : null}
       </View>
