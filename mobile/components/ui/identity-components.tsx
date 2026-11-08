@@ -107,3 +107,8 @@ export function ReviewCard({ children, style }: { children: ReactNode; style?: S
 export function ReviewList({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return <View style={[{ gap: 0 }, style]}>{children}</View>;
 }
+
+export function UserProfileCard({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const theme = useAppTheme();
+  return <View style={[{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border, gap: designTokens.spacing.md }, style]}>{children}</View>;
+}
