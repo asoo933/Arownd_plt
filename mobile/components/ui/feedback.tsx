@@ -137,8 +137,8 @@ export function Dialog({
 }: {
   visible: boolean;
   onRequestClose: () => void;
-  title?: string;
-  description?: string;
+  title?: string | undefined;
+  description?: string | undefined;
   children?: ReactNode;
 }) {
   const theme = useAppTheme();
