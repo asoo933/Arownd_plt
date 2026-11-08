@@ -146,7 +146,7 @@ export function Dialog({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
       <Pressable onPress={onRequestClose} style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, backgroundColor: theme.colors.overlay }}>
         <Pressable onPress={() => undefined} style={{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
-          {title ? <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: "800", textAlign: "right" }}>{title}</UiText> : null}
+          {title ? <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.extrabold, textAlign: "right" }}>{title}</UiText> : null}
           {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText> : null}
           {children}
         </Pressable>
@@ -228,10 +228,10 @@ export function ConfirmDialog({
     <Dialog visible={visible} onRequestClose={onRequestClose} title={title} description={description}>
       <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
         <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} disabled={busy} onPress={onRequestClose} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.colors.border, opacity: busy ? 0.5 : 1 }}>
-          <UiText style={{ color: theme.colors.foreground, fontWeight: "700" }}>{cancelLabel}</UiText>
+          <UiText style={{ color: theme.colors.foreground, fontWeight: theme.fontWeights.bold }}>{cancelLabel}</UiText>
         </Pressable>
         <Pressable accessibilityRole="button" accessibilityLabel={confirmLabel} accessibilityState={{ disabled: busy, busy }} disabled={busy} onPress={onConfirm} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: destructive ? theme.colors.danger : theme.colors.accent, opacity: busy ? 0.5 : 1 }}>
-          {busy ? <ActivityIndicator color={destructive ? theme.colors.surface : theme.colors.accentForeground} /> : <UiText style={{ color: destructive ? theme.colors.surface : theme.colors.accentForeground, fontWeight: "700" }}>{confirmLabel}</UiText>}
+          {busy ? <ActivityIndicator color={destructive ? theme.colors.surface : theme.colors.accentForeground} /> : <UiText style={{ color: destructive ? theme.colors.surface : theme.colors.accentForeground, fontWeight: theme.fontWeights.bold }}>{confirmLabel}</UiText>}
         </Pressable>
       </View>
     </Dialog>
