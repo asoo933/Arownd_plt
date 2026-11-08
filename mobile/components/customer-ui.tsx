@@ -3,7 +3,6 @@ import { CustomerNavigation } from "@/components/customer-navigation";
 import {
   ActivityIndicator,
   Image,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, TextField } from "@/components/ui";
+import { Button, PressableSurface, TextField } from "@/components/ui";
 
 export function CustomerScreen({ children }: { children: ReactNode }) {
   const theme = useAppTheme();
@@ -92,7 +91,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable
+    <PressableSurface
       accessibilityRole="button"
       accessibilityLabel={`${name}، ${store}، ${price}`}
       onPress={onPress}
@@ -105,7 +104,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress }: {
       <Text numberOfLines={2} style={[styles.productName, { color: theme.colors.foreground }]}>{name}</Text>
       <Text numberOfLines={1} style={[styles.productStore, { color: theme.colors.muted }]}>{store}</Text>
       <Text style={[styles.productPrice, { color: theme.colors.accentMuted }]}>{price}</Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
