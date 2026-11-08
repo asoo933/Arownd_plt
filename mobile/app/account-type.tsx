@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   copy: { flex: 1, gap: designTokens.spacing.xs + 1 },
-  optionTitle: { fontSize: 15, textAlign: "right" },
-  optionDescription: { fontSize: 12, lineHeight: 20, textAlign: "right" }
+  optionTitle: { fontSize: designTokens.typography.subtitle - 1, textAlign: "right" },
+  optionDescription: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" }
 });
