@@ -42,7 +42,7 @@ export default function AuthCallbackScreen() {
     <AuthLayout title={translate("callbackTitle")} subtitle={translate("callbackLoading")}>
       {state === "loading" ? (
         <View style={{ alignItems: "center", paddingVertical: 20 }}>
-          <UiText style={{ color: "#737373", fontSize: 14 }}>{translate("callbackLoading")}</UiText>
+          <UiText tone="muted" style={{ fontSize: 14 }}>{translate("callbackLoading")}</UiText>
         </View>
       ) : state === "success" ? (
         <View style={{ gap: 18 }}>
