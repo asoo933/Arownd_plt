@@ -33,7 +33,7 @@ import {
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { Button, TextField } from "@/components/ui";
+import { AppHeader, Button, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
   const theme = useAppTheme();
@@ -163,18 +163,8 @@ export default function MerchantOnboardingScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Button label={translate("merchantOnboardingBack")} onPress={() => router.back()} variant="ghost" size="sm" />
-            <Text style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
-              {translate("businessTitle")}
-            </Text>
-            <Text style={[styles.title, { color: theme.colors.foreground }]}>
-              {translate("merchantOnboardingTitle")}
-            </Text>
-            <Text style={[styles.subtitle, { color: theme.colors.muted }]}>
-              {translate("merchantOnboardingSubtitle")}
-            </Text>
-          </View>
+          <AppHeader title={translate("merchantOnboardingTitle")} leading={<Button label={translate("merchantOnboardingBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
+          <Text style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantOnboardingSubtitle")}</Text>
 
           <View style={[styles.section, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
             <Text style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
