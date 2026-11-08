@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IconButton, QuantityStepper } from "@/components/ui";
+import { AppHeader, Button, IconButton, QuantityStepper } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
@@ -59,11 +59,11 @@ export default function ProductDetailsScreen() {
 
   return (
     <CustomerScreen>
-      <IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />
-      <View style={styles.titleRow}>
-        <Text style={[styles.pageTitle, { color: theme.colors.foreground }]}>{translate("detailProductTitle")}</Text>
-        <View style={styles.titleActions}><FavoriteButton kind="products" id={productId} /><CartButton /></View>
-      </View>
+      <AppHeader
+        title={translate("detailProductTitle")}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Text style={{ color: theme.colors.foreground, fontSize: 24 }}>‹</Text>} />}
+        trailing={<><FavoriteButton kind="products" id={productId} /><CartButton /></>}
+      />
       <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}>
         {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Text style={[styles.imageFallback, { color: theme.colors.subtle }]}>▧</Text>}
       </View>
@@ -166,9 +166,6 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
 }
 
 const styles = StyleSheet.create({
-  titleRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 10 },
-  pageTitle: { fontSize: 21, fontWeight: "900", textAlign: "right", flex: 1 },
-  titleActions: { flexDirection: "row-reverse", alignItems: "center", gap: 7 },
   heroImage: { height: 300, borderRadius: 22, backgroundColor: "#ECEFE4", overflow: "hidden", alignItems: "center", justifyContent: "center" },
   imageFallback: { color: "#8A9B55", fontSize: 46 },
   infoCard: { borderRadius: 18, padding: 16, gap: 10 },
