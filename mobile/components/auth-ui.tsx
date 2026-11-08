@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,7 +13,7 @@ import { router } from "expo-router";
 
 import { translate, type TranslationKey } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Button, IconButton, TextField } from "@/components/ui";
+import { Button, IconButton, PressableSurface, TextField } from "@/components/ui";
 
 type AuthLayoutProps = {
   title: string;
@@ -91,9 +90,9 @@ export function ActionButton({ label, onPress, loading = false, disabled = false
 export function InlineLink({ label, onPress }: { label: string; onPress: () => void }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="link" onPress={onPress} hitSlop={8}>
+    <PressableSurface accessibilityRole="link" onPress={onPress}>
       <Text style={[styles.link, { color: theme.colors.accentMuted }]}>{label}</Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 
