@@ -26,7 +26,7 @@ export function CartButton() {
           overflow: "hidden",
           textAlign: "center",
           textAlignVertical: "center",
-          backgroundColor: theme.colors.foreground,
+          backgroundColor: theme.colors.accentForeground,
           color: theme.colors.accent,
           fontSize: 10,
           fontWeight: "900"
