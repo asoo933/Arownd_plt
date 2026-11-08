@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { router, usePathname } from "expo-router";
 
 import { translate } from "@/lib/i18n";
 import { getCustomerTab, type CustomerTab } from "@/lib/customer-navigation-state";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { PressableSurface } from "@/components/ui";
 
 const tabs: { id: CustomerTab; label: "navHome" | "navExplore" | "navStores" | "favoriteTitleShort" | "navAccount"; icon: string; path: string }[] = [
   { id: "home", label: "navHome", icon: "⌂", path: "/home" },
@@ -28,7 +29,7 @@ export function CustomerNavigation() {
       {tabs.map((tab) => {
         const active = activeTab === tab.id;
         return (
-          <Pressable
+          <PressableSurface
             key={tab.id}
             accessibilityRole="tab"
             accessibilityLabel={translate(tab.label)}
@@ -40,7 +41,7 @@ export function CustomerNavigation() {
           >
             <Text style={[styles.icon, { color: active ? theme.colors.accentMuted : theme.colors.muted }]}>{tab.icon}</Text>
             <Text numberOfLines={1} style={[styles.label, { color: active ? theme.colors.accentMuted : theme.colors.muted }]}>{translate(tab.label)}</Text>
-          </Pressable>
+          </PressableSurface>
         );
       })}
     </View>
