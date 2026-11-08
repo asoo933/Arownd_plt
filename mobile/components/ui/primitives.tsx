@@ -181,7 +181,7 @@ export function Button({
               {
                 color: palette.foregroundColor,
                 fontSize: metrics.fontSize,
-                fontWeight: "700",
+                fontWeight: designTokens.fontWeights.bold,
                 includeFontPadding: false
               },
               textStyle
@@ -211,7 +211,7 @@ export function IconButton({
   accessibilityLabel,
   onPress,
   variant = "surface",
-  size = 44,
+  size = designTokens.dimensions.controlHeight.md,
   disabled = false,
   style,
   accessibilityHint,
