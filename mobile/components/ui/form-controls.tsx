@@ -4,10 +4,10 @@ import { Text as UiText } from "./typography";
 import { getQuantityStepState } from "./form-controls-state";
 
 type TextFieldProps = Omit<TextInputProps, "style"> & {
-  label?: string;
-  error?: string;
-  style?: StyleProp<TextStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
+  label?: string | undefined;
+  error?: string | undefined;
+  style?: StyleProp<TextStyle> | undefined;
+  containerStyle?: StyleProp<ViewStyle> | undefined;
 };
 
 export function TextField({ label, error, style, containerStyle, accessibilityLabel, ...props }: TextFieldProps) {
@@ -43,8 +43,8 @@ type QuantityStepperProps = {
   onChange: (value: number) => void;
   decreaseLabel: string;
   increaseLabel: string;
-  disabled?: boolean;
-  testID?: string;
+  disabled?: boolean | undefined;
+  testID?: string | undefined;
 };
 
 export function QuantityStepper({
