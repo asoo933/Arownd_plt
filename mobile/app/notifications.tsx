@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button } from "@/components/ui";
+import { AppHeader, Button, PressableSurface, StatusBadge } from "@/components/ui";
 import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -69,12 +69,13 @@ export default function NotificationsScreen() {
   const rows = notifications.data ?? [];
   const unreadCount = countUnreadNotifications(rows);
   return <CustomerScreen>
-    <CustomerHeading title={translate("notificationsTitle")} subtitle={translate("notificationsSubtitle")} />
+    <AppHeader title={translate("notificationsTitle")} trailing={unreadCount > 0 ? <StatusBadge label={String(unreadCount)} tone="accent" /> : undefined} />
+    <Text style={{ color: theme.colors.muted, fontSize: 12, textAlign: "right" }}>{translate("notificationsSubtitle")}</Text>
     {actionError ? <Text style={[styles.actionError, { color: theme.colors.danger }]}>{translate("notificationsMarkError")}</Text> : null}
     {unreadCount > 0 ? <Button label={translate("notificationsMarkAll") + " · " + unreadCount} onPress={() => markAll.mutate()} loading={markAll.isPending} fullWidth /> : null}
     {rows.length === 0 ? <EmptyState title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} /> : rows.map((item) => {
       const destination = getNotificationDestination(item);
-      return <Pressable key={item.id} accessibilityRole="button" onPress={() => {
+      return <PressableSurface key={item.id} accessibilityRole="button" accessibilityLabel={item.title} onPress={() => {
         if (!item.read) markOne.mutate(item.id);
         if (destination) router.push(destination as never);
       }} style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderWidth: 1, opacity: item.read ? 0.78 : 1 }]}><View style={styles.cardHeader}>
@@ -83,7 +84,7 @@ export default function NotificationsScreen() {
       </View><Text style={[styles.title, { color: theme.colors.foreground }]}>{item.title}</Text>
       {item.body ? <Text style={[styles.body, { color: theme.colors.muted }]}>{item.body}</Text> : null}
       {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accent }]} /> : null}
-      </Pressable>;
+      </PressableSurface>;
     })}
   </CustomerScreen>;
 }
