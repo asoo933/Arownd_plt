@@ -1,13 +1,19 @@
 import type { ReactNode } from "react";
 import {
+  ActivityIndicator,
+  Pressable,
   StyleSheet,
+  Text,
   View,
+  type PressableProps,
   type StyleProp,
+  type TextStyle,
   type ViewProps,
   type ViewStyle
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { getButtonPalette, type ButtonVariant } from "./palette";
 
 type SurfaceProps = Pick<ViewProps, "accessibilityLabel" | "accessibilityRole" | "testID"> & {
   children: ReactNode;
@@ -78,5 +84,100 @@ export function Divider({
         style
       ]}
     />
+  );
+}
+
+type ButtonSize = "sm" | "md" | "lg";
+
+type ButtonProps = Pick<PressableProps, "accessibilityHint" | "testID"> & {
+  label: string;
+  onPress: () => void;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  loading?: boolean;
+  disabled?: boolean;
+  fullWidth?: boolean;
+  startIcon?: ReactNode;
+  endIcon?: ReactNode;
+  textStyle?: StyleProp<TextStyle>;
+  style?: StyleProp<ViewStyle>;
+};
+
+const buttonMetrics: Record<ButtonSize, { minHeight: number; paddingX: number; fontSize: number }> = {
+  sm: { minHeight: 40, paddingX: 14, fontSize: 12 },
+  md: { minHeight: 48, paddingX: 18, fontSize: 14 },
+  lg: { minHeight: 54, paddingX: 22, fontSize: 16 }
+};
+
+export function Button({
+  label,
+  onPress,
+  variant = "primary",
+  size = "md",
+  loading = false,
+  disabled = false,
+  fullWidth = false,
+  startIcon,
+  endIcon,
+  textStyle,
+  style,
+  accessibilityHint,
+  testID
+}: ButtonProps) {
+  const theme = useAppTheme();
+  const palette = getButtonPalette(theme, variant);
+  const metrics = buttonMetrics[size];
+  const unavailable = disabled || loading;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: unavailable, busy: loading }}
+      disabled={unavailable}
+      onPress={onPress}
+      testID={testID}
+      style={({ pressed }) => [
+        {
+          minHeight: metrics.minHeight,
+          paddingHorizontal: metrics.paddingX,
+          borderRadius: theme.radius.md,
+          borderWidth: palette.borderColor ? 1 : 0,
+          borderColor: palette.borderColor ?? "transparent",
+          backgroundColor: palette.backgroundColor,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: designTokens.spacing.sm,
+          alignSelf: fullWidth ? "stretch" : "auto",
+          opacity: unavailable ? 0.55 : pressed ? 0.82 : 1
+        },
+        style
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={palette.foregroundColor} />
+      ) : (
+        <>
+          {startIcon}
+          <Text
+            numberOfLines={1}
+            style={[
+              {
+                color: palette.foregroundColor,
+                fontSize: metrics.fontSize,
+                fontWeight: "700",
+                includeFontPadding: false
+              },
+              textStyle
+            ]}
+          >
+            {label}
+          </Text>
+          {endIcon}
+        </>
+      )}
+    </Pressable>
   );
 }
