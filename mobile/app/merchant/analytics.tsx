@@ -7,7 +7,7 @@ import { formatDZD } from "@/lib/catalog";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { AppHeader, Button, ChartCard, ErrorState, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
@@ -107,19 +107,19 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: 16, paddingBottom: 36, gap: 12 },
-    subtitle: { fontSize: 12, lineHeight: 20, textAlign: "right" },
-    grid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 9 },
+    content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.md },
+    subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" },
+    grid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
     metricCard: { width: "48%", flexGrow: 1, minHeight: 88 },
-    chartCard: { borderWidth: 1, borderRadius: 16, padding: 14, gap: 15 },
-    sectionTitle: { fontSize: 13, fontWeight: "900", textAlign: "right" },
-    dayRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
-    dayLabel: { width: 48, fontSize: 10, textAlign: "right" },
+    chartCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
+    sectionTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    dayRow: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
+    dayLabel: { width: 48, fontSize: designTokens.typography.caption - 1, textAlign: "right" },
     track: { flex: 1, height: 9, borderRadius: 6, overflow: "hidden" },
     bar: { height: 9, borderRadius: 6 },
-    amount: { width: 90, fontSize: 9, textAlign: "right" },
-    empty: { textAlign: "center", fontSize: 11, paddingVertical: 12 },
-    note: { fontSize: 10, lineHeight: 17, textAlign: "right" },
-    message: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, gap: 14 }
+    amount: { width: 90, fontSize: designTokens.typography.caption - 2, textAlign: "right" },
+    empty: { textAlign: "center", fontSize: designTokens.typography.caption, paddingVertical: designTokens.spacing.md },
+    note: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "right" },
+    message: { flex: 1, justifyContent: "center", alignItems: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg }
   });
 }
