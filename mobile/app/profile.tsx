@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, IdentityRow, PressableSurface } from "@/components/ui";
+import { AppHeader, Button, IdentityRow, PressableSurface } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
 import { translate } from "@/lib/i18n";
@@ -86,7 +86,8 @@ export default function ProfileScreen() {
 
   return (
     <CustomerScreen>
-      <CustomerHeading title={translate("profileTitle")} subtitle={translate("profileSubtitle")} />
+      <AppHeader title={translate("profileTitle")} />
+      <Text style={{ color: colors.muted, fontSize: 12, textAlign: "right" }}>{translate("profileSubtitle")}</Text>
       {profile.isPending ? (
         <LoadingState label={translate("stateLoading")} />
       ) : (
