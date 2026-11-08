@@ -34,7 +34,7 @@ import {
 } from "@/lib/merchant-category-state";
 import { translate } from "@/lib/i18n";
 import { useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Image as UiImage, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -357,7 +357,7 @@ export default function MerchantNewProductScreen() {
                 <View style={styles.imageGrid}>
                   {selectedImages.map((asset) => (
                     <View key={asset.assetId ?? asset.uri} style={styles.imageItem}>
-                      <Image source={{ uri: asset.uri }} style={styles.imagePreview} />
+                      <UiImage uri={asset.uri} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.imagePreview} />
                       <PressableSurface
                         accessibilityRole="button"
                         accessibilityLabel={translate("merchantProductImageRemove")}
