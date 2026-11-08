@@ -61,12 +61,12 @@ export default function ProductDetailsScreen() {
     <CustomerScreen>
       <AppHeader
         title={translate("detailProductTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} /> />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />}
         trailing={<><FavoriteButton kind="products" id={productId} /><CartButton /></>}
       />
       {imageUrl ? <ProductImageGallery images={[imageUrl]} accessibilityLabel={productDetails.name} onSelect={() => undefined} imageStyle={styles.heroImage} /> : <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" size={42} color={theme.colors.subtle} accessibilityHidden /></View>}
       <Card contentStyle={styles.infoCard}>
-        <UiText weight="800" style={styles.productName}>{productDetails.name}</UiText>
+        <UiText weight="700" style={styles.productName}>{productDetails.name}</UiText>
         {selectedOffer ? <PriceDisplay value={formatDZD(selectedOffer.price)} style={styles.priceDisplay} /> : null}
         <View style={styles.metadata}>
           {productDetails.brand ? <UiText tone="muted" style={styles.metaText}>{translate("productBrand")}: {productDetails.brand}</UiText> : null}
