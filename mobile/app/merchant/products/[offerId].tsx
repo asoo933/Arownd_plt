@@ -524,9 +524,9 @@ export default function MerchantEditProductScreen() {
                       hitSlop={8}
                     >
                       {removingImageId === image.id ? (
-                        <Spinner color=designTokens.brand.white size="small" />
+                        <Spinner color={designTokens.brand.white} size="small" />
                       ) : (
-                        <Icon name="x" color=designTokens.brand.white size={15} accessibilityHidden />
+                        <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
                       )}
                     </PressableSurface>
                   </View>
