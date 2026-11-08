@@ -20,7 +20,7 @@ import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem as CartLine } from "@/lib/cart-state";
 import { translate } from "@/lib/i18n";
-import { useAppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function CartScreen() {
   const theme = useAppTheme();
@@ -139,24 +139,24 @@ export default function CartScreen() {
 
 const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   group: { backgroundColor: theme.colors.surface },
-  groupContent: { padding: 13, gap: 12 },
-  store: { fontSize: 13, textAlign: "right" },
+  groupContent: { padding: designTokens.spacing.md, gap: designTokens.spacing.md },
+  store: { fontSize: designTokens.typography.body - 1, textAlign: "right" },
   line: { paddingVertical: 0 },
-  itemContent: { flex: 1, gap: 8 },
-  lineMain: { flexDirection: "row-reverse", gap: 10 },
+  itemContent: { flex: 1, gap: designTokens.spacing.sm },
+  lineMain: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
   thumb: { width: 76, height: 76, borderRadius: 13, backgroundColor: theme.colors.surfaceMuted, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  details: { flex: 1, alignItems: "flex-end", gap: 4 },
-  name: { fontSize: 13, textAlign: "right" },
-  options: { fontSize: 11, textAlign: "right" },
-  issue: { color: theme.colors.warning, fontSize: 11, fontWeight: "700", textAlign: "right" },
+  details: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+  name: { fontSize: designTokens.typography.body - 1, textAlign: "right" },
+  options: { fontSize: designTokens.typography.caption, textAlign: "right" },
+  issue: { color: theme.colors.warning, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "right" },
   priceIssue: { color: theme.colors.warning },
-  price: { fontSize: 13 },
-  controls: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  blockedHint: { fontSize: 11, textAlign: "right" },
+  price: { fontSize: designTokens.typography.body - 1 },
+  controls: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
+  blockedHint: { fontSize: designTokens.typography.caption, textAlign: "right" },
   summary: { backgroundColor: theme.colors.surface },
-  summaryContent: { padding: 15, gap: 12 },
+  summaryContent: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   summaryRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
-  summaryLabel: { fontSize: 13, fontWeight: "700" },
-  total: { fontSize: 19 },
-  note: { fontSize: 11, lineHeight: 18, textAlign: "right" }
+  summaryLabel: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
+  total: { fontSize: designTokens.typography.title - 3 },
+  note: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" }
 });
