@@ -1,5 +1,4 @@
 import {
-  Text,
   TextInput,
   View,
   type StyleProp,
@@ -8,6 +7,7 @@ import {
 } from "react-native";
 
 import { useAppTheme } from "@/lib/theme";
+import { Text as UiText } from "./typography";
 import { Icon } from "./icon";
 
 export type SearchFieldProps = Pick<TextInputProps, "autoCapitalize" | "autoCorrect" | "onSubmitEditing" | "returnKeyType"> & {
@@ -101,9 +101,9 @@ export function StatusBadge({
         backgroundColor: colors.backgroundColor
       }}
     >
-      <Text style={{ color: colors.color, fontSize: theme.typography.caption, fontWeight: "700" }}>
+      <UiText style={{ color: colors.color, fontSize: theme.typography.caption, fontWeight: "700" }}>
         {label}
-      </Text>
+      </UiText>
     </View>
   );
 }
