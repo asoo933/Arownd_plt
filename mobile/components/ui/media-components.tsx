@@ -83,7 +83,7 @@ export function CameraButton({
   accessibilityLabel: string;
   disabled?: boolean;
 }) {
-  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.72 : 1 })}>{children}</Pressable>;
+  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minWidth: theme.dimensions.controlHeight.md, minHeight: theme.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.45 : pressed ? 0.72 : 1 })}>{children}</Pressable>;
 }
 
 export function MediaViewer({
@@ -98,5 +98,5 @@ export function MediaViewer({
   closeLabel: string;
 }) {
   const theme = useAppTheme();
-  return <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}><View style={{ flex: 1, padding: designTokens.spacing.md, backgroundColor: theme.colors.overlay, justifyContent: "center" }}><Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onRequestClose} style={{ alignSelf: "flex-end", minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><Icon name="x" size={22} color={theme.colors.surface} accessibilityHidden /></Pressable>{children}</View></Modal>;
+  return <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}><View style={{ flex: 1, padding: designTokens.spacing.md, backgroundColor: theme.colors.overlay, justifyContent: "center" }}><Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onRequestClose} style={{ alignSelf: "flex-end", minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}><Icon name="x" size={theme.dimensions.iconSize.md} color={theme.colors.surface} accessibilityHidden /></Pressable>{children}</View></Modal>;
 }
