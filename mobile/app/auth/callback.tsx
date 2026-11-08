@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 
+import { designTokens } from "@/lib/theme";
 import { ActionButton, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
 import { Text as UiText } from "@/components/ui";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -41,16 +42,16 @@ export default function AuthCallbackScreen() {
   return (
     <AuthLayout title={translate("callbackTitle")} subtitle={translate("callbackLoading")}>
       {state === "loading" ? (
-        <View style={{ alignItems: "center", paddingVertical: 20 }}>
-          <UiText tone="muted" style={{ fontSize: 14 }}>{translate("callbackLoading")}</UiText>
+        <View style={{ alignItems: "center", paddingVertical: designTokens.spacing.xl }}>
+          <UiText tone="muted" style={{ fontSize: designTokens.typography.body }}>{translate("callbackLoading")}</UiText>
         </View>
       ) : state === "success" ? (
-        <View style={{ gap: 18 }}>
+        <View style={{ gap: designTokens.spacing.xl }}>
           <SuccessPanel title={translate("callbackTitle")} message={translate("callbackSuccess")} />
           <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/login")} />
         </View>
       ) : (
-        <View style={{ gap: 18 }}>
+        <View style={{ gap: designTokens.spacing.xl }}>
           <FormError message={translate("callbackError")} />
           <ActionButton label={translate("backToLogin")} onPress={() => router.replace("/login")} />
         </View>
