@@ -177,7 +177,7 @@ export function ProductImageGallery({
       {selectedSource ? <Image source={selectedSource} resizeMode="cover" style={[{ width: "100%", aspectRatio: 1, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surfaceMuted }, imageStyle]} /> : null}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
         {images.map((uri, index) => (
-          <Pressable key={uri + index} accessibilityRole="button" accessibilityState={{ selected: index === selectedIndex }} onPress={() => onSelect(index)} style={{ borderRadius: theme.radius.md, borderWidth: index === selectedIndex ? 2 : 1, borderColor: index === selectedIndex ? theme.colors.accentMuted : theme.colors.border, overflow: "hidden" }}>
+          <Pressable key={uri + index} accessibilityRole="button" accessibilityLabel={`${accessibilityLabel} ${index + 1}`} accessibilityState={{ selected: index === selectedIndex }} onPress={() => onSelect(index)} style={{ borderRadius: theme.radius.md, borderWidth: index === selectedIndex ? 2 : 1, borderColor: index === selectedIndex ? theme.colors.accentMuted : theme.colors.border, overflow: "hidden" }}>
             <Image source={{ uri }} resizeMode="cover" style={{ width: 64, height: 64 }} />
           </Pressable>
         ))}
