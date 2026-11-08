@@ -97,11 +97,18 @@ export default function ProfileScreen() {
       <AppHeader
         title=""
         leading={
-          <IconButton
-            icon={<Icon name="settings" size={20} />}
-            accessibilityLabel={translate("profileSettings")}
-            onPress={() => router.push("/settings")}
-          />
+          <View style={styles.headerActions}>
+            <IconButton
+              icon={<Icon name="settings" size={20} />}
+              accessibilityLabel={translate("profileSettings")}
+              onPress={() => router.push("/settings")}
+            />
+            <IconButton
+              icon={<Icon name="bell" size={20} />}
+              accessibilityLabel={translate("notificationsTitle")}
+              onPress={() => router.push("/notifications")}
+            />
+          </View>
         }
       />
 
@@ -192,6 +199,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerActions: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
   identityCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   identityRow: { flexDirection: "row-reverse" },
   phoneRow: {
