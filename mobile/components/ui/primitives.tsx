@@ -87,6 +87,38 @@ export function Divider({
   );
 }
 
+
+type PressableSurfaceProps = Pick<PressableProps, "accessibilityLabel" | "accessibilityRole" | "accessibilityState" | "onPress" | "testID"> & {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
+};
+
+export function PressableSurface({
+  children,
+  accessibilityLabel,
+  accessibilityRole = "button",
+  accessibilityState,
+  onPress,
+  testID,
+  style,
+  disabled = false
+}: PressableSurfaceProps) {
+  return (
+    <Pressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole={accessibilityRole}
+      accessibilityState={{ ...accessibilityState, disabled }}
+      onPress={onPress}
+      testID={testID}
+      disabled={disabled || !onPress}
+      style={({ pressed }) => [style, { opacity: disabled ? 0.5 : pressed ? 0.82 : 1 }]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
 type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonProps = Pick<PressableProps, "accessibilityHint" | "testID"> & {
