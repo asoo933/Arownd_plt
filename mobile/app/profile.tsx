@@ -121,7 +121,7 @@ export default function ProfileScreen() {
           <Card contentStyle={styles.identityCard}>
             <IdentityRow
               name={displayName}
-              subtitle={user.data.email}
+              {...(user.data.email ? { subtitle: user.data.email } : {})}
               avatarSize={64}
               style={styles.identityRow}
             />
