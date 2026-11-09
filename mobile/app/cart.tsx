@@ -84,7 +84,7 @@ export default function CartScreen() {
       <CartSummary style={style.summaryContent}>
         <View style={style.summaryRow}>
           <UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText>
-          <PriceText value={offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)} tone="accentMuted" style={style.total} />
+          <PriceText numberOfLines={1} adjustsFontSizeToFit value={offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)} tone="accentMuted" style={style.total} />
         </View>
         <Caption style={style.note}>{translate("cartDeliveryNote")}</Caption>
         <Button
@@ -128,12 +128,14 @@ export default function CartScreen() {
                 {Object.keys(normalizeCartOptions(item.options)).length > 0 ? <Caption style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Caption> : null}
                 {line?.issues.map((issue) => <Caption key={issue} tone={issue === "priceChanged" ? "warning" : "danger"} weight="700" style={style.issue}>{issueLabels[issue]}</Caption>)}
                 <PriceText
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
                   value={formatDZD(currentPrice * item.quantity)}
                   previousValue={line?.issues.includes("priceChanged") && item.price != null ? formatDZD(item.price * item.quantity) : undefined}
                   tone="accentMuted"
                   style={style.price}
                 />
-                {item.quantity > 1 ? <Caption style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Caption> : null}
+                {item.quantity > 1 ? <Caption numberOfLines={1} style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Caption> : null}
               </View>
             </PressableSurface>
             <View style={style.controls}>
