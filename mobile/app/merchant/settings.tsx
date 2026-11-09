@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BottomSheet, AppHeader, Button, Card, ErrorState, Icon, IconButton, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { BottomSheet, AppHeader, Button, Card, ErrorState, Heading, Icon, IconButton, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsset } from "@/lib/merchant-store-images";
@@ -31,15 +31,18 @@ export default function MerchantStoreSettingsScreen() {
     retry: false
   });
   const [form, setForm] = useState<MerchantStoreSettings | null>(null);
+  const [formDirty, setFormDirty] = useState(false);
   const [formError, setFormError] = useState(false);
   const [wilayaPickerOpen, setWilayaPickerOpen] = useState(false);
-  const [imageBusy, setImageBusy] = useState<"logo" | "cover" | null>(null);
+  const [imageBusy, setImageBusy] = useState<"logo" | null>(null);
   const [imageError, setImageError] = useState(false);
   const [imageSaved, setImageSaved] = useState(false);
   const [imageCleanupPending, setImageCleanupPending] = useState(false);
   const mutation = useMutation({
     mutationFn: (values: MerchantStoreSettings) => updateMyMerchantStoreSettings(storeId ?? "", values),
-    onSuccess: async () => {
+    onSuccess: async (_data, values) => {
+      setForm(values);
+      setFormDirty(false);
       await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
       await queryClient.invalidateQueries({ queryKey: ["merchant-dashboard", storeId] });
       setFormError(false);
@@ -48,8 +51,8 @@ export default function MerchantStoreSettingsScreen() {
   });
 
   useEffect(() => {
-    if (settings.data) setForm(settings.data);
-  }, [settings.data]);
+    if (settings.data && !formDirty) setForm(settings.data);
+  }, [settings.data, formDirty]);
 
   if (access.isPending || wilayas.isPending || (ready && settings.isPending)) {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
@@ -63,12 +66,14 @@ export default function MerchantStoreSettingsScreen() {
   const selectedWilaya = wilayas.data?.find((item) => item.id === form.wilaya_id);
   const selectWilaya = (wilaya: Wilaya) => {
     setForm((current) => current ? { ...current, wilaya_id: wilaya.id, commune: "" } : current);
+    setFormDirty(true);
     setWilayaPickerOpen(false);
     setFormError(false);
     mutation.reset();
   };
   const update = <K extends keyof MerchantStoreSettings>(key: K, value: MerchantStoreSettings[K]) => {
     setForm((current) => current ? { ...current, [key]: value } : current);
+    setFormDirty(true);
     setFormError(false);
     mutation.reset();
   };
@@ -90,7 +95,7 @@ export default function MerchantStoreSettingsScreen() {
       : [...form.opening_hours.closed_days, day];
     update("opening_hours", { ...form.opening_hours, closed_days: closedDays });
   };
-  const chooseStoreImage = async (kind: "logo" | "cover") => {
+  const chooseStoreImage = async () => {
     if (!storeId || imageBusy || mutation.isPending) return;
     setImageBusy(kind);
     setImageError(false);
@@ -114,8 +119,8 @@ export default function MerchantStoreSettingsScreen() {
         setImageError(true);
         return;
       }
-      const uploaded = await uploadMerchantStoreImage(storeId, asset, kind);
-      setForm((current) => current ? { ...current, [kind === "logo" ? "logo_url" : "cover_url"]: uploaded.url } : current);
+      const uploaded = await uploadMerchantStoreImage(storeId, asset, "logo");
+      setForm((current) => current ? { ...current, logo_url: uploaded.url } : current);
       await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
       setImageSaved(true);
       setImageCleanupPending(uploaded.cleanupPending);
@@ -126,6 +131,7 @@ export default function MerchantStoreSettingsScreen() {
     }
   };
   const submit = () => {
+    if (imageBusy || mutation.isPending) return;
     const parsed = MerchantStoreSettingsSchema.safeParse(form);
     if (!parsed.success) {
       setFormError(true);
@@ -139,45 +145,47 @@ export default function MerchantStoreSettingsScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <AppHeader
           title={translate("merchantStoreSettingsTitle")}
-          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />}
+          leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name={language === "ar" ? "chevron-right" : "chevron-left"} color={theme.colors.foreground} size={20} />} />}
         />
         <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantStoreSettingsSubtitle")}</UiText>
-        <Card contentStyle={styles.card}>
+
+        <Card contentStyle={styles.sectionCard}>
+          <Heading level={3}>{translate("merchantStoreLogo")}</Heading>
           <View style={styles.brandingRow}>
-            <View style={styles.brandingItem}>
-              <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreLogo")}</UiText>
-              {form.logo_url ? <UiImage uri={form.logo_url} accessibilityLabel={translate("merchantStoreLogo")} aspectRatio={1} style={styles.logoPreview} /> : <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" color={theme.colors.muted} size={24} accessibilityHidden /></View>}
+            {form.logo_url ? (
+              <UiImage uri={form.logo_url} accessibilityLabel={translate("merchantStoreLogo")} aspectRatio={1} style={styles.logoPreview} />
+            ) : (
+              <View style={[styles.logoPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}>
+                <Icon name="store" color={theme.colors.muted} size={28} accessibilityHidden />
+              </View>
+            )}
+            <View style={styles.brandingDetails}>
+              <UiText style={[styles.brandingHint, { color: theme.colors.muted }]}>{translate("merchantStoreLogo")}</UiText>
               <Button
                 label={translate("merchantStoreImageUpload")}
-                onPress={() => void chooseStoreImage("logo")}
+                onPress={() => void chooseStoreImage()}
                 loading={imageBusy === "logo"}
-                disabled={imageBusy !== null}
+                disabled={imageBusy !== null || mutation.isPending}
                 variant="outline"
                 size="sm"
-                fullWidth
-              />
-            </View>
-            <View style={styles.brandingItem}>
-              <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreCover")}</UiText>
-              {form.cover_url ? <UiImage uri={form.cover_url} accessibilityLabel={translate("merchantStoreCover")} aspectRatio={16 / 5} style={styles.coverPreview} /> : <View style={[styles.coverPreview, styles.imagePlaceholder, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" color={theme.colors.muted} size={24} accessibilityHidden /></View>}
-              <Button
-                label={translate("merchantStoreImageUpload")}
-                onPress={() => void chooseStoreImage("cover")}
-                loading={imageBusy === "cover"}
-                disabled={imageBusy !== null}
-                variant="outline"
-                size="sm"
-                fullWidth
               />
             </View>
           </View>
           {imageError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</UiText> : null}
           {imageSaved ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreImageSaved")}</UiText> : null}
           {imageCleanupPending ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageCleanupPending")}</UiText> : null}
+        </Card>
+
+        <Card contentStyle={styles.sectionCard}>
+          <Heading level={3}>{translate("merchantStoreSettingsName")}</Heading>
           <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
           <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} />
+        </Card>
+
+        <Card contentStyle={styles.sectionCard}>
+          <Heading level={3}>{translate("merchantStoreWilayaLabel")}</Heading>
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
@@ -186,10 +194,19 @@ export default function MerchantStoreSettingsScreen() {
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} />
+        </Card>
+
+        <Card contentStyle={styles.sectionCard}>
+          <Heading level={3}>{translate("merchantStoreSettingsOpen")}</Heading>
           <View style={styles.row}>
-            <View style={styles.half}><Field label={translate("merchantStoreSettingsOpen")} value={form.opening_hours.open} onChangeText={(value) => updateHours("open", value)} theme={theme} /></View>
-            <View style={styles.half}><Field label={translate("merchantStoreSettingsClose")} value={form.opening_hours.close} onChangeText={(value) => updateHours("close", value)} theme={theme} /></View>
+            <View style={styles.half}>
+              <Field label={translate("merchantStoreSettingsOpen")} value={form.opening_hours.open} onChangeText={(value) => updateHours("open", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" />
+            </View>
+            <View style={styles.half}>
+              <Field label={translate("merchantStoreSettingsClose")} value={form.opening_hours.close} onChangeText={(value) => updateHours("close", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" />
+            </View>
           </View>
+          <UiText style={[styles.hint, { color: theme.colors.muted }]}>HH:MM</UiText>
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsClosedDays")}</UiText>
             <View style={styles.days}>
@@ -201,45 +218,55 @@ export default function MerchantStoreSettingsScreen() {
               })}
             </View>
           </View>
+        </Card>
+
+        <Card contentStyle={styles.sectionCard}>
+          <Heading level={3}>{translate("merchantStoreSettingsInstagram")}</Heading>
           <Field label={translate("merchantStoreSettingsInstagram")} value={form.instagram_url} onChangeText={(value) => update("instagram_url", value)} theme={theme} keyboardType="url" />
           <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" />
-          {formError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</UiText> : null}
-          {mutation.isSuccess ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreSettingsSaved")}</UiText> : null}
-          <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} fullWidth />
         </Card>
-      </ScrollView>
-      <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
-            <View style={styles.modalHeader}>
-              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
-              <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
-                <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</UiText>
-              </PressableSurface>
-            </View>
-            <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
-              {(wilayas.data ?? []).map((wilaya) => (
-                <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
-                  <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}</UiText>
-                </PressableSurface>
-              ))}
-            </ScrollView>
 
+        {formError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</UiText> : null}
+        {mutation.isSuccess ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreSettingsSaved")}</UiText> : null}
+      </ScrollView>
+
+      <View style={[styles.footer, { backgroundColor: theme.colors.background, borderTopColor: theme.colors.border }]}>
+        <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} disabled={imageBusy !== null} fullWidth />
+      </View>
+
+      <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
+        <View style={styles.modalHeader}>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
+          <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
+            <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</UiText>
+          </PressableSurface>
+        </View>
+        <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
+          {(wilayas.data ?? []).map((wilaya) => (
+            <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
+              <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}</UiText>
+            </PressableSurface>
+          ))}
+        </ScrollView>
       </BottomSheet>
     </SafeAreaView>
   );
 }
 
-function Field({ label, value, onChangeText, theme, multiline = false, keyboardType = "default" }: {
+function Field({ label, value, onChangeText, theme, multiline = false, keyboardType = "default", maxLength, placeholder }: {
   label: string;
   value: string;
   onChangeText: (value: string) => void;
   theme: AppTheme;
   multiline?: boolean;
-  keyboardType?: "default" | "url";
+  keyboardType?: "default" | "url" | "numbers-and-punctuation";
+  maxLength?: number;
+  placeholder?: string;
 }) {
   const styles = createStyles(theme);
   return <View style={styles.field}>
     <UiText style={[styles.label, { color: theme.colors.foreground }]}>{label}</UiText>
-    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={multiline ? 2000 : 300} textAlign="auto" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
+    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={maxLength ?? (multiline ? 2000 : 300)} placeholder={placeholder} textAlign="auto" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
   </View>;
 }
 
@@ -265,15 +292,18 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.md },
+    content: { padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.lg, gap: designTokens.spacing.md },
+    sectionCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+    footer: { paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.md, borderTopWidth: StyleSheet.hairlineWidth },
     backText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" },
     card: { padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     select: { justifyContent: "center" },
-    brandingRow: { flexDirection: "row", gap: designTokens.spacing.md },
-    brandingItem: { flex: 1, gap: designTokens.spacing.sm },
-    logoPreview: { width: 76, height: 76, borderRadius: designTokens.radius.md, alignSelf: "flex-start" },
-    coverPreview: { width: "100%", height: 76, borderRadius: designTokens.radius.md },
+    brandingRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
+    brandingDetails: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.sm },
+    brandingHint: { fontSize: designTokens.typography.caption, textAlign: "auto" },
+    logoPreview: { width: 88, height: 88, borderRadius: designTokens.radius.pill },
+    hint: { fontSize: designTokens.typography.caption, textAlign: "auto" },
     imagePlaceholder: { alignItems: "center", justifyContent: "center" },
     modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
     sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
