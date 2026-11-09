@@ -37,11 +37,12 @@ export function CustomerNavigation() {
     retry: false
   });
   const isMerchant = access.data?.status === "merchant_ready" || access.data?.status === "merchant_setup_required";
+  const isMerchantRoute = pathname.startsWith("/merchant");
   const tabs = isMerchant ? merchantTabs : customerTabs;
-  const activeTab = getCustomerTab(pathname);
-  const selectedTab = isMerchant && activeTab === "profile" ? "studio" : activeTab;
+  const activeTab = isMerchantRoute ? "studio" : getCustomerTab(pathname);
+  const selectedTab = isMerchant && (isMerchantRoute || activeTab === "profile") ? "studio" : activeTab;
 
-  if (access.isPending || !activeTab) return null;
+  if (access.isPending || !activeTab || (isMerchantRoute && !isMerchant)) return null;
 
   return (
     <BottomNavigation
