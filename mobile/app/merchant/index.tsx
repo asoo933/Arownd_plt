@@ -202,7 +202,7 @@ export default function MerchantEntryScreen() {
             </UiText>
           </Card>
         ) : (
-          <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.ordersCard}>
+          <Card style={{ backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }} contentStyle={styles.ordersCard}>
             {recentOrders.map((order, index) => (
               <PressableSurface
                 key={order.id}
@@ -248,7 +248,7 @@ export default function MerchantEntryScreen() {
             {translate("merchantManagementTitle")}
           </UiText>
         </View>
-        <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.managementCard}>
+        <Card style={{ backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }} contentStyle={styles.managementCard}>
           {[
             { key: "orders", label: translate("merchantManageOrders"), icon: "shopping-bag", path: "/merchant/orders" },
             { key: "products", label: translate("merchantManageProducts"), icon: "package", path: "/merchant/products" },
@@ -393,7 +393,7 @@ function createStyles(theme: AppTheme) {
     sectionHeadingText: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
     sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
-    metricCard: { width: "48%", minHeight: 112, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
+    metricCard: { width: "48%", minHeight: 112, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
     metricsGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     textButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 3 },
     textButtonLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
