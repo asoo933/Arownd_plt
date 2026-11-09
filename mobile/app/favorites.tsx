@@ -209,8 +209,8 @@ function createStyles(theme: AppTheme) {
     },
     productItem: { width: "48%" },
     productCard: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+      borderColor: theme.mode === "light" ? "transparent" : theme.colors.border,
       borderRadius: designTokens.radius.xl
     },
     productContent: { gap: designTokens.spacing.xs, padding: designTokens.spacing.md },
