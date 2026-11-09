@@ -3,8 +3,8 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Icon, IconButton, OrderCard, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
+import { CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
+import { AppHeader, Icon, IconButton, OrderCard, OrderCardSkeleton, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
 import { formatDZD, formatNumber } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -118,7 +118,10 @@ export default function OrdersScreen() {
     return row.status === "cancelled" || row.status === "rejected";
   });
 
-  if (auth.isPending || (auth.data && orders.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (auth.isPending || (auth.data && orders.isPending)) return <CustomerScreen>
+    <AppHeader title={translate("ordersTitle")} />
+    {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
+  </CustomerScreen>;
   if (auth.isError || orders.isError) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={auth.isFetching || orders.isFetching} onRetry={() => { void auth.refetch(); void refetchOrders(); }} />
