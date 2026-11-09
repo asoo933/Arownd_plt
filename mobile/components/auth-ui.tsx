@@ -81,7 +81,7 @@ export function AuthField({ label, error, style, ...props }: FieldProps) {
       {...props}
       label={label}
       error={error}
-      textAlign={isEmail ? "left" : "right"}
+      textAlign={isEmail ? "left" : "auto"}
       autoCapitalize={isEmail ? "none" : props.autoCapitalize}
       style={style}
     />
