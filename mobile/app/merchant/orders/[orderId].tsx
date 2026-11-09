@@ -139,7 +139,7 @@ export default function MerchantOrderDetailsScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AppHeader title={translate("merchantOrderDetailTitle")} leading={<Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
         <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</UiText>
@@ -335,7 +335,7 @@ function InfoRow({ label, value, theme }: { label: string; value: string; theme:
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
-    <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
         <LoadingState label={label} />
       </View>
@@ -345,7 +345,7 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
 
 function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppTheme; title: string; actionLabel: string; onAction: () => void }) {
   return (
-    <SafeAreaView style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
         <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
