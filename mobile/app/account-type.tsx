@@ -58,7 +58,7 @@ function AccountTypeOption({
         <UiText weight={designTokens.fontWeights.extrabold} style={styles.optionTitle}>
           {title}
         </UiText>
-        <UiText tone="muted" style={styles.optionDescription}>
+        <UiText tone="muted" style={[styles.optionDescription, selected && theme.mode === "light" && { color: theme.colors.accentForeground }]}>
           {description}
         </UiText>
       </View>
