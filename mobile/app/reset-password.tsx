@@ -11,6 +11,7 @@ import {
   FormError,
   SuccessPanel
 } from "@/components/auth-ui";
+import { LoadingState } from "@/components/ui";
 import { getSupabaseClient } from "@/lib/supabase";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/auth-validation";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -85,7 +86,7 @@ export default function ResetPasswordScreen() {
     >
       {state === "loading" ? (
         <View style={styles.loadingContent}>
-          <FormError message={translate("callbackLoading")} />
+          <LoadingState label={translate("callbackLoading")} />
         </View>
       ) : state === "invalid" ? (
         <View style={styles.stateContent}>
