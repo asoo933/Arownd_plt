@@ -104,7 +104,7 @@ export function PriceText({
   previousValue,
   tone = "foreground",
   weight,
-  align = "right",
+  align = "auto",
   fontFamily,
   style,
   ...props

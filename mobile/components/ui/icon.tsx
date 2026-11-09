@@ -60,6 +60,7 @@ import {
 import { View, type StyleProp, type ViewStyle } from "react-native";
 
 import { useAppTheme } from "@/lib/theme";
+import { useLanguage } from "@/lib/i18n";
 
 const iconRegistry = {
   "arrow-down": ArrowDown,
@@ -142,8 +143,16 @@ export function Icon({
   accessibilityHidden?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
-  const IconComponent = iconRegistry[name];
+  const { language } = useLanguage();
   const theme = useAppTheme();
+  const mirroredNames: Partial<Record<IconName, IconName>> = {
+    "arrow-left": "arrow-right",
+    "arrow-right": "arrow-left",
+    "chevron-left": "chevron-right",
+    "chevron-right": "chevron-left"
+  };
+  const resolvedName = language === "en" ? mirroredNames[name] ?? name : name;
+  const IconComponent = iconRegistry[resolvedName];
   const resolvedSize = size ?? theme.dimensions.iconSize.md;
 
   return (

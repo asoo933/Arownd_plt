@@ -4,11 +4,12 @@ import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState, StoreTile } from "@/components/customer-ui";
 import { fetchFeaturedStores } from "@/lib/catalog";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { AppHeader, Icon, IconButton, Text as UiText } from "@/components/ui";
 
 export default function StoresScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const stores = useQuery({ queryKey: ["customer-stores"], queryFn: fetchFeaturedStores, staleTime: 60_000 });
   return (

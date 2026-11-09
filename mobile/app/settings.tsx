@@ -393,7 +393,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 const detailStyles = StyleSheet.create({
   row: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: designTokens.spacing.md
@@ -420,12 +420,12 @@ function createStyles(theme: AppTheme) {
     },
     input: {
       minHeight: 48,
-      textAlign: "right"
+      textAlign: "auto"
     },
     linkRow: {
       minHeight: 58,
       paddingVertical: designTokens.spacing.md,
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       gap: designTokens.spacing.md
@@ -433,7 +433,7 @@ function createStyles(theme: AppTheme) {
     linkLabel: {
       flex: 1,
       minWidth: 0,
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       alignItems: "center",
       gap: designTokens.spacing.md
     },
@@ -447,13 +447,13 @@ function createStyles(theme: AppTheme) {
       backgroundColor: theme.colors.surfaceMuted
     },
     addressSummaryHeader: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between"
     },
     languageOption: {
       minHeight: designTokens.dimensions.controlHeight.lg,
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: designTokens.spacing.md,

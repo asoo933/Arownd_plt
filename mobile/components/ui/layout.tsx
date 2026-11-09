@@ -57,7 +57,7 @@ export function Stack({
     <View
       style={[
         {
-          flexDirection: direction === "row" ? "row-reverse" : "column",
+          flexDirection: direction === "row" ? "row" : "column",
           gap,
           alignItems: align,
           justifyContent: justify,
