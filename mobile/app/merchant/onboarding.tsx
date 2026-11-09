@@ -640,7 +640,7 @@ function createStyles(theme: AppTheme) {
     input: {
       minHeight: designTokens.dimensions.controlHeight.lg,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border,
       borderRadius: designTokens.radius.sm,
       paddingHorizontal: designTokens.spacing.md,
       backgroundColor: theme.colors.surfaceMuted,
