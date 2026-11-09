@@ -336,7 +336,7 @@ function InfoRow({ label, value, theme }: { label: string; value: string; theme:
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
-      <View style={stylesForComponents.center}>
+      <View accessible accessibilityLabel={label} style={stylesForComponents.center}>
         <View style={{ width: "100%", gap: designTokens.spacing.md }}>
           {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
         </View>
