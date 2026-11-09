@@ -3,11 +3,11 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, LoadingState, ProductTile, SectionTitle } from "@/components/customer-ui";
+import { CustomerScreen, EmptyState, ErrorState, ProductTile, SectionTitle } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { CategorySelectorTile, Icon, IconButton, SearchField, Text as UiText } from "@/components/ui";
+import { CategorySelectorTile, Icon, IconButton, ProductCardSkeleton, SearchField, Text as UiText } from "@/components/ui";
 
 const categories = [
   { id: "fashion", icon: "shirt", label: "categoryFashion" },
@@ -148,7 +148,11 @@ export default function ExploreScreen() {
       </View>
 
       {hasActiveFilter ? (
-        products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
+        products.isPending ? (
+          <View style={styles.grid}>
+            {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
+          </View>
+        ) : products.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void products.refetch()} />
         ) : products.data.length === 0 ? (
           <EmptyState title={translate("exploreNoResults")} hint={translate("exploreNoResultsHint")} />
