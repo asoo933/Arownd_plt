@@ -31,6 +31,9 @@ export function Text({
   const theme = useAppTheme();
   const { language } = useLanguage();
   const flattenedStyle = StyleSheet.flatten(style);
+  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
+  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
+  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
   const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
     ? { ...flattenedStyle, textAlign: "left" as const }
     : style;
@@ -44,7 +47,7 @@ export function Text({
           fontSize: theme.typography.body,
           fontWeight: weight ?? theme.fontWeights.regular,
           fontFamily: fontFamily ?? (language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin),
-          textAlign: align,
+          textAlign: resolvedAlign,
           includeFontPadding: false
         },
         resolvedStyle
@@ -126,7 +129,7 @@ export function PriceText({
           fontWeight: weight ?? theme.fontWeights.extrabold,
           fontFamily: fontFamily ?? theme.fontFamilies.latin,
           fontVariant: ["tabular-nums"],
-          textAlign: align,
+          textAlign: resolvedAlign,
           includeFontPadding: false
         },
         resolvedStyle
@@ -154,7 +157,7 @@ export function BadgeText({
   style,
   tone = "accent",
   weight,
-  align = "right",
+  align = "auto",
   fontFamily,
   ...props
 }: Omit<TextComponentProps, "tone"> & { tone?: "accent" | "success" | "warning" | "danger" }) {
@@ -187,7 +190,7 @@ export function BadgeText({
           fontSize: theme.typography.caption,
           fontWeight: weight ?? theme.fontWeights.bold,
           fontFamily: fontFamily ?? (language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin),
-          textAlign: align,
+          textAlign: resolvedAlign,
           includeFontPadding: false
         },
         resolvedStyle

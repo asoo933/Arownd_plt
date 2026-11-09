@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { useLanguage } from "@/lib/i18n";
 import { Text as UiText } from "./typography";
 import { getQuantityStepState } from "./form-controls-state";
 
@@ -12,6 +13,7 @@ type TextFieldProps = Omit<TextInputProps, "style"> & {
 
 export function TextField({ label, error, style, containerStyle, accessibilityLabel, ...props }: TextFieldProps) {
   const theme = useAppTheme();
+  const { language } = useLanguage();
 
   return (
     <View style={[styles.field, containerStyle]}>
@@ -26,7 +28,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
             backgroundColor: theme.colors.surface,
             borderColor: error ? theme.colors.danger : theme.colors.border,
             color: theme.colors.foreground,
-            fontFamily: theme.fontFamilies.arabic
+            fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
           },
           style
         ]}

@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import { I18nManager } from "react-native";
+import { reloadAppAsync } from "expo";
 
 const LANGUAGE_STORAGE_KEY = "arownd:app-language";
 let activeLanguage: Language = "ar";
@@ -1490,7 +1491,7 @@ export function LanguageProvider({ children }: PropsWithChildren) {
         I18nManager.allowRTL(true);
         if (I18nManager.isRTL !== (nextLanguage === "ar")) {
           I18nManager.forceRTL(nextLanguage === "ar");
-          setRestartNoticeVersion(1);
+          void reloadAppAsync("Apply saved Arownd language direction").catch(() => setRestartNoticeVersion(1));
         }
       })
       .catch(() => {
@@ -1499,7 +1500,7 @@ export function LanguageProvider({ children }: PropsWithChildren) {
         I18nManager.allowRTL(true);
         if (!I18nManager.isRTL) {
           I18nManager.forceRTL(true);
-          setRestartNoticeVersion(1);
+          void reloadAppAsync("Apply default Arownd RTL direction").catch(() => setRestartNoticeVersion(1));
         }
       })
       .finally(() => {
@@ -1517,7 +1518,11 @@ export function LanguageProvider({ children }: PropsWithChildren) {
     setLanguageState(nextLanguage);
     I18nManager.allowRTL(true);
     I18nManager.forceRTL(nextLanguage === "ar");
-    setRestartNoticeVersion((version) => version + 1);
+    try {
+      await reloadAppAsync("Arownd language changed");
+    } catch {
+      setRestartNoticeVersion((version) => version + 1);
+    }
   }, [language]);
 
   const value = useMemo(

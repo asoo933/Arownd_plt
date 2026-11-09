@@ -33,8 +33,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0A0A0A"
-      },
-      "supportsRTL": true
+      }
     }
   }
 }

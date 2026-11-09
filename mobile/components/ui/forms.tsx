@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLanguage } from "@/lib/i18n";
 import type { ReactNode } from "react";
 import {
   Pressable,
@@ -31,6 +32,7 @@ export function TextArea({
   ...props
 }: TextAreaProps) {
   const theme = useAppTheme();
+  const { language } = useLanguage();
 
   return (
     <View style={containerStyle}>
@@ -49,7 +51,7 @@ export function TextArea({
             color: theme.colors.foreground,
             backgroundColor: theme.colors.surface,
             fontSize: theme.typography.body,
-            fontFamily: theme.fontFamilies.arabic,
+            fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin,
             textAlign: "auto"
           },
           style
@@ -62,6 +64,7 @@ export function TextArea({
 export type NumberFieldProps = Omit<TextInputProps, "keyboardType">;
 
 export function NumberField({ onChangeText, ...props }: NumberFieldProps) {
+  const { language } = useLanguage();
   const handleChange = (raw: string) => {
     const normalized = raw.replace(/[^0-9٠-٩٫.,-]/g, "");
     if (onChangeText) onChangeText(normalized);
@@ -72,7 +75,7 @@ export function NumberField({ onChangeText, ...props }: NumberFieldProps) {
       {...props}
       keyboardType="numeric"
       onChangeText={handleChange}
-      style={[{ fontFamily: designTokens.fontFamilies.arabic }, props.style]}
+      style={[{ fontFamily: language === "ar" ? designTokens.fontFamilies.arabic : designTokens.fontFamilies.latin }, props.style]}
     />
   );
 }

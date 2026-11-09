@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { LocaleProvider, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -16,12 +16,11 @@ import {
   IBMPlexSansArabic_700Bold
 } from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Alert } from "react-native";
 import { useEffect, useState } from "react";
 
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
-import { LanguageProvider, translate, useLanguage } from "@/lib/i18n";
+import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -74,10 +73,10 @@ function RootLayoutContent() {
   const { isReady: themeReady } = useThemePreference();
 
   useEffect(() => {
-    if ((fontsLoaded || fontError) && themeReady) {
+    if ((fontsLoaded || fontError) && themeReady && languageReady) {
       void SplashScreen.hideAsync().catch(() => undefined);
     }
-  }, [fontError, fontsLoaded, themeReady]);
+  }, [fontError, fontsLoaded, themeReady, languageReady]);
 
   useEffect(() => {
     if (restartNoticeVersion > 0) {
@@ -108,13 +107,15 @@ function RootLayoutContent() {
   return (
     <QueryClientProvider client={queryClient}>
       <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: language === "ar" ? "slide_from_left" : "slide_from_right",
-          contentStyle: { backgroundColor: theme.colors.background }
-        }}
-      />
+      <LocaleProvider direction={language === "ar" ? "rtl" : "ltr"}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: language === "ar" ? "slide_from_left" : "slide_from_right",
+            contentStyle: { backgroundColor: theme.colors.background }
+          }}
+        />
+      </LocaleProvider>
     </QueryClientProvider>
   );
 }
