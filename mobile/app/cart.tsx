@@ -16,7 +16,6 @@ import {
   Image as UiImage,
   PressableSurface,
   PriceText,
-  OrderCardSkeleton,
   QuantityStepper,
   Text as UiText
 } from "@/components/ui";
@@ -47,10 +46,7 @@ export default function CartScreen() {
     }
   });
 
-  if (cart.isPending) return <CustomerScreen>
-    <AppHeader title={translate("cartTitle")} />
-    {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
-  </CustomerScreen>;
+  if (cart.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (cart.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching} onRetry={() => void cart.refetch()} /></CustomerScreen>;
   if (cart.data.length === 0) return <CustomerScreen>
     <AppHeader title={translate("cartTitle")} />
