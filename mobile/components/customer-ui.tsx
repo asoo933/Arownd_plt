@@ -14,13 +14,14 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, RatingStars, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
-export function CustomerScreen({ children, showNavigation = true }: { children: ReactNode; showNavigation?: boolean }) {
+export function CustomerScreen({ children, footer, showNavigation = true }: { children: ReactNode; footer?: ReactNode; showNavigation?: boolean }) {
   const theme = useAppTheme();
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
+      {footer ? <View style={[styles.footer, { backgroundColor: theme.colors.background, borderTopColor: theme.colors.border }]}>{footer}</View> : null}
       {showNavigation ? <CustomerNavigation /> : null}
     </SafeAreaView>
   );
@@ -138,6 +139,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: { flex: 1 },
+  footer: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.sm, borderTopWidth: StyleSheet.hairlineWidth },
   content: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.xxl },
   heading: { gap: designTokens.spacing.xs, alignItems: "flex-start" },
   sectionTitle: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
