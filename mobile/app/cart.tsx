@@ -47,7 +47,7 @@ export default function CartScreen() {
   });
 
   if (cart.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
-  if (cart.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void cart.refetch()} /></CustomerScreen>;
+  if (cart.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching} onRetry={() => void cart.refetch()} /></CustomerScreen>;
   if (cart.data.length === 0) return <CustomerScreen>
     <AppHeader title={translate("cartTitle")} />
     <Card contentStyle={style.emptyContent}>
@@ -100,7 +100,7 @@ export default function CartScreen() {
       title={translate("cartTitle")}
       trailing={<Caption style={style.itemCount}>{translate("cartItemsCount") + formatNumber(cart.data.reduce((sum, item) => sum + item.quantity, 0))}</Caption>}
     />
-    {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
+    {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={offers.isFetching} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
     {mutation.isError ? <Alert tone="danger" description={translate("genericError")} /> : null}
     {evaluation.blockingCount > 0 ? <Alert tone="danger" description={translate("cartBlocked") + evaluation.blockingCount} /> : null}
