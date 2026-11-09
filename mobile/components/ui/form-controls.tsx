@@ -45,7 +45,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           style
         ]}
       />
-      {error ? <UiText accessibilityRole="alert" style={[styles.fieldError, { color: theme.colors.danger }]}>{error}</UiText> : null}
+      {error ? <UiText accessibilityRole="alert" style={[styles.fieldError, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{error}</UiText> : null}
     </View>
   );
 }
