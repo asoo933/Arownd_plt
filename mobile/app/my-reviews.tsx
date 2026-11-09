@@ -16,7 +16,7 @@ import {
   Text as UiText
 } from "@/components/ui";
 import { fetchMyReviews, getReviewTargetPath, type AppReview } from "@/lib/reviews";
-import { translate, useLanguage } from "@/lib/i18n";
+import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function MyReviewsScreen() {
@@ -59,13 +59,13 @@ export default function MyReviewsScreen() {
         <EmptyState title={translate("myReviewsEmpty")} hint={translate("myReviewsEmptyHint")} />
       ) : null}
       {query.data?.map((review) => (
-        <ReviewRow key={review.id} review={review} onPress={() => router.push(getReviewTargetPath(review) as never)} />
+        <ReviewRow key={review.id} review={review} language={language} onPress={() => router.push(getReviewTargetPath(review) as never)} />
       ))}
     </CustomerScreen>
   );
 }
 
-function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void }) {
+function ReviewRow({ review, language, onPress }: { review: AppReview; language: Language; onPress: () => void }) {
   const theme = useAppTheme();
   const styles = createReviewStyles(theme);
   const status = review.status === "approved"
