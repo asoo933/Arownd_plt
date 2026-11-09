@@ -36,12 +36,12 @@ export function CustomerNavigation() {
     queryFn: fetchMerchantAccess,
     retry: false
   });
-  const isMerchant = access.data?.status === "merchant_ready" && Boolean(access.data.store?.id);
+  const isMerchant = access.data?.status === "merchant_ready" || access.data?.status === "merchant_setup_required";
   const tabs = isMerchant ? merchantTabs : customerTabs;
   const activeTab = getCustomerTab(pathname);
   const selectedTab = isMerchant && activeTab === "profile" ? "studio" : activeTab;
 
-  if (!activeTab) return null;
+  if (access.isPending || !activeTab) return null;
 
   return (
     <BottomNavigation
