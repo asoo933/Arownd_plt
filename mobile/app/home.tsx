@@ -68,7 +68,6 @@ export default function CustomerHomeScreen() {
         ) : (
           <View
             style={styles.storeViewport}
-            onLayout={(event) => setStoreViewportWidth(event.nativeEvent.layout.width)}
           >
             <ScrollView
               horizontal
