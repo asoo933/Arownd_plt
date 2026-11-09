@@ -45,7 +45,8 @@ const ShipmentSchema = z.object({
   notes: z.string().nullable().optional(),
   updated_at: z.string().nullable().optional(),
   created_at: z.string().nullable().optional(),
-  merchant_order_id: z.string().nullable().optional()
+  merchant_order_id: z.string().nullable().optional(),
+  company_id: z.string().nullable().optional()
 }).passthrough();
 
 const OrderSchema = z.object({
@@ -104,7 +105,7 @@ export async function fetchCustomerOrderDetails(orderId: string): Promise<{
   const client = getSupabaseClient();
   const [{ data: order, error: orderError }, { data: shipments, error: shipmentError }] = await Promise.all([
     client.from("orders").select(ORDER_SELECT).eq("id", orderId).eq("user_id", auth.user.id).maybeSingle(),
-    client.from("shipments").select("id, status, notes, updated_at, created_at, merchant_order_id").eq("order_id", orderId).order("created_at", { ascending: true })
+    client.from("shipments").select("id, status, notes, updated_at, created_at, merchant_order_id, company_id").eq("order_id", orderId).order("created_at", { ascending: true })
   ]);
   if (orderError) throw orderError;
   if (shipmentError) throw shipmentError;
