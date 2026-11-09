@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   TextInput,
   View,
@@ -11,7 +12,7 @@ import { useLanguage } from "@/lib/i18n";
 import { Text as UiText } from "./typography";
 import { Icon } from "./icon";
 
-export type SearchFieldProps = Pick<TextInputProps, "autoCapitalize" | "autoCorrect" | "onSubmitEditing" | "returnKeyType"> & {
+export type SearchFieldProps = Pick<TextInputProps, "autoCapitalize" | "autoCorrect" | "onSubmitEditing" | "returnKeyType" | "onFocus" | "onBlur"> & {
   value: string;
   onChangeText: (value: string) => void;
   placeholder: string;
@@ -27,11 +28,14 @@ export function SearchField({
   autoCapitalize = "none",
   autoCorrect = false,
   onSubmitEditing,
+  onFocus,
+  onBlur,
   returnKeyType = "search",
   style
 }: SearchFieldProps) {
   const theme = useAppTheme();
   const { language } = useLanguage();
+  const [focused, setFocused] = useState(false);
 
   return (
     <View
@@ -43,7 +47,7 @@ export function SearchField({
           gap: theme.spacing.sm,
           paddingHorizontal: theme.spacing.md,
           borderWidth: 1,
-          borderColor: theme.colors.border,
+          borderColor: focused ? theme.colors.focus : theme.colors.inputBorder,
           borderRadius: theme.radius.pill,
           backgroundColor: theme.colors.surface
         },
@@ -55,6 +59,14 @@ export function SearchField({
         accessibilityLabel={accessibilityLabel}
         value={value}
         onChangeText={onChangeText}
+        onFocus={(event) => {
+          setFocused(true);
+          onFocus?.(event);
+        }}
+        onBlur={(event) => {
+          setFocused(false);
+          onBlur?.(event);
+        }}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.placeholder}
         autoCapitalize={autoCapitalize}
