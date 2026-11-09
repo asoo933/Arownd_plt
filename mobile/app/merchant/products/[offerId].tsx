@@ -338,7 +338,160 @@ export default function MerchantEditProductScreen() {
           <AppHeader title={translate("merchantProductEditTitle")} leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />} />
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</UiText>
 
-                    <Card contentStyle={styles.card}>
+          <Card contentStyle={styles.card}>
+            <View style={styles.productHeading}>
+              <UiText style={[styles.productName, { color: theme.colors.foreground }]}>{offer.product.name}</UiText>
+              {offer.product.brand ? (
+                <UiText style={[styles.productBrand, { color: theme.colors.muted }]}>{offer.product.brand}</UiText>
+              ) : null}
+            </View>
+
+            <View style={[styles.sharedDetails, { backgroundColor: theme.colors.surfaceMuted }]}>
+              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                {translate("merchantProductSharedDetailsTitle")}
+              </UiText>
+              <View style={styles.field}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductNameLabel")}
+                </UiText>
+                <TextField
+                  value={productName}
+                  onChangeText={setProductName}
+                  editable={!isBusy}
+                  maxLength={120}
+                  accessibilityLabel={translate("merchantProductNameLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductBrandLabel")}
+                </UiText>
+                <TextField
+                  value={productBrand}
+                  onChangeText={setProductBrand}
+                  editable={!isBusy}
+                  maxLength={80}
+                  accessibilityLabel={translate("merchantProductBrandLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductDescriptionLabel")}
+                </UiText>
+                <TextField
+                  value={productDescription}
+                  onChangeText={setProductDescription}
+                  editable={!isBusy}
+                  maxLength={3000}
+                  multiline
+                  textAlignVertical="top"
+                  accessibilityLabel={translate("merchantProductDescriptionLabel")}
+                  style={[styles.input, styles.descriptionInput, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductCategoryLabel")}
+                </UiText>
+                <PressableSurface
+                  accessibilityRole="button"
+                  accessibilityLabel={translate("merchantProductCategoryLabel")}
+                  disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
+                  onPress={() => setCategoryPickerOpen(true)}
+                  style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: theme.colors.border, opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
+                >
+                  <UiText style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
+                    {selectedCategory
+                      ? `${selectedCategory.emoji} ${getLocalizedMerchantCategoryLabel(selectedCategory.id, selectedCategory.label, language)}`
+                      : translate("merchantProductCategoryUnknown")}
+                  </UiText>
+                </PressableSurface>
+                {categoriesQuery.isError ? (
+                  <UiText style={[styles.hint, { color: theme.colors.danger }]}>
+                    {translate("merchantProductCategoriesLoadError")}
+                  </UiText>
+                ) : null}
+              </View>
+              <UiText style={[styles.noteText, { color: theme.colors.muted }]}>
+                {translate("merchantProductEditSharedFieldsHint")}
+              </UiText>
+              <Button label={translate("merchantProductDetailsSave")} onPress={() => void saveProductDetails()} loading={detailsSaving} disabled={isBusy && !detailsSaving} fullWidth />
+            </View>
+
+            <View style={styles.field}>
+              <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                {translate("merchantProductPriceLabel")}
+              </UiText>
+              <TextField
+                value={price}
+                onChangeText={setPrice}
+                editable={!isBusy}
+                keyboardType="number-pad"
+                accessibilityLabel={translate("merchantProductPriceLabel")}
+                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                {translate("merchantProductStockLabel")}
+              </UiText>
+              <TextField
+                value={stock}
+                onChangeText={setStock}
+                editable={!isBusy}
+                keyboardType="number-pad"
+                accessibilityLabel={translate("merchantProductStockLabel")}
+                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+              />
+              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
+                {translate("merchantProductsStockHint")}
+              </UiText>
+            </View>
+
+            <View style={styles.optionsSection}>
+              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                {translate("merchantProductOptionsTitle")}
+              </UiText>
+              <View style={styles.field}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductSizesLabel")}
+                </UiText>
+                <TextField
+                  value={sizes}
+                  onChangeText={setSizes}
+                  editable={!isBusy}
+                  placeholder={translate("merchantProductOptionsPlaceholder")}
+                  placeholderTextColor={theme.colors.placeholder}
+                  accessibilityLabel={translate("merchantProductSizesLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <View style={styles.field}>
+                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductColorsLabel")}
+                </UiText>
+                <TextField
+                  value={colors}
+                  onChangeText={setColors}
+                  editable={!isBusy}
+                  placeholder={translate("merchantProductOptionsPlaceholder")}
+                  placeholderTextColor={theme.colors.placeholder}
+                  accessibilityLabel={translate("merchantProductColorsLabel")}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+                />
+              </View>
+              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
+                {translate("merchantProductOptionsHint")}
+              </UiText>
+            </View>
+
+            <Button label={translate("merchantProductEditSave")} onPress={() => void saveOffer()} loading={saving} disabled={isBusy && !saving} fullWidth />
+          </Card>
+
+          <Card contentStyle={styles.card}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitles}>
                 <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
@@ -425,8 +578,6 @@ export default function MerchantEditProductScreen() {
               ) : null}
             </View>
           </Card>
-
-
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
               <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
@@ -567,7 +718,7 @@ function createStyles(theme: AppTheme) {
     productHeading: { alignItems: "flex-start", gap: designTokens.spacing.xs, paddingBottom: 3 },
     productName: { width: "100%", fontSize: designTokens.typography.subtitle, lineHeight: 23, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     productBrand: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "auto" },
-    sharedDetails: { gap: designTokens.spacing.md },
+    sharedDetails: { borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.md },
     descriptionInput: { minHeight: 104, paddingTop: 12 },
     categoryPicker: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, justifyContent: "center", paddingHorizontal: designTokens.spacing.md },
     categoryPickerText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
@@ -586,8 +737,8 @@ function createStyles(theme: AppTheme) {
     imageCount: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     imageGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md },
     imageItem: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "visible" },
-    imagePreviewPressable: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "hidden" },
     imagePreview: { width: 94, height: 94, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
+    imagePreviewPressable: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "hidden" },
     imageAddItem: { width: 94, height: 94, borderWidth: 1, borderStyle: "dashed", borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.xs, padding: designTokens.spacing.xs },
     imageAddText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
     fullscreenImage: { width: "100%", maxHeight: 520, borderRadius: designTokens.radius.md },
