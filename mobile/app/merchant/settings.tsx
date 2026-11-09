@@ -187,9 +187,9 @@ export default function MerchantStoreSettingsScreen() {
               />
             </View>
           </View>
-          {imageError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</UiText> : null}
-          {imageSaved ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreImageSaved")}</UiText> : null}
-          {imageCleanupPending ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreImageCleanupPending")}</UiText> : null}
+          {imageError ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreImageUploadError")}</UiText> : null}
+          {imageSaved ? <UiText style={[styles.success, { color: theme.mode === "light" ? theme.colors.successText : theme.colors.success }]}>{translate("merchantStoreImageSaved")}</UiText> : null}
+          {imageCleanupPending ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreImageCleanupPending")}</UiText> : null}
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
@@ -207,7 +207,7 @@ export default function MerchantStoreSettingsScreen() {
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
               <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr)}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
-            {fieldErrors.wilaya_id ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
+            {fieldErrors.wilaya_id ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.commune} />
           <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.address_line} />
@@ -224,7 +224,7 @@ export default function MerchantStoreSettingsScreen() {
             </View>
           </View>
           <UiText style={[styles.hint, { color: theme.colors.muted }]}>HH:MM</UiText>
-          {fieldErrors["opening_hours.closed_days"] ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
+          {fieldErrors["opening_hours.closed_days"] ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsClosedDays")}</UiText>
             <View style={styles.days}>
@@ -244,7 +244,7 @@ export default function MerchantStoreSettingsScreen() {
           <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" disabled={mutation.isPending} error={fieldErrors.facebook_url} />
         </Card>
 
-        {formError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</UiText> : null}
+        {formError ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</UiText> : null}
         {mutation.isSuccess ? <UiText style={[styles.success, { color: theme.colors.success }]}>{translate("merchantStoreSettingsSaved")}</UiText> : null}
       </ScrollView>
 
@@ -286,7 +286,7 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
   const styles = createStyles(theme);
   return <View style={styles.field}>
     <UiText style={[styles.label, { color: theme.colors.foreground }]}>{label}</UiText>
-    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} editable={!disabled} keyboardType={keyboardType} multiline={multiline} maxLength={maxLength ?? (multiline ? 2000 : 300)} placeholder={placeholder} textAlign="auto" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} error={error ? translate("merchantStoreSettingsValidation") : undefined} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
+    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} editable={!disabled} keyboardType={keyboardType} multiline={multiline} maxLength={maxLength ?? (multiline ? 2000 : 300)} placeholder={placeholder} textAlign="auto" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} error={error ? translate("merchantStoreSettingsValidation") : undefined} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border }, multiline && styles.textarea]} />
   </View>;
 }
 
