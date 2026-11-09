@@ -203,6 +203,12 @@ export function getPrimaryImage(product: HomeProduct | ProductOffer): string | n
   return image?.image_url ?? null;
 }
 
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat(getCurrentLanguage() === "ar" ? "ar-DZ" : "en-DZ", {
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
 export function formatDZD(amount: number): string {
   return new Intl.NumberFormat(getCurrentLanguage() === "ar" ? "ar-DZ" : "en-DZ", {
     style: "currency",
