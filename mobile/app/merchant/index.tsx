@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import {
   ScrollView,
@@ -9,9 +9,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   fetchMerchantAccess,
-  fetchMerchantDashboard
+  fetchMerchantDashboard,
+  fetchMerchantOrderDetails
 } from "@/lib/merchant";
-import { formatDZD } from "@/lib/catalog";
+import { fetchMerchantProducts } from "@/lib/merchant-products";
+import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
+import { fetchStoreDetails, fetchStoreOffers, formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
@@ -20,6 +23,7 @@ import { Button, Card, ErrorState, Icon, IconButton, Image as UiImage, MetricCar
 export default function MerchantEntryScreen() {
   useLanguage();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
   const styles = createStyles(theme);
 
   const access = useQuery({
@@ -151,7 +155,11 @@ export default function MerchantEntryScreen() {
             </View>
           </View>
           <View style={styles.storeActions}>
-            <Button label={translate("merchantPreviewStore")} onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } })} variant="outline" size="sm" style={{ flex: 1 }} />
+            <Button label={translate("merchantPreviewStore")} onPress={() => {
+              void queryClient.prefetchQuery({ queryKey: ["customer-store", data.store.id], queryFn: () => fetchStoreDetails(data.store.id), staleTime: 60_000 });
+              void queryClient.prefetchQuery({ queryKey: ["customer-store-offers", data.store.id], queryFn: () => fetchStoreOffers(data.store.id), staleTime: 30_000 });
+              router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } });
+            }} variant="outline" size="sm" style={{ flex: 1 }} />
             <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" style={{ flex: 1 }} />
           </View>
         </Card>
@@ -200,7 +208,10 @@ export default function MerchantEntryScreen() {
                 key={order.id}
                 accessibilityRole="button"
                 accessibilityLabel={`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}، ${order.customerName || translate("merchantCustomerUnknown")}، ${formatDZD(order.subtotal + order.shippingFee)}`}
-                onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
+                onPress={() => {
+                  if (storeId) void queryClient.prefetchQuery({ queryKey: ["merchant-order-detail", storeId, order.id], queryFn: () => fetchMerchantOrderDetails(order.id, storeId), staleTime: 15_000 });
+                  router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } });
+                }}
                 style={[
                   styles.orderRow,
                   index < recentOrders.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
@@ -248,7 +259,11 @@ export default function MerchantEntryScreen() {
               key={item.key}
               accessibilityRole="button"
               accessibilityLabel={item.label}
-              onPress={() => router.push(item.path as "/merchant/orders" | "/merchant/products" | "/merchant/analytics" | "/merchant/settings")}
+              onPress={() => {
+                if (storeId && item.key === "products") void queryClient.prefetchQuery({ queryKey: ["merchant-products", storeId], queryFn: () => fetchMerchantProducts(storeId), staleTime: 30_000 });
+                if (storeId && item.key === "analytics") void queryClient.prefetchQuery({ queryKey: ["merchant-analytics", storeId], queryFn: () => fetchMerchantAnalytics(storeId), staleTime: 30_000 });
+                router.push(item.path as "/merchant/orders" | "/merchant/products" | "/merchant/analytics" | "/merchant/settings");
+              }}
               style={[
                 styles.managementRow,
                 index < items.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
