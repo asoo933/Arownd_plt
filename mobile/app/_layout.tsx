@@ -16,6 +16,7 @@ import {
   IBMPlexSansArabic_700Bold
 } from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Alert } from "react-native";
 import { useEffect, useState } from "react";
 
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
