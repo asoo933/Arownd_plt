@@ -55,11 +55,11 @@ function OrderStatusBadge({ status }: { status: string }) {
   return <UiOrderStatusBadge label={statusLabel(status)} tone={tone} />;
 }
 
-function dateLabel(value: string | null | undefined): string {
+function dateLabel(value: string | null | undefined, language: "ar" | "en"): string {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("ar-DZ", { day: "numeric", month: "long", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { day: "numeric", month: "long", year: "numeric" }).format(date);
 }
 
 export default function OrderDetailsScreen() {
@@ -148,7 +148,7 @@ export default function OrderDetailsScreen() {
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderSummary")}</UiText>
       <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderTotal")}</UiText><PriceDisplay value={formatDZD(order.total)} style={styles.priceDisplay} /></View>
-      <UiText style={styles.meta}>{dateLabel(order.created_at)}</UiText>
+      <UiText style={styles.meta}>{dateLabel(order.created_at, language)}</UiText>
     </View>
 
     {showParentTimeline ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
@@ -229,7 +229,7 @@ export default function OrderDetailsScreen() {
         {(query.data.trackingEvents.find((entry) => entry.merchantOrderId === merchantOrder.id)?.events ?? []).map((event) => (
           <View key={event.id} style={styles.trackingEvent}>
             <OrderStatusBadge status={event.status} />
-            <UiText style={styles.meta}>{dateLabel(event.created_at)}</UiText>
+            <UiText style={styles.meta}>{dateLabel(event.created_at, language)}</UiText>
             {event.note ? <UiText style={styles.meta}>{event.note}</UiText> : null}
           </View>
         ))}
@@ -251,7 +251,7 @@ export default function OrderDetailsScreen() {
       <UiText style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</UiText>
       {query.data.shipments.map((shipment) => <View key={shipment.id} style={styles.shipment}>
         <OrderStatusBadge status={shipment.status} />
-        {shipment.updated_at ? <UiText style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at)}</UiText> : null}
+        {shipment.updated_at ? <UiText style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at, language)}</UiText> : null}
         {shipment.notes ? <UiText style={styles.meta}>{shipment.notes}</UiText> : null}
       </View>)}
     </View> : null}
