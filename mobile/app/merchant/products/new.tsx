@@ -305,7 +305,7 @@ export default function MerchantNewProductScreen() {
             ) : null}
             {imageError ? (
               <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-                <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{imageError}</UiText>
+                <UiText style={[styles.errorText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{imageError}</UiText>
               </View>
             ) : null}
           </Card>
@@ -437,7 +437,7 @@ export default function MerchantNewProductScreen() {
 
             {submitError ? (
               <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-                <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</UiText>
+                <UiText style={[styles.errorText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{submitError}</UiText>
               </View>
             ) : null}
 
