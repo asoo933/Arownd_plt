@@ -4,6 +4,9 @@ import { defineConfig } from "vitest/config";
 const mobileRoot = process.cwd();
 
 export default defineConfig({
+  define: {
+    __DEV__: "true"
+  },
   resolve: {
     alias: {
       "@": mobileRoot,
