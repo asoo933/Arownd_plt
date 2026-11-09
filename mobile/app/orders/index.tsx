@@ -121,7 +121,7 @@ export default function OrdersScreen() {
   if (auth.isPending || (auth.data && orders.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (auth.isError || orders.isError) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
-    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void refetchOrders(); }} />
+    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={auth.isFetching || orders.isFetching} onRetry={() => { void auth.refetch(); void refetchOrders(); }} />
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
@@ -142,7 +142,7 @@ export default function OrdersScreen() {
       }}
       style={styles.tabs}
     />
-    {filtered.length === 0 ? <EmptyState title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
+    {filtered.length === 0 ? <EmptyState icon="package" title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
     {filtered.map((row) => {
       const orderCode = formatOrderCode(row.order.id);
       const tone = getOrderStatusTone(row.status);
