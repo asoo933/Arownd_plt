@@ -117,3 +117,9 @@ export function getLocalizedMerchantCategoryLabel(
   if (language === "ar") return fallback;
   return MERCHANT_CATEGORY_NAMES_EN[id] ?? fallback;
 }
+
+export function getLocalizedProductCategoryLabel(id: string, language: Language): string {
+  const normalizedId = id.trim();
+  if (language === "ar") return PRODUCT_CATEGORY_NAMES_AR[normalizedId] ?? normalizedId;
+  return MERCHANT_CATEGORY_NAMES_EN[normalizedId] ?? normalizedId;
+}
