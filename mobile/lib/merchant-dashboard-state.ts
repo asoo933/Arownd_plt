@@ -50,7 +50,7 @@ export function groupMerchantOrderRows(rows: MerchantOrderRow[]): MerchantOrderS
 
   for (const row of rows) {
     const parentOrder = row.order;
-    if (!parentOrder || parentOrder.status === "cancelled") continue;
+    if (!parentOrder) continue;
 
     const merchantOrder = row.merchant_order;
     const existing = groups.get(merchantOrder.id);
@@ -68,7 +68,7 @@ export function groupMerchantOrderRows(rows: MerchantOrderRow[]): MerchantOrderS
     groups.set(merchantOrder.id, {
       id: merchantOrder.id,
       parentOrderId: parentOrder.id,
-      status: merchantOrder.status,
+      status: parentOrder.status === "cancelled" ? "cancelled" : merchantOrder.status,
       subtotal: merchantOrder.subtotal,
       shippingFee: merchantOrder.shipping_fee,
       quotedAt: merchantOrder.quoted_at,
@@ -124,4 +124,20 @@ export function getNextMerchantTrackingStatus(
   }
   if (currentStatus === "out_for_delivery" && deliveryType === "home") return "delivered";
   return null;
+}
+
+
+export function canManageMerchantOrderFulfillment(status: string): boolean {
+  return status === "confirmed" || status === "shipped";
+}
+
+export function canCollectMerchantOrderCod(
+  status: string,
+  paymentStatus: string,
+  deliveryType: string,
+  hasAssignedCarrier: boolean
+): boolean {
+  if (status !== "delivered" || paymentStatus === "paid") return false;
+  if (deliveryType === "desk") return true;
+  return deliveryType === "home" && !hasAssignedCarrier;
 }
