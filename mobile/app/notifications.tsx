@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
 import {
   Alert,
   AppHeader,
