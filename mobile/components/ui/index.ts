@@ -46,6 +46,7 @@ export type { FeedbackTone } from "./feedback";
 
 export {
   Card,
+  CategorySelectorTile,
   ProductCard,
   StoreCard,
   OfferCard,
@@ -57,7 +58,7 @@ export {
   AddressCard,
   NotificationCard,
 } from "./cards";
-export type { CardProps } from "./cards";
+export type { CardProps, CategorySelectorTileProps } from "./cards";
 
 export { BackButton, BottomNavigation } from "./navigation-components";
 export type { NavigationItem } from "./navigation-components";
