@@ -288,7 +288,7 @@ export default function CheckoutScreen() {
 
       <UiText style={styles.fieldLabel}>{translate("checkoutWilaya")}</UiText>
       <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
-        <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + selectedWilaya.name_ar : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
+        <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language) : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
         {wilayas.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
       {wilayas.isError ? <PressableSurface accessibilityLabel={translate("retry")} onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
