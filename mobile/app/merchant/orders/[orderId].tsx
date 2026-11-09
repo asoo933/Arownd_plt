@@ -145,12 +145,15 @@ export default function MerchantOrderDetailsScreen() {
         <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</UiText>
         <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
 
-        <MerchantOrderCard>
+        <MerchantOrderCard style={styles.orderSummaryCard}>
           <View style={styles.summaryRow}>
             <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
             <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} />
           </View>
-          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderItems")}</UiText>
+          <View style={styles.sectionHeading}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderItems")}</UiText>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{formatNumber(detail.data.items.length)} {translate("merchantOrderItems")}</UiText>
+          </View>
           {detail.data.items.length === 0 ? (
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderItemsUnavailable")}</UiText>
           ) : detail.data.items.map((item) => (
@@ -197,6 +200,7 @@ export default function MerchantOrderDetailsScreen() {
             {deliveryType === "desk" ? (
               <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantQuotePickupHint")}</UiText>
             ) : (
+              <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{translate("merchantOrderShippingFee")}</UiText>
               <TextField
                 value={shippingFee}
                 onChangeText={setShippingFee}
@@ -233,9 +237,12 @@ export default function MerchantOrderDetailsScreen() {
           {trackingEvents.length === 0 ? (
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantTrackingEmpty")}</UiText>
           ) : trackingEvents.map((event) => (
-            <View key={event.id} style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
-              <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</UiText>
-              <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
+            <View key={event.id} style={[styles.trackingEvent, { borderBottomColor: theme.colors.border }]}>
+              <View style={[styles.trackingMarker, { backgroundColor: theme.colors.accent }]} />
+              <View style={styles.trackingEventContent}>
+                <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</UiText>
+                <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
+              </View>
             </View>
           ))}
         </MerchantOrderCard>
@@ -363,25 +370,31 @@ const stylesForComponents = StyleSheet.create({
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: 17, paddingBottom: 38, gap: 13 },
+    content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.lg },
     eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    subtitle: { fontSize: designTokens.typography.caption, textAlign: "auto" },
-    summaryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-    amount: { fontSize: 17, fontWeight: designTokens.fontWeights.extrabold },
-    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    itemRow: { minHeight: 55, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 7 },
-    itemInfo: { flex: 1, alignItems: "flex-start", gap: 4 },
+    subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
+    orderSummaryCard: { borderRadius: theme.radius.lg },
+    summaryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: designTokens.spacing.md },
+    amount: { fontSize: designTokens.typography.subtitle, fontWeight: designTokens.fontWeights.extrabold },
+    sectionHeading: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
+    sectionTitle: { fontSize: designTokens.typography.body, lineHeight: 21, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    itemRow: { minHeight: 64, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: designTokens.spacing.sm },
+    itemInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
     itemName: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     itemPriceDisplay: { alignSelf: "flex-start" },
-    mutedText: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "auto" },
-    totalRow: { minHeight: 30, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 7 },
-    valueText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    input: { minHeight: 48, borderWidth: 1, borderRadius: 13, paddingHorizontal: 13, fontSize: designTokens.typography.body },
-    dangerButton: { minHeight: 45, borderWidth: 1, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+    mutedText: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
+    totalRow: { minHeight: 38, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, paddingTop: designTokens.spacing.sm },
+    valueText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    fieldLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body },
+    dangerButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, alignItems: "center", justifyContent: "center" },
     dangerButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
-    notice: { borderRadius: 14, padding: 13 },
-    noticeText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    errorCard: { borderWidth: 1, borderRadius: 14, padding: 12 },
+    notice: { borderRadius: theme.radius.md, padding: designTokens.spacing.md },
+    noticeText: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    trackingEvent: { minHeight: 52, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: designTokens.spacing.sm },
+    trackingMarker: { width: 9, height: 9, borderRadius: theme.radius.pill },
+    trackingEventContent: { flex: 1, gap: designTokens.spacing.xs },
+    errorCard: { borderWidth: 1, borderRadius: theme.radius.md, padding: designTokens.spacing.md },
     disabled: { opacity: 0.5 }
   });
 }
