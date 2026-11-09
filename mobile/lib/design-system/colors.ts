@@ -52,7 +52,7 @@ export const themeColors = {
     foregroundMuted: "#A3A3A3",
     border: "#262626",
     input: "#262626",
-    inputBorder: "#525252",
+    inputBorder: "#707070",
     focus: "#FFF01F"
   }
 } as const;
