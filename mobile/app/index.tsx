@@ -14,14 +14,20 @@ export default function IndexRoute() {
 
   useEffect(() => {
     let active = true;
-    void getSupabaseClient().auth.getSession()
-      .then(({ data, error }) => {
-        if (!active) return;
-        setDestination(!error && data.session ? "/home" : "/login");
-      })
-      .catch(() => {
+
+    const resolveDestination = async (): Promise<void> => {
+      try {
+        const { data, error } = await getSupabaseClient().auth.getSession();
+        if (active) {
+          setDestination(!error && data.session ? "/home" : "/login");
+        }
+      } catch {
         if (active) setDestination("/login");
-      });
+      }
+    };
+
+    void resolveDestination();
+
     return () => {
       active = false;
     };
