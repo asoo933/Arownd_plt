@@ -12,10 +12,11 @@ import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsse
 import { fetchMyMerchantStoreSettings, updateMyMerchantStoreSettings } from "@/lib/merchant-store-settings";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 import { translate, useLanguage } from "@/lib/i18n";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 export default function MerchantStoreSettingsScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -180,7 +181,7 @@ export default function MerchantStoreSettingsScreen() {
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
-              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}` : translate("merchantStoreChooseWilaya")}</UiText>
+              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language)}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
@@ -216,8 +217,8 @@ export default function MerchantStoreSettingsScreen() {
             </View>
             <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
               {(wilayas.data ?? []).map((wilaya) => (
-                <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + wilaya.name_ar} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
-                  <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}</UiText>
+                <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language)} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
+                  <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language)}</UiText>
                 </PressableSurface>
               ))}
             </ScrollView>
