@@ -116,8 +116,8 @@ export default function MerchantEntryScreen() {
         <View style={styles.headerActions}>
           <IconButton
             icon={<Icon name="settings" size={20} color={theme.colors.foreground} accessibilityHidden />}
-            accessibilityLabel={translate("merchantStoreSettingsTitle")}
-            onPress={() => router.push("/merchant/settings")}
+            accessibilityLabel={translate("settingsTitle")}
+            onPress={() => router.push("/settings")}
             variant="surface"
           />
         </View>
@@ -332,6 +332,7 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: designTokens.spacing.xl, paddingBottom: 36, gap: designTokens.spacing.lg },
+    headerActions: { flexDirection: "row", justifyContent: "flex-end" },
     entryContent: { flexGrow: 1, padding: designTokens.spacing.xl, gap: designTokens.spacing.xl },
     header: { alignItems: "flex-start", gap: designTokens.spacing.sm },
     backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
