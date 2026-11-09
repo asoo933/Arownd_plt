@@ -167,10 +167,10 @@ export default function CheckoutScreen() {
   }
 
   if (cart.isPending || auth.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
-  if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
+  if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching || auth.isFetching} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
   if (!cart.data.length) return <CustomerScreen>
     <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
-    <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
+    <EmptyState icon="shopping-cart" title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
     <Button label={translate("cartBrowse")} onPress={() => router.replace("/explore")} fullWidth />
   </CustomerScreen>;
 
@@ -342,7 +342,7 @@ export default function CheckoutScreen() {
         </View>;
       })}
       {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
-      {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
+      {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={offers.isFetching} onRetry={() => void offers.refetch()} /> : null}
       {hasBlockingItems ? <UiText style={styles.errorText}>{translate("checkoutFixCart")}</UiText> : null}
       <View style={styles.totalRow}>
         <UiText style={styles.totalLabel}>{translate("checkoutProductsTotal")}</UiText>
