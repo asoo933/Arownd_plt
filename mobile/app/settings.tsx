@@ -17,6 +17,7 @@ import {
   Icon,
   PressableSurface,
   SegmentedControl,
+  Surface,
   Text as UiText,
   TextField,
   type IconName
@@ -295,13 +296,13 @@ export default function SettingsScreen() {
 
       <BottomSheet visible={activeSheet === "language"} onRequestClose={closeSheet}>
         <Heading level={3}>{translate("settingsLanguageTitle")}</Heading>
-        <View style={styles.languageOption}>
+        <Surface elevated={false} padding={0} radius="md" style={styles.languageOption}>
           <UiText weight="700">{translate("settingsLanguageArabic")}</UiText>
           <Icon name="circle-check" size={19} color={theme.colors.success} />
-        </View>
-        <View style={styles.languageOption}>
+        </Surface>
+        <Surface elevated={false} padding={0} radius="md" style={styles.languageOption}>
           <UiText tone="muted">{translate("settingsLanguageEnglish")}</UiText>
-        </View>
+        </Surface>
         <Caption>{translate("settingsLanguageComingSoon")}</Caption>
       </BottomSheet>
 
@@ -357,7 +358,6 @@ function SettingsRow({
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {
-  const theme = useAppTheme();
   return (
     <View style={detailStyles.row}>
       <Caption>{label}</Caption>
@@ -430,7 +430,7 @@ function createStyles(theme: AppTheme) {
       justifyContent: "space-between"
     },
     languageOption: {
-      minHeight: 48,
+      minHeight: designTokens.dimensions.controlHeight.lg,
       flexDirection: "row-reverse",
       alignItems: "center",
       justifyContent: "space-between",
