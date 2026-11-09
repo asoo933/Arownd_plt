@@ -8,7 +8,7 @@ import { Button, RatingSelector, RatingStars, Text as UiText, TextField } from "
 import { fetchApprovedReviews, fetchMyReview, submitMyReview } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
-import { useAppTheme, type AppTheme } from "@/lib/theme";
+import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 export function ReviewPanel({ targetType, targetId }: { targetType: "product" | "store"; targetId: string }) {
   const theme = useAppTheme();
@@ -106,17 +106,17 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
-    panel: { borderWidth: 1, borderRadius: 18, padding: 14, gap: 10 },
-    heading: { fontSize: 17, fontWeight: "700", textAlign: "auto" },
-    subtitle: { fontSize: 11, textAlign: "auto" },
-    form: { gap: 10 },
-    input: { minHeight: 88, borderWidth: 1, borderRadius: 13, padding: 12, textAlignVertical: "top", fontSize: 13 },
-    error: { fontSize: 11, textAlign: "auto" },
-    ownReview: { borderRadius: 13, padding: 12, gap: 6 },
-    ownTitle: { fontSize: 13, fontWeight: "700", textAlign: "auto" },
-    body: { fontSize: 12, lineHeight: 20, textAlign: "auto" },
-    caption: { fontSize: 10 },
-    review: { borderTopWidth: 1, paddingTop: 10, gap: 6 },
+    panel: { borderWidth: 1, borderRadius: theme.radius.xl, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
+    heading: { fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.bold, textAlign: "auto" },
+    subtitle: { fontSize: theme.typography.caption, textAlign: "auto" },
+    form: { gap: designTokens.spacing.sm },
+    input: { minHeight: 88, borderWidth: 1, borderRadius: theme.radius.lg, padding: designTokens.spacing.md, textAlignVertical: "top", fontSize: theme.typography.body },
+    error: { fontSize: theme.typography.caption, textAlign: "auto" },
+    ownReview: { borderRadius: theme.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
+    ownTitle: { fontSize: theme.typography.body, fontWeight: theme.fontWeights.bold, textAlign: "auto" },
+    body: { fontSize: theme.typography.caption + 1, lineHeight: theme.typography.body + designTokens.spacing.sm, textAlign: "auto" },
+    caption: { fontSize: theme.typography.caption },
+    review: { borderTopWidth: 1, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
     reviewHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }
   });
 }
