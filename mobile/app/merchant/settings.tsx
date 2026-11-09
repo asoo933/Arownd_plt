@@ -281,7 +281,7 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
   maxLength?: number;
   placeholder?: string;
   disabled?: boolean;
-  error?: boolean;
+  error?: boolean | undefined;
 }) {
   const styles = createStyles(theme);
   return <View style={styles.field}>
