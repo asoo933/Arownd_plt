@@ -28,7 +28,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           styles.textInput,
           {
             backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.danger : theme.colors.border,
+            borderColor: error ? theme.colors.danger : theme.colors.inputBorder,
             color: theme.colors.foreground,
             fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
           },
@@ -63,7 +63,7 @@ export function QuantityStepper({
 }: QuantityStepperProps) {
   const theme = useAppTheme();
   const state = getQuantityStepState(value, min, max);
-  const buttonStyle = { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border };
+  const buttonStyle = { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder };
 
   return (
     <View style={styles.stepper} testID={testID}>
