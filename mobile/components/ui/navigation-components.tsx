@@ -105,7 +105,7 @@ export function BottomNavigation({
                 borderRadius: theme.radius.pill,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: selected ? theme.colors.border : "transparent"
+                backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : "transparent"
               }}
             >
               {item.icon}
@@ -113,7 +113,7 @@ export function BottomNavigation({
             <UiText
               numberOfLines={1}
               style={{
-                color: selected ? theme.colors.accentMuted : theme.colors.muted,
+                color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted,
                 fontSize: theme.typography.caption,
                 fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular,
                 flexShrink: 1
