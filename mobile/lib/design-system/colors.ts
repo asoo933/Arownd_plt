@@ -1,15 +1,15 @@
 export const brandColors = {
-  lime: "#C6F135",
-  limeDark: "#A8D522",
-  limeLight: "#E5F8A8",
-  black: "#0A0A0A",
+  primary: "#FFF01F",
+  primaryHover: "#F0E100",
+  primaryPressed: "#D9CC00",
+  black: "#000000",
   white: "#FFFFFF",
   light: "#F5F5F5"
 } as const;
 
 export const semanticColors = {
-  success: "#16A34A",
-  warning: "#D97706",
+  success: "#15803D",
+  warning: "#B45309",
   danger: "#DC2626",
   info: "#2563EB"
 } as const;
@@ -30,59 +30,67 @@ export const deliveryColors = {
 
 export const themeColors = {
   light: {
-    background: "#F5F5F5",
+    background: "#FFFFFF",
     surface: "#FFFFFF",
-    surfaceSecondary: "#EEEEEE",
+    surfaceSecondary: "#F5F5F5",
     surfaceTertiary: "#E5E5E5",
-    foreground: "#0A0A0A",
-    foregroundSecondary: "#525252",
-    foregroundMuted: "#6F6F6F",
+    foreground: "#000000",
+    foregroundSecondary: "#737373",
+    foregroundMuted: "#737373",
     border: "#E5E5E5",
-    input: "#F5F5F5"
+    input: "#F5F5F5",
+    inputBorder: "#8A8A8A"
   },
   dark: {
-    background: "#0A0A0A",
+    background: "#000000",
     surface: "#171717",
     surfaceSecondary: "#262626",
-    surfaceTertiary: "#333333",
-    foreground: "#F5F5F5",
-    foregroundSecondary: "#D4D4D4",
+    surfaceTertiary: "#262626",
+    foreground: "#FFFFFF",
+    foregroundSecondary: "#A3A3A3",
     foregroundMuted: "#A3A3A3",
-    border: "#333333",
-    input: "#171717"
+    border: "#262626",
+    input: "#262626",
+    inputBorder: "#525252"
   }
 } as const;
 
 export const extendedThemeColors = {
   light: {
-    surfaceMuted: "#ECEFE4",
-    subtle: "#6F6F6F",
-    accentMuted: "#5B7012",
-    danger: "#B42318",
-    dangerSurface: "#FEECEB",
-    dangerBorder: "#F7C8C4",
-    success: "#3F6212",
-    successSurface: "#F7FBEA",
-    successBorder: "#D7E9A1",
-    warning: "#8A5B00",
-    warningSurface: "#FFF7E0",
-    warningBorder: "#F0D99A",
-    placeholder: "#6F6F6F",
+    surfaceMuted: "#F5F5F5",
+    subtle: "#737373",
+    accentMuted: "#7A7000",
+    danger: "#DC2626",
+    dangerSurface: "#FEE2E2",
+    dangerBorder: "#FEE2E2",
+    success: "#15803D",
+    successSurface: "#DCFCE7",
+    successBorder: "#DCFCE7",
+    warning: "#B45309",
+    warningSurface: "#FEF3C7",
+    warningBorder: "#FEF3C7",
+    info: "#2563EB",
+    infoSurface: "#DBEAFE",
+    infoBorder: "#DBEAFE",
+    placeholder: "#737373",
     overlay: "rgba(0,0,0,0.42)"
   },
   dark: {
-    surfaceMuted: "#202020",
-    subtle: "#858585",
-    accentMuted: brandColors.lime,
-    danger: "#F97066",
-    dangerSurface: "#321A19",
-    dangerBorder: "#71312D",
-    success: "#B9E65A",
-    successSurface: "#1C2410",
-    successBorder: "#4B5C20",
+    surfaceMuted: "#171717",
+    subtle: "#A3A3A3",
+    accentMuted: brandColors.primary,
+    danger: "#F87171",
+    dangerSurface: "rgba(248,113,113,0.15)",
+    dangerBorder: "rgba(248,113,113,0.15)",
+    success: "#4ADE80",
+    successSurface: "rgba(74,222,128,0.15)",
+    successBorder: "rgba(74,222,128,0.15)",
     warning: "#FBBF24",
-    warningSurface: "#302510",
-    warningBorder: "#70551D",
+    warningSurface: "rgba(251,191,36,0.15)",
+    warningBorder: "rgba(251,191,36,0.15)",
+    info: "#60A5FA",
+    infoSurface: "rgba(96,165,250,0.15)",
+    infoBorder: "rgba(96,165,250,0.15)",
     placeholder: "#A3A3A3",
     overlay: "rgba(0,0,0,0.72)"
   }
