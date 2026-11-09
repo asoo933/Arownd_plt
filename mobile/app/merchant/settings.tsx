@@ -177,7 +177,7 @@ export default function MerchantStoreSettingsScreen() {
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
-          <Heading level={3}>{translate("merchantStoreSettingsName")}</Heading>
+          <Heading level={3}>{translate("merchantStoreDetailsTitle")}</Heading>
           <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} />
           <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
           <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
@@ -185,7 +185,7 @@ export default function MerchantStoreSettingsScreen() {
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
-          <Heading level={3}>{translate("merchantStoreWilayaLabel")}</Heading>
+          <Heading level={3}>{translate("merchantStoreLocationTitle")}</Heading>
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
@@ -197,7 +197,7 @@ export default function MerchantStoreSettingsScreen() {
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
-          <Heading level={3}>{translate("merchantStoreSettingsOpen")}</Heading>
+          <Heading level={3}>{translate("merchantStoreHoursTitle")}</Heading>
           <View style={styles.row}>
             <View style={styles.half}>
               <Field label={translate("merchantStoreSettingsOpen")} value={form.opening_hours.open} onChangeText={(value) => updateHours("open", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" />
@@ -221,7 +221,7 @@ export default function MerchantStoreSettingsScreen() {
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
-          <Heading level={3}>{translate("merchantStoreSettingsInstagram")}</Heading>
+          <Heading level={3}>{translate("merchantStoreSocialTitle")}</Heading>
           <Field label={translate("merchantStoreSettingsInstagram")} value={form.instagram_url} onChangeText={(value) => update("instagram_url", value)} theme={theme} keyboardType="url" />
           <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" />
         </Card>
@@ -297,7 +297,6 @@ function createStyles(theme: AppTheme) {
     footer: { paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.md, borderTopWidth: StyleSheet.hairlineWidth },
     backText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" },
-    card: { padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     select: { justifyContent: "center" },
     brandingRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
     brandingDetails: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.sm },
