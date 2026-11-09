@@ -151,7 +151,7 @@ export default function MerchantOnboardingScreen() {
     message ? translate(message as TranslationKey) : null;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -531,7 +531,7 @@ export default function MerchantOnboardingScreen() {
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
-    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <LoadingState label={label} />
       </View>
@@ -551,7 +551,7 @@ function MessageScreen({
   onAction: () => void;
 }) {
   return (
-    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
