@@ -30,6 +30,7 @@ import {
   groupMerchantCategories
 } from "@/lib/merchant-category-state";
 import { translate, useLanguage } from "@/lib/i18n";
+import { getLocalizedMerchantCategoryLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { BottomSheet, AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
@@ -56,7 +57,7 @@ const INITIAL_FORM: ProductForm = {
 };
 
 export default function MerchantNewProductScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -275,7 +276,7 @@ export default function MerchantNewProductScreen() {
               >
                 <UiText style={[styles.selectText, { color: selectedCategory ? theme.colors.foreground : theme.colors.placeholder }]}>
                   {selectedCategory
-                    ? `${selectedCategory.emoji} ${selectedCategory.label}`
+                    ? `${selectedCategory.emoji} ${getLocalizedMerchantCategoryLabel(selectedCategory.id, selectedCategory.label, language)}`
                     : translate("merchantProductCategoryPlaceholder")}
                 </UiText>
               </PressableSurface>
@@ -426,13 +427,14 @@ export default function MerchantNewProductScreen() {
                       <View style={styles.categoryGroupHeading}>
                         <UiText style={styles.categoryEmoji}>{group.parent.emoji}</UiText>
                         <UiText style={[styles.categoryGroupTitle, { color: theme.colors.foreground }]}>
-                          {group.parent.label}
+                          {getLocalizedMerchantCategoryLabel(group.parent.id, group.parent.label, language)}
                         </UiText>
                       </View>
                       {group.children.map((category) => (
                         <CategoryOption
                           key={category.id}
                           category={category}
+                          language={language}
                           nested
                           selected={form.category === category.id}
                           theme={theme}
@@ -446,6 +448,7 @@ export default function MerchantNewProductScreen() {
                   ) : (
                     <CategoryOption
                       category={group.parent}
+                      language={language}
                       selected={form.category === group.parent.id}
                       theme={theme}
                       onSelect={() => {
@@ -465,12 +468,14 @@ export default function MerchantNewProductScreen() {
 
 function CategoryOption({
   category,
+  language,
   nested = false,
   selected,
   theme,
   onSelect
 }: {
   category: MerchantCategory;
+  language: import("@/lib/i18n").Language;
   nested?: boolean;
   selected: boolean;
   theme: AppTheme;
@@ -481,7 +486,7 @@ function CategoryOption({
   return (
     <PressableSurface
       accessibilityRole="button"
-      accessibilityLabel={category.label}
+      accessibilityLabel={getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
       accessibilityState={{ selected }}
       onPress={onSelect}
       style={[
@@ -496,7 +501,7 @@ function CategoryOption({
       <View style={styles.categoryOptionContent}>
         <UiText style={styles.categoryEmojiSmall}>{category.emoji}</UiText>
         <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
-          {category.label}
+          {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
         </UiText>
       </View>
       {selected ? (
