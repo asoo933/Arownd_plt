@@ -23,12 +23,12 @@ export default function StoreDetailsScreen() {
   const store = useQuery({
     queryKey: ["customer-store", storeId],
     queryFn: () => fetchStoreDetails(storeId),
-    enabled: Boolean(storeId) && tab === "products"
+    enabled: Boolean(storeId)
   });
   const offers = useQuery({
     queryKey: ["customer-store-offers", storeId],
     queryFn: () => fetchStoreOffers(storeId),
-    enabled: Boolean(storeId)
+    enabled: Boolean(storeId) && tab === "products"
   });
 
   if (store.isPending) return <CustomerScreen>
