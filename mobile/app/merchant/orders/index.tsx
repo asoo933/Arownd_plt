@@ -17,7 +17,7 @@ import { translate, type Language, type TranslationKey, useLanguage } from "@/li
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, OrderCardSkeleton, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
 
 type OrderFilter = "all" | "pending" | "quoted" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -238,7 +238,9 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <LoadingState label={label} />
+        <View style={{ width: "100%", gap: designTokens.spacing.md }}>
+          {[0, 1, 2, 3].map((item) => <OrderCardSkeleton key={item} />)}
+        </View>
       </View>
     </SafeAreaView>
   );
