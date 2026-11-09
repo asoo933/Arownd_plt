@@ -193,7 +193,7 @@ export default function MerchantEntryScreen() {
         </View>
 
         {recentOrders.length === 0 ? (
-          <Card contentStyle={styles.emptyCard}>
+          <Card style={{ backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }} contentStyle={styles.emptyCard}>
             <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>
               {translate("merchantOrdersEmpty")}
             </UiText>
