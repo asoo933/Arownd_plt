@@ -26,6 +26,12 @@ describe("getButtonPalette", () => {
     });
   });
 
+  it("uses the accent for transparent secondary buttons in dark mode", () => {
+    const theme = getAppTheme("dark");
+    expect(getButtonPalette(theme, "outline").foregroundColor).toBe(theme.colors.accent);
+    expect(getButtonPalette(theme, "ghost").foregroundColor).toBe(theme.colors.accent);
+  });
+
   it("uses contrasting foregrounds for destructive actions in both themes", () => {
     const lightTheme = getAppTheme("light");
     const darkTheme = getAppTheme("dark");
