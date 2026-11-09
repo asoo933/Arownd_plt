@@ -10,6 +10,7 @@ import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/ord
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { formatOrderCode } from "@/lib/orders-state";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
 type OrderRow = {
@@ -143,7 +144,7 @@ export default function OrdersScreen() {
     />
     {filtered.length === 0 ? <EmptyState title={tab === "all" ? translate("ordersEmpty") : translate("ordersEmptyTab")} hint={translate("ordersEmptyHint")} /> : null}
     {filtered.map((row) => {
-      const orderCode = row.order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
+      const orderCode = formatOrderCode(row.order.id);
       const tone = getOrderStatusTone(row.status);
       const total = row.status === "cancelled" || row.status === "rejected" ? 0 : row.subtotal + row.shippingFee;
       return <OrderCard key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card} contentStyle={styles.cardContent}>
