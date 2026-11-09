@@ -90,6 +90,10 @@ export default function MerchantOrdersScreen() {
     ? dashboard.data.orders
     : dashboard.data.orders.filter((order) => order.status === filter);
 
+  const getFilterCount = (value: OrderFilter) => value === "all"
+    ? dashboard.data.orders.length
+    : dashboard.data.orders.filter((order) => order.status === value).length;
+
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -102,7 +106,12 @@ export default function MerchantOrdersScreen() {
 
         <FilterBar style={styles.filters}>
           {FILTERS.map((item) => (
-            <FilterChip key={item.value} label={translate(item.label)} selected={filter === item.value} onPress={() => setFilter(item.value)} />
+            <FilterChip
+              key={item.value}
+              label={`${translate(item.label)} (${formatNumber(getFilterCount(item.value))})`}
+              selected={filter === item.value}
+              onPress={() => setFilter(item.value)}
+            />
           ))}
         </FilterBar>
 
@@ -168,22 +177,34 @@ function OrderCard({ order, language, theme, onPress }: { order: MerchantDashboa
         {order.customerName || translate("merchantCustomerUnknown")}
       </UiText>
       <UiText style={[style.orderMeta, { color: theme.colors.muted }]} numberOfLines={2}>
-        {itemNames} · {formatNumber(order.totalQuantity)} {translate("merchantOrderQuantity")}
+        {itemNames}
+      </UiText>
+      <UiText style={[style.quantityText, { color: theme.colors.subtle }]}>
+        {formatNumber(order.totalQuantity)} {translate("merchantOrderQuantity")}
       </UiText>
       {location ? (
         <UiText style={[style.orderMeta, { color: theme.colors.muted }]}>{location}</UiText>
       ) : null}
       <View style={style.orderFooter}>
-        <PriceDisplay value={formatDZD(order.subtotal + order.shippingFee)} style={style.orderPrice} />
-        <UiText style={[style.deliveryType, { color: theme.colors.subtle }]}>
-          {order.deliveryType === "desk"
-            ? translate("checkoutStorePickup")
-            : translate("checkoutHomeDelivery")}
-        </UiText>
+        <View style={style.priceBlock}>
+          <UiText style={[style.metaLabel, { color: theme.colors.subtle }]}>{translate("merchantOrderTotal")}</UiText>
+          <PriceDisplay value={formatDZD(order.subtotal + order.shippingFee)} style={style.orderPrice} />
+        </View>
+        <View style={style.deliveryBlock}>
+          <UiText style={[style.metaLabel, { color: theme.colors.subtle }]}>{translate("merchantOrderDeliveryType")}</UiText>
+          <UiText style={[style.deliveryType, { color: theme.colors.foreground }]}>
+            {order.deliveryType === "desk"
+              ? translate("checkoutStorePickup")
+              : translate("checkoutHomeDelivery")}
+          </UiText>
+        </View>
       </View>
-      <UiText style={{ color: theme.colors.accentMuted, fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" }}>
-        {translate("merchantOrderDetailTitle")} ←
-      </UiText>
+      <View style={style.orderAction}>
+        <UiText style={{ color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" }}>
+          {translate("merchantOrderDetailTitle")}
+        </UiText>
+        <UiText style={{ color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold }}>←</UiText>
+      </View>
     </MerchantOrderCard>
   );
 }
@@ -264,10 +285,15 @@ function createStyles(theme: AppTheme) {
     orderHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
     orderCode: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     customerName: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    orderMeta: { fontSize: designTokens.typography.caption, textAlign: "auto", lineHeight: 17 },
-    orderFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
+    orderMeta: { fontSize: designTokens.typography.caption, textAlign: "auto", lineHeight: 18 },
+    quantityText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.semibold, textAlign: "auto" },
+    orderFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: designTokens.spacing.md, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
+    priceBlock: { gap: designTokens.spacing.xs, alignItems: "flex-start" },
+    deliveryBlock: { gap: designTokens.spacing.xs, alignItems: "flex-end" },
+    metaLabel: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.medium },
     orderPrice: { alignSelf: "flex-start" },
-    deliveryType: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.bold },
+    deliveryType: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold },
+    orderAction: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs, alignSelf: "flex-start", paddingTop: designTokens.spacing.xs },
     emptyCard: { padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-start" },
     emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     limitHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto", paddingHorizontal: 3 }
