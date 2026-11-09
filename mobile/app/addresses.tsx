@@ -22,7 +22,7 @@ import {
   TextField
 } from "@/components/ui";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
-import { translate } from "@/lib/i18n";
+import {  translate, useLanguage } from "@/lib/i18n";
 import {
   createMyAddress,
   deleteMyAddress,
@@ -38,6 +38,7 @@ type EditorState = { address: UserAddress | null } | null;
 type AddressLabel = UserAddressInput["label"];
 
 export default function AddressesScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -327,13 +328,13 @@ function createStyles(theme: AppTheme) {
       padding: designTokens.spacing.lg
     },
     cardHeader: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       gap: designTokens.spacing.sm
     },
     actions: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       flexWrap: "wrap",
       gap: designTokens.spacing.sm,
       marginTop: designTokens.spacing.xs,

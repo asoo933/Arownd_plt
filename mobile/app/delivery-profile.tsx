@@ -8,12 +8,13 @@ import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton,
 import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
-import { translate } from "@/lib/i18n";
+import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 type Picker = "wilaya" | "commune" | null;
 
 export default function DeliveryProfileScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -184,7 +185,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     borderRadius: theme.radius.xl,
     padding: 0
   },
-  label: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  label: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   input: {
     minHeight: designTokens.dimensions.controlHeight.lg,
     borderWidth: 1,
@@ -199,7 +200,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     paddingHorizontal: designTokens.spacing.md,
     justifyContent: "center"
   },
-  pickerText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
+  pickerText: { textAlign: "auto", fontSize: designTokens.typography.body - 1 },
   suggestionButton: {
     alignSelf: "flex-start",
     minHeight: designTokens.dimensions.controlHeight.md,
@@ -207,9 +208,9 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     justifyContent: "center"
   },
   suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-  error: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "right" },
-  success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
-  note: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" },
+  error: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "auto" },
+  success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
+  note: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
   disabled: { opacity: 0.5 },
   backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: designTokens.spacing.lg },
   modalPanel: {
@@ -218,7 +219,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     padding: designTokens.spacing.lg,
     gap: designTokens.spacing.md
   },
-  modalTitle: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  modalTitle: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   options: { maxHeight: 440 },
   option: {
     minHeight: 52,
@@ -227,7 +228,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border
   },
-  optionText: { textAlign: "right", fontSize: designTokens.typography.body - 1 },
+  optionText: { textAlign: "auto", fontSize: designTokens.typography.body - 1 },
   closeButton: {
     minHeight: designTokens.dimensions.controlHeight.md,
     justifyContent: "center",

@@ -6,11 +6,12 @@ import { designTokens } from "@/lib/theme";
 import { ActionButton, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
 import { Text as UiText } from "@/components/ui";
 import { getSupabaseClient } from "@/lib/supabase";
-import { translate } from "@/lib/i18n";
+import {  translate, useLanguage } from "@/lib/i18n";
 
 type CallbackState = "loading" | "success" | "error";
 
 export default function AuthCallbackScreen() {
+  useLanguage();
   const params = useLocalSearchParams<{ code?: string }>();
   const code = typeof params.code === "string" ? params.code : undefined;
   const [state, setState] = useState<CallbackState>("loading");

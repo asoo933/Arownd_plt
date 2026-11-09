@@ -3,10 +3,11 @@ import { StyleSheet, View } from "react-native";
 
 import { AuthLayout, ActionButton } from "@/components/auth-ui";
 import { Icon, PressableSurface, Text as UiText } from "@/components/ui";
-import { translate } from "@/lib/i18n";
+import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function AccountTypeScreen() {
+  useLanguage();
   const theme = useAppTheme();
 
   return (
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: designTokens.radius.lg,
     borderWidth: 1,
     padding: designTokens.spacing.lg,
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: designTokens.spacing.md
   },
@@ -73,6 +74,6 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   copy: { flex: 1, gap: designTokens.spacing.xs + 1 },
-  optionTitle: { fontSize: designTokens.typography.subtitle - 1, textAlign: "right" },
-  optionDescription: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" }
+  optionTitle: { fontSize: designTokens.typography.subtitle - 1, textAlign: "auto" },
+  optionDescription: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" }
 });
