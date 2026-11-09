@@ -32,7 +32,7 @@ export function Card({
     <Surface
       elevated={false}
       style={[
-        { overflow: "hidden", borderRadius: theme.radius.xl, padding: 0 },
+        { overflow: "hidden", borderRadius: theme.radius.xl, padding: 0, backgroundColor: theme.colors.surfaceSecondary },
         style
       ]}
     >
@@ -116,7 +116,7 @@ export function CategorySelectorTile({
         width: 112,
         minHeight: 88,
         borderRadius: theme.radius.lg,
-        backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface,
+        backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary,
         alignItems: "center",
         justifyContent: "center",
         gap: designTokens.spacing.sm,
