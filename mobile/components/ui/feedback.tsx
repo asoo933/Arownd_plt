@@ -27,10 +27,10 @@ export function Alert({
 }) {
   const theme = useAppTheme();
   const palette = {
-    info: { foreground: theme.colors.accentMuted, background: theme.colors.surfaceMuted, border: theme.colors.border },
-    success: { foreground: theme.colors.success, background: theme.colors.successSurface, border: theme.colors.successBorder },
-    warning: { foreground: theme.colors.warning, background: theme.colors.warningSurface, border: theme.colors.warningBorder },
-    danger: { foreground: theme.colors.danger, background: theme.colors.dangerSurface, border: theme.colors.dangerBorder }
+    info: { foreground: theme.colors.infoText, background: theme.colors.infoSurface, border: theme.colors.infoBorder },
+    success: { foreground: theme.colors.successText, background: theme.colors.successSurface, border: theme.colors.successBorder },
+    warning: { foreground: theme.colors.warningText, background: theme.colors.warningSurface, border: theme.colors.warningBorder },
+    danger: { foreground: theme.colors.dangerText, background: theme.colors.dangerSurface, border: theme.colors.dangerBorder }
   } satisfies Record<FeedbackTone, { foreground: string; background: string; border: string }>;
   const colors = palette[tone];
 
