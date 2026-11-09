@@ -237,7 +237,7 @@ function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
-      <View style={stylesForScreen.center}>
+      <View accessible accessibilityLabel={label} style={stylesForScreen.center}>
         <View style={{ width: "100%", gap: designTokens.spacing.md }}>
           {[0, 1, 2, 3].map((item) => <OrderCardSkeleton key={item} />)}
         </View>
