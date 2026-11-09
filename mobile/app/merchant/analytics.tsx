@@ -8,7 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, ChartCard, ErrorState, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, ChartCard, ErrorState, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const { language } = useLanguage();
@@ -27,36 +27,41 @@ export default function MerchantAnalyticsScreen() {
   if (access.isPending || (ready && analytics.isPending)) {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
   }
-  if (access.isError || analytics.isError) {
-    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} onAction={() => { void access.refetch(); void analytics.refetch(); }} />;
+  if (access.isError) {
+    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} onAction={() => void access.refetch()} />;
+  }
+  if (analytics.isError) {
+    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} onAction={() => void analytics.refetch()} />;
   }
   if (!access.data) return <Redirect href="/login" />;
   if (!ready || !analytics.data) return <Redirect href="/merchant" />;
 
   const data = analytics.data;
   const maxDaily = Math.max(1, ...data.daily_delivered.map((item) => item.amount));
-  const cards: { label: string; value: string; tone: "default" | "success" | "warning" | "danger" | "accent" }[] = [
-    { label: translate("merchantAnalyticsOrders"), value: formatNumber(data.orders_total), tone: "default" },
-    { label: translate("merchantAnalyticsDelivered"), value: formatNumber(data.delivered_orders), tone: "success" },
-    { label: translate("merchantAnalyticsActive"), value: formatNumber(data.active_orders), tone: "warning" },
-    { label: translate("merchantAnalyticsCancelled"), value: formatNumber(data.cancelled_orders), tone: "danger" },
-    { label: translate("merchantAnalyticsRevenue"), value: formatDZD(data.delivered_revenue), tone: "accent" },
-    { label: translate("merchantAnalyticsAverage"), value: formatDZD(data.average_delivered_order), tone: "default" },
-    { label: translate("merchantAnalyticsProducts"), value: formatNumber(data.product_count), tone: "default" },
-    { label: translate("merchantAnalyticsLowStock"), value: formatNumber(data.low_stock_count), tone: "warning" },
-    { label: translate("merchantAnalyticsOutOfStock"), value: formatNumber(data.out_of_stock_count), tone: "danger" },
+  const orderCards = [
+    { label: translate("merchantAnalyticsOrders"), value: formatNumber(data.orders_total), tone: "default" as const },
+    { label: translate("merchantAnalyticsDelivered"), value: formatNumber(data.delivered_orders), tone: "success" as const },
+    { label: translate("merchantAnalyticsActive"), value: formatNumber(data.active_orders), tone: "warning" as const },
+    { label: translate("merchantAnalyticsCancelled"), value: formatNumber(data.cancelled_orders), tone: "danger" as const }
+  ];
+  const inventoryCards = [
+    { label: translate("merchantAnalyticsProducts"), value: formatNumber(data.product_count), tone: "default" as const },
+    { label: translate("merchantAnalyticsLowStock"), value: formatNumber(data.low_stock_count), tone: "warning" as const },
+    { label: translate("merchantAnalyticsOutOfStock"), value: formatNumber(data.out_of_stock_count), tone: "danger" as const }
   ];
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AppHeader
           title={translate("merchantAnalyticsTitle")}
           leading={<Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />}
         />
         <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantAnalyticsSubtitle")}</UiText>
+
+        <SectionHeading theme={theme} title={translate("merchantAnalyticsOrders")} />
         <View style={styles.grid}>
-          {cards.map((card) => (
+          {orderCards.map((card) => (
             <MerchantMetricCard
               key={card.label}
               label={card.label}
@@ -66,8 +71,25 @@ export default function MerchantAnalyticsScreen() {
             />
           ))}
         </View>
+
+        <SectionHeading theme={theme} title={translate("merchantAnalyticsRevenue")} />
+        <Card style={styles.revenueCard} contentStyle={styles.revenueContent}>
+          <MerchantMetricCard
+            label={translate("merchantAnalyticsRevenue")}
+            value={formatDZD(data.delivered_revenue)}
+            valueTone="accent"
+            style={styles.revenueMetric}
+          />
+          <View style={[styles.metricDivider, { backgroundColor: theme.colors.border }]} />
+          <MerchantMetricCard
+            label={translate("merchantAnalyticsAverage")}
+            value={formatDZD(data.average_delivered_order)}
+            style={styles.revenueMetric}
+          />
+        </Card>
+
+        <SectionHeading theme={theme} title={translate("merchantAnalyticsLastSevenDays")} />
         <ChartCard style={styles.chartCard}>
-          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantAnalyticsLastSevenDays")}</UiText>
           {data.daily_delivered.every((item) => item.amount === 0) ? (
             <UiText style={[styles.empty, { color: theme.colors.muted }]}>{translate("merchantAnalyticsNoSales")}</UiText>
           ) : data.daily_delivered.map((item) => (
@@ -80,9 +102,30 @@ export default function MerchantAnalyticsScreen() {
             </View>
           ))}
         </ChartCard>
+
+        <SectionHeading theme={theme} title={translate("merchantAnalyticsProducts")} />
+        <View style={styles.inventoryGrid}>
+          {inventoryCards.map((card) => (
+            <MerchantMetricCard
+              key={card.label}
+              label={card.label}
+              value={card.value}
+              valueTone={card.tone}
+              style={styles.metricCard}
+            />
+          ))}
+        </View>
         <UiText style={[styles.note, { color: theme.colors.muted }]}>{translate("merchantAnalyticsRevenueNote")}</UiText>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function SectionHeading({ theme, title }: { theme: AppTheme; title: string }) {
+  return (
+    <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" }}>
+      {title}
+    </UiText>
   );
 }
 
@@ -108,16 +151,20 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.md },
+    content: { padding: designTokens.spacing.xl, paddingBottom: 36, gap: designTokens.spacing.lg },
     subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" },
     grid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
-    metricCard: { width: "48%", flexGrow: 1, minHeight: 88 },
-    chartCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
-    sectionTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    inventoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
+    metricCard: { width: "48%", flexGrow: 1, minHeight: 96 },
+    revenueCard: { borderWidth: 1, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface },
+    revenueContent: { flexDirection: "row", alignItems: "stretch", gap: designTokens.spacing.md },
+    revenueMetric: { flex: 1, minWidth: 0, padding: designTokens.spacing.sm, gap: designTokens.spacing.xs },
+    metricDivider: { width: StyleSheet.hairlineWidth, alignSelf: "stretch" },
+    chartCard: { gap: designTokens.spacing.md },
     dayRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
     dayLabel: { width: 48, fontSize: designTokens.typography.caption - 1, textAlign: "auto" },
-    track: { flex: 1, height: 9, borderRadius: 6, overflow: "hidden" },
-    bar: { height: 9, borderRadius: 6 },
+    track: { flex: 1, height: 9, borderRadius: theme.radius.pill, overflow: "hidden" },
+    bar: { height: 9, borderRadius: theme.radius.pill },
     amount: { width: 90, fontSize: designTokens.typography.caption - 2, textAlign: "auto" },
     empty: { textAlign: "center", fontSize: designTokens.typography.caption, paddingVertical: designTokens.spacing.md },
     note: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "auto" },
