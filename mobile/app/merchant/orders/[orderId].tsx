@@ -374,9 +374,6 @@ function createStyles(theme: AppTheme) {
     totalRow: { minHeight: 38, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, paddingTop: designTokens.spacing.sm },
     valueText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     fieldLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body },
-    dangerButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, alignItems: "center", justifyContent: "center" },
-    dangerButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
-    disabled: { opacity: 0.5 }
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body }
   });
 }
