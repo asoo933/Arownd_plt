@@ -203,7 +203,7 @@ export default function MerchantOrderDetailsScreen() {
                 placeholder={translate("merchantQuoteShippingPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 style={[styles.input, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border, color: theme.colors.foreground }]}
-                textAlign="right"
+                textAlign="auto"
               />
             )}
             <Button label={translate("merchantQuoteSend")} onPress={sendQuote} loading={quoteMutation.isPending} fullWidth />
