@@ -1542,3 +1542,7 @@ export function useLanguage(): LanguageContextValue {
 export function translate(key: TranslationKey, language: Language = activeLanguage): string {
   return messages[language][key];
 }
+
+export function getCurrentLanguage(): Language {
+  return activeLanguage;
+}
