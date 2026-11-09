@@ -721,7 +721,7 @@ function createStyles(theme: AppTheme) {
     field: { gap: designTokens.spacing.xs },
     optionsSection: { gap: designTokens.spacing.md, paddingTop: 2 },
     label: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    input: { minHeight: 47, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, textAlign: "auto", fontSize: designTokens.typography.body - 1 },
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, textAlign: "auto", fontSize: designTokens.typography.body - 1 },
     hint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
     note: { borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
     noteText: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "auto" },
