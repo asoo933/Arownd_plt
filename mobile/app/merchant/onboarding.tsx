@@ -343,7 +343,7 @@ export default function MerchantOnboardingScreen() {
             </UiText>
 
             {mainCategories.length === 0 ? (
-              <UiText style={[styles.errorText, { color: theme.colors.danger }]}>
+              <UiText style={[styles.errorText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>
                 {translate("merchantNoCategories")}
               </UiText>
             ) : (
@@ -362,7 +362,7 @@ export default function MerchantOnboardingScreen() {
                       styles.categoryOption,
                       {
                         borderColor: categoryId === category.id ? theme.colors.accentMuted : theme.colors.border,
-                        backgroundColor: categoryId === category.id ? theme.colors.successSurface : theme.colors.surfaceMuted
+                        backgroundColor: categoryId === category.id ? (theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface) : theme.colors.surfaceMuted
                       }
                     ]}
                   >
@@ -374,7 +374,7 @@ export default function MerchantOnboardingScreen() {
               </View>
             )}
             {fieldError(errors.category?.message) ? (
-              <UiText style={[styles.errorText, { color: theme.colors.danger }]}>
+              <UiText style={[styles.errorText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>
                 {fieldError(errors.category?.message)}
               </UiText>
             ) : null}
@@ -408,7 +408,7 @@ export default function MerchantOnboardingScreen() {
                             styles.chip,
                             {
                               borderColor: selected ? theme.colors.accentMuted : theme.colors.border,
-                              backgroundColor: selected ? theme.colors.successSurface : theme.colors.surfaceMuted
+                              backgroundColor: selected ? (theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface) : theme.colors.surfaceMuted
                             }
                           ]}
                         >
@@ -486,7 +486,7 @@ export default function MerchantOnboardingScreen() {
 
           {submitError ? (
             <View style={[styles.submitError, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-              <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{submitError}</UiText>
+              <UiText style={[styles.errorText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{submitError}</UiText>
             </View>
           ) : null}
 
@@ -583,7 +583,7 @@ function FormField({
       <UiText style={[stylesForScreen.fieldLabel, { color: theme.colors.muted }]}>{label}</UiText>
       {children}
       {hint ? <UiText style={[stylesForScreen.hint, { color: theme.colors.muted }]}>{hint}</UiText> : null}
-      {error ? <UiText style={[stylesForScreen.error, { color: theme.colors.danger }]}>{error}</UiText> : null}
+      {error ? <UiText style={[stylesForScreen.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{error}</UiText> : null}
     </View>
   );
 }
