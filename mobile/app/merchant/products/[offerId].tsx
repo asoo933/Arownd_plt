@@ -338,6 +338,94 @@ export default function MerchantEditProductScreen() {
           <AppHeader title={translate("merchantProductEditTitle")} leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />} />
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</UiText>
 
+                    <Card contentStyle={styles.card}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitles}>
+                <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductImagesManageTitle")}
+                </UiText>
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
+                  {translate("merchantProductImagesManageHint")}
+                </UiText>
+              </View>
+              <UiText style={[styles.imageCount, { color: theme.colors.accentMuted }]}>
+                {offer.images.length}/{PRODUCT_IMAGE_MAX_COUNT}
+              </UiText>
+            </View>
+
+            <View style={styles.imageGrid}>
+              {offer.images.map((image) => (
+                <View key={image.id} style={styles.imageItem}>
+                  <PressableSurface
+                    accessibilityRole="button"
+                    accessibilityLabel={translate("merchantProductImagesLabel")}
+                    accessibilityState={{ selected: image.is_primary }}
+                    disabled={isBusy}
+                    onPress={() => setPreviewImage({ uri: image.image_url })}
+                    style={[styles.imagePreviewPressable, { opacity: isBusy ? 0.65 : 1 }]}
+                  >
+                    <UiImage
+                      uri={image.image_url}
+                      accessibilityLabel={translate("merchantProductImagesLabel")}
+                      aspectRatio={1}
+                      style={styles.imagePreview}
+                    />
+                  </PressableSurface>
+                  {image.is_primary ? (
+                    <View style={[styles.primaryBadge, { backgroundColor: theme.colors.accent }]}>
+                      <UiText style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
+                        {translate("merchantProductImagePrimary")}
+                      </UiText>
+                    </View>
+                  ) : null}
+                  <PressableSurface
+                    accessibilityRole="button"
+                    accessibilityLabel={translate("merchantProductImageRemove")}
+                    disabled={isBusy}
+                    onPress={() => setPendingRemoval(image)}
+                    style={[styles.imageRemove, { backgroundColor: theme.colors.danger, opacity: isBusy ? 0.55 : 1 }]}
+                    hitSlop={8}
+                  >
+                    {removingImageId === image.id ? (
+                      <Spinner color={designTokens.brand.white} size="small" />
+                    ) : (
+                      <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
+                    )}
+                  </PressableSurface>
+                </View>
+              ))}
+
+              {offer.images.length < PRODUCT_IMAGE_MAX_COUNT ? (
+                <PressableSurface
+                  accessibilityRole="button"
+                  accessibilityLabel={translate("merchantProductImageAdd")}
+                  accessibilityState={{ disabled: isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT, busy: imageBusy }}
+                  disabled={isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT}
+                  onPress={() => void chooseAndUploadImage()}
+                  style={[
+                    styles.imageAddItem,
+                    {
+                      borderColor: theme.colors.border,
+                      backgroundColor: theme.colors.surfaceMuted,
+                      opacity: isBusy ? 0.55 : 1
+                    }
+                  ]}
+                >
+                  {imageBusy ? (
+                    <Spinner size="small" />
+                  ) : (
+                    <>
+                      <Icon name="plus" size={22} color={theme.colors.accentMuted} accessibilityHidden />
+                      <UiText style={[styles.imageAddText, { color: theme.colors.accentMuted }]}>
+                        {translate("merchantProductImageAdd")}
+                      </UiText>
+                    </>
+                  )}
+                </PressableSurface>
+              ) : null}
+            </View>
+          </Card>
+
           <Card contentStyle={styles.card}>
             <View style={styles.productHeading}>
               <UiText style={[styles.productName, { color: theme.colors.foreground }]}>{offer.product.name}</UiText>
@@ -491,93 +579,7 @@ export default function MerchantEditProductScreen() {
             <Button label={translate("merchantProductEditSave")} onPress={() => void saveOffer()} loading={saving} disabled={isBusy && !saving} fullWidth />
           </Card>
 
-          <Card contentStyle={styles.card}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitles}>
-                <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductImagesManageTitle")}
-                </UiText>
-                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
-                  {translate("merchantProductImagesManageHint")}
-                </UiText>
-              </View>
-              <UiText style={[styles.imageCount, { color: theme.colors.accentMuted }]}>
-                {offer.images.length}/{PRODUCT_IMAGE_MAX_COUNT}
-              </UiText>
-            </View>
 
-            <View style={styles.imageGrid}>
-              {offer.images.map((image) => (
-                <View key={image.id} style={styles.imageItem}>
-                  <PressableSurface
-                    accessibilityRole="button"
-                    accessibilityLabel={translate("merchantProductImagesLabel")}
-                    accessibilityState={{ selected: image.is_primary }}
-                    disabled={isBusy}
-                    onPress={() => setPreviewImage({ uri: image.image_url })}
-                    style={[styles.imagePreviewPressable, { opacity: isBusy ? 0.65 : 1 }]}
-                  >
-                    <UiImage
-                      uri={image.image_url}
-                      accessibilityLabel={translate("merchantProductImagesLabel")}
-                      aspectRatio={1}
-                      style={styles.imagePreview}
-                    />
-                  </PressableSurface>
-                  {image.is_primary ? (
-                    <View style={[styles.primaryBadge, { backgroundColor: theme.colors.accent }]}>
-                      <UiText style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
-                        {translate("merchantProductImagePrimary")}
-                      </UiText>
-                    </View>
-                  ) : null}
-                  <PressableSurface
-                    accessibilityRole="button"
-                    accessibilityLabel={translate("merchantProductImageRemove")}
-                    disabled={isBusy}
-                    onPress={() => setPendingRemoval(image)}
-                    style={[styles.imageRemove, { backgroundColor: theme.colors.danger, opacity: isBusy ? 0.55 : 1 }]}
-                    hitSlop={8}
-                  >
-                    {removingImageId === image.id ? (
-                      <Spinner color={designTokens.brand.white} size="small" />
-                    ) : (
-                      <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
-                    )}
-                  </PressableSurface>
-                </View>
-              ))}
-
-              {offer.images.length < PRODUCT_IMAGE_MAX_COUNT ? (
-                <PressableSurface
-                  accessibilityRole="button"
-                  accessibilityLabel={translate("merchantProductImageAdd")}
-                  accessibilityState={{ disabled: isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT, busy: imageBusy }}
-                  disabled={isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT}
-                  onPress={() => void chooseAndUploadImage()}
-                  style={[
-                    styles.imageAddItem,
-                    {
-                      borderColor: theme.colors.border,
-                      backgroundColor: theme.colors.surfaceMuted,
-                      opacity: isBusy ? 0.55 : 1
-                    }
-                  ]}
-                >
-                  {imageBusy ? (
-                    <Spinner size="small" />
-                  ) : (
-                    <>
-                      <Icon name="plus" size={22} color={theme.colors.accentMuted} accessibilityHidden />
-                      <UiText style={[styles.imageAddText, { color: theme.colors.accentMuted }]}>
-                        {translate("merchantProductImageAdd")}
-                      </UiText>
-                    </>
-                  )}
-                </PressableSurface>
-              ) : null}
-            </View>
-          </Card>
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
               <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
