@@ -1,11 +1,13 @@
 import {
   Text as NativeText,
+  StyleSheet,
   type StyleProp,
   type TextProps,
   type TextStyle
 } from "react-native";
 
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { useLanguage } from "@/lib/i18n";
 
 type ThemeTone = keyof Pick<AppTheme["colors"], "foreground" | "muted" | "subtle" | "accentMuted" | "success" | "warning" | "danger">;
 
@@ -21,12 +23,17 @@ export function Text({
   children,
   tone = "foreground",
   weight,
-  align = "right",
+  align = "auto",
   fontFamily,
   style,
   ...props
 }: TextComponentProps) {
   const theme = useAppTheme();
+  const { language } = useLanguage();
+  const flattenedStyle = StyleSheet.flatten(style);
+  const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
+    ? { ...flattenedStyle, textAlign: "left" as const }
+    : style;
 
   return (
     <NativeText
@@ -36,11 +43,11 @@ export function Text({
           color: theme.colors[tone],
           fontSize: theme.typography.body,
           fontWeight: weight ?? theme.fontWeights.regular,
-          fontFamily: fontFamily ?? theme.fontFamilies.arabic,
+          fontFamily: fontFamily ?? (language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin),
           textAlign: align,
           includeFontPadding: false
         },
-        style
+        resolvedStyle
       ]}
     >
       {children}
@@ -103,6 +110,11 @@ export function PriceText({
   ...props
 }: TextComponentProps & { value: string; previousValue?: string }) {
   const theme = useAppTheme();
+  const { language } = useLanguage();
+  const flattenedStyle = StyleSheet.flatten(style);
+  const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
+    ? { ...flattenedStyle, textAlign: "left" as const }
+    : style;
 
   return (
     <NativeText
@@ -117,7 +129,7 @@ export function PriceText({
           textAlign: align,
           includeFontPadding: false
         },
-        style
+        resolvedStyle
       ]}
     >
       {value}
@@ -147,6 +159,11 @@ export function BadgeText({
   ...props
 }: Omit<TextComponentProps, "tone"> & { tone?: "accent" | "success" | "warning" | "danger" }) {
   const theme = useAppTheme();
+  const { language } = useLanguage();
+  const flattenedStyle = StyleSheet.flatten(style);
+  const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
+    ? { ...flattenedStyle, textAlign: "left" as const }
+    : style;
   const colors = {
     accent: { backgroundColor: theme.colors.accent, color: theme.colors.accentForeground },
     success: { backgroundColor: theme.colors.successSurface, color: theme.colors.success },
@@ -169,11 +186,11 @@ export function BadgeText({
           color: palette.color,
           fontSize: theme.typography.caption,
           fontWeight: weight ?? theme.fontWeights.bold,
-          fontFamily: fontFamily ?? theme.fontFamilies.arabic,
+          fontFamily: fontFamily ?? (language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin),
           textAlign: align,
           includeFontPadding: false
         },
-        style
+        resolvedStyle
       ]}
     >
       {children}

@@ -22,7 +22,7 @@ import {
   TextField,
   type IconName
 } from "@/components/ui";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
@@ -35,8 +35,10 @@ export default function SettingsScreen() {
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
   const { mode: themeMode, setMode: setThemeMode } = useThemePreference();
+  const { language, setLanguage } = useLanguage();
   const [activeSheet, setActiveSheet] = useState<SettingsSheet>(null);
   const [appearanceError, setAppearanceError] = useState(false);
+  const [languageError, setLanguageError] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
@@ -301,14 +303,32 @@ export default function SettingsScreen() {
 
       <BottomSheet visible={activeSheet === "language"} onRequestClose={closeSheet}>
         <Heading level={3}>{translate("settingsLanguageTitle")}</Heading>
-        <Surface elevated={false} padding={0} radius="md" style={styles.languageOption}>
-          <UiText weight="700">{translate("settingsLanguageArabic")}</UiText>
-          <Icon name="circle-check" size={19} color={theme.colors.success} />
-        </Surface>
-        <Surface elevated={false} padding={0} radius="md" style={styles.languageOption}>
-          <UiText tone="muted">{translate("settingsLanguageEnglish")}</UiText>
-        </Surface>
+        <PressableSurface
+          accessibilityRole="button"
+          accessibilityState={{ selected: language === "ar" }}
+          onPress={() => {
+            setLanguageError(false);
+            void setLanguage("ar").catch(() => setLanguageError(true));
+          }}
+          style={styles.languageOption}
+        >
+          <UiText weight={language === "ar" ? "700" : "500"}>{translate("settingsLanguageArabic")}</UiText>
+          {language === "ar" ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
+        </PressableSurface>
+        <PressableSurface
+          accessibilityRole="button"
+          accessibilityState={{ selected: language === "en" }}
+          onPress={() => {
+            setLanguageError(false);
+            void setLanguage("en").catch(() => setLanguageError(true));
+          }}
+          style={styles.languageOption}
+        >
+          <UiText weight={language === "en" ? "700" : "500"}>{translate("settingsLanguageEnglish")}</UiText>
+          {language === "en" ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
+        </PressableSurface>
         <Caption>{translate("settingsLanguageComingSoon")}</Caption>
+        {languageError ? <UiText tone="danger">{translate("settingsLanguageSaveError")}</UiText> : null}
       </BottomSheet>
 
       <ConfirmDialog

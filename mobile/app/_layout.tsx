@@ -16,18 +16,22 @@ import {
   IBMPlexSansArabic_700Bold
 } from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Alert } from "react-native";
 import { useEffect, useState } from "react";
 
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
+import { LanguageProvider, translate, useLanguage } from "@/lib/i18n";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootLayoutContent />
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <RootLayoutContent />
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }
 
@@ -66,6 +70,7 @@ function RootLayoutContent() {
       })
   );
   const theme = useAppTheme();
+  const { language, isReady: languageReady, restartNoticeVersion } = useLanguage();
   const { isReady: themeReady } = useThemePreference();
 
   useEffect(() => {
@@ -73,6 +78,12 @@ function RootLayoutContent() {
       void SplashScreen.hideAsync().catch(() => undefined);
     }
   }, [fontError, fontsLoaded, themeReady]);
+
+  useEffect(() => {
+    if (restartNoticeVersion > 0) {
+      Alert.alert(translate("settingsLanguageRestartTitle"), translate("settingsLanguageRestartMessage"));
+    }
+  }, [restartNoticeVersion]);
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
@@ -92,7 +103,7 @@ function RootLayoutContent() {
     return () => unsubscribe?.();
   }, [queryClient]);
 
-  if ((!fontsLoaded && !fontError) || !themeReady) return null;
+  if ((!fontsLoaded && !fontError) || !themeReady || !languageReady) return null;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -100,7 +111,7 @@ function RootLayoutContent() {
       <Stack
         screenOptions={{
           headerShown: false,
-          animation: "slide_from_right",
+          animation: language === "ar" ? "slide_from_left" : "slide_from_right",
           contentStyle: { backgroundColor: theme.colors.background }
         }}
       />

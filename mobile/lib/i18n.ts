@@ -1,3 +1,10 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import { I18nManager } from "react-native";
+
+const LANGUAGE_STORAGE_KEY = "arownd:app-language";
+let activeLanguage: Language = "ar";
+
 export const messages = {
   ar: {
     appName: "Arownd",
@@ -332,7 +339,10 @@ export const messages = {
     settingsLanguageTitle: "تغيير اللغة",
     settingsLanguageArabic: "العربية",
     settingsLanguageEnglish: "الإنجليزية",
-    settingsLanguageComingSoon: "تغيير اللغة غير مفعّل حالياً.",
+    settingsLanguageComingSoon: "سيُطبّق اتجاه الواجهة بالكامل بعد إعادة فتح التطبيق.",
+    settingsLanguageRestartTitle: "يلزم إعادة فتح التطبيق",
+    settingsLanguageRestartMessage: "حُفظت اللغة الجديدة. أغلق Arownd وافتحه مجددًا لتطبيق اتجاه الواجهة بالكامل.",
+    settingsLanguageSaveError: "تعذر حفظ اللغة. حاول مجددًا.",
     settingsAppearanceTitle: "المظهر",
     settingsAppearanceHint: "تخصيص مظهر التطبيق.",
     settingsThemeSystem: "تلقائي",
@@ -1054,7 +1064,10 @@ export const messages = {
     settingsLanguageTitle: "Change language",
     settingsLanguageArabic: "Arabic",
     settingsLanguageEnglish: "English",
-    settingsLanguageComingSoon: "Language switching is not enabled yet.",
+    settingsLanguageComingSoon: "The full layout direction will apply after reopening the app.",
+    settingsLanguageRestartTitle: "Restart the app",
+    settingsLanguageRestartMessage: "Your new language has been saved. Close and reopen Arownd to apply the layout direction throughout the app.",
+    settingsLanguageSaveError: "Could not save the language. Please try again.",
     settingsAppearanceTitle: "Appearance",
     settingsAppearanceHint: "Customize the app appearance.",
     settingsThemeSystem: "System",
@@ -1448,6 +1461,79 @@ export const messages = {
 export type Language = keyof typeof messages;
 export type TranslationKey = keyof typeof messages.ar;
 
-export function translate(key: TranslationKey, language: Language = "ar"): string {
+type LanguageContextValue = {
+  language: Language;
+  isReady: boolean;
+  restartNoticeVersion: number;
+  setLanguage: (language: Language) => Promise<void>;
+};
+
+const LanguageContext = createContext<LanguageContextValue | null>(null);
+
+function isLanguage(value: string | null): value is Language {
+  return value === "ar" || value === "en";
+}
+
+export function LanguageProvider({ children }: PropsWithChildren) {
+  const [language, setLanguageState] = useState<Language>("ar");
+  const [isReady, setIsReady] = useState(false);
+  const [restartNoticeVersion, setRestartNoticeVersion] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    void AsyncStorage.getItem(LANGUAGE_STORAGE_KEY)
+      .then((storedValue) => {
+        if (!mounted) return;
+        const nextLanguage = isLanguage(storedValue) ? storedValue : "ar";
+        activeLanguage = nextLanguage;
+        setLanguageState(nextLanguage);
+        I18nManager.allowRTL(true);
+        if (I18nManager.isRTL !== (nextLanguage === "ar")) {
+          I18nManager.forceRTL(nextLanguage === "ar");
+          setRestartNoticeVersion(1);
+        }
+      })
+      .catch(() => {
+        if (!mounted) return;
+        activeLanguage = "ar";
+        I18nManager.allowRTL(true);
+        if (!I18nManager.isRTL) {
+          I18nManager.forceRTL(true);
+          setRestartNoticeVersion(1);
+        }
+      })
+      .finally(() => {
+        if (mounted) setIsReady(true);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const setLanguage = useCallback(async (nextLanguage: Language) => {
+    if (nextLanguage === language) return;
+    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
+    activeLanguage = nextLanguage;
+    setLanguageState(nextLanguage);
+    I18nManager.allowRTL(true);
+    I18nManager.forceRTL(nextLanguage === "ar");
+    setRestartNoticeVersion((version) => version + 1);
+  }, [language]);
+
+  const value = useMemo(
+    () => ({ language, isReady, restartNoticeVersion, setLanguage }),
+    [language, isReady, restartNoticeVersion, setLanguage]
+  );
+
+  return createElement(LanguageContext.Provider, { value }, children);
+}
+
+export function useLanguage(): LanguageContextValue {
+  const context = useContext(LanguageContext);
+  if (!context) throw new Error("useLanguage must be used within LanguageProvider");
+  return context;
+}
+
+export function translate(key: TranslationKey, language: Language = activeLanguage): string {
   return messages[language][key];
 }
