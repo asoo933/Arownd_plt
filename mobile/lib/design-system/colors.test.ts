@@ -63,6 +63,10 @@ describe("design system text contrast", () => {
     }
   });
 
+  it("keeps dark input borders distinguishable from their surface", () => {
+    expect(contrastRatio(themeColors.dark.inputBorder, themeColors.dark.input)).toBeGreaterThanOrEqual(3);
+  });
+
   it("uses mode-specific focus colors", () => {
     expect(getAppTheme("light").colors.focus).toBe("#000000");
     expect(getAppTheme("dark").colors.focus).toBe("#FFF01F");
