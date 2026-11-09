@@ -57,7 +57,7 @@ export default function CustomerHomeScreen() {
             accessibilityRole="button"
             accessibilityLabel={translate("notificationsTitle")}
             onPress={() => router.push("/notifications")}
-            style={[styles.headerIconButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            style={[styles.headerIconButton, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border }]}
           >
             <Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />
           </PressableSurface>
