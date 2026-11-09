@@ -32,8 +32,6 @@ export function Text({
   const { language } = useLanguage();
   const flattenedStyle = StyleSheet.flatten(style);
   const resolvedAlign = language === "en" && align === "right" ? "left" : align;
-  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
-  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
   const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
     ? { ...flattenedStyle, textAlign: "left" as const }
     : style;
@@ -115,6 +113,7 @@ export function PriceText({
   const theme = useAppTheme();
   const { language } = useLanguage();
   const flattenedStyle = StyleSheet.flatten(style);
+  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
   const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
     ? { ...flattenedStyle, textAlign: "left" as const }
     : style;
@@ -164,6 +163,7 @@ export function BadgeText({
   const theme = useAppTheme();
   const { language } = useLanguage();
   const flattenedStyle = StyleSheet.flatten(style);
+  const resolvedAlign = language === "en" && align === "right" ? "left" : align;
   const resolvedStyle = language === "en" && flattenedStyle?.textAlign === "right"
     ? { ...flattenedStyle, textAlign: "left" as const }
     : style;
