@@ -35,7 +35,6 @@ export default function CustomerHomeScreen() {
       onPress={() => {
         void queryClient.prefetchQuery({ queryKey: ["customer-store", store.id], queryFn: () => fetchStoreDetails(store.id), staleTime: 60_000 });
         void queryClient.prefetchQuery({ queryKey: ["customer-store-offers", store.id], queryFn: () => fetchStoreOffers(store.id), staleTime: 30_000 });
-        void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "store", store.id], queryFn: () => fetchApprovedReviews("store", store.id), staleTime: 60_000 });
         router.push({ pathname: "/store/[storeId]", params: { storeId: store.id } });
       }}
       style={styles.storeTile}
