@@ -181,11 +181,15 @@ export default function SettingsScreen() {
         ) : deliveryProfile.isError ? (
           <UiText tone="danger">{translate("deliveryProfileLoadError")}</UiText>
         ) : deliveryProfile.data ? (
-          <View style={styles.sheetDetails}>
-            <DetailRow label={translate("fullNamePlaceholder")} value={deliveryProfile.data.full_name || "—"} />
-            <DetailRow label={translate("checkoutPhonePlaceholder")} value={deliveryProfile.data.phone || "—"} />
-            <DetailRow label={translate("checkoutWilaya")} value={deliveryProfile.data.wilaya_id ? String(deliveryProfile.data.wilaya_id).padStart(2, "0") : "—"} />
-            <DetailRow label={translate("checkoutCommune")} value={deliveryProfile.data.commune || "—"} />
+          <View style={styles.sheetContent}>
+            <Surface elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
+              <DetailRow label={translate("fullNamePlaceholder")} value={deliveryProfile.data.full_name || "—"} />
+              <DetailRow label={translate("checkoutPhonePlaceholder")} value={deliveryProfile.data.phone || "—"} />
+            </Surface>
+            <Surface elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
+              <DetailRow label={translate("checkoutWilaya")} value={deliveryProfile.data.wilaya_id ? String(deliveryProfile.data.wilaya_id).padStart(2, "0") : "—"} />
+              <DetailRow label={translate("checkoutCommune")} value={deliveryProfile.data.commune || "—"} />
+            </Surface>
           </View>
         ) : (
           <Caption>{translate("deliveryProfileSubtitle")}</Caption>
@@ -209,19 +213,20 @@ export default function SettingsScreen() {
         ) : addresses.data.length === 0 ? (
           <Caption>{translate("addressesEmptyHint")}</Caption>
         ) : (
-          <View style={styles.sheetDetails}>
+          <View style={styles.sheetContent}>
             {addresses.data.map((address) => (
-              <View key={address.id} style={styles.addressSummary}>
+              <Surface key={address.id} elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
                 <View style={styles.addressSummaryHeader}>
                   <UiText weight="700">
                     {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
                   </UiText>
                   {address.is_default ? <Icon name="circle-check" size={17} color={theme.colors.success} /> : null}
                 </View>
-                <UiText>{address.recipient_name}</UiText>
-                <Caption>{address.phone}</Caption>
-                <Caption>{address.commune}، {address.address_line}</Caption>
-              </View>
+                <DetailRow label={translate("fullNamePlaceholder")} value={address.recipient_name} />
+                <DetailRow label={translate("checkoutPhonePlaceholder")} value={address.phone} />
+                <DetailRow label={translate("checkoutCommune")} value={address.commune} />
+                <DetailRow label={translate("addressesTitle")} value={address.address_line} />
+              </Surface>
             ))}
           </View>
         )}
@@ -412,17 +417,14 @@ function createStyles(theme: AppTheme) {
       alignItems: "center",
       gap: designTokens.spacing.md
     },
-    sheetDetails: {
-      gap: designTokens.spacing.md,
-      padding: designTokens.spacing.md,
-      borderRadius: designTokens.radius.lg,
-      backgroundColor: theme.colors.surfaceMuted
+    sheetContent: {
+      gap: designTokens.spacing.md
     },
-    addressSummary: {
-      gap: designTokens.spacing.xs,
-      paddingBottom: designTokens.spacing.md,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border
+    sheetGroup: {
+      gap: designTokens.spacing.md,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceMuted
     },
     addressSummaryHeader: {
       flexDirection: "row-reverse",
