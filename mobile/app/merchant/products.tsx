@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
@@ -295,7 +295,6 @@ function MerchantOfferCard({
             {offer.product.brand}
           </UiText>
         ) : null}
-        <PriceDisplay value={formatDZD(offer.price)} />
       </View>
 
       <View style={styles.inputsRow}>
@@ -450,11 +449,11 @@ function createStyles(theme: AppTheme) {
     productBrand: { width: "100%", fontSize: designTokens.typography.caption - 1, textAlign: "auto" },
     badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 2 },
     currentPrice: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, marginTop: 1 },
-    inputsRow: { flexDirection: "row", gap: designTokens.spacing.xs },
-    inputGroup: { flex: 1, gap: designTokens.spacing.xs },
-    inputLabel: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    inputsRow: { flexDirection: "column", gap: designTokens.spacing.sm },
+    inputGroup: { width: "100%", gap: designTokens.spacing.xs },
+    inputLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     stockHint: { fontSize: designTokens.typography.caption - 2, lineHeight: 14, textAlign: "auto" },
-    valueInput: { minHeight: 42, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.xs, textAlign: "auto", fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+    valueInput: { width: "100%", minHeight: 42, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.sm, textAlign: "auto", fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     actionsRow: { flexDirection: "row", gap: designTokens.spacing.sm },
     messageContainer: { flex: 1, padding: designTokens.spacing.xxl, justifyContent: "center", alignItems: "center", gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, lineHeight: 21, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" }
