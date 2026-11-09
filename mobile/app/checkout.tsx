@@ -213,7 +213,7 @@ export default function CheckoutScreen() {
     mutation.mutate(input);
   };
 
-  const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.foreground }];
+  const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border, color: theme.colors.foreground }];
   const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune");
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
     ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr), wilaya: item }))
@@ -421,17 +421,17 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   savedAddresses: { gap: designTokens.spacing.sm },
   savedHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   savedAddress: { borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
-  savedAddressSelected: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
+  savedAddressSelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface },
   savedAddressTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   savedAddressName: { color: theme.colors.foreground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
   savedDefault: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   radio: { width: 17, height: 17, borderRadius: 9, borderWidth: 1.5, borderColor: theme.colors.muted },
-  radioSelected: { borderWidth: 5, borderColor: theme.colors.accentMuted },
+  radioSelected: { borderWidth: 5, borderColor: theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted },
   deliveryOptions: { flexDirection: "row", gap: designTokens.spacing.sm },
   deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
-  deliverySelected: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
+  deliverySelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface },
   deliveryTitle: { color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-  deliveryTextSelected: { color: theme.colors.accentMuted },
+  deliveryTextSelected: { color: theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted },
   deliveryHint: { color: theme.colors.muted, fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "auto" },
   summaryRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
   summaryInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
@@ -441,7 +441,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   totalLabel: { color: theme.colors.foreground, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   shippingRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: designTokens.spacing.md },
   shippingValue: { flex: 1, color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
-  errorText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto", lineHeight: 18 },
+  errorText: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto", lineHeight: 18 },
   successPanel: { borderRadius: designTokens.radius.lg },
   successContent: { padding: designTokens.spacing.xl, gap: designTokens.spacing.lg, alignItems: "center" },
   successMark: { width: 58, height: 58, overflow: "hidden", borderRadius: 29, backgroundColor: theme.colors.accent, color: theme.colors.foreground, textAlign: "center", textAlignVertical: "center", fontSize: designTokens.typography.display + 1, fontWeight: designTokens.fontWeights.extrabold },
