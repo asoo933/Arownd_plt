@@ -168,7 +168,7 @@ export default function CheckoutScreen() {
   if (cart.isPending || auth.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
   if (!cart.data.length) return <CustomerScreen>
-    <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
+    <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
     <Button label={translate("cartBrowse")} onPress={() => router.replace("/explore")} fullWidth />
   </CustomerScreen>;
@@ -231,7 +231,7 @@ export default function CheckoutScreen() {
   >
     <AppHeader
       title={translate("checkoutTitle")}
-      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={theme.dimensions.iconSize.md} accessibilityHidden />} />}
+      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={theme.dimensions.iconSize.md} accessibilityHidden />} />}
     />
     <UiText style={styles.fieldHint}>{translate("checkoutSubtitle")}</UiText>
 
