@@ -12,8 +12,8 @@ import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image
 import {
   fetchMerchantAccess
 } from "@/lib/merchant";
-import { fetchMerchantProductOffer } from "@/lib/merchant-products";
 import {
+  fetchMerchantProductOffer,
   fetchMerchantProducts,
   setMerchantProductVisibility,
   updateMerchantProductOffer
