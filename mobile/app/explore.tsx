@@ -155,7 +155,7 @@ export default function ExploreScreen() {
         ) : (
           <View style={styles.grid}>
             {products.data.map((item) => (
-              <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} style={{ width: "48%" }} />
+              <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} style={{ width: "47%", flexGrow: 0, flexShrink: 0 }} />
             ))}
           </View>
         )
@@ -175,6 +175,6 @@ const styles = StyleSheet.create({
   categoryViewport: { overflow: "hidden" },
   categoryTrack: { flexDirection: "row", alignItems: "center", direction: "ltr" },
   categoryGroup: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm, paddingRight: designTokens.spacing.sm, flexShrink: 0, direction: "ltr" },
-  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: designTokens.spacing.md },
   footer: { fontSize: designTokens.typography.caption, textAlign: "center", padding: designTokens.spacing.lg }
 });
