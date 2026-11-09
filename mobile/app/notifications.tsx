@@ -16,7 +16,7 @@ import {
 import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { getSupabaseClient } from "@/lib/supabase";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 function typeLabel(type: AppNotification["type"]): string {
@@ -37,6 +37,7 @@ function dateLabel(value: string): string {
 }
 
 export default function NotificationsScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [actionError, setActionError] = useState(false);
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     padding: designTokens.spacing.lg
   },
   cardHeader: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: designTokens.spacing.sm,

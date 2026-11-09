@@ -16,10 +16,11 @@ import {
   Text as UiText
 } from "@/components/ui";
 import { fetchMyReviews, getReviewTargetPath, type AppReview } from "@/lib/reviews";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function MyReviewsScreen() {
+  useLanguage();
   const auth = useQuery({
     queryKey: ["my-reviews-auth"],
     queryFn: async () => {
@@ -115,7 +116,7 @@ function createReviewStyles(theme: AppTheme) {
       padding: designTokens.spacing.lg
     },
     rowHeader: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       gap: designTokens.spacing.md
@@ -123,7 +124,7 @@ function createReviewStyles(theme: AppTheme) {
     targetLabel: { color: theme.colors.foreground },
     comment: { lineHeight: designTokens.typography.body * 1.6 },
     rowFooter: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       gap: designTokens.spacing.md,

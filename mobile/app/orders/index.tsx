@@ -8,7 +8,7 @@ import { AppHeader, Icon, IconButton, OrderCard, OrderStatusBadge, PriceDisplay,
 import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
@@ -74,6 +74,7 @@ function toRows(orders: CustomerOrder[]): OrderRow[] {
 }
 
 export default function OrdersScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const [tab, setTab] = useState<OrdersTab>("all");
@@ -121,13 +122,13 @@ export default function OrdersScreen() {
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
-    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "right" }}>{translate("ordersLoginHint")}</UiText>
+    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersLoginHint")}</UiText>
     <PressableSurface accessibilityRole="button" accessibilityLabel={translate("login")} onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
 
   return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
-    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "right" }}>{translate("ordersSubtitle")}</UiText>
+    <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersSubtitle")}</UiText>
     <SegmentedControl
       accessibilityLabel={translate("ordersTitle")}
       options={TABS.map((item) => ({ key: item.id, label: translate(item.key) }))}
@@ -170,14 +171,14 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   card: { borderRadius: designTokens.radius.xl },
   cardContent: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   priceDisplay: { justifyContent: "flex-start" },
-  cardHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
-  cardHeading: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
+  cardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
+  cardHeading: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   orderCode: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
   date: { color: theme.colors.muted, fontSize: designTokens.typography.caption - 1 },
-  storeName: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  metaRow: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs },
-  meta: { fontSize: designTokens.typography.caption, textAlign: "right" },
-  cardFooter: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.md, marginTop: designTokens.spacing.xs },
+  storeName: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs },
+  meta: { fontSize: designTokens.typography.caption, textAlign: "auto" },
+  cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.md, marginTop: designTokens.spacing.xs },
   openLabel: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   primary: { minHeight: 48, borderRadius: designTokens.radius.md, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
   primaryText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold }
