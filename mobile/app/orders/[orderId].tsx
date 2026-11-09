@@ -55,6 +55,12 @@ function OrderStatusBadge({ status }: { status: string }) {
   return <UiOrderStatusBadge label={statusLabel(status)} tone={tone} />;
 }
 
+function itemOptionsLabel(options: unknown): string | null {
+  const entries = Object.entries(readCartOptions(options));
+  if (entries.length === 0) return null;
+  return entries.map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ");
+}
+
 function dateLabel(value: string | null | undefined, language: "ar" | "en"): string {
   if (!value) return "";
   const date = new Date(value);
@@ -189,16 +195,31 @@ export default function OrderDetailsScreen() {
           <UiText style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</UiText>
           <OrderStatusBadge status={merchantOrder.status} />
         </View>
-        {merchantOrder.items.map((item) => <View key={item.id} style={styles.itemRow}>
-          <View style={styles.itemInfo}>
-            <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</UiText>
-            
+        {cancelled ? <UiText style={styles.cancelledNotice}>{translate("orderStoreCancelledNotice")}</UiText> : null}
+        {merchantOrder.items.map((item) => {
+          const optionsLabel = itemOptionsLabel(item.options);
+          return <View key={item.id} style={styles.itemRow}>
+            <View style={styles.itemInfo}>
+              <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</UiText>
+              <UiText style={styles.meta}>{translate("ordersQuantity")}: {formatNumber(item.quantity)}</UiText>
+              {optionsLabel ? <UiText style={styles.meta}>{optionsLabel}</UiText> : null}
+            </View>
+            {!cancelled ? <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} /> : null}
+          </View>;
+        })}
+        {!cancelled ? <>
+          <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderStoreSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.subtotal)}</UiText></View>
+          {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</UiText></View> : null}
+          <View style={styles.totalRow}><UiText style={styles.sectionTitle}>{translate("orderStoreTotal")}</UiText><UiText style={styles.total}>{formatDZD(subTotal)}</UiText></View>
+        </> : null}
+        {(merchantOrder.payment_status === "paid" || (!cancelled && merchantOrder.payment_status === "unpaid")) ? <View style={styles.paymentInfo}>
+          <View style={styles.totalRow}>
+            <UiText style={styles.label}>{translate("orderPaymentStatus")}</UiText>
+            <UiText style={[styles.label, merchantOrder.payment_status === "paid" ? styles.paymentPaid : styles.paymentUnpaid]}>{translate(merchantOrder.payment_status === "paid" ? "orderPaymentPaid" : "orderPaymentUnpaid")}</UiText>
           </View>
-          <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
-        </View>)}
-        <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderStoreSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.subtotal)}</UiText></View>
-        {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</UiText></View> : null}
-        {!cancelled ? <View style={styles.totalRow}><UiText style={styles.sectionTitle}>{translate("orderStoreTotal")}</UiText><UiText style={styles.total}>{formatDZD(subTotal)}</UiText></View> : null}
+          {merchantOrder.payment_status === "paid" && merchantOrder.paid_amount != null ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderPaidAmount")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.paid_amount)}</UiText></View> : null}
+          {merchantOrder.payment_status === "paid" && merchantOrder.paid_at ? <UiText style={styles.meta}>{translate("orderPaidAt")}: {dateLabel(merchantOrder.paid_at, language)}</UiText> : null}
+        </View> : null}
         {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <PressableSurface
           accessibilityLabel={translate("orderCancelStore")}
           disabled={cancelMutation.isPending}
@@ -250,9 +271,9 @@ export default function OrderDetailsScreen() {
       <UiText style={styles.meta}>{translate("orderPayment")}: {order.payment_method === "cod" ? translate("checkoutCodNote") : order.payment_method ?? ""}</UiText>
     </View>
 
-    {query.data.shipments.length > 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).length > 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</UiText>
-      {query.data.shipments.map((shipment) => <View key={shipment.id} style={styles.shipment}>
+      {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).map((shipment) => <View key={shipment.id} style={styles.shipment}>
         <OrderStatusBadge status={shipment.status} />
         {shipment.updated_at ? <UiText style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at, language)}</UiText> : null}
         {shipment.notes ? <UiText style={styles.meta}>{shipment.notes}</UiText> : null}
@@ -314,6 +335,10 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   itemName: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   merchantHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: designTokens.spacing.sm },
   notice: { color: theme.colors.warning, fontSize: designTokens.typography.caption, textAlign: "auto", lineHeight: 18 },
+  cancelledNotice: { color: theme.colors.danger, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "auto", lineHeight: 18 },
+  paymentInfo: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
+  paymentPaid: { color: theme.colors.success },
+  paymentUnpaid: { color: theme.colors.warning },
   recipient: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
   trackingEvent: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
