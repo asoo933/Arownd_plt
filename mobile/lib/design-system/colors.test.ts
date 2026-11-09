@@ -49,6 +49,25 @@ describe("design system text contrast", () => {
     }
   });
 
+  it("keeps semantic text readable on its semantic background surfaces", () => {
+    const light = getAppTheme("light");
+    const statusPairs = [
+      [light.colors.dangerText, light.colors.dangerSurface],
+      [light.colors.successText, light.colors.successSurface],
+      [light.colors.warningText, light.colors.warningSurface],
+      [light.colors.infoText, light.colors.infoSurface]
+    ];
+
+    for (const [foreground, background] of statusPairs) {
+      expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("uses mode-specific focus colors", () => {
+    expect(getAppTheme("light").colors.focus).toBe("#000000");
+    expect(getAppTheme("dark").colors.focus).toBe("#FFF01F");
+  });
+
   it("uses the approved semantic background colors for both modes", () => {
     expect(extendedThemeColors.light.dangerSurface).toBe("#FEE2E2");
     expect(extendedThemeColors.light.successSurface).toBe("#DCFCE7");
