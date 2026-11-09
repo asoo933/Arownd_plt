@@ -338,7 +338,7 @@ export default function MerchantEditProductScreen() {
           <AppHeader title={translate("merchantProductEditTitle")} leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />} />
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</UiText>
 
-          <Card contentStyle={styles.card}>
+                    <Card contentStyle={styles.card}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitles}>
                 <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
@@ -425,6 +425,8 @@ export default function MerchantEditProductScreen() {
               ) : null}
             </View>
           </Card>
+
+
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
               <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
