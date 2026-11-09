@@ -115,14 +115,14 @@ export default function MerchantOrderDetailsScreen() {
 
   if (access.isPending) return <LoadingScreen theme={theme} label={translate("merchantLoading")} />;
   if (access.isError) {
-    return <MessageScreen theme={theme} title={translate("merchantLoadError")} actionLabel={translate("merchantRetry")} onAction={() => void access.refetch()} />;
+    return <MessageScreen theme={theme} title={translate("merchantLoadError")} actionLabel={translate("merchantRetry")} busy={access.isFetching} onAction={() => void access.refetch()} />;
   }
   if (!access.data) return <Redirect href="/login" />;
   if (!isReady) return <Redirect href="/merchant" />;
 
   if (detail.isPending) return <LoadingScreen theme={theme} label={translate("merchantOrderDetailLoading")} />;
   if (detail.isError || !detail.data) {
-    return <MessageScreen theme={theme} title={translate("merchantOrderDetailError")} actionLabel={translate("merchantRetry")} onAction={() => void detail.refetch()} />;
+    return <MessageScreen theme={theme} title={translate("merchantOrderDetailError")} actionLabel={translate("merchantRetry")} busy={detail.isFetching} onAction={() => void detail.refetch()} />;
   }
 
   const order = detail.data.merchantOrder;
@@ -340,11 +340,11 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   );
 }
 
-function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppTheme; title: string; actionLabel: string; onAction: () => void }) {
+function MessageScreen({ theme, title, actionLabel, onAction, busy = false }: { theme: AppTheme; title: string; actionLabel: string; onAction: () => void; busy?: boolean }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
-        <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
+        <ErrorState title={title} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
       </View>
     </SafeAreaView>
   );
