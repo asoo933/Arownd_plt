@@ -59,7 +59,7 @@ describe("groupMerchantOrderRows", () => {
           commune: "البليدة",
           delivery_type: "home",
           created_at: "2026-11-07T10:00:00.000Z",
-          wilaya: { id: 9, name_ar: "البليدة" }
+          wilaya: { id: 9, name_ar: "البليدة", name_fr: null }
         }
       })
     ]);
@@ -88,7 +88,7 @@ describe("groupMerchantOrderRows", () => {
           commune: "الشفة",
           delivery_type: "home",
           created_at: "2026-11-07T11:00:00.000Z",
-          wilaya: { id: 9, name_ar: "البليدة" }
+          wilaya: { id: 9, name_ar: "البليدة", name_fr: null }
         }
       })
     ]);
