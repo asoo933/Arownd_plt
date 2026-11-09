@@ -148,7 +148,7 @@ function createStyles(theme: AppTheme) {
     grid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     inventoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     metricCard: { width: "48%", flexGrow: 1, minHeight: 96 },
-    inventoryWideCard: { width: "100%", flexGrow: 0, minHeight: 96 },
+    inventoryWideCard: { width: "100%", flex: 0, flexGrow: 0, alignSelf: "stretch", minHeight: 96 },
     revenueMetrics: { flexDirection: "row", alignItems: "stretch", gap: designTokens.spacing.md },
     revenueMetric: { flex: 1, minWidth: 0, padding: designTokens.spacing.sm, gap: designTokens.spacing.xs },
     metricDivider: { width: StyleSheet.hairlineWidth, alignSelf: "stretch" },
