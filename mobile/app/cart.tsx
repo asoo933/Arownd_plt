@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   Alert,
   AppHeader,
@@ -50,7 +50,13 @@ export default function CartScreen() {
   if (cart.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void cart.refetch()} /></CustomerScreen>;
   if (cart.data.length === 0) return <CustomerScreen>
     <AppHeader title={translate("cartTitle")} />
-    <EmptyState title={translate("cartEmpty")} hint={translate("cartEmptyHint")} />
+    <Card contentStyle={style.emptyContent}>
+      <View style={style.emptyIcon}>
+        <Icon name="shopping-cart" size={30} color={theme.colors.accentMuted} accessibilityHidden />
+      </View>
+      <UiText weight="800" style={style.emptyTitle}>{translate("cartEmpty")}</UiText>
+      <Caption style={style.emptyHint}>{translate("cartEmptyHint")}</Caption>
+    </Card>
     <Button label={translate("cartBrowse")} onPress={() => router.push("/explore")} fullWidth />
   </CustomerScreen>;
 
@@ -155,6 +161,10 @@ export default function CartScreen() {
 const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   group: { backgroundColor: theme.colors.surface },
   groupContent: { padding: designTokens.spacing.md, gap: designTokens.spacing.md },
+  emptyContent: { minHeight: 220, alignItems: "center", justifyContent: "center", padding: designTokens.spacing.xl, gap: designTokens.spacing.md },
+  emptyIcon: { width: 64, height: 64, borderRadius: designTokens.radius.pill, backgroundColor: theme.colors.surfaceMuted, alignItems: "center", justifyContent: "center" },
+  emptyTitle: { fontSize: designTokens.typography.subtitle, textAlign: "center" },
+  emptyHint: { textAlign: "center", lineHeight: 20 },
   itemCount: { fontSize: designTokens.typography.caption + 1 },
   store: { fontSize: designTokens.typography.body - 1, textAlign: "auto" },
   line: { paddingVertical: 0 },
