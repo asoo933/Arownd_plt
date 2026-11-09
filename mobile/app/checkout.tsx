@@ -191,7 +191,7 @@ export default function CheckoutScreen() {
       setFormError(translate("checkoutAreaRequired"));
       return;
     }
-    if (deliveryType === "home" && !addressLine.trim()) {
+    if (!addressLine.trim()) {
       setFormError(translate("checkoutAddressRequired"));
       return;
     }
@@ -201,7 +201,7 @@ export default function CheckoutScreen() {
       deliveryType,
       wilayaId,
       commune: commune.trim(),
-      addressLine: deliveryType === "home" ? addressLine.trim() : "",
+      addressLine: addressLine.trim(),
       fullName: fullName.trim(),
       phone: normalizeAddressPhone(phone)
     };
@@ -214,7 +214,17 @@ export default function CheckoutScreen() {
     ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr), wilaya: item }))
     : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
-  return <CustomerScreen>
+  return <CustomerScreen
+    footer={
+      <Button
+        label={translate("checkoutConfirm")}
+        onPress={submit}
+        loading={mutation.isPending}
+        disabled={mutation.isPending || offers.isPending || offers.isError || hasBlockingItems || wilayas.isError}
+        fullWidth
+      />
+    }
+  >
     <AppHeader
       title={translate("checkoutTitle")}
       leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={theme.dimensions.iconSize.md} accessibilityHidden />} />}
@@ -303,10 +313,8 @@ export default function CheckoutScreen() {
       )}
       {communes.isError ? <UiText style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</UiText> : null}
 
-      {deliveryType === "home" ? <>
-        <UiText style={styles.fieldLabel}>{translate("checkoutAddress")}</UiText>
-        <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="auto" multiline maxLength={300} />
-      </> : <UiText style={styles.fieldHint}>{translate("checkoutPickupNote")}</UiText>}
+      <UiText style={styles.fieldLabel}>{translate("checkoutAddress")}</UiText>
+      <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="auto" multiline maxLength={300} />
     </View>
 
     <CheckoutSummary style={styles.summaryCard}>
@@ -335,14 +343,6 @@ export default function CheckoutScreen() {
     </CheckoutSummary>
 
     {formError ? <UiText accessibilityRole="alert" style={styles.errorText}>{formError}</UiText> : null}
-    <Button
-      label={translate("checkoutConfirm")}
-      onPress={submit}
-      loading={mutation.isPending}
-      disabled={offers.isPending || offers.isError || hasBlockingItems || wilayas.isError}
-      fullWidth
-    />
-
     <Modal visible={picker !== null} transparent animationType="slide" onRequestClose={() => setPicker(null)}>
       <View style={styles.modalBackdrop}>
         <View style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
