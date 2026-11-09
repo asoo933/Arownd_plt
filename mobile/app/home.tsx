@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
@@ -10,7 +10,8 @@ import {
   ProductTile,
   SectionTitle
 } from "@/components/customer-ui";
-import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchFeaturedStores, fetchHomeProducts, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
@@ -20,6 +21,7 @@ const STORE_TILE_WIDTH = 88;
 export default function CustomerHomeScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
 
@@ -30,7 +32,12 @@ export default function CustomerHomeScreen() {
       key={store.id}
       accessibilityRole="button"
       accessibilityLabel={store.name}
-      onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: store.id } })}
+      onPress={() => {
+        void queryClient.prefetchQuery({ queryKey: ["customer-store", store.id], queryFn: () => fetchStoreDetails(store.id), staleTime: 60_000 });
+        void queryClient.prefetchQuery({ queryKey: ["customer-store-offers", store.id], queryFn: () => fetchStoreOffers(store.id), staleTime: 30_000 });
+        void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "store", store.id], queryFn: () => fetchApprovedReviews("store", store.id), staleTime: 60_000 });
+        router.push({ pathname: "/store/[storeId]", params: { storeId: store.id } });
+      }}
       style={styles.storeTile}
     >
       <Avatar name={store.name} imageUri={store.logo_url ?? undefined} size={STORE_AVATAR_SIZE} />
@@ -112,7 +119,12 @@ export default function CustomerHomeScreen() {
                 store={item.store.name}
                 price={formatDZD(item.price)}
                 imageUrl={getPrimaryImage(item)}
-                onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })}
+                onPress={() => {
+                  void queryClient.prefetchQuery({ queryKey: ["customer-product", item.product.id], queryFn: () => fetchProductDetails(item.product.id), staleTime: 60_000 });
+                  void queryClient.prefetchQuery({ queryKey: ["customer-product-offers", item.product.id], queryFn: () => fetchProductOffers(item.product.id), staleTime: 30_000 });
+                  void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "product", item.product.id], queryFn: () => fetchApprovedReviews("product", item.product.id), staleTime: 60_000 });
+                  router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } });
+                }}
               />
             ))}
           </ScrollView>
