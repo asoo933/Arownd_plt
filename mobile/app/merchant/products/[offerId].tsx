@@ -34,7 +34,7 @@ import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/
 import { translate, useLanguage } from "@/lib/i18n";
 import { getLocalizedMerchantCategoryLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { BottomSheet, AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { BottomSheet, AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, MediaViewer, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
   const { language } = useLanguage();
