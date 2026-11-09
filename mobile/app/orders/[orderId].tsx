@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, Text as UiText, TrackingTimeline } from "@/components/ui";
-import { formatDZD } from "@/lib/catalog";
+import { formatDZD, formatNumber } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
 import { readCartOptions } from "@/lib/cart-state";
@@ -169,7 +169,7 @@ export default function OrderDetailsScreen() {
       {order.items.map((item) => <View key={item.id} style={styles.itemRow}>
         <View style={styles.itemInfo}>
           <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name ?? translate("cartUnknownStore")}</UiText>
-          <UiText style={styles.meta}>{translate("ordersQuantity")}: {item.quantity}</UiText>
+          <UiText style={styles.meta}>{translate("ordersQuantity")}: {formatNumber(item.quantity)}</UiText>
           {Object.entries(readCartOptions(item.options)).length > 0 ? <UiText style={styles.meta}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</UiText> : null}
         </View>
         <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
