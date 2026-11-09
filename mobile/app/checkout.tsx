@@ -167,7 +167,7 @@ export default function CheckoutScreen() {
   }
 
   if (cart.isPending || auth.isPending) return <CustomerScreen>
-    <AppHeader title={translate("checkoutTitle")} />
+    <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
   </CustomerScreen>;
   if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching || auth.isFetching} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
