@@ -49,7 +49,7 @@ export default function ProductDetailsScreen() {
 
   if (product.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (product.isError) {
-    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void product.refetch()} /></CustomerScreen>;
+    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={product.isFetching} onRetry={() => void product.refetch()} /></CustomerScreen>;
   }
   if (!product.data) {
     return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("productNoDescription")} /></CustomerScreen>;
@@ -120,9 +120,9 @@ export default function ProductDetailsScreen() {
       <View style={styles.section}>
         <UiText weight="800" style={styles.sectionTitle}>{translate("productOffersTitle")}</UiText>
         {offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
-          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} />
+          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={offers.isFetching} onRetry={() => void offers.refetch()} />
         ) : productOffers.length === 0 ? (
-          <EmptyState title={translate("productNoOffers")} hint={translate("productNoDescription")} />
+          <EmptyState icon="shopping-bag" title={translate("productNoOffers")} hint={translate("productNoDescription")} />
         ) : productOffers.map((offer) => {
           const active = selectedOffer?.id === offer.id;
           const available = offer.is_available && offer.stock_quantity > 0;
