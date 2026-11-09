@@ -114,7 +114,7 @@ type SkeletonLayoutProps = {
 export function ProductCardSkeleton({ style }: SkeletonLayoutProps) {
   const theme = useAppTheme();
   return (
-    <View accessibilityElementsHidden style={[{ flex: 1, gap: designTokens.spacing.sm, padding: designTokens.spacing.sm, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface }, style]}>
+    <View accessibilityElementsHidden style={[{ flex: 1, gap: designTokens.spacing.sm, padding: designTokens.spacing.sm, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }, style]}>
       <Skeleton height={132} radius={theme.radius.lg} />
       <Skeleton width="82%" height={14} />
       <Skeleton width="58%" height={12} />
