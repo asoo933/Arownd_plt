@@ -29,6 +29,7 @@ import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
 import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
+import { formatOrderCode } from "@/lib/orders-state";
 
 type Picker = "wilaya" | "commune" | null;
 
@@ -158,7 +159,7 @@ export default function CheckoutScreen() {
         <AppHeader title={translate("checkoutSuccessTitle")} />
         <UiText style={styles.hint}>{translate("checkoutSuccessMessage")}</UiText>
         <UiText style={styles.orderLabel}>{translate("checkoutOrderNumber")}</UiText>
-        <UiText selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{createdOrderId}</UiText>
+        <UiText selectable style={[styles.orderId, { color: theme.colors.foreground }]}>{formatOrderCode(createdOrderId)}</UiText>
         <UiText style={styles.hint}>{translate("checkoutDeliveryAfterNote")}</UiText>
         <Button label={translate("checkoutBackHome")} onPress={() => router.replace("/home")} fullWidth />
       </Card>
