@@ -1,6 +1,6 @@
 import type { Language } from "@/lib/i18n";
 
-const MERCHANT_CATEGORY_NAMES_EN: Record<string, string> = {
+const CATEGORY_NAMES_EN: Record<string, string> = {
   fashion: "Fashion & Clothing",
   clothes: "Clothing",
   shoes: "Shoes",
@@ -115,11 +115,11 @@ export function getLocalizedMerchantCategoryLabel(
   language: Language
 ): string {
   if (language === "ar") return fallback;
-  return MERCHANT_CATEGORY_NAMES_EN[id] ?? fallback;
+  return CATEGORY_NAMES_EN[id] ?? fallback;
 }
 
 export function getLocalizedProductCategoryLabel(id: string, language: Language): string {
   const normalizedId = id.trim();
   if (language === "ar") return PRODUCT_CATEGORY_NAMES_AR[normalizedId] ?? normalizedId;
-  return MERCHANT_CATEGORY_NAMES_EN[normalizedId] ?? normalizedId;
+  return CATEGORY_NAMES_EN[normalizedId] ?? normalizedId;
 }
