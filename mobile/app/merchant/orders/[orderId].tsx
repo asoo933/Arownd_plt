@@ -22,6 +22,7 @@ import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import { AppHeader, Button, ConfirmDialog, ErrorState, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
@@ -34,7 +35,7 @@ const trackingTranslationKeys: Record<MerchantTrackingStatus, TranslationKey> = 
 };
 
 export default function MerchantOrderDetailsScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -180,7 +181,7 @@ export default function MerchantOrderDetailsScreen() {
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</UiText>
           <InfoRow label={translate("merchantCustomerUnknown")} value={customerOrder.full_name || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderPhone")} value={customerOrder.phone || "—"} theme={theme} />
-          <InfoRow label={translate("merchantStoreWilayaLabel")} value={customerOrder.wilaya?.name_ar || "—"} theme={theme} />
+          <InfoRow label={translate("merchantStoreWilayaLabel")} value={getLocalizedWilayaLabel(customerOrder.wilaya_id ?? 0, customerOrder.wilaya?.name_ar ?? "—", language)} theme={theme} />
           <InfoRow label={translate("merchantStoreCommuneLabel")} value={customerOrder.commune || "—"} theme={theme} />
           <InfoRow label={translate("merchantStoreAddressLabel")} value={customerOrder.address_line || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderDeliveryType")} value={deliveryType === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")} theme={theme} />
