@@ -4,7 +4,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, Icon, IconButton, PriceDisplay, ProductImageGallery, ProductQuantitySelector, PressableSurface, RatingStars, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, Icon, IconButton, OfferCard, PriceDisplay, ProductImageGallery, ProductQuantitySelector, ProductVariantSelector, RatingStars, StockBadge, Text as UiText } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
@@ -69,7 +69,12 @@ export default function ProductDetailsScreen() {
     : 0;
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      footer={selectedOffer ? (
+        <View style={styles.purchaseFooter}>
+        </Card>
+      ) : undefined}
+    >
       <AppHeader
         title={translate("detailProductTitle")}
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />}
@@ -103,29 +108,53 @@ export default function ProductDetailsScreen() {
           const active = selectedOffer?.id === offer.id;
           const available = offer.is_available && offer.stock_quantity > 0;
           return (
-            <PressableSurface
+            <OfferCard
               key={offer.id}
-              accessibilityRole="button"
               accessibilityLabel={offer.store.name}
-              accessibilityState={{ selected: active }}
               onPress={() => { setSelectedOfferId(offer.id); setSize(""); setColor(""); setQuantity(1); addMutation.reset(); }}
-              style={[styles.offerCard, { backgroundColor: theme.colors.surface, borderColor: active ? theme.colors.accentMuted : theme.colors.border }]}
+              style={[styles.offerCard, { borderColor: active ? theme.colors.accentMuted : theme.colors.border, backgroundColor: active ? theme.colors.surfaceMuted : theme.colors.surface }]}
+              contentStyle={styles.offerCardContent}
             >
               <View style={styles.offerInfo}>
                 <UiText weight="800" style={styles.offerStore}>{offer.store.name}</UiText>
                 <UiText tone="muted" style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</UiText>
-                <UiText tone={available ? "success" : "warning"} weight="700" style={styles.stock}>{available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}</UiText>
+                <StockBadge
+                  label={available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}
+                  tone={available ? offer.stock_quantity <= 3 ? "warning" : "success" : "danger"}
+                />
               </View>
               <PriceDisplay value={formatDZD(offer.price)} style={styles.offerPriceDisplay} />
-            </PressableSurface>
+            </OfferCard>
           );
         })}
       </View>
 
       {selectedOffer ? (
-        <View style={[styles.purchaseCard, { backgroundColor: theme.colors.surface }]}>
-          {variants.colors.length > 0 ? <OptionPicker label={translate("productColorOption")} values={variants.colors} value={selectedColor} onSelect={setColor} /> : null}
-          {variants.sizes.length > 0 ? <OptionPicker label={translate("productSizeOption")} values={variants.sizes} value={selectedSize} onSelect={setSize} /> : null}
+        <Card contentStyle={styles.purchaseCard}>
+          {variants.colors.length > 0 ? (
+            <View style={styles.optionGroup}>
+              <UiText style={styles.optionLabel}>{translate("productColorOption")}</UiText>
+              <ProductVariantSelector
+                options={variants.colors.map((value) => ({ value, label: value }))}
+                value={selectedColor}
+                onChange={setColor}
+                accessibilityLabel={translate("productColorOption")}
+                display="chips"
+              />
+            </View>
+          ) : null}
+          {variants.sizes.length > 0 ? (
+            <View style={styles.optionGroup}>
+              <UiText style={styles.optionLabel}>{translate("productSizeOption")}</UiText>
+              <ProductVariantSelector
+                options={variants.sizes.map((value) => ({ value, label: value }))}
+                value={selectedSize}
+                onChange={setSize}
+                accessibilityLabel={translate("productSizeOption")}
+                display="chips"
+              />
+            </View>
+          ) : null}
           <View style={styles.quantityRow}>
             <UiText weight="700" style={styles.optionLabel}>{translate("productQuantity")}</UiText>
             <ProductQuantitySelector
@@ -170,18 +199,6 @@ export default function ProductDetailsScreen() {
   );
 }
 
-function OptionPicker({ label, values, value, onSelect }: { label: string; values: string[]; value: string; onSelect: (value: string) => void }) {
-  const theme = useAppTheme();
-  return (
-    <View style={styles.optionGroup}>
-      <UiText style={[styles.optionLabel, { color: theme.colors.foreground }]}>{label}</UiText>
-      <View style={styles.optionValues}>
-        {values.map((option) => <PressableSurface key={option} accessibilityRole="button" accessibilityLabel={label + ": " + option} accessibilityState={{ selected: value === option }} onPress={() => onSelect(option)} style={[styles.optionChip, { backgroundColor: value === option ? theme.colors.accent : theme.colors.surface, borderColor: value === option ? theme.colors.accentMuted : theme.colors.border }]}><UiText style={[styles.optionChipText, { color: value === option ? theme.colors.accentForeground : theme.colors.foreground }]}>{option}</UiText></PressableSurface>)}
-      </View>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   heroImage: { height: 300, borderRadius: designTokens.radius.lg, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   infoCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
@@ -195,18 +212,16 @@ const styles = StyleSheet.create({
   description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "auto" },
   section: { gap: designTokens.spacing.md },
   sectionTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-  offerCard: { minHeight: 82, borderWidth: 1.5, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
+  offerCard: { minHeight: 82 },
+  offerCardContent: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
   offerInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   offerStore: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   stock: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   offerPriceDisplay: { justifyContent: "flex-start" },
-  offerPrice: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
   purchaseCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   optionGroup: { gap: designTokens.spacing.sm },
   optionLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-  optionValues: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
-  optionChip: { minWidth: designTokens.dimensions.controlHeight.md, minHeight: designTokens.dimensions.controlHeight.md, paddingHorizontal: 13, borderRadius: designTokens.radius.sm, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  optionChipText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.bold },
   quantityRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   mutationError: { fontSize: designTokens.typography.caption, textAlign: "auto" },
+  purchaseFooter: { gap: designTokens.spacing.xs },
 });
