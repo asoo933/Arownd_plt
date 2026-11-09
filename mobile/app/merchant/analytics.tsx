@@ -8,7 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, Card, ChartCard, ErrorState, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, ChartCard, ErrorState, Heading, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const { language } = useLanguage();
@@ -59,7 +59,7 @@ export default function MerchantAnalyticsScreen() {
         />
         <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantAnalyticsSubtitle")}</UiText>
 
-        <SectionHeading theme={theme} title={translate("merchantAnalyticsOrders")} />
+        <Heading level={3}>{translate("merchantAnalyticsOrders")}</Heading>
         <View style={styles.grid}>
           {orderCards.map((card) => (
             <MerchantMetricCard
@@ -72,8 +72,8 @@ export default function MerchantAnalyticsScreen() {
           ))}
         </View>
 
-        <SectionHeading theme={theme} title={translate("merchantAnalyticsRevenue")} />
-        <Card style={styles.revenueCard} contentStyle={styles.revenueContent}>
+        <Heading level={3}>{translate("merchantAnalyticsRevenue")}</Heading>
+        <View style={styles.revenueMetrics}>
           <MerchantMetricCard
             label={translate("merchantAnalyticsRevenue")}
             value={formatDZD(data.delivered_revenue)}
@@ -86,9 +86,9 @@ export default function MerchantAnalyticsScreen() {
             value={formatDZD(data.average_delivered_order)}
             style={styles.revenueMetric}
           />
-        </Card>
+        </View>
 
-        <SectionHeading theme={theme} title={translate("merchantAnalyticsLastSevenDays")} />
+        <Heading level={3}>{translate("merchantAnalyticsLastSevenDays")}</Heading>
         <ChartCard style={styles.chartCard}>
           {data.daily_delivered.every((item) => item.amount === 0) ? (
             <UiText style={[styles.empty, { color: theme.colors.muted }]}>{translate("merchantAnalyticsNoSales")}</UiText>
@@ -98,34 +98,26 @@ export default function MerchantAnalyticsScreen() {
               <View style={[styles.track, { backgroundColor: theme.colors.surfaceMuted }]}>
                 <View style={[styles.bar, { backgroundColor: theme.colors.accent, width: Math.max(item.amount > 0 ? 3 : 0, item.amount / maxDaily * 100) + "%" }]} />
               </View>
-              <UiText style={[styles.amount, { color: theme.colors.foreground }]}>{formatDZD(item.amount)}</UiText>
+              <UiText numberOfLines={1} adjustsFontSizeToFit style={[styles.amount, { color: theme.colors.foreground }]}>{formatDZD(item.amount)}</UiText>
             </View>
           ))}
         </ChartCard>
 
-        <SectionHeading theme={theme} title={translate("merchantAnalyticsProducts")} />
+        <Heading level={3}>{translate("merchantAnalyticsProducts")}</Heading>
         <View style={styles.inventoryGrid}>
-          {inventoryCards.map((card) => (
+          {inventoryCards.map((card, index) => (
             <MerchantMetricCard
               key={card.label}
               label={card.label}
               value={card.value}
               valueTone={card.tone}
-              style={styles.metricCard}
+              style={index === 2 ? styles.inventoryWideCard : styles.metricCard}
             />
           ))}
         </View>
         <UiText style={[styles.note, { color: theme.colors.muted }]}>{translate("merchantAnalyticsRevenueNote")}</UiText>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function SectionHeading({ theme, title }: { theme: AppTheme; title: string }) {
-  return (
-    <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" }}>
-      {title}
-    </UiText>
   );
 }
 
@@ -156,16 +148,16 @@ function createStyles(theme: AppTheme) {
     grid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     inventoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     metricCard: { width: "48%", flexGrow: 1, minHeight: 96 },
-    revenueCard: { borderWidth: 1, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface },
-    revenueContent: { flexDirection: "row", alignItems: "stretch", gap: designTokens.spacing.md },
+    inventoryWideCard: { width: "100%", flexGrow: 0, minHeight: 96 },
+    revenueMetrics: { flexDirection: "row", alignItems: "stretch", gap: designTokens.spacing.md },
     revenueMetric: { flex: 1, minWidth: 0, padding: designTokens.spacing.sm, gap: designTokens.spacing.xs },
     metricDivider: { width: StyleSheet.hairlineWidth, alignSelf: "stretch" },
     chartCard: { gap: designTokens.spacing.md },
     dayRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
     dayLabel: { width: 48, fontSize: designTokens.typography.caption - 1, textAlign: "auto" },
-    track: { flex: 1, height: 9, borderRadius: theme.radius.pill, overflow: "hidden" },
+    track: { flex: 1, minWidth: 0, height: 9, borderRadius: theme.radius.pill, overflow: "hidden" },
     bar: { height: 9, borderRadius: theme.radius.pill },
-    amount: { width: 90, fontSize: designTokens.typography.caption - 2, textAlign: "auto" },
+    amount: { minWidth: 54, maxWidth: 104, flexShrink: 1, fontSize: designTokens.typography.caption - 2, textAlign: "auto" },
     empty: { textAlign: "center", fontSize: designTokens.typography.caption, paddingVertical: designTokens.spacing.md },
     note: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "auto" },
     message: { flex: 1, justifyContent: "center", alignItems: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg }
