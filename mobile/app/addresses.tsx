@@ -33,12 +33,13 @@ import {
 } from "@/lib/user-address";
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 
 type EditorState = { address: UserAddress | null } | null;
 type AddressLabel = UserAddressInput["label"];
 
 export default function AddressesScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -179,7 +180,7 @@ export default function AddressesScreen() {
           <Heading level={3}>{address.recipient_name}</Heading>
           <UiText tone="muted">{address.phone}</UiText>
           <Caption>
-            {String(address.wilaya_id).padStart(2, "0")} - {wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}
+            {String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language)}، {address.commune}
           </Caption>
           <Caption>{address.address_line}</Caption>
           {address.additional_info ? <Caption>{address.additional_info}</Caption> : null}
@@ -221,7 +222,7 @@ export default function AddressesScreen() {
                 style={styles.input}
                 accessibilityLabel={translate("checkoutChooseWilaya")}
               >
-                <UiText>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</UiText>
+                <UiText>{selectedWilaya ? getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language) : translate("checkoutChooseWilaya")}</UiText>
               </PressableSurface>
 
               <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
@@ -241,7 +242,7 @@ export default function AddressesScreen() {
               {wilayas.data.map((item: Wilaya) => (
                 <PressableSurface
                   key={item.id}
-                  accessibilityLabel={String(item.id).padStart(2, "0") + " - " + item.name_ar}
+                  accessibilityLabel={String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language)}
                   onPress={() => {
                     setWilayaId(item.id);
                     setCommune("");
@@ -249,7 +250,7 @@ export default function AddressesScreen() {
                   }}
                   style={[styles.pickerOption, wilayaId === item.id && styles.pickerOptionSelected]}
                 >
-                  <UiText>{String(item.id).padStart(2, "0")} - {item.name_ar}</UiText>
+                  <UiText>{String(item.id).padStart(2, "0")} - {getLocalizedWilayaLabel(item.id, item.name_ar, language)}</UiText>
                 </PressableSurface>
               ))}
             </ScrollView>
