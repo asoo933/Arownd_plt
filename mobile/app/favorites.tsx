@@ -219,8 +219,8 @@ function createStyles(theme: AppTheme) {
     favoriteOverlay: { position: "absolute", top: 7, end: 7 },
     storeList: { gap: designTokens.spacing.md },
     storeCard: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+      borderColor: theme.mode === "light" ? "transparent" : theme.colors.border,
       borderRadius: designTokens.radius.xl
     },
     storeContent: {
