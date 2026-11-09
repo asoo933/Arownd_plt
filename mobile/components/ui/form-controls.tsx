@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { useLanguage } from "@/lib/i18n";
@@ -12,8 +13,9 @@ type TextFieldProps = Omit<TextInputProps, "style" | "textAlign"> & {
   containerStyle?: StyleProp<ViewStyle> | undefined;
 };
 
-export function TextField({ label, error, style, containerStyle, accessibilityLabel, textAlign, ...props }: TextFieldProps) {
+export function TextField({ label, error, style, containerStyle, accessibilityLabel, textAlign, onFocus, onBlur, ...props }: TextFieldProps) {
   const theme = useAppTheme();
+  const [focused, setFocused] = useState(false);
   const { language } = useLanguage();
 
   return (
@@ -21,6 +23,14 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
       {label ? <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</UiText> : null}
       <TextInput
         {...props}
+        onFocus={(event) => {
+          setFocused(true);
+          onFocus?.(event);
+        }}
+        onBlur={(event) => {
+          setFocused(false);
+          onBlur?.(event);
+        }}
         textAlign={textAlign === "auto" ? "start" : textAlign}
         accessibilityLabel={accessibilityLabel ?? label}
         placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
@@ -28,7 +38,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           styles.textInput,
           {
             backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.danger : theme.colors.inputBorder,
+            borderColor: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.inputBorder,
             color: theme.colors.foreground,
             fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
           },
