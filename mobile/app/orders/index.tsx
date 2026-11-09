@@ -92,20 +92,22 @@ export default function OrdersScreen() {
     enabled: auth.isSuccess && auth.data !== null
   });
 
+  const userId = auth.data?.id;
+  const refetchOrders = orders.refetch;
+
   useEffect(() => {
-    const userId = auth.data?.id;
     if (!userId) return;
     const client = getSupabaseClient();
     const channel = client.channel("native-customer-orders-" + userId)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: "user_id=eq." + userId }, () => {
-        void orders.refetch();
+        void refetchOrders();
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "merchant_orders", filter: "customer_id=eq." + userId }, () => {
-        void orders.refetch();
+        void refetchOrders();
       })
       .subscribe();
     return () => { void client.removeChannel(channel); };
-  }, [auth.data?.id, orders.refetch]);
+  }, [userId, refetchOrders]);
 
   const rows = useMemo(() => toRows(orders.data ?? []), [orders.data]);
   const filtered = rows.filter((row) => {
@@ -118,7 +120,7 @@ export default function OrdersScreen() {
   if (auth.isPending || (auth.data && orders.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (auth.isError || orders.isError) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
-    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void orders.refetch(); }} />
+    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void refetchOrders(); }} />
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
