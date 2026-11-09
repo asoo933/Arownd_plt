@@ -48,7 +48,11 @@ export default function ProductDetailsScreen() {
   });
 
   if (product.isPending) return <CustomerScreen>
-    <AppHeader title={translate("detailProductTitle")} />
+    <AppHeader
+      title={translate("detailProductTitle")}
+      leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />}
+      trailing={<CartButton />}
+    />
     <ProductCardSkeleton style={{ width: "100%", flex: 0, minHeight: 320 }} />
   </CustomerScreen>;
   if (product.isError) {
