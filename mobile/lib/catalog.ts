@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { getCurrentLanguage } from "@/lib/i18n";
 
 const ProductSummarySchema = z.object({
   id: z.string(),
@@ -203,7 +204,7 @@ export function getPrimaryImage(product: HomeProduct | ProductOffer): string | n
 }
 
 export function formatDZD(amount: number): string {
-  return new Intl.NumberFormat("ar-DZ", {
+  return new Intl.NumberFormat(getCurrentLanguage() === "ar" ? "ar-DZ" : "en-DZ", {
     style: "currency",
     currency: "DZD",
     maximumFractionDigits: 0
