@@ -136,6 +136,7 @@ export default function AddressesScreen() {
         <ErrorState
           title={translate("addressesLoadError")}
           retryLabel={translate("retry")}
+          busy={addresses.isFetching || wilayas.isFetching}
           onRetry={() => { void addresses.refetch(); void wilayas.refetch(); }}
         />
       </CustomerScreen>
