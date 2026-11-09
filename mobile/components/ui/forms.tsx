@@ -45,7 +45,7 @@ export function TextArea({
           {
             minHeight,
             borderWidth: 1,
-            borderColor: theme.colors.border,
+            borderColor: theme.colors.inputBorder,
             borderRadius: theme.radius.lg,
             padding: designTokens.spacing.md,
             color: theme.colors.foreground,
@@ -239,7 +239,7 @@ export function Select({
         disabled={disabled}
         onPress={() => setOpen(true)}
         style={({ pressed }) => [
-          { minHeight: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.pill, paddingHorizontal: designTokens.spacing.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: theme.colors.surface, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
+          { minHeight: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.inputBorder, borderRadius: theme.radius.pill, paddingHorizontal: designTokens.spacing.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: theme.colors.surface, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
           style
         ]}
       >
@@ -329,7 +329,7 @@ export function InputOTP({
   return (
     <View accessibilityRole="group" accessibilityLabel={accessibilityLabel} style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
       {Array.from({ length }, (_, index) => (
-        <View key={index} style={{ flex: 1, minWidth: 0, height: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface }}>
+        <View key={index} style={{ flex: 1, minWidth: 0, height: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.inputBorder, borderRadius: theme.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surface }}>
           <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: theme.fontWeights.bold }}>
             {value[index] ?? ""}
           </UiText>
