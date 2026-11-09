@@ -359,7 +359,7 @@ export default function MerchantNewProductScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={translate("merchantProductCategoryLabel")}
                 onPress={() => setCategoryPickerOpen(true)}
-                style={[styles.selectButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+                style={[styles.selectButton, { borderColor: theme.colors.inputBorder, backgroundColor: theme.colors.background }]}
               >
                 <UiText style={[styles.selectText, { color: selectedCategory ? theme.colors.foreground : theme.colors.placeholder }]}>
                   {selectedCategory
@@ -633,7 +633,7 @@ function createStyles(theme: AppTheme) {
     half: { flex: 1 },
     field: { gap: designTokens.spacing.xs },
     label: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.background, paddingHorizontal: designTokens.spacing.md, color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" },
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.inputBorder, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.background, paddingHorizontal: designTokens.spacing.md, color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" },
     textarea: { minHeight: 112, paddingTop: 12 },
     hint: { fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "auto" },
     selectButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center" },
