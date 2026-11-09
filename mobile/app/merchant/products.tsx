@@ -113,6 +113,7 @@ export default function MerchantProductsScreen() {
         theme={theme}
         title={translate("merchantLoadError")}
         actionLabel={translate("merchantRetry")}
+        busy={access.isFetching}
         onAction={() => void access.refetch()}
       />
     );
@@ -131,6 +132,7 @@ export default function MerchantProductsScreen() {
         theme={theme}
         title={translate("merchantProductsLoadError")}
         actionLabel={translate("merchantRetry")}
+        busy={products.isFetching}
         onAction={() => void products.refetch()}
       />
     );
@@ -385,7 +387,8 @@ function MessageScreen({
   label,
   actionLabel,
   onAction,
-  loading = false
+  loading = false,
+  busy = false
 }: {
   theme: AppTheme;
   title?: string;
@@ -393,6 +396,7 @@ function MessageScreen({
   actionLabel?: string;
   onAction?: () => void;
   loading?: boolean;
+  busy?: boolean;
 }) {
   const styles = createStyles(theme);
 
@@ -402,7 +406,7 @@ function MessageScreen({
         {loading ? (
           <LoadingState label={label ?? ""} />
         ) : onAction && actionLabel ? (
-          <ErrorState title={title ?? label ?? ""} retryLabel={actionLabel} onRetry={onAction} />
+          <ErrorState title={title ?? label ?? ""} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
         ) : (
           <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{title ?? label ?? ""}</UiText>
         )}
