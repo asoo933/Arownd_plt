@@ -27,7 +27,7 @@ export default function AuthCallbackScreen() {
 
     const exchangeCode = async (): Promise<void> => {
       if (!code) {
-        setState("error");
+        if (active) setState("error");
         return;
       }
 
@@ -46,10 +46,16 @@ export default function AuthCallbackScreen() {
     };
   }, [code]);
 
+  const subtitleKey = state === "loading"
+    ? "callbackLoading"
+    : state === "success"
+      ? "callbackSuccess"
+      : "callbackError";
+
   return (
     <AuthLayout
       title={translate("callbackTitle")}
-      subtitle={translate("callbackLoading")}
+      subtitle={translate(subtitleKey)}
     >
       {state === "loading" ? (
         <View style={styles.loadingContent}>
