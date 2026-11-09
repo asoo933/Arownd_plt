@@ -14,7 +14,7 @@ import { borderRadius, spacing } from "./spacing";
 import { fontFamilies, fontWeights, typography } from "./typography";
 
 export const designTokens = {
-  brand: { ...brandColors, accent: brandColors.lime, dark: brandColors.black, light: brandColors.light },
+  brand: { ...brandColors, accent: brandColors.primary, dark: brandColors.black, light: brandColors.light },
   semantic: semanticColors,
   commerce: commerceColors,
   delivery: deliveryColors,
