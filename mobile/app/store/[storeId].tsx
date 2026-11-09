@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, EmptyState, ErrorState, ProductTile } from "@/components/customer-ui";
 import { FavoriteButton } from "@/components/favorite-button";
 import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { translate, useLanguage } from "@/lib/i18n";
