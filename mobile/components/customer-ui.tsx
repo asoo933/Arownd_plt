@@ -120,7 +120,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
       accessibilityLabel={`${name}${commune ? `، ${commune}` : ""}${rating != null ? `، ${rating.toFixed(1)}` : ""}${verified ? `، ${translate("storeVerified")}` : ""}`}
       onPress={onPress}
       disabled={!onPress}
-      style={[styles.storeTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+      style={[styles.storeTile, { backgroundColor: theme.colors.surfaceSecondary }]}
     >
       <View style={[styles.storeLogo, { backgroundColor: theme.colors.surfaceMuted }]}>
         {logoUrl ? <UiImage uri={logoUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="store" size={28} color={theme.colors.subtle} accessibilityHidden />}
