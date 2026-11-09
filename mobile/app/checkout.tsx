@@ -211,7 +211,7 @@ export default function CheckoutScreen() {
   const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.foreground }];
   const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune");
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
-    ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language), wilaya: item }))
+    ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr), wilaya: item }))
     : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
   return <CustomerScreen>
@@ -254,7 +254,7 @@ export default function CheckoutScreen() {
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
               </View>
               <UiText style={styles.fieldHint}>{address.phone}</UiText>
-              <UiText style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language)}، {address.commune}</UiText>
+              <UiText style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_fr)}، {address.commune}</UiText>
               <UiText style={styles.fieldHint}>{address.address_line}</UiText>
               {address.is_default ? <UiText style={styles.savedDefault}>{translate("addressesDefault")}</UiText> : null}
             </PressableSurface>
@@ -288,7 +288,7 @@ export default function CheckoutScreen() {
 
       <UiText style={styles.fieldLabel}>{translate("checkoutWilaya")}</UiText>
       <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
-        <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language) : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
+        <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr) : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
         {wilayas.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
       {wilayas.isError ? <PressableSurface accessibilityLabel={translate("retry")} onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
