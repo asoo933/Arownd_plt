@@ -23,7 +23,7 @@ export default function StoreDetailsScreen() {
   const store = useQuery({
     queryKey: ["customer-store", storeId],
     queryFn: () => fetchStoreDetails(storeId),
-    enabled: Boolean(storeId)
+    enabled: Boolean(storeId) && tab === "products"
   });
   const offers = useQuery({
     queryKey: ["customer-store-offers", storeId],
