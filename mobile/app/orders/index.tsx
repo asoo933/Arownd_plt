@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Icon, IconButton, OrderCard, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
-import { formatDZD } from "@/lib/catalog";
+import { formatDZD, formatNumber } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, type Language, useLanguage } from "@/lib/i18n";
@@ -154,7 +154,7 @@ export default function OrdersScreen() {
         </View>
         {row.storeName ? <UiText style={styles.storeName}>{row.storeName}</UiText> : null}
         <View style={styles.metaRow}>
-          <UiText style={[styles.meta, { color: theme.colors.muted }]}>{row.itemCount} {translate("ordersItems")}</UiText>
+          <UiText style={[styles.meta, { color: theme.colors.muted }]}>{formatNumber(row.itemCount)} {translate("ordersItems")}</UiText>
           <Icon name="shopping-bag" size={designTokens.dimensions.iconSize.xs} color={theme.colors.muted} />
         </View>
         <View style={styles.cardFooter}>
