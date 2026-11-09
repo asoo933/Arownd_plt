@@ -22,7 +22,7 @@ export function MerchantNavigation() {
     retry: false
   });
 
-  if (access.data?.status !== "merchant_ready" || !access.data.store?.id) return null;
+  if (access.data?.status !== "merchant_ready" && access.data?.status !== "merchant_setup_required") return null;
 
   return (
     <BottomNavigation
@@ -32,20 +32,23 @@ export function MerchantNavigation() {
         const destination = tabs.find((tab) => tab.key === key)?.path;
         if (destination && pathname !== destination) router.replace(destination);
       }}
-      items={tabs.map((tab) => ({
-        key: tab.key,
-        label: translate(tab.label),
-        icon: (
-          <Icon
-            name={tab.icon}
-            size={22}
-            color={theme.colors.accentMuted}
-            fill={theme.colors.accentMuted}
-            strokeWidth={2}
-            accessibilityHidden
-          />
-        )
-      }))}
+      items={tabs.map((tab) => {
+        const selected = tab.key === "studio";
+        return {
+          key: tab.key,
+          label: translate(tab.label),
+          icon: (
+            <Icon
+              name={tab.icon}
+              size={22}
+              color={selected ? theme.colors.accentMuted : theme.colors.muted}
+              fill={selected ? theme.colors.accentMuted : "none"}
+              strokeWidth={selected ? 2 : 1.8}
+              accessibilityHidden
+            />
+          )
+        };
+      })}
     />
   );
 }
