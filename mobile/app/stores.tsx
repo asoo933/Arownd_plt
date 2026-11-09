@@ -14,7 +14,7 @@ export default function StoresScreen() {
   const stores = useQuery({ queryKey: ["customer-stores"], queryFn: fetchFeaturedStores, staleTime: 60_000 });
   return (
     <CustomerScreen>
-      <AppHeader title={translate("storesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={20} />} />} />
+      <AppHeader title={translate("storesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />} />
       <UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("storesSubtitle")}</UiText>
       {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void stores.refetch()} />
