@@ -35,9 +35,9 @@ function AccountTypeOption({
       style={[
         styles.option,
         {
-          backgroundColor: selected ? theme.colors.surfaceMuted : theme.colors.surface,
-          borderColor: selected ? theme.colors.accentMuted : theme.colors.border,
-          borderWidth: selected ? 2 : 1
+          backgroundColor: selected ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted) : (theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface),
+          borderColor: selected ? (theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted) : (theme.mode === "light" ? "transparent" : theme.colors.border),
+          borderWidth: selected ? 2 : theme.mode === "light" ? 0 : 1
         }
       ]}
     >
