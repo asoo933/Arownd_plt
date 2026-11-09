@@ -84,7 +84,7 @@ export default function CartScreen() {
     {evaluation.blockingCount > 0 ? <Alert tone="danger" description={translate("cartBlocked") + evaluation.blockingCount} /> : null}
     {[...groups.entries()].map(([storeId, group]) => <Card key={storeId} style={style.group} contentStyle={style.groupContent}>
       <UiText tone="accentMuted" weight="900" style={style.store}>{group.storeName}</UiText>
-      {group.items.map((item) => {
+      {group.items.map((item, itemIndex) => {
         const key = cartLineKey(item);
         const offer = offerById.get(item.offerId);
         const line = evaluation.lines.find((entry) => cartLineKey(entry.item) === key);
@@ -92,7 +92,7 @@ export default function CartScreen() {
         const currentPrice = offer?.price ?? item.price ?? 0;
         const blocking = (line?.issues.length ?? 0) > 0;
         const totalRequestedForOffer = cart.data.filter((entry) => entry.offerId === item.offerId).reduce((sum, entry) => sum + entry.quantity, 0);
-        return <CartItem key={key} style={style.line}>
+        return <CartItem key={key} style={[style.line, itemIndex === group.items.length - 1 && style.lastLine]}>
           <View style={style.itemContent}>
             <PressableSurface
               accessibilityLabel={offer?.product.name ?? item.name}
@@ -102,10 +102,15 @@ export default function CartScreen() {
             >
               <View style={style.thumb}>{image ? <UiImage uri={image} accessibilityLabel={offer?.product.name ?? item.name ?? ""} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={28} color={theme.colors.subtle} accessibilityHidden />}</View>
               <View style={style.details}>
-                <UiText weight="800" style={style.name}>{offer?.product.name ?? item.name}</UiText>
-                <Caption style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Caption>
+                <UiText numberOfLines={2} weight="800" style={style.name}>{offer?.product.name ?? item.name}</UiText>
+                {Object.keys(normalizeCartOptions(item.options)).length > 0 ? <Caption style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Caption> : null}
                 {line?.issues.map((issue) => <Caption key={issue} tone="warning" weight="700" style={style.issue}>{issueLabels[issue]}</Caption>)}
-                <PriceText value={formatDZD(currentPrice * item.quantity)} tone="accentMuted" style={style.price} />
+                <PriceText
+                  value={formatDZD(currentPrice * item.quantity)}
+                  previousValue={line?.issues.includes("priceChanged") && item.price != null ? formatDZD(item.price * item.quantity) : undefined}
+                  tone="accentMuted"
+                  style={style.price}
+                />
                 {item.quantity > 1 ? <Caption style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Caption> : null}
               </View>
             </PressableSurface>
@@ -153,8 +158,9 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   itemCount: { fontSize: designTokens.typography.caption + 1 },
   store: { fontSize: designTokens.typography.body - 1, textAlign: "auto" },
   line: { paddingVertical: 0 },
+  lastLine: { borderBottomWidth: 0 },
   itemContent: { flex: 1, gap: designTokens.spacing.sm },
-  lineMain: { flexDirection: "row", gap: designTokens.spacing.md },
+  lineMain: { flex: 1, flexDirection: "row", gap: designTokens.spacing.md },
   thumb: { width: 76, height: 76, borderRadius: designTokens.radius.md, backgroundColor: theme.colors.surfaceMuted, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   details: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   name: { fontSize: designTokens.typography.body - 1, textAlign: "auto" },
