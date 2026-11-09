@@ -62,6 +62,7 @@ export default function MerchantEditProductScreen() {
     image_url: string;
     is_primary: boolean;
   } | null>(null);
+  const [previewImage, setPreviewImage] = useState<{ uri: string } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -338,164 +339,6 @@ export default function MerchantEditProductScreen() {
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductEditSubtitle")}</UiText>
 
           <Card contentStyle={styles.card}>
-            <View style={styles.productHeading}>
-              <UiText style={[styles.productName, { color: theme.colors.foreground }]}>{offer.product.name}</UiText>
-              {offer.product.brand ? (
-                <UiText style={[styles.productBrand, { color: theme.colors.muted }]}>{offer.product.brand}</UiText>
-              ) : null}
-            </View>
-
-            <View style={styles.sharedDetails}>
-              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-                {translate("merchantProductSharedDetailsTitle")}
-              </UiText>
-              <View style={styles.field}>
-                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductNameLabel")}
-                </UiText>
-                <TextField
-                  value={productName}
-                  onChangeText={setProductName}
-                  editable={!isBusy}
-                  maxLength={120}
-                  accessibilityLabel={translate("merchantProductNameLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-                />
-              </View>
-              <View style={styles.field}>
-                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductBrandLabel")}
-                </UiText>
-                <TextField
-                  value={productBrand}
-                  onChangeText={setProductBrand}
-                  editable={!isBusy}
-                  maxLength={80}
-                  accessibilityLabel={translate("merchantProductBrandLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-                />
-              </View>
-              <View style={styles.field}>
-                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductDescriptionLabel")}
-                </UiText>
-                <TextField
-                  value={productDescription}
-                  onChangeText={setProductDescription}
-                  editable={!isBusy}
-                  maxLength={3000}
-                  multiline
-                  textAlignVertical="top"
-                  accessibilityLabel={translate("merchantProductDescriptionLabel")}
-                  style={[styles.input, styles.descriptionInput, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-                />
-              </View>
-              <View style={styles.field}>
-                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductCategoryLabel")}
-                </UiText>
-                <PressableSurface
-                  accessibilityRole="button"
-                  accessibilityLabel={translate("merchantProductCategoryLabel")}
-                  disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
-                  onPress={() => setCategoryPickerOpen(true)}
-                  style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: theme.colors.border, opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
-                >
-                  <UiText style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
-                    {selectedCategory
-                      ? `${selectedCategory.emoji} ${getLocalizedMerchantCategoryLabel(selectedCategory.id, selectedCategory.label, language)}`
-                      : translate("merchantProductCategoryUnknown")}
-                  </UiText>
-                </PressableSurface>
-                {categoriesQuery.isError ? (
-                  <UiText style={[styles.hint, { color: theme.colors.danger }]}>
-                    {translate("merchantProductCategoriesLoadError")}
-                  </UiText>
-                ) : null}
-              </View>
-              <UiText style={[styles.noteText, { color: theme.colors.muted }]}>
-                {translate("merchantProductEditSharedFieldsHint")}
-              </UiText>
-              <Button label={translate("merchantProductDetailsSave")} onPress={() => void saveProductDetails()} loading={detailsSaving} disabled={isBusy && !detailsSaving} fullWidth />
-            </View>
-          </Card>
-
-          <Card contentStyle={styles.card}>
-            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-              {translate("merchantProductOfferDetailsTitle")}
-            </UiText>
-            <View style={styles.field}>
-              <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                {translate("merchantProductPriceLabel")}
-              </UiText>
-              <TextField
-                value={price}
-                onChangeText={setPrice}
-                editable={!isBusy}
-                keyboardType="number-pad"
-                accessibilityLabel={translate("merchantProductPriceLabel")}
-                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-              />
-            </View>
-
-            <View style={styles.field}>
-              <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                {translate("merchantProductStockLabel")}
-              </UiText>
-              <TextField
-                value={stock}
-                onChangeText={setStock}
-                editable={!isBusy}
-                keyboardType="number-pad"
-                accessibilityLabel={translate("merchantProductStockLabel")}
-                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-              />
-              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
-                {translate("merchantProductsStockHint")}
-              </UiText>
-            </View>
-
-            <View style={styles.optionsSection}>
-              <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-                {translate("merchantProductOptionsTitle")}
-              </UiText>
-              <View style={styles.field}>
-                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductSizesLabel")}
-                </UiText>
-                <TextField
-                  value={sizes}
-                  onChangeText={setSizes}
-                  editable={!isBusy}
-                  placeholder={translate("merchantProductOptionsPlaceholder")}
-                  placeholderTextColor={theme.colors.placeholder}
-                  accessibilityLabel={translate("merchantProductSizesLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-                />
-              </View>
-              <View style={styles.field}>
-                <UiText style={[styles.label, { color: theme.colors.foreground }]}>
-                  {translate("merchantProductColorsLabel")}
-                </UiText>
-                <TextField
-                  value={colors}
-                  onChangeText={setColors}
-                  editable={!isBusy}
-                  placeholder={translate("merchantProductOptionsPlaceholder")}
-                  placeholderTextColor={theme.colors.placeholder}
-                  accessibilityLabel={translate("merchantProductColorsLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-                />
-              </View>
-              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
-                {translate("merchantProductOptionsHint")}
-              </UiText>
-            </View>
-
-            <Button label={translate("merchantProductEditSave")} onPress={() => void saveOffer()} loading={saving} disabled={isBusy && !saving} fullWidth />
-          </Card>
-
-          <Card contentStyle={styles.card}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitles}>
                 <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
@@ -510,60 +353,78 @@ export default function MerchantEditProductScreen() {
               </UiText>
             </View>
 
-            {offer.images.length > 0 ? (
-              <View style={styles.imageGrid}>
-                {offer.images.map((image) => (
-                  <View key={image.id} style={styles.imageItem}>
-                    <UiImage uri={image.image_url} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.imagePreview} />
-                    {image.is_primary ? (
-                      <View style={[styles.primaryBadge, { backgroundColor: theme.colors.accent }]}>
-                        <UiText style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
-                          {translate("merchantProductImagePrimary")}
-                        </UiText>
-                      </View>
-                    ) : null}
-                    <PressableSurface
-                      accessibilityRole="button"
-                      accessibilityLabel={translate("merchantProductImageRemove")}
-                      disabled={isBusy}
-                      onPress={() => setPendingRemoval(image)}
-                      style={[styles.imageRemove, { backgroundColor: theme.colors.danger, opacity: isBusy ? 0.55 : 1 }]}
-                      hitSlop={8}
-                    >
-                      {removingImageId === image.id ? (
-                        <Spinner color={designTokens.brand.white} size="small" />
-                      ) : (
-                        <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
-                      )}
-                    </PressableSurface>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <View style={[styles.emptyImages, { backgroundColor: theme.colors.surfaceMuted }]}>
-                <UiText style={[styles.emptyText, { color: theme.colors.muted }]}>
-                  {translate("merchantProductImagesEmpty")}
-                </UiText>
-              </View>
-            )}
+            <View style={styles.imageGrid}>
+              {offer.images.map((image) => (
+                <View key={image.id} style={styles.imageItem}>
+                  <PressableSurface
+                    accessibilityRole="button"
+                    accessibilityLabel={translate("merchantProductImagesLabel")}
+                    accessibilityState={{ selected: image.is_primary }}
+                    disabled={isBusy}
+                    onPress={() => setPreviewImage({ uri: image.image_url })}
+                    style={[styles.imagePreviewPressable, { opacity: isBusy ? 0.65 : 1 }]}
+                  >
+                    <UiImage
+                      uri={image.image_url}
+                      accessibilityLabel={translate("merchantProductImagesLabel")}
+                      aspectRatio={1}
+                      style={styles.imagePreview}
+                    />
+                  </PressableSurface>
+                  {image.is_primary ? (
+                    <View style={[styles.primaryBadge, { backgroundColor: theme.colors.accent }]}>
+                      <UiText style={[styles.primaryBadgeText, { color: theme.colors.accentForeground }]}>
+                        {translate("merchantProductImagePrimary")}
+                      </UiText>
+                    </View>
+                  ) : null}
+                  <PressableSurface
+                    accessibilityRole="button"
+                    accessibilityLabel={translate("merchantProductImageRemove")}
+                    disabled={isBusy}
+                    onPress={() => setPendingRemoval(image)}
+                    style={[styles.imageRemove, { backgroundColor: theme.colors.danger, opacity: isBusy ? 0.55 : 1 }]}
+                    hitSlop={8}
+                  >
+                    {removingImageId === image.id ? (
+                      <Spinner color={designTokens.brand.white} size="small" />
+                    ) : (
+                      <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
+                    )}
+                  </PressableSurface>
+                </View>
+              ))}
 
-            <PressableSurface
-              accessibilityRole="button"
-              accessibilityLabel={translate("merchantProductImageAdd")}
-              disabled={isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT}
-              onPress={() => void chooseAndUploadImage()}
-              style={[styles.secondaryButton, { borderColor: theme.colors.border, opacity: isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT ? 0.55 : 1 }]}
-            >
-              {imageBusy ? (
-                <Spinner size="small" />
-              ) : (
-                <UiText style={[styles.secondaryButtonText, { color: theme.colors.accentMuted }]}>
-                  {translate("merchantProductImageAdd")}
-                </UiText>
-              )}
-            </PressableSurface>
+              {offer.images.length < PRODUCT_IMAGE_MAX_COUNT ? (
+                <PressableSurface
+                  accessibilityRole="button"
+                  accessibilityLabel={translate("merchantProductImageAdd")}
+                  accessibilityState={{ disabled: isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT, busy: imageBusy }}
+                  disabled={isBusy || offer.images.length >= PRODUCT_IMAGE_MAX_COUNT}
+                  onPress={() => void chooseAndUploadImage()}
+                  style={[
+                    styles.imageAddItem,
+                    {
+                      borderColor: theme.colors.border,
+                      backgroundColor: theme.colors.surfaceMuted,
+                      opacity: isBusy ? 0.55 : 1
+                    }
+                  ]}
+                >
+                  {imageBusy ? (
+                    <Spinner size="small" />
+                  ) : (
+                    <>
+                      <Icon name="plus" size={22} color={theme.colors.accentMuted} accessibilityHidden />
+                      <UiText style={[styles.imageAddText, { color: theme.colors.accentMuted }]}>
+                        {translate("merchantProductImageAdd")}
+                      </UiText>
+                    </>
+                  )}
+                </PressableSurface>
+              ) : null}
+            </View>
           </Card>
-
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
               <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
@@ -581,6 +442,22 @@ export default function MerchantEditProductScreen() {
           ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <MediaViewer
+        visible={previewImage !== null}
+        onRequestClose={() => setPreviewImage(null)}
+        closeLabel={translate("merchantProductCategoryClose")}
+      >
+        {previewImage ? (
+          <UiImage
+            uri={previewImage.uri}
+            accessibilityLabel={translate("merchantProductImagesLabel")}
+            aspectRatio={1}
+            resizeMode="contain"
+            style={styles.fullscreenImage}
+          />
+        ) : null}
+      </MediaViewer>
 
       <BottomSheet visible={categoryPickerOpen} onRequestClose={() => setCategoryPickerOpen(false)} maxHeight="85%">
             <UiText style={[styles.confirmTitle, { color: theme.colors.foreground }]}>
@@ -707,7 +584,11 @@ function createStyles(theme: AppTheme) {
     imageCount: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     imageGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md },
     imageItem: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "visible" },
+    imagePreviewPressable: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "hidden" },
     imagePreview: { width: 94, height: 94, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
+    imageAddItem: { width: 94, height: 94, borderWidth: 1, borderStyle: "dashed", borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.xs, padding: designTokens.spacing.xs },
+    imageAddText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
+    fullscreenImage: { width: "100%", maxHeight: 520, borderRadius: designTokens.radius.md },
     primaryBadge: { position: "absolute", start: 4, bottom: 4, borderRadius: designTokens.radius.sm, paddingHorizontal: 5, paddingVertical: designTokens.spacing.xs },
     primaryBadgeText: { fontSize: 8, fontWeight: designTokens.fontWeights.extrabold },
     imageRemove: { position: "absolute", top: -7, end: -7, width: 26, height: 26, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
