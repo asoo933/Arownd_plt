@@ -313,7 +313,7 @@ export default function SettingsScreen() {
           style={[styles.languageOption, language === "ar" && { backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted }]}
         >
           <UiText weight={language === "ar" ? "700" : "500"}>{translate("settingsLanguageArabic")}</UiText>
-          {language === "ar" ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
+          {language === "ar" ? <Icon name="circle-check" size={19} color={theme.mode === "light" ? theme.colors.accentForeground : theme.colors.success} /> : null}
         </PressableSurface>
         <PressableSurface
           accessibilityRole="button"
