@@ -40,21 +40,28 @@ export default function FavoritesScreen() {
   const [tab, setTab] = useState<FavoriteTab>("products");
   const favorites = useQuery({ queryKey: FAVORITES_QUERY_KEY, queryFn: getFavorites });
   const content = useQuery({
-    queryKey: ["customer-favorites-content", favorites.data?.products, favorites.data?.stores],
+    queryKey: ["customer-favorites-content", tab, tab === "products" ? favorites.data?.products : favorites.data?.stores],
     enabled: Boolean(favorites.data),
     queryFn: async () => {
       const ids = favorites.data;
       if (!ids) return { products: [], stores: [] };
-      const [productResults, storeResults] = await Promise.all([
-        Promise.all(ids.products.map(async (id) => {
+      if (tab === "products") {
+        const productResults = await Promise.all(ids.products.map(async (id) => {
           const offers = await fetchProductOffers(id);
           const best = chooseBestProductOffer(offers);
           return best ? { id, offer: best } : null;
-        })),
-        Promise.all(ids.stores.map(async (id) => ({ id, store: await fetchStoreDetails(id) })))
-      ]);
+        }));
+        return {
+          products: productResults.flatMap((item) => item === null ? [] : [item]),
+          stores: []
+        };
+      }
+      const storeResults = await Promise.all(ids.stores.map(async (id) => ({
+        id,
+        store: await fetchStoreDetails(id)
+      })));
       return {
-        products: productResults.flatMap((item) => item === null ? [] : [item]),
+        products: [],
         stores: storeResults.flatMap((item) => item.store === null ? [] : [item])
       };
     }
