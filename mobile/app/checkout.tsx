@@ -428,7 +428,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   radio: { width: 17, height: 17, borderRadius: 9, borderWidth: 1.5, borderColor: theme.colors.muted },
   radioSelected: { borderWidth: 5, borderColor: theme.colors.accentMuted },
   deliveryOptions: { flexDirection: "row", gap: designTokens.spacing.sm },
-  deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 14, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
+  deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
   deliverySelected: { borderColor: theme.colors.accentMuted, backgroundColor: theme.colors.successSurface },
   deliveryTitle: { color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   deliveryTextSelected: { color: theme.colors.accentMuted },
@@ -449,7 +449,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   orderId: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   hint: { color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "center" },
   modalBackdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "flex-end" },
-  modalPanel: { maxHeight: "78%", minHeight: "45%", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: designTokens.spacing.xl, gap: designTokens.spacing.md },
+  modalPanel: { maxHeight: "78%", minHeight: "45%", borderTopLeftRadius: designTokens.radius.xl, borderTopRightRadius: designTokens.radius.xl, padding: designTokens.spacing.xl, gap: designTokens.spacing.md },
   modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   pickerItem: { minHeight: 48, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border },
   pickerText: { fontSize: designTokens.typography.body, textAlign: "auto", fontWeight: designTokens.fontWeights.bold }
