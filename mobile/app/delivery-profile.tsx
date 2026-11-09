@@ -10,11 +10,12 @@ import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-pr
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 
 type Picker = "wilaya" | "commune" | null;
 
 export default function DeliveryProfileScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -92,7 +93,7 @@ export default function DeliveryProfileScreen() {
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
     ? (wilayas.data ?? []).map((item) => ({
         id: String(item.id),
-        label: String(item.id).padStart(2, "0") + " - " + item.name_ar,
+        label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language),
         wilaya: item
       }))
     : (communes.data ?? []).map((item) => ({ id: item, label: item }));
@@ -129,7 +130,7 @@ export default function DeliveryProfileScreen() {
       <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" />
       <FormLabel>{translate("checkoutWilaya")}</FormLabel>
       <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => setPicker("wilaya")} style={pickerStyle}>
-        <UiText tone={selectedWilaya ? "foreground" : "muted"}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</UiText>
+        <UiText tone={selectedWilaya ? "foreground" : "muted"}>{selectedWilaya ? getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language) : translate("checkoutChooseWilaya")}</UiText>
       </PressableSurface>
       <FormLabel>{translate("checkoutCommune")}</FormLabel>
       <TextField
