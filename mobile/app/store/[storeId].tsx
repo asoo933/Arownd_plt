@@ -30,7 +30,7 @@ export default function StoreDetailsScreen() {
   });
 
   if (store.isPending) return <CustomerScreen>
-    <AppHeader title="" />
+    <AppHeader title="" leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />} />
     <StoreCardSkeleton />
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md }}>
       {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
