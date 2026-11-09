@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, type ScrollViewInstance } from "react-native";
 
 import { Avatar, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import {
@@ -26,7 +26,7 @@ export default function CustomerHomeScreen() {
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
 
-  const storeScrollRef = useRef<ScrollView | null>(null);
+  const storeScrollRef = useRef<ScrollViewInstance | null>(null);
   const scrollOffsetRef = useRef(0);
   const isDraggingRef = useRef(false);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
