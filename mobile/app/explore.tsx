@@ -7,7 +7,7 @@ import { CustomerScreen, EmptyState, ErrorState, LoadingState, ProductTile, Sect
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Icon, IconButton, PressableSurface, SearchField, Text as UiText } from "@/components/ui";
+import { CategorySelectorTile, Icon, IconButton, SearchField, Text as UiText } from "@/components/ui";
 
 const categories = [
   { id: "fashion", icon: "shirt", label: "categoryFashion" },
@@ -76,32 +76,23 @@ export default function ExploreScreen() {
 
   const orderedCategories = language === "ar" ? [...categories].reverse() : categories;
 
-  const renderCategory = (item: (typeof categories)[number]) => {
+  const renderCategory = (item: (typeof categories)[number], instance: "primary" | "duplicate") => {
     const selected = category === item.id;
 
     return (
-      <PressableSurface
-        key={item.id}
-        accessibilityRole="button"
+      <CategorySelectorTile
+        key={`${instance}-${item.id}`}
+        label={translate(item.label)}
         accessibilityLabel={translate(item.label)}
-        accessibilityState={{ selected }}
+        icon={item.icon}
+        selected={selected}
         onPress={() => {
           animationRef.current?.stop();
           if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
           resumeTimerRef.current = setTimeout(() => animationRef.current?.start(), 900);
           router.setParams({ category: selected ? undefined : item.id });
         }}
-        style={[
-          styles.category,
-          {
-            backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
-            borderColor: selected ? theme.colors.accent : theme.colors.border
-          }
-        ]}
-      >
-        <Icon name={item.icon} size={27} color={selected ? theme.colors.accentForeground : theme.colors.accentMuted} accessibilityHidden />
-        <UiText style={[styles.categoryLabel, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(item.label)}</UiText>
-      </PressableSurface>
+      />
     );
   };
 
@@ -128,7 +119,6 @@ export default function ExploreScreen() {
             icon={<Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />}
           />
         </View>
-        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("exploreSubtitle")}</UiText>
       </View>
 
       <View>
@@ -144,14 +134,14 @@ export default function ExploreScreen() {
             ]}
           >
             <View style={styles.categoryGroup} onLayout={(event) => setRailWidth(event.nativeEvent.layout.width)}>
-              {orderedCategories.map(renderCategory)}
+              {orderedCategories.map((item) => renderCategory(item, "primary"))}
             </View>
             <View
               style={styles.categoryGroup}
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             >
-              {orderedCategories.map(renderCategory)}
+              {orderedCategories.map((item) => renderCategory(item, "duplicate"))}
             </View>
           </Animated.View>
         </View>
@@ -182,12 +172,9 @@ const styles = StyleSheet.create({
   topSection: { gap: designTokens.spacing.xs },
   header: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
   search: { flex: 1 },
-  subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
   categoryViewport: { overflow: "hidden" },
   categoryTrack: { flexDirection: "row", alignItems: "center", direction: "ltr" },
   categoryGroup: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm, paddingRight: designTokens.spacing.sm, flexShrink: 0, direction: "ltr" },
-  category: { width: 112, minHeight: 88, borderWidth: 1, borderRadius: designTokens.radius.lg, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
-  categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
   footer: { fontSize: designTokens.typography.caption, textAlign: "center", padding: designTokens.spacing.lg }
 });
