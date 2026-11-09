@@ -30,7 +30,7 @@ export default function StoreDetailsScreen() {
   });
 
   if (store.isPending) return <CustomerScreen>
-    <AppHeader title={translate("storeTitle")} />
+    <AppHeader title="" />
     <StoreCardSkeleton />
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md }}>
       {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
