@@ -240,7 +240,7 @@ export default function OrderDetailsScreen() {
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderRecipientTitle")}</UiText>
       <UiText style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</UiText>
-      <UiText style={styles.meta}>{getLocalizedWilayaLabel(order.wilaya_id ?? 0, order.wilaya?.name_ar ?? "", language)} · {order.commune ?? ""}</UiText>
+      <UiText style={styles.meta}>{getLocalizedWilayaLabel(order.wilaya_id ?? 0, order.wilaya?.name_ar ?? "", language, order.wilaya?.name_fr)} · {order.commune ?? ""}</UiText>
       {order.delivery_type === "home" && order.address_line ? <UiText style={styles.meta}>{order.address_line}</UiText> : null}
       <UiText style={styles.meta}>{order.phone ?? ""}</UiText>
       <UiText style={styles.meta}>{order.delivery_type === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")}</UiText>
