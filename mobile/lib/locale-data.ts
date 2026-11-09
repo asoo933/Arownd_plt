@@ -113,9 +113,9 @@ const MERCHANT_CATEGORY_NAMES_EN: Record<string, string> = {
   misc: "Other Products"
 };
 
-export function getLocalizedWilayaLabel(id: number, fallback: string, language: Language): string {
+export function getLocalizedWilayaLabel(id: number, fallback: string, language: Language, nameFr?: string | null): string {
   if (language === "ar") return fallback;
-  return WILAYA_NAMES_EN[id] ?? fallback;
+  return nameFr?.trim() || WILAYA_NAMES_EN[id] || fallback;
 }
 
 export function getLocalizedMerchantCategoryLabel(
