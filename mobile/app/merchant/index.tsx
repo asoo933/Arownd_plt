@@ -57,7 +57,7 @@ export default function MerchantEntryScreen() {
 
   if (access.data.status === "personal" || access.data.status === "merchant_setup_required") {
     return (
-      <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
         <ScrollView contentContainerStyle={styles.entryContent}>
           <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />
           <View style={[styles.entryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
@@ -111,7 +111,7 @@ export default function MerchantEntryScreen() {
   const recentOrders = data.orders.slice(0, 5);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
 
@@ -283,7 +283,7 @@ function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
-    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <LoadingState label={label} />
       </View>
@@ -303,7 +303,7 @@ function MessageScreen({
   onAction: () => void;
 }) {
   return (
-    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
