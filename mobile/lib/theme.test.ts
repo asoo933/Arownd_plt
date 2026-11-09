@@ -22,7 +22,7 @@ describe("design system theme tokens", () => {
     expect(light.colors.foregroundSecondary).toBe("#737373");
     expect(dark.colors.foregroundSecondary).toBe("#A3A3A3");
     expect(light.colors.inputBorder).toBe("#8A8A8A");
-    expect(dark.colors.inputBorder).toBe("#525252");
+    expect(dark.colors.inputBorder).toBe("#707070");
   });
 
   it("exposes consistent spacing, radius, typography and dimensions", () => {
