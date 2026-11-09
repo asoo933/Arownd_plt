@@ -186,7 +186,7 @@ export default function MerchantOnboardingScreen() {
                     placeholderTextColor={theme.colors.placeholder}
                     style={styles.input}
                     maxLength={100}
-                    textAlign="right"
+                    textAlign="auto"
                     autoCapitalize="words"
                     returnKeyType="next"
                   />
@@ -213,7 +213,7 @@ export default function MerchantOnboardingScreen() {
                     style={styles.input}
                     keyboardType="phone-pad"
                     maxLength={20}
-                    textAlign="right"
+                    textAlign="auto"
                   />
                 </FormField>
               )}
@@ -239,7 +239,7 @@ export default function MerchantOnboardingScreen() {
                     style={styles.input}
                     keyboardType="phone-pad"
                     maxLength={20}
-                    textAlign="right"
+                    textAlign="auto"
                   />
                 </FormField>
               )}
@@ -295,7 +295,7 @@ export default function MerchantOnboardingScreen() {
                     placeholderTextColor={theme.colors.placeholder}
                     style={styles.input}
                     maxLength={80}
-                    textAlign="right"
+                    textAlign="auto"
                   />
                 </FormField>
               )}
@@ -320,7 +320,7 @@ export default function MerchantOnboardingScreen() {
                     style={[styles.input, styles.multiline]}
                     multiline
                     maxLength={300}
-                    textAlign="right"
+                    textAlign="auto"
                     textAlignVertical="top"
                   />
                 </FormField>
