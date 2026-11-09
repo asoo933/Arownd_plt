@@ -13,7 +13,7 @@ import {
   fetchMerchantAccess,
   fetchMerchantDashboard
 } from "@/lib/merchant";
-import { translate, type TranslationKey } from "@/lib/i18n";
+import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
@@ -31,6 +31,7 @@ const FILTERS: ReadonlyArray<{ value: OrderFilter; label: TranslationKey }> = [
 ];
 
 export default function MerchantOrdersScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const [filter, setFilter] = useState<OrderFilter>("all");
@@ -177,7 +178,7 @@ function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; t
             : translate("checkoutHomeDelivery")}
         </UiText>
       </View>
-      <UiText style={{ color: theme.colors.accentMuted, fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" }}>
+      <UiText style={{ color: theme.colors.accentMuted, fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" }}>
         {translate("merchantOrderDetailTitle")} ←
       </UiText>
     </MerchantOrderCard>
@@ -250,22 +251,22 @@ function createStyles(theme: AppTheme) {
     safe: { flex: 1 },
     content: { padding: designTokens.spacing.xl, paddingBottom: 35, gap: designTokens.spacing.lg },
     eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "right" },
+    subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
     filters: { paddingVertical: designTokens.spacing.xs },
-    listHeading: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    listHeading: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     countText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     orderList: { gap: designTokens.spacing.md },
     orderCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.sm },
-    orderHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
+    orderHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
     orderCode: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    customerName: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    orderMeta: { fontSize: designTokens.typography.caption, textAlign: "right", lineHeight: 17 },
-    orderFooter: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
+    customerName: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    orderMeta: { fontSize: designTokens.typography.caption, textAlign: "auto", lineHeight: 17 },
+    orderFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 8, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border },
     orderPrice: { alignSelf: "flex-start" },
     deliveryType: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.bold },
-    emptyCard: { padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-end" },
-    emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    limitHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "right", paddingHorizontal: 3 }
+    emptyCard: { padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-start" },
+    emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    limitHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto", paddingHorizontal: 3 }
   });
 }

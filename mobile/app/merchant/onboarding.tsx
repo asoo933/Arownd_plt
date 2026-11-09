@@ -27,11 +27,12 @@ import {
   type MerchantStoreFormValues,
   type MerchantStoreFormInput
 } from "@/lib/merchant-validation";
-import { translate, type TranslationKey } from "@/lib/i18n";
+import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { BottomSheet, AppHeader, Button, Card, ErrorState, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -612,11 +613,11 @@ const stylesForScreen = StyleSheet.create({
   center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
   message: { fontSize: designTokens.typography.body, lineHeight: 22, textAlign: "center", fontWeight: designTokens.fontWeights.bold },
   field: { gap: designTokens.spacing.sm },
-  fieldLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  hint: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "right" },
-  error: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "right", fontWeight: designTokens.fontWeights.bold },
+  fieldLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  hint: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "auto" },
+  error: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "auto", fontWeight: designTokens.fontWeights.bold },
   wilayaOption: { minHeight: designTokens.dimensions.controlHeight.lg, justifyContent: "center", borderBottomWidth: StyleSheet.hairlineWidth },
-  wilayaText: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.bold, textAlign: "right" }
+  wilayaText: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" }
 });
 
 function createStyles(theme: AppTheme) {
@@ -625,9 +626,9 @@ function createStyles(theme: AppTheme) {
     flex: { flex: 1 },
     content: { padding: designTokens.spacing.xl, paddingBottom: 38, gap: designTokens.spacing.lg },
     backText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
-    subtitle: { fontSize: designTokens.typography.body - 1, lineHeight: 21, textAlign: "right" },
+    subtitle: { fontSize: designTokens.typography.body - 1, lineHeight: 21, textAlign: "auto" },
     section: { padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
-    sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     input: {
       minHeight: designTokens.dimensions.controlHeight.lg,
       borderWidth: 1,
@@ -644,13 +645,13 @@ function createStyles(theme: AppTheme) {
       borderWidth: 1,
       borderRadius: designTokens.radius.sm,
       paddingHorizontal: designTokens.spacing.md,
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between"
     },
-    selectText: { flex: 1, textAlign: "right", fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
+    selectText: { flex: 1, textAlign: "auto", fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
     selectIcon: { fontSize: 20, marginStart: 10 },
-    categoryGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+    categoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     categoryOption: {
       width: "48%",
       minHeight: 54,
@@ -663,17 +664,17 @@ function createStyles(theme: AppTheme) {
     },
     categoryText: { fontSize: designTokens.typography.caption + 1, textAlign: "center", fontWeight: designTokens.fontWeights.extrabold, lineHeight: 18 },
     subcategoryGroup: { gap: designTokens.spacing.sm },
-    fieldLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    chipList: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+    fieldLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    chipList: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     chip: { minHeight: 39, borderWidth: 1, borderRadius: designTokens.radius.pill, paddingHorizontal: designTokens.spacing.md, justifyContent: "center" },
     chipText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold },
-    hint: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "right" },
-    errorText: { fontSize: designTokens.typography.caption + 1, lineHeight: 18, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
-    hoursRow: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
+    hint: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "auto" },
+    errorText: { fontSize: designTokens.typography.caption + 1, lineHeight: 18, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
+    hoursRow: { flexDirection: "row", gap: designTokens.spacing.md },
     halfField: { flex: 1 },
     timeInput: { minWidth: 0 },
     submitError: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md },
-    modalHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
     modalClose: { minHeight: 40, justifyContent: "center", paddingHorizontal: 4 }
   });
 }

@@ -26,10 +26,11 @@ import {
   type MerchantInventoryFilter,
   type MerchantProductOffer
 } from "@/lib/merchant-products-state";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 export default function MerchantProductsScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -382,45 +383,45 @@ function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
     content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.lg },
-    header: { alignItems: "flex-end", gap: designTokens.spacing.xs },
+    header: { alignItems: "flex-start", gap: designTokens.spacing.xs },
     eyebrow: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
-    title: { width: "100%", fontSize: designTokens.typography.display - 4, lineHeight: 33, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    subtitle: { width: "100%", fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" },
-    summaryGrid: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
-    summaryCard: { flex: 1, minHeight: 75, alignItems: "flex-end", justifyContent: "center" },
-    searchInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.lg, textAlign: "right", fontSize: designTokens.typography.body - 1 },
-    filters: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+    title: { width: "100%", fontSize: designTokens.typography.display - 4, lineHeight: 33, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    subtitle: { width: "100%", fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" },
+    summaryGrid: { flexDirection: "row", gap: designTokens.spacing.sm },
+    summaryCard: { flex: 1, minHeight: 75, alignItems: "flex-start", justifyContent: "center" },
+    searchInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.lg, textAlign: "auto", fontSize: designTokens.typography.body - 1 },
+    filters: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     filterButton: { minHeight: 42, borderWidth: 1, borderRadius: designTokens.radius.pill, paddingHorizontal: 15, justifyContent: "center", alignItems: "center" },
     filterLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     feedback: { borderWidth: 1, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
-    feedbackText: { fontSize: designTokens.typography.caption, lineHeight: 18, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    emptyCard: { gap: designTokens.spacing.sm, alignItems: "flex-end" },
-    emptyTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    emptyHint: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" },
+    feedbackText: { fontSize: designTokens.typography.caption, lineHeight: 18, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    emptyCard: { gap: designTokens.spacing.sm, alignItems: "flex-start" },
+    emptyTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    emptyHint: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
     offerList: { gap: designTokens.spacing.md },
     offerCard: { padding: 13, gap: designTokens.spacing.lg },
-    productHeader: { flexDirection: "row-reverse", alignItems: "flex-start", gap: 11 },
+    productHeader: { flexDirection: "row", alignItems: "flex-start", gap: 11 },
     productImage: { width: 76, height: 76, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     image: { width: "100%", height: "100%" },
     galleryOverlay: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg },
     galleryCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
-    galleryHeader: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
+    galleryHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
     galleryTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
     galleryClose: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    galleryImages: { flexDirection: "row-reverse", gap: designTokens.spacing.md, paddingVertical: 4 },
+    galleryImages: { flexDirection: "row", gap: designTokens.spacing.md, paddingVertical: 4 },
     galleryImage: { width: 260, height: 300, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
     imageFallback: { fontSize: designTokens.typography.title + 2, fontWeight: designTokens.fontWeights.extrabold },
-    productInfo: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-    productName: { width: "100%", fontSize: designTokens.typography.body - 1, lineHeight: 19, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    productBrand: { width: "100%", fontSize: designTokens.typography.caption - 1, textAlign: "right" },
-    badgeRow: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 2 },
+    productInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    productName: { width: "100%", fontSize: designTokens.typography.body - 1, lineHeight: 19, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    productBrand: { width: "100%", fontSize: designTokens.typography.caption - 1, textAlign: "auto" },
+    badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 2 },
     currentPrice: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, marginTop: 1 },
-    inputsRow: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+    inputsRow: { flexDirection: "row", gap: designTokens.spacing.sm },
     inputGroup: { flex: 1, gap: designTokens.spacing.xs },
-    inputLabel: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    stockHint: { fontSize: designTokens.typography.caption - 2, lineHeight: 14, textAlign: "right" },
-    valueInput: { minHeight: 46, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 11, textAlign: "right", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
-    actionsRow: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+    inputLabel: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    stockHint: { fontSize: designTokens.typography.caption - 2, lineHeight: 14, textAlign: "auto" },
+    valueInput: { minHeight: 46, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 11, textAlign: "auto", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
+    actionsRow: { flexDirection: "row", gap: designTokens.spacing.sm },
     messageContainer: { flex: 1, padding: designTokens.spacing.xxl, justifyContent: "center", alignItems: "center", gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, lineHeight: 21, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" }
   });

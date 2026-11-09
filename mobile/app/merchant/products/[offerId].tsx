@@ -31,11 +31,12 @@ import {
 } from "@/lib/merchant-products-state";
 import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { BottomSheet, AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -673,32 +674,32 @@ function createStyles(theme: AppTheme) {
     content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.lg },
     backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center" },
     backText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    header: { alignItems: "flex-end", gap: designTokens.spacing.xs },
+    header: { alignItems: "flex-start", gap: designTokens.spacing.xs },
     eyebrow: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
-    title: { width: "100%", fontSize: designTokens.typography.title + 2, lineHeight: 32, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    subtitle: { width: "100%", fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "right" },
+    title: { width: "100%", fontSize: designTokens.typography.title + 2, lineHeight: 32, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    subtitle: { width: "100%", fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
     card: { padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
-    productHeading: { alignItems: "flex-end", gap: designTokens.spacing.xs, paddingBottom: 3 },
-    productName: { width: "100%", fontSize: designTokens.typography.subtitle, lineHeight: 23, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    productBrand: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "right" },
+    productHeading: { alignItems: "flex-start", gap: designTokens.spacing.xs, paddingBottom: 3 },
+    productName: { width: "100%", fontSize: designTokens.typography.subtitle, lineHeight: 23, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    productBrand: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "auto" },
     sharedDetails: { borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.md },
     descriptionInput: { minHeight: 104, paddingTop: 12 },
     categoryPicker: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, justifyContent: "center", paddingHorizontal: designTokens.spacing.md },
-    categoryPickerText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    categoryPickerText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     field: { gap: designTokens.spacing.xs },
     optionsSection: { gap: designTokens.spacing.md, paddingTop: 2 },
-    label: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, textAlign: "right", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
-    hint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "right" },
+    label: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, textAlign: "auto", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
+    hint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
     note: { borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
-    noteText: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "right" },
+    noteText: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "auto" },
     primaryButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     primaryButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    sectionHeader: { flexDirection: "row-reverse", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.sm },
-    sectionTitles: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    sectionHeader: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.sm },
+    sectionTitles: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     imageCount: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    imageGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.md },
+    imageGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md },
     imageItem: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "visible" },
     imagePreview: { width: 94, height: 94, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
     primaryBadge: { position: "absolute", left: 4, bottom: 4, borderRadius: designTokens.radius.sm, paddingHorizontal: 5, paddingVertical: designTokens.spacing.xs },
@@ -710,14 +711,14 @@ function createStyles(theme: AppTheme) {
     secondaryButton: { minHeight: 46, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center", paddingHorizontal: designTokens.spacing.lg },
     secondaryButtonText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     feedback: { borderWidth: 1, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
-    feedbackText: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "right", fontWeight: designTokens.fontWeights.extrabold },
+    feedbackText: { fontSize: designTokens.typography.caption, lineHeight: 17, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
     confirmCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
     categoryList: { maxHeight: 420 },
     categoryOption: { minHeight: 46, borderWidth: 1, borderRadius: designTokens.radius.sm, justifyContent: "center", paddingHorizontal: designTokens.spacing.md, marginBottom: 8 },
-    categoryOptionText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    confirmTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    confirmHint: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "right" },
-    confirmActions: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+    categoryOptionText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    confirmTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    confirmHint: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
+    confirmActions: { flexDirection: "row", gap: designTokens.spacing.sm },
     cancelButton: { flex: 1, minHeight: 45, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     cancelText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     removeConfirmButton: { flex: 1, minHeight: 45, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },

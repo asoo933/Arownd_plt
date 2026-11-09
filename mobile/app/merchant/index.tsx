@@ -12,12 +12,13 @@ import {
   fetchMerchantDashboard
 } from "@/lib/merchant";
 import { formatDZD } from "@/lib/catalog";
-import { translate, type TranslationKey } from "@/lib/i18n";
+import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
 
@@ -299,43 +300,43 @@ function createStyles(theme: AppTheme) {
     safe: { flex: 1 },
     content: { padding: designTokens.spacing.xl, paddingBottom: 36, gap: designTokens.spacing.lg },
     entryContent: { flexGrow: 1, padding: designTokens.spacing.xl, gap: designTokens.spacing.xl },
-    header: { alignItems: "flex-end", gap: designTokens.spacing.sm },
+    header: { alignItems: "flex-start", gap: designTokens.spacing.sm },
     backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
     backText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    title: { fontSize: designTokens.typography.display - 4, lineHeight: 33, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    body: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "right" },
+    title: { fontSize: designTokens.typography.display - 4, lineHeight: 33, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    body: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" },
     entryCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.xl, gap: designTokens.spacing.lg },
     storeCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
-    storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
+    storeHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
     storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     storeImage: { width: "100%", height: "100%" },
     storeAvatarText: { fontSize: designTokens.typography.display - 4, fontWeight: designTokens.fontWeights.extrabold },
-    storeInfo: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-    storeName: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    storeMeta: { fontSize: designTokens.typography.caption, textAlign: "right" },
-    storeBadges: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 3 },
+    storeInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    storeName: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    storeMeta: { fontSize: designTokens.typography.caption, textAlign: "auto" },
+    storeBadges: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 3 },
     statusPill: { borderRadius: designTokens.radius.pill, paddingHorizontal: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xs },
     statusPillText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
     secondaryButton: { minHeight: 43, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     secondaryButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    sectionHeading: { flexDirection: "row-reverse", alignItems: "flex-end", justifyContent: "space-between", gap: designTokens.spacing.md, marginTop: 2 },
-    sectionHeadingText: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-    sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-    sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "right" },
-    metricsGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+    sectionHeading: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.md, marginTop: 2 },
+    sectionHeadingText: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
+    metricsGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     textButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 3 },
     textButtonLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     ordersCard: { borderWidth: 1, borderRadius: designTokens.radius.md, overflow: "hidden" },
-    orderRow: { paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md },
-    orderMain: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-    orderTopLine: { width: "100%", flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
+    orderRow: { paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
+    orderMain: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    orderTopLine: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
     orderCode: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    orderCustomer: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "right" },
-    orderItems: { width: "100%", fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "right" },
+    orderCustomer: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "auto" },
+    orderItems: { width: "100%", fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "auto" },
     orderAmount: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    emptyCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-end" },
-    emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+    emptyCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-start" },
+    emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     primaryButton: { minHeight: 50, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", paddingHorizontal: designTokens.spacing.lg },
     primaryButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
   });
