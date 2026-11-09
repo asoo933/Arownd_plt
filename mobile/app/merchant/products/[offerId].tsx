@@ -397,7 +397,7 @@ export default function MerchantEditProductScreen() {
                   style={[
                     styles.imageAddItem,
                     {
-                      borderColor: theme.colors.border,
+                      borderColor: theme.colors.inputBorder,
                       backgroundColor: theme.colors.surfaceMuted,
                       opacity: isBusy ? 0.55 : 1
                     }
@@ -574,17 +574,17 @@ export default function MerchantEditProductScreen() {
 
           {notice ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
-              <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
+              <UiText style={[styles.feedbackText, { color: theme.mode === "light" ? theme.colors.successText : theme.colors.success }]}>{notice}</UiText>
             </View>
           ) : null}
           {warning ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.warningSurface, borderColor: theme.colors.warning }]}>
-              <UiText style={[styles.feedbackText, { color: theme.colors.warning }]}>{warning}</UiText>
+              <UiText style={[styles.feedbackText, { color: theme.mode === "light" ? theme.colors.warningText : theme.colors.warning }]}>{warning}</UiText>
             </View>
           ) : null}
           {actionError ? (
             <View style={[styles.feedback, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-              <UiText style={[styles.feedbackText, { color: theme.colors.danger }]}>{actionError}</UiText>
+              <UiText style={[styles.feedbackText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{actionError}</UiText>
             </View>
           ) : null}
         </ScrollView>
