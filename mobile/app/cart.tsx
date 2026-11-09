@@ -16,7 +16,7 @@ import {
   QuantityStepper,
   Text as UiText
 } from "@/components/ui";
-import { fetchOffersByIds, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchOffersByIds, formatDZD, formatNumber, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem as CartLine } from "@/lib/cart-state";
 import {  translate, useLanguage } from "@/lib/i18n";
@@ -73,7 +73,7 @@ export default function CartScreen() {
   return <CustomerScreen>
     <AppHeader
       title={translate("cartTitle")}
-      trailing={<UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("cartItemsCount") + cart.data.reduce((sum, item) => sum + item.quantity, 0)}</UiText>}
+      trailing={<UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("cartItemsCount") + formatNumber(cart.data.reduce((sum, item) => sum + item.quantity, 0))}</UiText>}
     />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
