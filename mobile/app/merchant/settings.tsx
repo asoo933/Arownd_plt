@@ -97,7 +97,7 @@ export default function MerchantStoreSettingsScreen() {
   };
   const chooseStoreImage = async () => {
     if (!storeId || imageBusy || mutation.isPending) return;
-    setImageBusy(kind);
+    setImageBusy("logo");
     setImageError(false);
     setImageSaved(false);
     setImageCleanupPending(false);
