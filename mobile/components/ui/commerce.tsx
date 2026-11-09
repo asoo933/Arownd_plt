@@ -144,15 +144,55 @@ export function ProductVariantSelector({
   value,
   onChange,
   accessibilityLabel,
+  display = "radio",
   style
 }: {
   options: RadioOption[];
   value: string;
   onChange: (value: string) => void;
   accessibilityLabel: string;
+  display?: "radio" | "chips";
   style?: StyleProp<ViewStyle>;
 }) {
-  return <RadioGroup options={options} value={value} onChange={onChange} accessibilityLabel={accessibilityLabel} style={style} />;
+  const theme = useAppTheme();
+
+  if (display === "radio") {
+    return <RadioGroup options={options} value={value} onChange={onChange} accessibilityLabel={accessibilityLabel} style={style} />;
+  }
+
+  return (
+    <View accessibilityRole="radiogroup" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm }, style]}>
+      {options.map((option) => {
+        const selected = option.value === value;
+        return (
+          <Pressable
+            key={option.value}
+            accessibilityRole="radio"
+            accessibilityLabel={option.label}
+            accessibilityState={{ checked: selected, disabled: option.disabled }}
+            disabled={option.disabled}
+            onPress={() => onChange(option.value)}
+            style={({ pressed }) => [{
+              minWidth: theme.dimensions.controlHeight.md,
+              minHeight: theme.dimensions.controlHeight.md,
+              paddingHorizontal: designTokens.spacing.md,
+              borderWidth: 1,
+              borderRadius: theme.radius.md,
+              borderColor: selected ? theme.colors.accentMuted : theme.colors.border,
+              backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: option.disabled ? 0.45 : pressed ? 0.75 : 1
+            }]}
+          >
+            <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.medium }}>
+              {option.label}
+            </UiText>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
 }
 
 export function ProductImageGallery({
