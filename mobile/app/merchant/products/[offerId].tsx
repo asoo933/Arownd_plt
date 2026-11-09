@@ -345,7 +345,7 @@ export default function MerchantEditProductScreen() {
               ) : null}
             </View>
 
-            <View style={[styles.sharedDetails, { backgroundColor: theme.colors.surfaceMuted }]}>
+            <View style={styles.sharedDetails}>
               <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
                 {translate("merchantProductSharedDetailsTitle")}
               </UiText>
@@ -418,7 +418,12 @@ export default function MerchantEditProductScreen() {
               </UiText>
               <Button label={translate("merchantProductDetailsSave")} onPress={() => void saveProductDetails()} loading={detailsSaving} disabled={isBusy && !detailsSaving} fullWidth />
             </View>
+          </Card>
 
+          <Card contentStyle={styles.card}>
+            <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+              {translate("merchantProductOfferDetailsTitle")}
+            </UiText>
             <View style={styles.field}>
               <UiText style={[styles.label, { color: theme.colors.foreground }]}>
                 {translate("merchantProductPriceLabel")}
@@ -683,7 +688,7 @@ function createStyles(theme: AppTheme) {
     productHeading: { alignItems: "flex-start", gap: designTokens.spacing.xs, paddingBottom: 3 },
     productName: { width: "100%", fontSize: designTokens.typography.subtitle, lineHeight: 23, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     productBrand: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "auto" },
-    sharedDetails: { borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.md },
+    sharedDetails: { gap: designTokens.spacing.md },
     descriptionInput: { minHeight: 104, paddingTop: 12 },
     categoryPicker: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, justifyContent: "center", paddingHorizontal: designTokens.spacing.md },
     categoryPickerText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
