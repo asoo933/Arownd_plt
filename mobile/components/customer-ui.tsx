@@ -89,7 +89,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
       onPress={onPress}
       disabled={!onPress}
       accessibilityLabel={`${name}، ${store}، ${price}`}
-      style={[styles.productTile, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }, style]}
+      style={[styles.productTile, { backgroundColor: theme.colors.surfaceSecondary }, style]}
       media={
         <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
           {imageUrl ? <UiImage uri={imageUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={32} color={theme.colors.subtle} accessibilityHidden />}
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   productContent: { padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
   productImage: { height: 132, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   productName: { minHeight: 38 },
-  storeTile: { minHeight: 82, borderWidth: 1, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md - 1 },
+  storeTile: { minHeight: 82, borderRadius: designTokens.radius.lg - 1, padding: designTokens.spacing.md - 1, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md - 1 },
   storeLogo: { width: 54, height: 54, borderRadius: designTokens.radius.md + 2, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   storeInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-start" },
 });
