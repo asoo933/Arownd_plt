@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { Button, Icon } from "@/components/ui";
+import { Button, Icon, IconButton } from "@/components/ui";
 import { getFavorites, toggleFavorite } from "@/lib/favorites";
 import { hasFavorite, type FavoriteKind } from "@/lib/favorites-state";
 import { translate } from "@/lib/i18n";
@@ -8,7 +8,7 @@ import { useAppTheme } from "@/lib/theme";
 
 export const FAVORITES_QUERY_KEY = ["customer-favorites"] as const;
 
-export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string }) {
+export function FavoriteButton({ kind, id, iconOnly = false }: { kind: FavoriteKind; id: string; iconOnly?: boolean }) {
   const theme = useAppTheme();
   const queryClient = useQueryClient();
   const favorites = useQuery({
@@ -25,10 +25,28 @@ export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string })
 
   const active = favorites.data ? hasFavorite(favorites.data, kind, id) : false;
   const disabled = favorites.isPending || mutation.isPending || favorites.isError;
+  const label = translate(active ? "favoriteSaved" : "favoriteAdd");
+
+  if (iconOnly) {
+    return (
+      <IconButton
+        accessibilityLabel={label}
+        onPress={() => mutation.mutate()}
+        disabled={disabled}
+        variant="surface"
+        size={44}
+        icon={<Icon name="heart" size={20} color={active ? theme.colors.danger : theme.colors.muted} fill={active ? theme.colors.danger : "none"} accessibilityHidden />}
+        style={{
+          backgroundColor: active ? theme.colors.successSurface : theme.colors.surface,
+          borderColor: active ? theme.colors.accentMuted : theme.colors.border
+        }}
+      />
+    );
+  }
 
   return (
     <Button
-      label={translate(active ? "favoriteSaved" : "favoriteAdd")}
+      label={label}
       onPress={() => mutation.mutate()}
       variant="outline"
       size="sm"
@@ -47,4 +65,3 @@ export function FavoriteButton({ kind, id }: { kind: FavoriteKind; id: string })
     />
   );
 }
-
