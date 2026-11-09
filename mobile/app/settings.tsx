@@ -222,7 +222,7 @@ export default function SettingsScreen() {
                   <UiText weight="700">
                     {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
                   </UiText>
-                  {address.is_default ? <Icon name="circle-check" size={17} color={theme.mode === "light" ? theme.colors.accentForeground : theme.colors.success} /> : null}
+                  {address.is_default ? <Icon name="circle-check" size={17} color={theme.colors.success} /> : null}
                 </View>
                 <DetailRow label={translate("fullNamePlaceholder")} value={address.recipient_name} />
                 <DetailRow label={translate("checkoutPhonePlaceholder")} value={address.phone} />
