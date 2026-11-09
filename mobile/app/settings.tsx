@@ -325,7 +325,7 @@ export default function SettingsScreen() {
           style={[styles.languageOption, language === "en" && { backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted }]}
         >
           <UiText weight={language === "en" ? "700" : "500"}>{translate("settingsLanguageEnglish")}</UiText>
-          {language === "en" ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
+          {language === "en" ? <Icon name="circle-check" size={19} color={theme.mode === "light" ? theme.colors.accentForeground : theme.colors.success} /> : null}
         </PressableSurface>
         <Caption>{translate("settingsLanguageComingSoon")}</Caption>
         {languageError ? <UiText tone="danger">{translate("settingsLanguageSaveError")}</UiText> : null}
