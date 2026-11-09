@@ -86,6 +86,7 @@ export default function ProfileScreen() {
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
+          busy={profile.isFetching}
           onRetry={() => void profile.refetch()}
         />
       </CustomerScreen>
