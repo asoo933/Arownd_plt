@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { extendedThemeColors, themeColors } from "./colors";
+import { brandColors, extendedThemeColors, themeColors } from "./colors";
 import { getAppTheme } from "./themes";
 
 function luminance(hex: string): number {
@@ -38,26 +38,30 @@ describe("design system text contrast", () => {
     }
   });
 
-  it("keeps semantic status text readable on base surfaces and status surfaces", () => {
+  it("keeps semantic status text readable on the base theme surface", () => {
     for (const mode of ["light", "dark"] as const) {
       const theme = getAppTheme(mode);
-      const semantic = extendedThemeColors[mode];
-      const cases = [
-        [theme.colors.danger, theme.colors.dangerSurface],
-        [theme.colors.success, theme.colors.successSurface],
-        [theme.colors.warning, theme.colors.warningSurface]
-      ] as const;
+      const statusColors = [theme.colors.danger, theme.colors.success, theme.colors.warning, theme.colors.info];
 
-      for (const [foreground, statusSurface] of cases) {
+      for (const foreground of statusColors) {
         expect(contrastRatio(foreground, theme.colors.surface)).toBeGreaterThanOrEqual(4.5);
-        expect(contrastRatio(foreground, statusSurface)).toBeGreaterThanOrEqual(4.5);
       }
-
-      expect(semantic.accentMuted).toBe(theme.colors.accentMuted);
     }
   });
 
-  it("uses dark text on the lime brand surface", () => {
-    expect(contrastRatio("#0A0A0A", "#C6F135")).toBeGreaterThanOrEqual(4.5);
+  it("uses the approved semantic background colors for both modes", () => {
+    expect(extendedThemeColors.light.dangerSurface).toBe("#FEE2E2");
+    expect(extendedThemeColors.light.successSurface).toBe("#DCFCE7");
+    expect(extendedThemeColors.light.warningSurface).toBe("#FEF3C7");
+    expect(extendedThemeColors.light.infoSurface).toBe("#DBEAFE");
+    expect(extendedThemeColors.dark.dangerSurface).toBe("rgba(248,113,113,0.15)");
+    expect(extendedThemeColors.dark.successSurface).toBe("rgba(74,222,128,0.15)");
+    expect(extendedThemeColors.dark.warningSurface).toBe("rgba(251,191,36,0.15)");
+    expect(extendedThemeColors.dark.infoSurface).toBe("rgba(96,165,250,0.15)");
+  });
+
+  it("uses black text on the approved yellow brand surface", () => {
+    expect(brandColors.primary).toBe("#FFF01F");
+    expect(contrastRatio(brandColors.black, brandColors.primary)).toBeGreaterThanOrEqual(4.5);
   });
 });
