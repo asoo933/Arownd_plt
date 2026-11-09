@@ -181,7 +181,7 @@ export default function MerchantOrderDetailsScreen() {
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</UiText>
           <InfoRow label={translate("merchantCustomerUnknown")} value={customerOrder.full_name || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderPhone")} value={customerOrder.phone || "—"} theme={theme} />
-          <InfoRow label={translate("merchantStoreWilayaLabel")} value={getLocalizedWilayaLabel(customerOrder.wilaya_id ?? 0, customerOrder.wilaya?.name_ar ?? "—", language)} theme={theme} />
+          <InfoRow label={translate("merchantStoreWilayaLabel")} value={getLocalizedWilayaLabel(customerOrder.wilaya_id ?? 0, customerOrder.wilaya?.name_ar ?? "—", language, customerOrder.wilaya?.name_fr)} theme={theme} />
           <InfoRow label={translate("merchantStoreCommuneLabel")} value={customerOrder.commune || "—"} theme={theme} />
           <InfoRow label={translate("merchantStoreAddressLabel")} value={customerOrder.address_line || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderDeliveryType")} value={deliveryType === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")} theme={theme} />
