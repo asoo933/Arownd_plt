@@ -588,7 +588,7 @@ function createStyles(theme: AppTheme) {
     imageGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     imageItem: { width: 88, height: 88, borderRadius: designTokens.radius.sm, overflow: "visible" },
     imagePreview: { width: 88, height: 88, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
-    imageRemove: { position: "absolute", top: -7, right: -7, width: 25, height: 25, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
+    imageRemove: { position: "absolute", top: -7, end: -7, width: 25, height: 25, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     imageRemoveText: { color: designTokens.brand.white, fontSize: 19, lineHeight: 22, fontWeight: designTokens.fontWeights.extrabold },
     noteText: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
     errorBox: { borderWidth: 1, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
