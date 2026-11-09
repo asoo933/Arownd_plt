@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -26,7 +26,8 @@ import {
   EmptyState,
   ErrorState,
 } from "@/components/customer-ui";
-import { chooseBestProductOffer, fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchApprovedReviews } from "@/lib/reviews";
 import { getFavorites } from "@/lib/favorites";
 import type { FavoriteKind } from "@/lib/favorites-state";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -36,6 +37,7 @@ type FavoriteTab = FavoriteKind;
 export default function FavoritesScreen() {
   useLanguage();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
   const styles = createStyles(theme);
   const [tab, setTab] = useState<FavoriteTab>("products");
   const favorites = useQuery({ queryKey: FAVORITES_QUERY_KEY, queryFn: getFavorites });
@@ -123,7 +125,12 @@ export default function FavoritesScreen() {
             <View key={id} style={styles.productItem}>
               <ProductCard
                 style={styles.productCard}
-                onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: id } })}
+                onPress={() => {
+                  void queryClient.prefetchQuery({ queryKey: ["customer-product", id], queryFn: () => fetchProductDetails(id), staleTime: 60_000 });
+                  void queryClient.prefetchQuery({ queryKey: ["customer-product-offers", id], queryFn: () => fetchProductOffers(id), staleTime: 30_000 });
+                  void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "product", id], queryFn: () => fetchApprovedReviews("product", id), staleTime: 60_000 });
+                  router.push({ pathname: "/product/[productId]", params: { productId: id } });
+                }}
                 accessibilityLabel={offer.product.name}
                 contentStyle={styles.productContent}
                 media={
@@ -153,7 +160,11 @@ export default function FavoritesScreen() {
             <StoreCard
               key={id}
               style={styles.storeCard}
-              onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: id } })}
+              onPress={() => {
+                void queryClient.prefetchQuery({ queryKey: ["customer-store", id], queryFn: () => fetchStoreDetails(id), staleTime: 60_000 });
+                void queryClient.prefetchQuery({ queryKey: ["customer-store-offers", id], queryFn: () => fetchStoreOffers(id), staleTime: 30_000 });
+                router.push({ pathname: "/store/[storeId]", params: { storeId: id } });
+              }}
               accessibilityLabel={store.name}
               contentStyle={styles.storeContent}
               media={
