@@ -26,7 +26,7 @@ function row(overrides: Partial<MerchantOrderRow> = {}): MerchantOrderRow {
       commune: "البليدة",
       delivery_type: "home",
       created_at: "2026-11-07T10:00:00.000Z",
-      wilaya: { name_ar: "البليدة" }
+      wilaya: { id: 9, name_ar: "البليدة" }
     },
     ...overrides
   };
@@ -59,7 +59,7 @@ describe("groupMerchantOrderRows", () => {
           commune: "البليدة",
           delivery_type: "home",
           created_at: "2026-11-07T10:00:00.000Z",
-          wilaya: { name_ar: "البليدة" }
+          wilaya: { id: 9, name_ar: "البليدة" }
         }
       })
     ]);
@@ -88,7 +88,7 @@ describe("groupMerchantOrderRows", () => {
           commune: "الشفة",
           delivery_type: "home",
           created_at: "2026-11-07T11:00:00.000Z",
-          wilaya: { name_ar: "البليدة" }
+          wilaya: { id: 9, name_ar: "البليدة" }
         }
       })
     ]);
