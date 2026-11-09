@@ -139,17 +139,21 @@ const MerchantDashboardStoreSchema = z.object({
   )
 }).passthrough();
 
-const MerchantOrderRowSchema = z.object({
+const MerchantDashboardOrderItemSchema = z.object({
   id: z.string().uuid(),
+  store_id: z.string().uuid(),
+  merchant_archived_at: z.string().nullable(),
   product_name: z.string().nullable(),
-  quantity: z.coerce.number(),
-  merchant_order: z.object({
-    id: z.string().uuid(),
-    status: z.string(),
-    subtotal: z.coerce.number(),
-    shipping_fee: z.coerce.number().default(0),
-    quoted_at: z.string().nullable().default(null)
-  }),
+  quantity: z.coerce.number()
+}).passthrough();
+
+const MerchantDashboardOrderRowSchema = z.object({
+  id: z.string().uuid(),
+  status: z.string(),
+  subtotal: z.coerce.number(),
+  shipping_fee: z.coerce.number().default(0),
+  quoted_at: z.string().nullable().default(null),
+  created_at: z.string(),
   order: z.object({
     id: z.string().uuid(),
     status: z.string(),
@@ -158,7 +162,8 @@ const MerchantOrderRowSchema = z.object({
     delivery_type: z.string(),
     created_at: z.string(),
     wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable()
-  }).nullable()
+  }),
+  items: z.array(MerchantDashboardOrderItemSchema)
 }).passthrough();
 
 export type MerchantDashboardStore = z.infer<typeof MerchantDashboardStoreSchema>;
@@ -194,12 +199,12 @@ export async function fetchMerchantDashboard(storeId: string): Promise<MerchantD
       .select("id", { count: "exact", head: true })
       .eq("store_id", storeId),
     client
-      .from("order_items")
-      .select("id, product_name, quantity, merchant_order:merchant_orders!inner(id, status, subtotal, shipping_fee, quoted_at), order:orders(id, status, full_name, commune, delivery_type, created_at, wilaya:wilayas(id, name_ar, name_fr))")
+      .from("merchant_orders")
+      .select("id, status, subtotal, shipping_fee, quoted_at, created_at, order:orders!inner(id, status, full_name, commune, delivery_type, created_at, wilaya:wilayas(id, name_ar, name_fr)), items:order_items!inner(id, store_id, merchant_archived_at, product_name, quantity)")
       .eq("store_id", storeId)
-      .eq("merchant_order.store_id", storeId)
-      .is("merchant_archived_at", null)
-      .order("id", { ascending: false })
+      .eq("items.store_id", storeId)
+      .is("items.merchant_archived_at", null)
+      .order("created_at", { ascending: false })
       .limit(100)
   ]);
 
@@ -207,7 +212,22 @@ export async function fetchMerchantDashboard(storeId: string): Promise<MerchantD
   if (orderItemsResult.error) throw orderItemsResult.error;
 
   const store = MerchantDashboardStoreSchema.parse(storeData as unknown);
-  const rows = MerchantOrderRowSchema.array().parse(orderItemsResult.data as unknown) as MerchantOrderRow[];
+  const dashboardOrders = MerchantDashboardOrderRowSchema.array().parse(orderItemsResult.data as unknown);
+  const rows: MerchantOrderRow[] = dashboardOrders.flatMap((merchantOrder) =>
+    merchantOrder.items.map((item) => ({
+      id: item.id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      merchant_order: {
+        id: merchantOrder.id,
+        status: merchantOrder.status,
+        subtotal: merchantOrder.subtotal,
+        shipping_fee: merchantOrder.shipping_fee,
+        quoted_at: merchantOrder.quoted_at
+      },
+      order: merchantOrder.order
+    }))
+  );
   const summary = groupMerchantOrderRows(rows);
 
   return {
