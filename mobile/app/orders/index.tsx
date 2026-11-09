@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -6,7 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
 import { AppHeader, Icon, IconButton, OrderCard, OrderCardSkeleton, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
 import { formatDZD, formatNumber } from "@/lib/catalog";
-import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
+import { fetchCustomerOrderDetails, fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
@@ -78,6 +78,7 @@ export default function OrdersScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
+  const queryClient = useQueryClient();
   const [tab, setTab] = useState<OrdersTab>("all");
   const auth = useQuery({
     queryKey: ["customer-orders-auth"],
@@ -150,7 +151,10 @@ export default function OrdersScreen() {
       const orderCode = formatOrderCode(row.order.id);
       const tone = getOrderStatusTone(row.status);
       const total = row.status === "cancelled" || row.status === "rejected" ? 0 : row.subtotal + row.shippingFee;
-      return <OrderCard key={row.merchantOrderId ?? row.order.id} onPress={() => router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } })} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card} contentStyle={styles.cardContent}>
+      return <OrderCard key={row.merchantOrderId ?? row.order.id} onPress={() => {
+        void queryClient.prefetchQuery({ queryKey: ["customer-order-details", row.order.id], queryFn: () => fetchCustomerOrderDetails(row.order.id), staleTime: 15_000 });
+        router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } });
+      }} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card} contentStyle={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <UiText style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</UiText>
