@@ -110,7 +110,6 @@ export default function ExploreScreen() {
               accessibilityLabel={translate("homeSearchPlaceholder")}
               style={{
                 backgroundColor: "transparent",
-                borderColor: theme.colors.border,
                 borderRadius: theme.radius.pill
               }}
             />
