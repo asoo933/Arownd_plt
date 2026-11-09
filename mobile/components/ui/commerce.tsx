@@ -28,7 +28,7 @@ export function PriceDisplay({
 
 export function DiscountBadge({ label }: { label: string }) {
   const theme = useAppTheme();
-  return <UiText style={{ alignSelf: "flex-start", overflow: "hidden", paddingHorizontal: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xs, borderRadius: theme.radius.pill, backgroundColor: theme.colors.dangerSurface, color: theme.colors.danger, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold }}>{label}</UiText>;
+  return <UiText style={{ alignSelf: "flex-start", overflow: "hidden", paddingHorizontal: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xs, borderRadius: theme.radius.pill, backgroundColor: theme.colors.dangerSurface, color: theme.colors.dangerText, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold }}>{label}</UiText>;
 }
 
 export function StockBadge({ label, tone = "success" }: { label: string; tone?: Extract<StatusBadgeTone, "success" | "warning" | "danger" | "neutral"> }) {
