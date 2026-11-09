@@ -4,7 +4,7 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, Icon, IconButton, OfferCard, PriceDisplay, ProductImageGallery, ProductQuantitySelector, ProductVariantSelector, RatingStars, StockBadge, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Card, Icon, IconButton, OfferCard, PriceDisplay, ProductImageGallery, ProductQuantitySelector, ProductVariantSelector, RatingStars, StockBadge, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
@@ -47,7 +47,10 @@ export default function ProductDetailsScreen() {
     enabled: Boolean(productId)
   });
 
-  if (product.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (product.isPending) return <CustomerScreen>
+    <AppHeader title={translate("productDetailsTitle")} />
+    <ProductCardSkeleton style={{ width: "100%", flex: 0, minHeight: 320 }} />
+  </CustomerScreen>;
   if (product.isError) {
     return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={product.isFetching} onRetry={() => void product.refetch()} /></CustomerScreen>;
   }
