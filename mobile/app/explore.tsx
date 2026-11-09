@@ -1,10 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, ProductTile, SectionTitle } from "@/components/customer-ui";
-import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
+import { fetchHomeProducts, fetchProductDetails, fetchProductOffers, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
+import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { CategorySelectorTile, Icon, IconButton, ProductCardSkeleton, SearchField, Text as UiText } from "@/components/ui";
@@ -21,6 +22,7 @@ const categories = [
 export default function ExploreScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ q?: string; category?: string }>();
   const initialQuery = typeof params.q === "string" ? params.q : "";
   const category = typeof params.category === "string" ? params.category : undefined;
@@ -159,7 +161,12 @@ export default function ExploreScreen() {
         ) : (
           <View style={styles.grid}>
             {products.data.map((item) => (
-              <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} style={{ width: "47%", flexGrow: 0, flexShrink: 0 }} />
+              <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => {
+                void queryClient.prefetchQuery({ queryKey: ["customer-product", item.product.id], queryFn: () => fetchProductDetails(item.product.id), staleTime: 60_000 });
+                void queryClient.prefetchQuery({ queryKey: ["customer-product-offers", item.product.id], queryFn: () => fetchProductOffers(item.product.id), staleTime: 30_000 });
+                void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "product", item.product.id], queryFn: () => fetchApprovedReviews("product", item.product.id), staleTime: 60_000 });
+                router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } });
+              }} style={{ width: "47%", flexGrow: 0, flexShrink: 0 }} />
             ))}
           </View>
         )
