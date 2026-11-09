@@ -48,7 +48,7 @@ export default function StoreDetailsScreen() {
           name={details.name}
           imageUri={details.logo_url || undefined}
           size={76}
-          verified={details.is_verified}
+          verified={details.is_verified ?? false}
           accessibilityLabel={details.name}
         />
         <View style={styles.storeInfo}>
