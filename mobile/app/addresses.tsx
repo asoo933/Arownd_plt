@@ -349,7 +349,7 @@ function createStyles(theme: AppTheme) {
     input: {
       minHeight: designTokens.dimensions.controlHeight.lg,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border,
       borderRadius: theme.radius.md,
       paddingHorizontal: designTokens.spacing.md,
       justifyContent: "center",
@@ -365,7 +365,7 @@ function createStyles(theme: AppTheme) {
       borderBottomColor: theme.colors.border
     },
     pickerOptionSelected: {
-      backgroundColor: theme.colors.surfaceMuted
+      backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted
     }
   });
 }
