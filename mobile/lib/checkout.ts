@@ -7,7 +7,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
 
-const WilayaSchema = z.object({ id: z.number(), name_ar: z.string() });
+const WilayaSchema = z.object({ id: z.number(), name_ar: z.string(), name_fr: z.string() });
 export type Wilaya = z.infer<typeof WilayaSchema>;
 
 const ProfileSchema = z.object({
@@ -23,7 +23,7 @@ export type CheckoutDeliveryType = "home" | "desk";
 export async function fetchCheckoutWilayas(): Promise<Wilaya[]> {
   const { data, error } = await getSupabaseClient()
     .from("wilayas")
-    .select("id, name_ar")
+    .select("id, name_ar, name_fr")
     .order("id");
   if (error) throw error;
   return WilayaSchema.array().parse(data as unknown);
