@@ -50,7 +50,7 @@ export function ImageGallery({
   return (
     <View accessibilityLabel={accessibilityLabel} style={{ gap: designTokens.spacing.sm }}>
       <Image uri={images[selectedIndex]?.uri} accessibilityLabel={images[selectedIndex]?.label ?? accessibilityLabel} aspectRatio={1} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
         {images.map((image, index) => <Pressable key={image.key} accessibilityRole="button" accessibilityLabel={image.label} accessibilityState={{ selected: index === selectedIndex }} onPress={() => onSelect(index)} style={{ borderWidth: index === selectedIndex ? 2 : 1, borderColor: index === selectedIndex ? theme.colors.accentMuted : theme.colors.border, borderRadius: theme.radius.md, overflow: "hidden" }}><NativeImage source={{ uri: image.uri }} style={{ width: 60, height: 60 }} /></Pressable>)}
       </ScrollView>
     </View>
