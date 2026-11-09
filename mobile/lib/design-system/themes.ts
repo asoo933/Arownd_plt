@@ -29,19 +29,24 @@ export type AppTheme = {
     border: string;
     input: string;
     inputBorder: string;
+    focus: string;
     accent: string;
     accentForeground: string;
     accentMuted: string;
     danger: string;
+    dangerText: string;
     dangerSurface: string;
     dangerBorder: string;
     success: string;
+    successText: string;
     successSurface: string;
     successBorder: string;
     warning: string;
+    warningText: string;
     warningSurface: string;
     warningBorder: string;
     info: string;
+    infoText: string;
     infoSurface: string;
     infoBorder: string;
     placeholder: string;
@@ -84,19 +89,24 @@ export function getAppTheme(mode: "light" | "dark"): AppTheme {
       border: palette.border,
       input: palette.input,
       inputBorder: palette.inputBorder,
+      focus: palette.focus,
       accent: brandColors.primary,
       accentForeground: brandColors.black,
       accentMuted: semanticPalette.accentMuted,
       danger: semanticPalette.danger,
+      dangerText: semanticPalette.dangerText,
       dangerSurface: semanticPalette.dangerSurface,
       dangerBorder: semanticPalette.dangerBorder,
       success: semanticPalette.success,
+      successText: semanticPalette.successText,
       successSurface: semanticPalette.successSurface,
       successBorder: semanticPalette.successBorder,
       warning: semanticPalette.warning,
+      warningText: semanticPalette.warningText,
       warningSurface: semanticPalette.warningSurface,
       warningBorder: semanticPalette.warningBorder,
       info: semanticPalette.info,
+      infoText: semanticPalette.infoText,
       infoSurface: semanticPalette.infoSurface,
       infoBorder: semanticPalette.infoBorder,
       placeholder: semanticPalette.placeholder,
