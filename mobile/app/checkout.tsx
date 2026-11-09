@@ -213,7 +213,7 @@ export default function CheckoutScreen() {
     mutation.mutate(input);
   };
 
-  const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, color: theme.colors.foreground }];
+  const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border, color: theme.colors.foreground }];
   const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune");
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
     ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr), wilaya: item }))
