@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { MerchantNavigation } from "@/components/merchant-navigation";
+import { CustomerNavigation } from "@/components/customer-navigation";
 import { useAppTheme } from "@/lib/theme";
 
 export default function MerchantLayout() {
@@ -21,7 +21,7 @@ export default function MerchantLayout() {
         edges={["bottom", "left", "right"]}
         style={{ backgroundColor: theme.colors.surface }}
       >
-        <MerchantNavigation />
+        <CustomerNavigation />
       </SafeAreaView>
     </View>
   );
