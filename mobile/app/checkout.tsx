@@ -154,7 +154,7 @@ export default function CheckoutScreen() {
 
   if (createdOrderId) {
     return <CustomerScreen>
-      <Card style={[styles.successPanel, { backgroundColor: theme.colors.surface }]} contentStyle={styles.successContent}>
+      <Card style={[styles.successPanel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]} contentStyle={styles.successContent}>
         <UiText style={styles.successMark}>✓</UiText>
         <AppHeader title={translate("checkoutSuccessTitle")} />
         <UiText style={styles.hint}>{translate("checkoutSuccessMessage")}</UiText>
@@ -420,7 +420,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   retryText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   savedAddresses: { gap: designTokens.spacing.sm },
   savedHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  savedAddress: { borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
+  savedAddress: { borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
   savedAddressSelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface },
   savedAddressTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   savedAddressName: { color: theme.colors.foreground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
@@ -428,7 +428,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   radio: { width: 17, height: 17, borderRadius: 9, borderWidth: 1.5, borderColor: theme.colors.muted },
   radioSelected: { borderWidth: 5, borderColor: theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted },
   deliveryOptions: { flexDirection: "row", gap: designTokens.spacing.sm },
-  deliveryOption: { flex: 1, minHeight: 92, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
+  deliveryOption: { flex: 1, minHeight: 92, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
   deliverySelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface },
   deliveryTitle: { color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   deliveryTextSelected: { color: theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted },
