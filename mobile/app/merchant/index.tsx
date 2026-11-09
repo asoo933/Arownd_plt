@@ -15,7 +15,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
+import { Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   useLanguage();
@@ -113,11 +113,7 @@ export default function MerchantEntryScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <AppHeader
-          title={translate("merchantDashboardTitle")}
-          leading={<Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />}
-        />
-        <UiText style={[styles.body, { color: theme.colors.muted }]}>{translate("merchantDashboardSubtitle")}</UiText>
+
 
         <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.storeCard}>
           <View style={styles.storeHeader}>
@@ -145,10 +141,10 @@ export default function MerchantEntryScreen() {
               </View>
             </View>
           </View>
-          <Button label={translate("merchantPreviewStore")} onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } })} variant="outline" fullWidth style={{}} />
-          <Button label={translate("merchantProductsTitle")} onPress={() => router.push("/merchant/products")} variant="outline" fullWidth style={{marginTop: 9}} />
-          <Button label={translate("merchantStoreSettingsTitle")} onPress={() => router.push("/merchant/settings")} variant="outline" fullWidth style={{marginTop: 9}} />
-          <Button label={translate("merchantAnalyticsTitle")} onPress={() => router.push("/merchant/analytics")} variant="outline" fullWidth style={{marginTop: 9}} />
+          <View style={styles.storeActions}>
+            <Button label={translate("merchantPreviewStore")} onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: data.store.id } })} variant="outline" size="sm" style={{ flex: 1 }} />
+            <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" style={{ flex: 1 }} />
+          </View>
         </Card>
 
         <View style={styles.sectionHeading}>
@@ -168,10 +164,40 @@ export default function MerchantEntryScreen() {
         </View>
 
         <View style={styles.sectionHeading}>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+            {translate("merchantManagementTitle")}
+          </UiText>
+        </View>
+        <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.managementCard}>
+          {[
+            { key: "orders", label: translate("merchantManageOrders"), icon: "shopping-bag", path: "/merchant/orders" },
+            { key: "products", label: translate("merchantManageProducts"), icon: "package", path: "/merchant/products" },
+            { key: "analytics", label: translate("merchantAnalyticsTitle"), icon: "chart-no-axes-combined", path: "/merchant/analytics" },
+            { key: "settings", label: translate("merchantStoreSettingsTitle"), icon: "settings", path: "/merchant/settings" }
+          ].map((item, index, items) => (
+            <PressableSurface
+              key={item.key}
+              accessibilityRole="button"
+              accessibilityLabel={item.label}
+              onPress={() => router.push(item.path as "/merchant/orders" | "/merchant/products" | "/merchant/analytics" | "/merchant/settings")}
+              style={[
+                styles.managementRow,
+                index < items.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
+              ]}
+            >
+              <View style={[styles.managementIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+                <Icon name={item.icon as "shopping-bag" | "package" | "chart-no-axes-combined" | "settings"} color={theme.colors.accentMuted} size={19} accessibilityHidden />
+              </View>
+              <UiText style={[styles.managementLabel, { color: theme.colors.foreground }]}>{item.label}</UiText>
+              <Icon name="chevron-left" color={theme.colors.muted} size={18} accessibilityHidden />
+            </PressableSurface>
+          ))}
+        </Card>
+
+        <View style={styles.sectionHeading}>
           <View style={styles.sectionHeadingText}>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantRecentOrdersTitle")}
-            </UiText>
             <UiText style={[styles.sectionHint, { color: theme.colors.muted }]}>
               {translate("merchantRecentOrdersHint")}
             </UiText>
@@ -226,9 +252,7 @@ export default function MerchantEntryScreen() {
           </Card>
         )}
 
-        <Button label={translate("merchantManageOrders")} onPress={() => router.push("/merchant/orders")} fullWidth />
 
-        <Button label={translate("merchantManageProducts")} onPress={() => router.push("/merchant/products")} variant="outline" fullWidth />
       </ScrollView>
     </SafeAreaView>
   );
@@ -309,7 +333,12 @@ function createStyles(theme: AppTheme) {
     entryCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.xl, gap: designTokens.spacing.lg },
     storeCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     storeHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
-    storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+    storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: designTokens.radius.pill, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+    storeActions: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
+    managementCard: { borderWidth: 1, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.xs },
+    managementRow: { minHeight: 62, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm },
+    managementIcon: { width: 38, height: 38, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
+    managementLabel: { flex: 1, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
     storeImage: { width: "100%", height: "100%" },
     storeAvatarText: { fontSize: designTokens.typography.display - 4, fontWeight: designTokens.fontWeights.extrabold },
     storeInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
