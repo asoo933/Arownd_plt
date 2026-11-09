@@ -60,7 +60,7 @@ export default function MerchantStoreSettingsScreen() {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
   }
   if (access.isError || wilayas.isError || settings.isError) {
-    return <Message theme={theme} label={translate("merchantStoreSettingsSaveError")} actionLabel={translate("merchantRetry")} onAction={() => { void access.refetch(); void wilayas.refetch(); void settings.refetch(); }} />;
+    return <Message theme={theme} label={translate("merchantStoreSettingsSaveError")} actionLabel={translate("merchantRetry")} busy={access.isFetching || wilayas.isFetching || settings.isFetching} onAction={() => { void access.refetch(); void wilayas.refetch(); void settings.refetch(); }} />;
   }
   if (!access.data) return <Redirect href="/login" />;
   if (!ready || !form) return <Redirect href="/merchant" />;
@@ -290,8 +290,8 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
   </View>;
 }
 
-function Message({ theme, label, loading = false, actionLabel, onAction }: {
-  theme: AppTheme; label: string; loading?: boolean; actionLabel?: string; onAction?: () => void;
+function Message({ theme, label, loading = false, actionLabel, onAction, busy = false }: {
+  theme: AppTheme; label: string; loading?: boolean; actionLabel?: string; onAction?: () => void; busy?: boolean;
 }) {
   const styles = createStyles(theme);
   return (
@@ -300,7 +300,7 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
         {loading ? (
           <LoadingState label={label} />
         ) : actionLabel && onAction ? (
-          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+          <ErrorState title={label} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
         ) : (
           <UiText style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</UiText>
         )}
