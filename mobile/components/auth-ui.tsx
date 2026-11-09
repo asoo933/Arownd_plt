@@ -52,7 +52,7 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
               <IconButton
                 accessibilityLabel={translate("back")}
                 onPress={handleBack}
-                icon={<Icon name="chevron-left" color={theme.colors.foreground} size={designTokens.dimensions.iconSize.md} />}
+                icon={<Icon name="chevron-right" color={theme.colors.foreground} size={designTokens.dimensions.iconSize.md} />}
                 variant="surface"
                 size={designTokens.dimensions.controlHeight.md}
               />
