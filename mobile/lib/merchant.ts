@@ -157,7 +157,7 @@ const MerchantOrderRowSchema = z.object({
     commune: z.string().nullable(),
     delivery_type: z.string(),
     created_at: z.string(),
-    wilaya: z.object({ name_ar: z.string().nullable() }).nullable()
+    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable() }).nullable()
   }).nullable()
 }).passthrough();
 
@@ -195,7 +195,7 @@ export async function fetchMerchantDashboard(storeId: string): Promise<MerchantD
       .eq("store_id", storeId),
     client
       .from("order_items")
-      .select("id, product_name, quantity, merchant_order:merchant_orders!inner(id, status, subtotal, shipping_fee, quoted_at), order:orders(id, status, full_name, commune, delivery_type, created_at, wilaya:wilayas(name_ar))")
+      .select("id, product_name, quantity, merchant_order:merchant_orders!inner(id, status, subtotal, shipping_fee, quoted_at), order:orders(id, status, full_name, commune, delivery_type, created_at, wilaya:wilayas(id, name_ar))")
       .eq("store_id", storeId)
       .eq("merchant_order.store_id", storeId)
       .is("merchant_archived_at", null)
@@ -301,7 +301,7 @@ export async function fetchMerchantOrderDetails(
 
   const { data: merchantOrderData, error: merchantOrderError } = await client
     .from("merchant_orders")
-    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(name_ar))")
+    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(id, name_ar))")
     .eq("id", merchantOrderId)
     .eq("store_id", storeId)
     .maybeSingle();
