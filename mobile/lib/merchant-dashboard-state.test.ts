@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  canCollectMerchantOrderCod,
+  canManageMerchantOrderFulfillment,
   getNextMerchantOrderStatus,
   getNextMerchantTrackingStatus,
   groupMerchantOrderRows,
@@ -49,7 +51,7 @@ describe("groupMerchantOrderRows", () => {
     expect(result.orders[0]?.productNames).toEqual(["قميص", "حذاء"]);
   });
 
-  it("ignores parent orders cancelled by the customer", () => {
+  it("keeps cancelled merchant orders visible when the parent is cancelled", () => {
     const result = groupMerchantOrderRows([
       row({
         order: {
@@ -64,7 +66,8 @@ describe("groupMerchantOrderRows", () => {
       })
     ]);
 
-    expect(result.orders).toHaveLength(0);
+    expect(result.orders).toHaveLength(1);
+    expect(result.orders[0]?.status).toBe("cancelled");
     expect(result.pendingCount).toBe(0);
   });
 
@@ -142,5 +145,28 @@ describe("getNextMerchantTrackingStatus", () => {
     expect(getNextMerchantTrackingStatus("delivered", "home")).toBeNull();
     expect(getNextMerchantTrackingStatus("ready_for_dispatch", "unknown")).toBeNull();
     expect(getNextMerchantTrackingStatus("out_for_delivery", "desk")).toBeNull();
+  });
+});
+
+
+describe("merchant order action guards", () => {
+  it("only allows fulfillment after customer approval", () => {
+    expect(canManageMerchantOrderFulfillment("pending")).toBe(false);
+    expect(canManageMerchantOrderFulfillment("quoted")).toBe(false);
+    expect(canManageMerchantOrderFulfillment("confirmed")).toBe(true);
+    expect(canManageMerchantOrderFulfillment("shipped")).toBe(true);
+    expect(canManageMerchantOrderFulfillment("cancelled")).toBe(false);
+    expect(canManageMerchantOrderFulfillment("delivered")).toBe(false);
+  });
+
+  it("allows COD collection after direct home delivery or store pickup", () => {
+    expect(canCollectMerchantOrderCod("delivered", "unpaid", "home", false)).toBe(true);
+    expect(canCollectMerchantOrderCod("delivered", "unpaid", "desk", false)).toBe(true);
+  });
+
+  it("blocks COD collection before delivery, after payment, or for carrier-managed orders", () => {
+    expect(canCollectMerchantOrderCod("shipped", "unpaid", "home", false)).toBe(false);
+    expect(canCollectMerchantOrderCod("delivered", "paid", "home", false)).toBe(false);
+    expect(canCollectMerchantOrderCod("delivered", "unpaid", "home", true)).toBe(false);
   });
 });
