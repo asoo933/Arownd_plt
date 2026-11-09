@@ -209,7 +209,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   },
   suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   error: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "auto" },
-  success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
+  success: { color: theme.mode === "light" ? theme.colors.successText : theme.colors.success, fontSize: designTokens.typography.caption + 1, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
   note: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
   disabled: { opacity: 0.5 },
   backdrop: { flex: 1, backgroundColor: theme.colors.overlay, justifyContent: "center", padding: designTokens.spacing.lg },
