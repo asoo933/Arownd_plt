@@ -40,7 +40,7 @@ export default function StoreDetailsScreen() {
     <CustomerScreen>
       <AppHeader
         title=""
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={20} />} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />}
       />
 
       <View style={styles.storeIdentity}>
