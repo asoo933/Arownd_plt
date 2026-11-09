@@ -1,19 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 
 import { ActionButton, AuthField, AuthLayout, FormError, InlineLink } from "@/components/auth-ui";
 import { Text as UiText } from "@/components/ui";
-import { designTokens, useAppTheme } from "@/lib/theme";
+import { designTokens } from "@/lib/theme";
 import { signIn } from "@/lib/auth-service";
 import { loginSchema, type LoginInput } from "@/lib/auth-validation";
 import { translate, useLanguage } from "@/lib/i18n";
 
 export default function LoginScreen() {
   useLanguage();
-  const theme = useAppTheme();
   const [serverError, setServerError] = useState<string | null>(null);
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -78,9 +77,7 @@ export default function LoginScreen() {
         />
         <View style={styles.signupRow}>
           <UiText tone="muted" style={styles.secondaryText}>{translate("noAccount")}</UiText>
-          <Link href="/account-type" style={[styles.link, { color: theme.colors.accentMuted }]}>
-            {translate("createAccount")}
-          </Link>
+          <InlineLink label={translate("createAccount")} onPress={() => router.push("/account-type")} />
         </View>
       </View>
     </AuthLayout>
@@ -97,9 +94,5 @@ const styles = StyleSheet.create({
     gap: designTokens.spacing.xs,
     marginTop: designTokens.spacing.xs
   },
-  secondaryText: { fontSize: designTokens.typography.caption + 2 },
-  link: {
-    fontSize: designTokens.typography.caption + 2,
-    fontWeight: designTokens.fontWeights.extrabold
-  }
+  secondaryText: { fontSize: designTokens.typography.caption + 2 }
 });
