@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, Text as UiText, TrackingTimeline } from "@/components/ui";
+import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, OrderCardSkeleton, Text as UiText, TrackingTimeline } from "@/components/ui";
 import { formatDZD, formatNumber } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder, formatOrderCode } from "@/lib/orders-state";
@@ -124,7 +124,10 @@ export default function OrderDetailsScreen() {
     return () => { void client.removeChannel(channel); };
   }, [orderId, userId, refetchOrder]);
 
-  if (auth.isPending || (auth.data && query.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (auth.isPending || (auth.data && query.isPending)) return <CustomerScreen>
+    <CustomerHeading title={translate("orderDetailsTitle")} />
+    {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
+  </CustomerScreen>;
   if (auth.isError || query.isError) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={auth.isFetching || query.isFetching} onRetry={() => void query.refetch()} />
