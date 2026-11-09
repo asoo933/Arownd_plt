@@ -23,7 +23,7 @@ import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
-import { AppHeader, Button, ConfirmDialog, ErrorState, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField } from "@/components/ui";
+import { Alert, AppHeader, Button, ConfirmDialog, ErrorState, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField, TrackingTimeline } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -62,6 +62,12 @@ export default function MerchantOrderDetailsScreen() {
   const merchantOrder = detail.data?.merchantOrder;
   const deliveryType = merchantOrder?.order.delivery_type;
   const trackingEvents = detail.data?.trackingEvents ?? [];
+  const trackingSteps = trackingEvents.map((event, index) => ({
+    key: event.id,
+    title: translate(trackingTranslationKeys[event.status]),
+    description: new Date(event.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ"),
+    status: index === trackingEvents.length - 1 ? "current" as const : "complete" as const
+  }));
   const latestTrackingStatus = trackingEvents[trackingEvents.length - 1]?.status
     ?? (merchantOrder?.status === "delivered"
       ? "delivered"
@@ -145,7 +151,7 @@ export default function MerchantOrderDetailsScreen() {
         <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</UiText>
         <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
 
-        <MerchantOrderCard style={styles.orderSummaryCard}>
+        <MerchantOrderCard>
           <View style={styles.summaryRow}>
             <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
             <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} />
@@ -221,32 +227,18 @@ export default function MerchantOrderDetailsScreen() {
         ) : null}
 
         {order.status === "quoted" ? (
-          <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
-            <UiText style={[styles.noticeText, { color: theme.colors.warning }]}>{translate("merchantQuoteAwaitingCustomer")}</UiText>
-          </View>
+          <Alert description={translate("merchantQuoteAwaitingCustomer")} tone="warning" />
         ) : null}
 
         {isCarrierManaged ? (
-          <View style={[styles.notice, { backgroundColor: theme.colors.warningSurface }]}>
-            <UiText style={[styles.noticeText, { color: theme.colors.warning }]}>
-              {translate("merchantTrackingCarrierCompletesDelivery")}
-            </UiText>
-          </View>
+          <Alert description={translate("merchantTrackingCarrierCompletesDelivery")} tone="warning" />
         ) : null}
 
         <MerchantOrderCard>
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantTrackingTitle")}</UiText>
           {trackingEvents.length === 0 ? (
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantTrackingEmpty")}</UiText>
-          ) : trackingEvents.map((event) => (
-            <View key={event.id} style={[styles.trackingEvent, { borderBottomColor: theme.colors.border }]}>
-              <View style={[styles.trackingMarker, { backgroundColor: theme.colors.accent }]} />
-              <View style={styles.trackingEventContent}>
-                <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</UiText>
-                <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
-              </View>
-            </View>
-          ))}
+          ) : <TrackingTimeline steps={trackingSteps} />}
         </MerchantOrderCard>
 
         {nextStatus && nextStatusLabel ? (
@@ -271,15 +263,11 @@ export default function MerchantOrderDetailsScreen() {
         ) : null}
 
         {order.payment_status === "paid" ? (
-          <View style={[styles.notice, { backgroundColor: theme.colors.successSurface }]}>
-            <UiText style={[styles.noticeText, { color: theme.colors.success }]}>{translate("merchantCodPaid")}: {formatDZD(order.paid_amount ?? 0)}</UiText>
-          </View>
+          <Alert description={`${translate("merchantCodPaid")}: ${formatDZD(order.paid_amount ?? 0)}`} tone="success" />
         ) : null}
 
         {actionError ? (
-          <View style={[styles.errorCard, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-            <UiText style={[styles.dangerButtonText, { color: theme.colors.danger }]}>{translateError(actionError)}</UiText>
-          </View>
+          <Alert description={translateError(actionError)} tone="danger" />
         ) : null}
       </ScrollView>
 
@@ -364,18 +352,16 @@ function MessageScreen({ theme, title, actionLabel, onAction }: { theme: AppThem
 
 const stylesForComponents = StyleSheet.create({
   safe: { flex: 1 },
-  center: { flex: 1, padding: 24, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
-  primaryButton: { minHeight: 46, borderRadius: 13, paddingHorizontal: 16, alignItems: "center", justifyContent: "center" },
-  infoRow: { minHeight: 35, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }
+  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
+  infoRow: { minHeight: designTokens.dimensions.controlHeight.md, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }
 });
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: designTokens.spacing.lg, paddingBottom: 36, gap: designTokens.spacing.lg },
+    content: { padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.lg },
     eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
-    orderSummaryCard: { borderRadius: theme.radius.lg },
     summaryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: designTokens.spacing.md },
     amount: { fontSize: designTokens.typography.subtitle, fontWeight: designTokens.fontWeights.extrabold },
     sectionHeading: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
@@ -391,12 +377,6 @@ function createStyles(theme: AppTheme) {
     input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body },
     dangerButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: theme.radius.sm, alignItems: "center", justifyContent: "center" },
     dangerButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
-    notice: { borderRadius: theme.radius.md, padding: designTokens.spacing.md },
-    noticeText: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    trackingEvent: { minHeight: 52, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: designTokens.spacing.sm },
-    trackingMarker: { width: 9, height: 9, borderRadius: theme.radius.pill },
-    trackingEventContent: { flex: 1, gap: designTokens.spacing.xs },
-    errorCard: { borderWidth: 1, borderRadius: theme.radius.md, padding: designTokens.spacing.md },
     disabled: { opacity: 0.5 }
   });
 }
