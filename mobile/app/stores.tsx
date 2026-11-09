@@ -17,9 +17,9 @@ export default function StoresScreen() {
       <AppHeader title={translate("storesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />} />
       <UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("storesSubtitle")}</UiText>
       {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
-        <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void stores.refetch()} />
+        <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={stores.isFetching} onRetry={() => void stores.refetch()} />
       ) : stores.data.length === 0 ? (
-        <EmptyState title={translate("homeNoStores")} hint={translate("homeNoStoresHint")} />
+        <EmptyState icon="store" title={translate("homeNoStores")} hint={translate("homeNoStoresHint")} />
       ) : (
         <View style={styles.list}>
           {stores.data.map((store) => (
