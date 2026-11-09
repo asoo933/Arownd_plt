@@ -135,10 +135,10 @@ const styles = StyleSheet.create({
   header: { minHeight: 48, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   brand: { fontSize: 24, letterSpacing: -1 },
   backPlaceholder: { width: 44, height: 44 },
-  hero: { marginTop: 38, marginBottom: 28, alignItems: "flex-end" },
+  hero: { marginTop: 38, marginBottom: 28, alignItems: "flex-start" },
   eyebrow: { marginBottom: designTokens.spacing.md },
   title: { lineHeight: 39 },
-  subtitle: { lineHeight: 25, textAlign: "right", marginTop: designTokens.spacing.sm },
+  subtitle: { lineHeight: 25, textAlign: "auto", marginTop: designTokens.spacing.sm },
   content: { gap: 18 },
   link: { fontSize: 13 },
   footer: { marginTop: "auto", paddingTop: 28, lineHeight: 19 }
