@@ -142,7 +142,7 @@ export default function MerchantProductsScreen() {
   const visibleOffers = filterMerchantProducts(allOffers, search, filter);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AppHeader
           title={translate("merchantProductsTitle")}
@@ -365,7 +365,7 @@ function MessageScreen({
   const styles = createStyles(theme);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.messageContainer}>
         {loading ? (
           <LoadingState label={label ?? ""} />
