@@ -27,12 +27,13 @@ import {
   type MerchantStoreFormValues,
   type MerchantStoreFormInput
 } from "@/lib/merchant-validation";
-import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
+import { translate, type Language, type TranslationKey, useLanguage } from "@/lib/i18n";
+import { getLocalizedMerchantCategoryLabel, getLocalizedWilayaLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { BottomSheet, AppHeader, Button, Card, ErrorState, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantOnboardingScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -268,7 +269,7 @@ export default function MerchantOnboardingScreen() {
                   >
                     <UiText style={[styles.selectText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>
                       {selectedWilaya
-                        ? `${String(selectedWilaya.id).padStart(2, "0")} - ${selectedWilaya.name_ar}`
+                        ? `${String(selectedWilaya.id).padStart(2, "0")} - ${getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language)}`
                         : translate("merchantStoreChooseWilaya")}
                     </UiText>
                     <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
@@ -349,7 +350,7 @@ export default function MerchantOnboardingScreen() {
                   <PressableSurface
                     key={category.id}
                     accessibilityRole="button"
-                    accessibilityLabel={category.label}
+                    accessibilityLabel={getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                     accessibilityState={{ selected: categoryId === category.id }}
                     onPress={() => {
                       setValue("category", category.id, { shouldValidate: true });
@@ -364,7 +365,7 @@ export default function MerchantOnboardingScreen() {
                     ]}
                   >
                     <UiText style={[styles.categoryText, { color: theme.colors.foreground }]}>
-                      {category.label}
+                      {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                     </UiText>
                   </PressableSurface>
                 ))}
@@ -393,7 +394,7 @@ export default function MerchantOnboardingScreen() {
                         <PressableSurface
                           key={category.id}
                           accessibilityRole="button"
-                          accessibilityLabel={category.label}
+                          accessibilityLabel={getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                           accessibilityState={{ selected }}
                           onPress={() => {
                             const next = selected
@@ -410,7 +411,7 @@ export default function MerchantOnboardingScreen() {
                           ]}
                         >
                           <UiText style={[styles.chipText, { color: theme.colors.foreground }]}>
-                            {category.label}
+                            {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                           </UiText>
                         </PressableSurface>
                       );
@@ -512,6 +513,7 @@ export default function MerchantOnboardingScreen() {
                 <WilayaOption
                   key={wilaya.id}
                   wilaya={wilaya}
+                  language={language}
                   selected={wilaya.id === wilayaId}
                   theme={theme}
                   onPress={() => {
@@ -584,11 +586,13 @@ function FormField({
 
 function WilayaOption({
   wilaya,
+  language,
   selected,
   theme,
   onPress
 }: {
   wilaya: Wilaya;
+  language: Language;
   selected: boolean;
   theme: AppTheme;
   onPress: () => void;
@@ -596,13 +600,13 @@ function WilayaOption({
   return (
     <PressableSurface
       accessibilityRole="button"
-      accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + wilaya.name_ar}
+      accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language)}
       accessibilityState={{ selected }}
       onPress={onPress}
       style={[stylesForScreen.wilayaOption, { borderBottomColor: theme.colors.border }]}
     >
       <UiText style={[stylesForScreen.wilayaText, { color: selected ? theme.colors.accentMuted : theme.colors.foreground }]}>
-        {String(wilaya.id).padStart(2, "0")} - {wilaya.name_ar}
+        {String(wilaya.id).padStart(2, "0")} - {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language)}
       </UiText>
     </PressableSurface>
   );
