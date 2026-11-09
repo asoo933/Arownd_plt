@@ -419,7 +419,7 @@ function createStyles(theme: AppTheme) {
       paddingVertical: designTokens.spacing.xs
     },
     input: {
-      minHeight: 48,
+      minHeight: designTokens.dimensions.controlHeight.lg,
       textAlign: "auto"
     },
     linkRow: {
