@@ -9,7 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { AppHeader, Card, Icon, IconButton, Image as UiImage, RatingStars, SegmentedControl, Text as UiText } from "@/components/ui";
+import { AppHeader, Avatar, Card, Icon, IconButton, RatingStars, SegmentedControl, Text as UiText } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -39,23 +39,25 @@ export default function StoreDetailsScreen() {
   return (
     <CustomerScreen>
       <AppHeader
-        title={details.name}
+        title=""
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" color={theme.colors.foreground} size={20} />} />}
-        trailing={<FavoriteButton kind="stores" id={storeId} />}
       />
-      <View style={[styles.cover, { backgroundColor: theme.colors.surfaceMuted }]}>
-        {details.cover_url ? <UiImage uri={details.cover_url} accessibilityLabel={details.name} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
-      </View>
-      <View style={styles.storeHeader}>
-        <View style={[styles.logo, { backgroundColor: theme.colors.surfaceMuted }]}>
-          {details.logo_url ? <UiImage uri={details.logo_url} accessibilityLabel={details.name} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <Icon name="store" color={theme.colors.subtle} size={30} accessibilityHidden />}
-        </View>
-        <View style={styles.storeTitleWrap}>
+
+      <View style={styles.storeIdentity}>
+        <Avatar
+          name={details.name}
+          imageUri={details.logo_url || undefined}
+          size={76}
+          verified={details.is_verified}
+          accessibilityLabel={details.name}
+        />
+        <View style={styles.storeInfo}>
           <UiText style={[styles.storeName, { color: theme.colors.foreground }]}>{details.name}</UiText>
           <UiText style={[styles.metaText, { color: theme.colors.muted }]}>{details.commune || details.address_line || translate("storeNoAddress")}</UiText>
           <UiText style={[styles.verified, { color: details.is_verified ? theme.colors.success : theme.colors.muted }]}>{details.is_verified ? translate("storeVerified") : translate("storeUnverified")}</UiText>
           {details.rating != null ? <RatingStars value={details.rating} showValue /> : null}
         </View>
+        <FavoriteButton kind="stores" id={storeId} iconOnly />
       </View>
 
       <SegmentedControl
@@ -84,28 +86,28 @@ export default function StoreDetailsScreen() {
           </View>
         )
       ) : (
-        <Card contentStyle={styles.aboutCard}>
-          <UiText style={[styles.aboutTitle, { color: theme.colors.foreground }]}>{translate("storeAboutTitle")}</UiText>
-          <UiText style={[styles.description, { color: theme.colors.muted }]}>{details.description || translate("storeNoDescription")}</UiText>
-          <UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeAddress")}</UiText>
-          <UiText style={[styles.description, { color: theme.colors.muted }]}>{[details.address_line, details.commune].filter(Boolean).join("، ") || translate("storeNoAddress")}</UiText>
-          {details.phone ? <><UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storePhone")}</UiText><UiText style={[styles.description, { color: theme.colors.muted }]}>{details.phone}</UiText></> : null}
-          {details.whatsapp ? <><UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeWhatsApp")}</UiText><UiText style={[styles.description, { color: theme.colors.muted }]}>{details.whatsapp}</UiText></> : null}
-        </Card>
+        <>
+          <Card contentStyle={styles.aboutCard}>
+            <UiText style={[styles.aboutTitle, { color: theme.colors.foreground }]}>{translate("storeAboutTitle")}</UiText>
+            <UiText style={[styles.description, { color: theme.colors.muted }]}>{details.description || translate("storeNoDescription")}</UiText>
+            <UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeAddress")}</UiText>
+            <UiText style={[styles.description, { color: theme.colors.muted }]}>{[details.address_line, details.commune].filter(Boolean).join("، ") || translate("storeNoAddress")}</UiText>
+            {details.phone ? <><UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storePhone")}</UiText><UiText style={[styles.description, { color: theme.colors.muted }]}>{details.phone}</UiText></> : null}
+            {details.whatsapp ? <><UiText style={[styles.fieldTitle, { color: theme.colors.accentMuted }]}>{translate("storeWhatsApp")}</UiText><UiText style={[styles.description, { color: theme.colors.muted }]}>{details.whatsapp}</UiText></> : null}
+          </Card>
+          <ReviewPanel targetType="store" targetId={storeId} />
+        </>
       )}
-      <ReviewPanel targetType="store" targetId={storeId} />
     </CustomerScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  cover: { height: 150, borderRadius: designTokens.radius.lg, overflow: "hidden" },
-  storeHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, marginTop: -2 },
-  logo: { width: 76, height: 76, borderRadius: designTokens.radius.lg, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  storeTitleWrap: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+  storeIdentity: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
+  storeInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   storeName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "auto" },
-  verified: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
+  verified: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   tabs: { width: "100%" },
   productGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
   aboutCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
