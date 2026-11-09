@@ -59,7 +59,7 @@ function toRows(orders: CustomerOrder[]): OrderRow[] {
         subtotal: order.subtotal,
         shippingFee: order.shipping_fee,
         storeName: null,
-        itemCount: order.items.length
+        itemCount: order.items.reduce((total, item) => total + item.quantity, 0)
       }];
     }
     return order.merchant_orders.map((merchantOrder) => ({
@@ -69,7 +69,7 @@ function toRows(orders: CustomerOrder[]): OrderRow[] {
       subtotal: merchantOrder.subtotal,
       shippingFee: merchantOrder.shipping_fee,
       storeName: merchantOrder.store?.name ?? null,
-      itemCount: merchantOrder.items.length
+      itemCount: merchantOrder.items.reduce((total, item) => total + item.quantity, 0)
     }));
   });
 }
