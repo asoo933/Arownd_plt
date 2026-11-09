@@ -30,6 +30,7 @@ export default function ExploreScreen() {
   const [railWidth, setRailWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasActiveFilter = Boolean(debouncedQuery || category);
 
   useEffect(() => setQuery(initialQuery), [initialQuery]);
@@ -58,6 +59,7 @@ export default function ExploreScreen() {
 
     return () => {
       animation.stop();
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
       if (animationRef.current === animation) animationRef.current = null;
     };
   }, [language, railWidth, translateX, viewportWidth]);
@@ -85,6 +87,8 @@ export default function ExploreScreen() {
         accessibilityState={{ selected }}
         onPress={() => {
           animationRef.current?.stop();
+          if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+          resumeTimerRef.current = setTimeout(() => animationRef.current?.start(), 900);
           router.setParams({ category: selected ? undefined : item.id });
         }}
         style={[
