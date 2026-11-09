@@ -26,13 +26,14 @@ import { cartLineKey, evaluateCart, normalizeCartOptions } from "@/lib/cart-stat
 import { getSupabaseClient } from "@/lib/supabase";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
 import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
 
 type Picker = "wilaya" | "commune" | null;
 
 export default function CheckoutScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -210,7 +211,7 @@ export default function CheckoutScreen() {
   const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.foreground }];
   const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune");
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
-    ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + item.name_ar, wilaya: item }))
+    ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language), wilaya: item }))
     : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
   return <CustomerScreen>
@@ -253,7 +254,7 @@ export default function CheckoutScreen() {
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
               </View>
               <UiText style={styles.fieldHint}>{address.phone}</UiText>
-              <UiText style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? ""}، {address.commune}</UiText>
+              <UiText style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language)}، {address.commune}</UiText>
               <UiText style={styles.fieldHint}>{address.address_line}</UiText>
               {address.is_default ? <UiText style={styles.savedDefault}>{translate("addressesDefault")}</UiText> : null}
             </PressableSurface>
