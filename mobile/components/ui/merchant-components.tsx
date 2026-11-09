@@ -40,8 +40,8 @@ export function MerchantOnboardingStep({
     <View style={[{ gap: designTokens.spacing.md }, style]}>
       {steps.map((step, index) => (
         <View key={step.key} style={{ flexDirection: "row", alignItems: "flex-start", gap: designTokens.spacing.md }}>
-          <View style={{ width: theme.dimensions.avatarSize.md, height: theme.dimensions.avatarSize.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
-            {step.icon ?? (step.status === "complete" ? <Icon name="check" size={theme.dimensions.iconSize.sm} color={theme.colors.success} accessibilityHidden /> : <UiText style={{ color: theme.colors.foreground, fontWeight: theme.fontWeights.extrabold }}>{index + 1}</UiText>)}
+          <View style={{ width: theme.dimensions.avatarSize.md, height: theme.dimensions.avatarSize.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" && theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted }}>
+            {step.icon ?? (step.status === "complete" ? <Icon name="check" size={theme.dimensions.iconSize.sm} color={theme.colors.success} accessibilityHidden /> : <UiText style={{ color: step.status === "current" ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.foreground, fontWeight: theme.fontWeights.extrabold }}>{index + 1}</UiText>)}
           </View>
           <View style={{ flex: 1, paddingTop: designTokens.spacing.xs, gap: designTokens.spacing.xs }}>
             <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "auto" }}>{step.label}</UiText>
