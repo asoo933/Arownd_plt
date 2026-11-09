@@ -60,7 +60,7 @@ export function BottomNavigation({
 }) {
   const theme = useAppTheme();
   return (
-    <View accessibilityRole="tablist" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row-reverse", justifyContent: "space-around", paddingVertical: designTokens.spacing.sm, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderTopColor: theme.colors.border }, style]}>
+    <View accessibilityRole="tablist" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row", justifyContent: "space-around", paddingVertical: designTokens.spacing.sm, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderTopColor: theme.colors.border }, style]}>
       {items.map((item) => {
         const selected = item.key === value;
         return (

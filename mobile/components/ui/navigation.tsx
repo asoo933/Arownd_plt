@@ -104,7 +104,7 @@ export function SegmentedControl({
 const styles = StyleSheet.create({
   header: {
     minHeight: designTokens.dimensions.controlHeight.lg,
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between"
   },
@@ -119,11 +119,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    textAlign: "right",
+    textAlign: "auto",
     fontWeight: designTokens.fontWeights.extrabold
   },
   segmented: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     padding: designTokens.spacing.xs,
     gap: designTokens.spacing.xs
