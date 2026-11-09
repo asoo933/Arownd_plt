@@ -124,9 +124,9 @@ export default function DeliveryProfileScreen() {
     <Card style={styles.panel} contentStyle={{ gap: designTokens.spacing.md, padding: designTokens.spacing.lg }}>
       <Heading level={3}>{translate("deliveryProfileTitle")}</Heading>
       <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
-      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
+      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" />
       <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
-      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" />
+      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" />
       <FormLabel>{translate("checkoutWilaya")}</FormLabel>
       <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <UiText tone={selectedWilaya ? "foreground" : "muted"}>{selectedWilaya?.name_ar ?? translate("checkoutChooseWilaya")}</UiText>
@@ -140,7 +140,7 @@ export default function DeliveryProfileScreen() {
         maxLength={100}
         placeholder={translate("checkoutCommunePlaceholder")}
         style={[...fieldStyle, wilayaId === null && styles.disabled]}
-        textAlign="right"
+        textAlign="auto"
       />
       {(communes.data?.length ?? 0) > 0 ? <PressableSurface accessibilityLabel={translate("checkoutChooseCommune")} onPress={() => setPicker("commune")} style={styles.suggestionButton}>
         <UiText tone="accentMuted" weight="700">{translate("checkoutChooseCommune")}</UiText>
