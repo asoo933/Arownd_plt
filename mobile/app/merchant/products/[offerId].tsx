@@ -32,11 +32,12 @@ import {
 import { fetchMerchantAccess, fetchMerchantCategories } from "@/lib/merchant";
 import { getSelectableMerchantCategories, groupMerchantCategories } from "@/lib/merchant-category-state";
 import { translate, useLanguage } from "@/lib/i18n";
+import { getLocalizedMerchantCategoryLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { BottomSheet, AppHeader, Button, Card, ConfirmDialog, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 export default function MerchantEditProductScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
@@ -402,7 +403,7 @@ export default function MerchantEditProductScreen() {
                 >
                   <UiText style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
                     {selectedCategory
-                      ? `${selectedCategory.emoji} ${selectedCategory.label}`
+                      ? `${selectedCategory.emoji} ${getLocalizedMerchantCategoryLabel(selectedCategory.id, selectedCategory.label, language)}`
                       : translate("merchantProductCategoryUnknown")}
                   </UiText>
                 </PressableSurface>
@@ -585,7 +586,7 @@ export default function MerchantEditProductScreen() {
                 <PressableSurface
                   key={category.id}
                   accessibilityRole="button"
-                  accessibilityLabel={category.label}
+                  accessibilityLabel={getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                   accessibilityState={{ selected: productCategory === category.id }}
                   onPress={() => {
                     setProductCategory(category.id);
@@ -600,7 +601,7 @@ export default function MerchantEditProductScreen() {
                   ]}
                 >
                   <UiText style={[styles.categoryOptionText, { color: theme.colors.foreground }]}>
-                    {category.emoji} {category.label}
+                    {category.emoji} {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                   </UiText>
                 </PressableSurface>
               ))}
