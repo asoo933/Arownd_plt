@@ -128,14 +128,14 @@ export function Checkbox({
           width: 22,
           height: 22,
           borderRadius: theme.radius.sm - 3,
-          borderWidth: checked ? 0 : 1.5,
-          borderColor: theme.colors.muted,
-          backgroundColor: checked ? theme.colors.accent : "transparent",
+          borderWidth: checked && theme.mode === "light" ? 0 : 1.5,
+          borderColor: checked ? theme.colors.accent : theme.colors.muted,
+          backgroundColor: checked && theme.mode === "light" ? theme.colors.accent : "transparent",
           alignItems: "center",
           justifyContent: "center"
         }}
       >
-        {checked ? <Icon name="check" size={theme.dimensions.iconSize.xs} color={theme.colors.accentForeground} accessibilityHidden /> : null}
+        {checked ? <Icon name="check" size={theme.dimensions.iconSize.xs} color={theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground} accessibilityHidden /> : null}
       </View>
       {label ? <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, flex: 1, textAlign: "auto" }}>{label}</UiText> : null}
     </Pressable>
@@ -310,9 +310,9 @@ export function MultiSelect({
             accessibilityState={{ checked: selected, disabled: option.disabled }}
             disabled={option.disabled}
             onPress={() => onChange(selected ? value.filter((item) => item !== option.value) : [...value, option.value])}
-            style={{ minHeight: theme.dimensions.controlHeight.md, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
+            style={{ minHeight: theme.dimensions.controlHeight.md, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
           >
-            <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>
+            <UiText style={{ color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>
               {option.label}
             </UiText>
           </Pressable>
@@ -481,8 +481,8 @@ export function DatePicker({
           const selected = value === dateKey;
           const unavailable = disabled || (minDate !== undefined && dateKey < minDate) || (maxDate !== undefined && dateKey > maxDate);
           return (
-            <Pressable key={dateKey} accessibilityRole="button" accessibilityLabel={dateKey} accessibilityState={{ selected, disabled: unavailable }} disabled={unavailable} onPress={() => onChange(dateKey)} style={({ pressed }) => [{ width: "14.2857%", aspectRatio: 1, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: selected ? theme.colors.accent : "transparent", opacity: unavailable ? 0.35 : pressed ? 0.7 : 1 }]}>
-              <UiText style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular }}>{day}</UiText>
+            <Pressable key={dateKey} accessibilityRole="button" accessibilityLabel={dateKey} accessibilityState={{ selected, disabled: unavailable }} disabled={unavailable} onPress={() => onChange(dateKey)} style={({ pressed }) => [{ width: "14.2857%", aspectRatio: 1, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : "transparent", opacity: unavailable ? 0.35 : pressed ? 0.7 : 1 }]}>
+              <UiText style={{ color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.foreground, fontSize: theme.typography.caption + 1, fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular }}>{day}</UiText>
             </Pressable>
           );
         })}
