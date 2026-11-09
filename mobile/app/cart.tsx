@@ -90,7 +90,7 @@ export default function CartScreen() {
         <Button
           label={translate("cartCheckout")}
           onPress={() => router.push("/checkout")}
-          disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
+          disabled={offers.isPending || offers.isError || mutation.isPending || evaluation.blockingCount > 0}
           fullWidth
         />
       </CartSummary>
@@ -184,7 +184,7 @@ const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   blockedHint: { textAlign: "auto" },
   summaryContent: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   summaryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  summaryLabel: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
-  total: { fontSize: designTokens.typography.title - 3 },
+  summaryLabel: { flex: 1, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
+  total: { flexShrink: 0, fontSize: designTokens.typography.title - 3 },
   note: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" }
 });
