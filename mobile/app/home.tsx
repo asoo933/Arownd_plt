@@ -56,14 +56,6 @@ export default function CustomerHomeScreen() {
           >
             <Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />
           </PressableSurface>
-          <PressableSurface
-            accessibilityRole="button"
-            accessibilityLabel={translate("homeLocation")}
-            onPress={() => router.push("/stores")}
-            style={[styles.headerIconButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-          >
-            <Icon name="map-pin" size={21} color={theme.colors.foreground} accessibilityHidden />
-          </PressableSurface>
         </View>
       </View>
 
