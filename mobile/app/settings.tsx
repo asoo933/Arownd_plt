@@ -310,7 +310,7 @@ export default function SettingsScreen() {
             setLanguageError(false);
             void setLanguage("ar").catch(() => setLanguageError(true));
           }}
-          style={styles.languageOption}
+          style={[styles.languageOption, language === "ar" && { backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted }]}
         >
           <UiText weight={language === "ar" ? "700" : "500"}>{translate("settingsLanguageArabic")}</UiText>
           {language === "ar" ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
@@ -322,7 +322,7 @@ export default function SettingsScreen() {
             setLanguageError(false);
             void setLanguage("en").catch(() => setLanguageError(true));
           }}
-          style={styles.languageOption}
+          style={[styles.languageOption, language === "en" && { backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted }]}
         >
           <UiText weight={language === "en" ? "700" : "500"}>{translate("settingsLanguageEnglish")}</UiText>
           {language === "en" ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
