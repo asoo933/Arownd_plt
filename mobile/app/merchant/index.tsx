@@ -320,7 +320,7 @@ function createStyles(theme: AppTheme) {
     statusPillText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
     secondaryButton: { minHeight: 43, borderWidth: 1, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     secondaryButtonText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    sectionHeading: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.md, marginTop: 2 },
+    sectionHeading: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: designTokens.spacing.md, marginTop: 2 },
     sectionHeadingText: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
     sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
