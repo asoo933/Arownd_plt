@@ -48,7 +48,7 @@ export default function MerchantAnalyticsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <AppHeader
           title={translate("merchantAnalyticsTitle")}
@@ -91,7 +91,7 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
 }) {
   const styles = createStyles(theme);
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
         {loading ? (
           <LoadingState label={label} />
