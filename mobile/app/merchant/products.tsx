@@ -9,7 +9,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PressableSurface, Text as UiText, TextField } from "@/components/ui";
-import { formatDZD } from "@/lib/catalog";
 import {
   fetchMerchantAccess
 } from "@/lib/merchant";
