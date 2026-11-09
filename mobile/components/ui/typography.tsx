@@ -169,9 +169,9 @@ export function BadgeText({
     : style;
   const colors = {
     accent: { backgroundColor: theme.colors.accent, color: theme.colors.accentForeground },
-    success: { backgroundColor: theme.colors.successSurface, color: theme.colors.success },
-    warning: { backgroundColor: theme.colors.warningSurface, color: theme.colors.warning },
-    danger: { backgroundColor: theme.colors.dangerSurface, color: theme.colors.danger }
+    success: { backgroundColor: theme.colors.successSurface, color: theme.mode === "light" ? theme.colors.successText : theme.colors.success },
+    warning: { backgroundColor: theme.colors.warningSurface, color: theme.mode === "light" ? theme.colors.warningText : theme.colors.warning },
+    danger: { backgroundColor: theme.colors.dangerSurface, color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }
   } satisfies Record<typeof tone, { backgroundColor: string; color: string }>;
   const palette = colors[tone];
 
