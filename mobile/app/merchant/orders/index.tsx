@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -11,7 +11,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { formatDZD, formatNumber } from "@/lib/catalog";
 import {
   fetchMerchantAccess,
-  fetchMerchantDashboard
+  fetchMerchantDashboard,
+  fetchMerchantOrderDetails
 } from "@/lib/merchant";
 import { translate, type Language, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
@@ -35,6 +36,7 @@ export default function MerchantOrdersScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState<OrderFilter>("all");
 
   const access = useQuery({
@@ -145,7 +147,10 @@ export default function MerchantOrdersScreen() {
                 order={order}
                 language={language}
                 theme={theme}
-                onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
+                onPress={() => {
+                  if (storeId) void queryClient.prefetchQuery({ queryKey: ["merchant-order-detail", storeId, order.id], queryFn: () => fetchMerchantOrderDetails(order.id, storeId), staleTime: 15_000 });
+                  router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } });
+                }}
               />
             ))}
           </View>
