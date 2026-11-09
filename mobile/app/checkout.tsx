@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Spinner, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Spinner, OrderCardSkeleton, Text as UiText, TextField } from "@/components/ui";
 import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
@@ -166,7 +166,10 @@ export default function CheckoutScreen() {
     </CustomerScreen>;
   }
 
-  if (cart.isPending || auth.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (cart.isPending || auth.isPending) return <CustomerScreen>
+    <AppHeader title={translate("checkoutTitle")} />
+    {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
+  </CustomerScreen>;
   if (cart.isError || auth.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching || auth.isFetching} onRetry={() => { void cart.refetch(); void auth.refetch(); }} /></CustomerScreen>;
   if (!cart.data.length) return <CustomerScreen>
     <AppHeader title={translate("checkoutTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
