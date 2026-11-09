@@ -10,6 +10,7 @@ import {
   Button,
   Caption,
   NotificationCard,
+  OrderCardSkeleton,
   StatusBadge,
   Text as UiText
 } from "@/components/ui";
@@ -91,7 +92,10 @@ export default function NotificationsScreen() {
   });
 
   if (auth.isPending || (auth.data && notifications.isPending)) {
-    return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+    return <CustomerScreen>
+      <AppHeader title={translate("notificationsTitle")} />
+      {[0, 1, 2, 3].map((item) => <OrderCardSkeleton key={item} />)}
+    </CustomerScreen>;
   }
   if (auth.isError || notifications.isError) {
     return (
