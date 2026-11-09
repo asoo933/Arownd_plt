@@ -1,11 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, ProductTile } from "@/components/customer-ui";
 import { FavoriteButton } from "@/components/favorite-button";
-import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -17,6 +18,7 @@ export default function StoreDetailsScreen() {
   useLanguage();
   const { storeId } = useLocalSearchParams<{ storeId: string }>();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
   const [tab, setTab] = useState<StoreTab>("products");
   const store = useQuery({
     queryKey: ["customer-store", storeId],
@@ -91,7 +93,12 @@ export default function StoreDetailsScreen() {
         ) : (
           <View style={styles.productGrid}>
             {offers.data.map((item) => (
-              <ProductTile key={item.id} name={item.product.name} store={details.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } })} />
+              <ProductTile key={item.id} name={item.product.name} store={details.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => {
+                void queryClient.prefetchQuery({ queryKey: ["customer-product", item.product.id], queryFn: () => fetchProductDetails(item.product.id), staleTime: 60_000 });
+                void queryClient.prefetchQuery({ queryKey: ["customer-product-offers", item.product.id], queryFn: () => fetchProductOffers(item.product.id), staleTime: 30_000 });
+                void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "product", item.product.id], queryFn: () => fetchApprovedReviews("product", item.product.id), staleTime: 60_000 });
+                router.push({ pathname: "/product/[productId]", params: { productId: item.product.id } });
+              }} />
             ))}
           </View>
         )
