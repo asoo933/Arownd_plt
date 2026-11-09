@@ -25,7 +25,7 @@ type SurfaceProps = Pick<ViewProps, "accessibilityHint" | "accessibilityLabel" |
 export function Surface({
   children,
   style,
-  elevated = true,
+  elevated = false,
   padding = designTokens.spacing.md,
   radius = "lg",
   accessibilityHint,
