@@ -164,37 +164,6 @@ export default function MerchantEntryScreen() {
         </View>
 
         <View style={styles.sectionHeading}>
-          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-            {translate("merchantManagementTitle")}
-          </UiText>
-        </View>
-        <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.managementCard}>
-          {[
-            { key: "orders", label: translate("merchantManageOrders"), icon: "shopping-bag", path: "/merchant/orders" },
-            { key: "products", label: translate("merchantManageProducts"), icon: "package", path: "/merchant/products" },
-            { key: "analytics", label: translate("merchantAnalyticsTitle"), icon: "layout-grid", path: "/merchant/analytics" },
-            { key: "settings", label: translate("merchantStoreSettingsTitle"), icon: "settings", path: "/merchant/settings" }
-          ].map((item, index, items) => (
-            <PressableSurface
-              key={item.key}
-              accessibilityRole="button"
-              accessibilityLabel={item.label}
-              onPress={() => router.push(item.path as "/merchant/orders" | "/merchant/products" | "/merchant/analytics" | "/merchant/settings")}
-              style={[
-                styles.managementRow,
-                index < items.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
-              ]}
-            >
-              <View style={[styles.managementIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
-                <Icon name={item.icon as "shopping-bag" | "package" | "layout-grid" | "settings"} color={theme.colors.accentMuted} size={19} accessibilityHidden />
-              </View>
-              <UiText style={[styles.managementLabel, { color: theme.colors.foreground }]}>{item.label}</UiText>
-              <Icon name="chevron-left" color={theme.colors.muted} size={18} accessibilityHidden />
-            </PressableSurface>
-          ))}
-        </Card>
-
-        <View style={styles.sectionHeading}>
           <View style={styles.sectionHeadingText}>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantRecentOrdersTitle")}
@@ -252,6 +221,38 @@ export default function MerchantEntryScreen() {
             ))}
           </Card>
         )}
+
+
+        <View style={styles.sectionHeading}>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+            {translate("merchantManagementTitle")}
+          </UiText>
+        </View>
+        <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.managementCard}>
+          {[
+            { key: "orders", label: translate("merchantManageOrders"), icon: "shopping-bag", path: "/merchant/orders" },
+            { key: "products", label: translate("merchantManageProducts"), icon: "package", path: "/merchant/products" },
+            { key: "analytics", label: translate("merchantAnalyticsTitle"), icon: "layout-grid", path: "/merchant/analytics" },
+            { key: "settings", label: translate("merchantStoreSettingsTitle"), icon: "settings", path: "/merchant/settings" }
+          ].map((item, index, items) => (
+            <PressableSurface
+              key={item.key}
+              accessibilityRole="button"
+              accessibilityLabel={item.label}
+              onPress={() => router.push(item.path as "/merchant/orders" | "/merchant/products" | "/merchant/analytics" | "/merchant/settings")}
+              style={[
+                styles.managementRow,
+                index < items.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
+              ]}
+            >
+              <View style={[styles.managementIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+                <Icon name={item.icon as "shopping-bag" | "package" | "layout-grid" | "settings"} color={theme.colors.accentMuted} size={19} accessibilityHidden />
+              </View>
+              <UiText style={[styles.managementLabel, { color: theme.colors.foreground }]}>{item.label}</UiText>
+              <Icon name="chevron-left" color={theme.colors.muted} size={18} accessibilityHidden />
+            </PressableSurface>
+          ))}
+        </Card>
 
 
       </ScrollView>
