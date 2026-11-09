@@ -143,7 +143,7 @@ export default function MerchantOrderDetailsScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AppHeader title={translate("merchantOrderDetailTitle")} leading={<Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />} />
         <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("merchantOrderNumber")} {customerOrder.id.slice(0, 8)}</UiText>
-        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString("ar-DZ")}</UiText>
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{new Date(customerOrder.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
 
         <MerchantOrderCard>
           <View style={styles.summaryRow}>
@@ -235,7 +235,7 @@ export default function MerchantOrderDetailsScreen() {
           ) : trackingEvents.map((event) => (
             <View key={event.id} style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
               <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{translate(trackingTranslationKeys[event.status])}</UiText>
-              <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString("ar-DZ")}</UiText>
+              <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{new Date(event.created_at).toLocaleString(language === "ar" ? "ar-DZ" : "en-DZ")}</UiText>
             </View>
           ))}
         </MerchantOrderCard>
