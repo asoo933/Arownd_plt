@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import { useColorScheme } from "react-native";
 
-import { brandColors, extendedThemeColors, semanticColors, themeColors } from "./colors";
+import { brandColors, extendedThemeColors, themeColors } from "./colors";
 import { dimensions } from "./dimensions";
 import { shadows } from "./shadows";
 import { borderRadius, spacing } from "./spacing";
@@ -28,6 +28,7 @@ export type AppTheme = {
     subtle: string;
     border: string;
     input: string;
+    inputBorder: string;
     accent: string;
     accentForeground: string;
     accentMuted: string;
@@ -41,6 +42,8 @@ export type AppTheme = {
     warningSurface: string;
     warningBorder: string;
     info: string;
+    infoSurface: string;
+    infoBorder: string;
     placeholder: string;
     overlay: string;
   };
@@ -80,7 +83,8 @@ export function getAppTheme(mode: "light" | "dark"): AppTheme {
       subtle: semanticPalette.subtle,
       border: palette.border,
       input: palette.input,
-      accent: brandColors.lime,
+      inputBorder: palette.inputBorder,
+      accent: brandColors.primary,
       accentForeground: brandColors.black,
       accentMuted: semanticPalette.accentMuted,
       danger: semanticPalette.danger,
@@ -92,7 +96,9 @@ export function getAppTheme(mode: "light" | "dark"): AppTheme {
       warning: semanticPalette.warning,
       warningSurface: semanticPalette.warningSurface,
       warningBorder: semanticPalette.warningBorder,
-      info: semanticColors.info,
+      info: semanticPalette.info,
+      infoSurface: semanticPalette.infoSurface,
+      infoBorder: semanticPalette.infoBorder,
       placeholder: semanticPalette.placeholder,
       overlay: semanticPalette.overlay
     },
