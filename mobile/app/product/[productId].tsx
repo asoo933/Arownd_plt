@@ -138,7 +138,7 @@ export default function ProductDetailsScreen() {
               key={offer.id}
               accessibilityLabel={offer.store.name}
               onPress={() => { setSelectedOfferId(offer.id); setSize(""); setColor(""); setQuantity(1); addMutation.reset(); }}
-              style={[styles.offerCard, { borderColor: active ? theme.colors.accentMuted : theme.colors.border, backgroundColor: active ? theme.colors.surfaceMuted : theme.colors.surface }]}
+              style={[styles.offerCard, { borderColor: active ? theme.colors.accent : theme.colors.border, backgroundColor: active ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted) : (theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface) }]}
               contentStyle={styles.offerCardContent}
             >
               <View style={styles.offerInfo}>
