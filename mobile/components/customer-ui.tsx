@@ -89,7 +89,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
       onPress={onPress}
       disabled={!onPress}
       accessibilityLabel={`${name}، ${store}، ${price}`}
-      style={[styles.productTile, { backgroundColor: theme.colors.surfaceSecondary }, style]}
+      style={[styles.productTile, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }, style]}
       media={
         <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
           {imageUrl ? <UiImage uri={imageUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={32} color={theme.colors.subtle} accessibilityHidden />}
@@ -120,7 +120,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
       accessibilityLabel={`${name}${commune ? `، ${commune}` : ""}${rating != null ? `، ${rating.toFixed(1)}` : ""}${verified ? `، ${translate("storeVerified")}` : ""}`}
       onPress={onPress}
       disabled={!onPress}
-      style={[styles.storeTile, { backgroundColor: theme.colors.surfaceSecondary }]}
+      style={[styles.storeTile, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}
     >
       <View style={[styles.storeLogo, { backgroundColor: theme.colors.surfaceMuted }]}>
         {logoUrl ? <UiImage uri={logoUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="store" size={28} color={theme.colors.subtle} accessibilityHidden />}
