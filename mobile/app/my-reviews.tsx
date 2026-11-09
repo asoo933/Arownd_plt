@@ -20,7 +20,7 @@ import { translate, useLanguage } from "@/lib/i18n";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function MyReviewsScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const auth = useQuery({
     queryKey: ["my-reviews-auth"],
     queryFn: async () => {
@@ -79,7 +79,7 @@ function ReviewRow({ review, onPress }: { review: AppReview; onPress: () => void
   const date = new Date(review.created_at);
   const dateLabel = Number.isNaN(date.getTime())
     ? ""
-    : new Intl.DateTimeFormat("ar-DZ", { dateStyle: "medium" }).format(date);
+    : new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { dateStyle: "medium" }).format(date);
 
   return (
     <Card
