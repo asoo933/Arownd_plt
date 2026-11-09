@@ -35,7 +35,7 @@ export function TrackingStep({ step, isLast = false }: { step: TrackingStepItem;
   const theme = useAppTheme();
   const active = step.status !== "upcoming";
   return (
-    <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.md, minHeight: isLast ? 44 : 68 }}>
+    <View style={{ flexDirection: "row", gap: designTokens.spacing.md, minHeight: isLast ? 44 : 68 }}>
       <View style={{ alignItems: "center", width: theme.dimensions.avatarSize.md }}>
         <View style={{ width: theme.dimensions.avatarSize.md, height: theme.dimensions.avatarSize.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
           {step.icon ?? (step.status === "complete" ? <Icon name="check" size={theme.dimensions.iconSize.xs + 2} color={theme.colors.success} accessibilityHidden /> : <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: active ? theme.colors.foreground : theme.colors.muted }} />)}
@@ -43,8 +43,8 @@ export function TrackingStep({ step, isLast = false }: { step: TrackingStepItem;
         {!isLast ? <View style={{ width: 2, flex: 1, minHeight: 24, backgroundColor: step.status === "complete" ? theme.colors.success : theme.colors.border }} /> : null}
       </View>
       <View style={{ flex: 1, paddingTop: designTokens.spacing.xs, gap: designTokens.spacing.xs }}>
-        <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "right" }}>{step.title}</UiText>
-        {step.description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{step.description}</UiText> : null}
+        <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "auto" }}>{step.title}</UiText>
+        {step.description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "auto" }}>{step.description}</UiText> : null}
       </View>
     </View>
   );

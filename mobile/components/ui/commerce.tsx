@@ -19,7 +19,7 @@ export function PriceDisplay({
 }) {
   const theme = useAppTheme();
   return (
-    <View style={[{ flexDirection: "row-reverse", alignItems: "baseline", flexWrap: "wrap", gap: designTokens.spacing.sm }, style]}>
+    <View style={[{ flexDirection: "row", alignItems: "baseline", flexWrap: "wrap", gap: designTokens.spacing.sm }, style]}>
       <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.title, fontWeight: theme.fontWeights.extrabold, fontVariant: ["tabular-nums"] }}>{value}</UiText>
       {previousValue ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textDecorationLine: "line-through" }}>{previousValue}</UiText> : null}
     </View>
@@ -80,7 +80,7 @@ export function CartButton({
 
 export function CartItem({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const theme = useAppTheme();
-  return <View style={[{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }, style]}>{children}</View>;
+  return <View style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, borderBottomWidth: 1, borderBottomColor: theme.colors.border }, style]}>{children}</View>;
 }
 
 export function ProductQuantitySelector({
@@ -130,7 +130,7 @@ export function CouponInput({
 }) {
   const theme = useAppTheme();
   return (
-    <View style={[{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm }, style]}>
+    <View style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm }, style]}>
       <TextField value={value} onChangeText={onChangeText} placeholder={placeholder} editable={!disabled} containerStyle={{ flex: 1 }} />
       <Pressable accessibilityRole="button" accessibilityLabel={applyLabel} accessibilityState={{ disabled }} disabled={disabled} onPress={onApply} style={{ minHeight: theme.dimensions.controlHeight.lg, justifyContent: "center", paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, opacity: disabled ? 0.5 : 1 }}>
         <UiText style={{ color: theme.colors.accentForeground, fontWeight: theme.fontWeights.bold }}>{applyLabel}</UiText>
@@ -175,7 +175,7 @@ export function ProductImageGallery({
   return (
     <View accessibilityLabel={accessibilityLabel} style={{ gap: designTokens.spacing.sm }}>
       {selectedSource ? <Image source={selectedSource} resizeMode="cover" style={[{ width: "100%", aspectRatio: 1, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surfaceMuted }, imageStyle]} /> : null}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
         {images.map((uri, index) => (
           <Pressable key={uri + index} accessibilityRole="button" accessibilityLabel={`${accessibilityLabel} ${index + 1}`} accessibilityState={{ selected: index === selectedIndex }} onPress={() => onSelect(index)} style={{ borderRadius: theme.radius.md, borderWidth: index === selectedIndex ? 2 : 1, borderColor: index === selectedIndex ? theme.colors.accentMuted : theme.colors.border, overflow: "hidden" }}>
             <Image source={{ uri }} resizeMode="cover" style={{ width: 64, height: 64 }} />
@@ -215,7 +215,7 @@ export function PaymentMethodCard({
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="radio" accessibilityLabel={accessibilityLabel} accessibilityState={{ checked: selected }} onPress={onPress} style={[{ minHeight: 64, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, borderWidth: selected ? 2 : 1, borderColor: selected ? theme.colors.accentMuted : theme.colors.border, backgroundColor: theme.colors.surface }, style]}>
+    <Pressable accessibilityRole="radio" accessibilityLabel={accessibilityLabel} accessibilityState={{ checked: selected }} onPress={onPress} style={[{ minHeight: 64, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, borderWidth: selected ? 2 : 1, borderColor: selected ? theme.colors.accentMuted : theme.colors.border, backgroundColor: theme.colors.surface }, style]}>
       {children}
     </Pressable>
   );

@@ -36,8 +36,8 @@ export function Alert({
 
   return (
     <View accessibilityRole="alert" style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.lg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, gap: designTokens.spacing.xs }, style]}>
-      {title ? <UiText style={{ color: colors.foreground, fontWeight: theme.fontWeights.bold, fontSize: theme.typography.body, textAlign: "right" }}>{title}</UiText> : null}
-      <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText>
+      {title ? <UiText style={{ color: colors.foreground, fontWeight: theme.fontWeights.bold, fontSize: theme.typography.body, textAlign: "auto" }}>{title}</UiText> : null}
+      <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, textAlign: "auto" }}>{description}</UiText>
     </View>
   );
 }
@@ -53,7 +53,7 @@ export function Banner({
 }) {
   const theme = useAppTheme();
   return (
-    <View style={[{ flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.accent }, style]}>
+    <View style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderRadius: theme.radius.lg, backgroundColor: theme.colors.accent }, style]}>
       <View style={{ flex: 1 }}>{children}</View>
       {action}
     </View>
@@ -147,8 +147,8 @@ export function Dialog({
       <View style={{ flex: 1, justifyContent: "center", padding: designTokens.spacing.lg }}>
         <Pressable accessible={false} onPress={onRequestClose} style={{ position: "absolute", top: 0, bottom: 0, start: 0, end: 0, backgroundColor: theme.colors.overlay }} />
         <View accessibilityViewIsModal style={{ padding: designTokens.spacing.lg, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }}>
-          {title ? <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.extrabold, textAlign: "right" }}>{title}</UiText> : null}
-          {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "right" }}>{description}</UiText> : null}
+          {title ? <UiText accessibilityRole="header" style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.extrabold, textAlign: "auto" }}>{title}</UiText> : null}
+          {description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.body, textAlign: "auto" }}>{description}</UiText> : null}
           {children}
         </View>
       </View>
@@ -195,8 +195,8 @@ export function Toast({
 
   return (
     <View accessibilityRole="alert" pointerEvents="box-none" style={{ position: "absolute", start: designTokens.spacing.md, end: designTokens.spacing.md, bottom: designTokens.spacing.xl, alignItems: "center" }}>
-      <View style={{ minHeight: theme.dimensions.controlHeight.lg, maxWidth: "100%", flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
-        <UiText style={{ color: theme.colors.surface, flex: 1, textAlign: "right" }}>{message}</UiText>
+      <View style={{ minHeight: theme.dimensions.controlHeight.lg, maxWidth: "100%", flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.lg, paddingVertical: designTokens.spacing.sm, borderRadius: theme.radius.pill, backgroundColor: theme.colors.foreground }}>
+        <UiText style={{ color: theme.colors.surface, flex: 1, textAlign: "auto" }}>{message}</UiText>
         {action}
       </View>
     </View>
@@ -228,7 +228,7 @@ export function ConfirmDialog({
   const theme = useAppTheme();
   return (
     <Dialog visible={visible} onRequestClose={onRequestClose} title={title} description={description}>
-      <View style={{ flexDirection: "row-reverse", gap: designTokens.spacing.sm }}>
+      <View style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
         <Pressable accessibilityRole="button" accessibilityLabel={cancelLabel} disabled={busy} onPress={onRequestClose} style={{ flex: 1, minHeight: 48, alignItems: "center", justifyContent: "center", borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.colors.border, opacity: busy ? 0.5 : 1 }}>
           <UiText style={{ color: theme.colors.foreground, fontWeight: theme.fontWeights.bold }}>{cancelLabel}</UiText>
         </Pressable>

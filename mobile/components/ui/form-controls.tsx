@@ -92,9 +92,9 @@ export function QuantityStepper({
 
 const styles = StyleSheet.create({
   field: { gap: designTokens.spacing.xs },
-  fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "right" },
+  fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
   textInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
-  fieldError: { fontSize: designTokens.typography.caption, textAlign: "right" },
+  fieldError: { fontSize: designTokens.typography.caption, textAlign: "auto" },
   stepper: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   stepButton: { width: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
   stepSymbol: { fontSize: designTokens.dimensions.iconSize.md, lineHeight: designTokens.dimensions.iconSize.lg - 4, fontWeight: designTokens.fontWeights.bold },
