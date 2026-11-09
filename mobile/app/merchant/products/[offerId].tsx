@@ -115,7 +115,9 @@ export default function MerchantEditProductScreen() {
     offer?.product.brand,
     offer?.product.category,
     offer?.price,
-    offer?.stock_quantity
+    offer?.stock_quantity,
+    offer?.options.sizes,
+    offer?.options.colors
   ]);
 
   const refreshProductData = async (): Promise<void> => {
