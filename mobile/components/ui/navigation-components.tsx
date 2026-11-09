@@ -60,7 +60,21 @@ export function BottomNavigation({
 }) {
   const theme = useAppTheme();
   return (
-    <View accessibilityRole="tablist" accessibilityLabel={accessibilityLabel} style={[{ flexDirection: "row", justifyContent: "space-around", paddingVertical: designTokens.spacing.sm, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderTopColor: theme.colors.border }, style]}>
+    <View
+      accessibilityRole="tablist"
+      accessibilityLabel={accessibilityLabel}
+      style={[
+        {
+          flexDirection: "row",
+          justifyContent: "space-around",
+          paddingVertical: designTokens.spacing.sm,
+          backgroundColor: theme.colors.surface,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.border
+        },
+        style
+      ]}
+    >
       {items.map((item) => {
         const selected = item.key === value;
         return (
@@ -71,10 +85,44 @@ export function BottomNavigation({
             accessibilityState={{ selected, disabled: item.disabled }}
             disabled={item.disabled}
             onPress={() => onChange(item.key)}
-            style={({ pressed }) => [{ flex: 1, minWidth: 0, minHeight: theme.dimensions.controlHeight.lg, paddingHorizontal: 2, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.xs, opacity: item.disabled ? 0.45 : pressed ? 0.7 : 1 }]}
+            hitSlop={4}
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                minWidth: 0,
+                minHeight: theme.dimensions.controlHeight.lg,
+                paddingHorizontal: designTokens.spacing.xs,
+                alignItems: "center",
+                justifyContent: "center",
+                gap: designTokens.spacing.xs,
+                opacity: item.disabled ? 0.45 : pressed ? 0.72 : 1
+              }
+            ]}
           >
-            {item.icon}
-            <UiText numberOfLines={1} style={{ color: selected ? theme.colors.accentMuted : theme.colors.muted, fontSize: theme.typography.caption, fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular }}>{item.label}</UiText>
+            <View
+              style={{
+                minWidth: 44,
+                minHeight: 32,
+                paddingHorizontal: designTokens.spacing.md,
+                borderRadius: theme.radius.pill,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: selected ? theme.colors.border : "transparent"
+              }}
+            >
+              {item.icon}
+            </View>
+            <UiText
+              numberOfLines={1}
+              style={{
+                color: selected ? theme.colors.accentMuted : theme.colors.muted,
+                fontSize: theme.typography.caption,
+                fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular,
+                flexShrink: 1
+              }}
+            >
+              {item.label}
+            </UiText>
           </Pressable>
         );
       })}
