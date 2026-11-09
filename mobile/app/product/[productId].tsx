@@ -148,7 +148,7 @@ export default function ProductDetailsScreen() {
       </View>
 
       {selectedOffer ? (
-        <Card contentStyle={styles.purchaseCard}>
+        <Card style={styles.purchaseCardSurface} contentStyle={styles.purchaseCard}>
           {variants.colors.length > 0 ? (
             <View style={styles.optionGroup}>
               <UiText style={styles.optionLabel}>{translate("productColorOption")}</UiText>
@@ -212,13 +212,13 @@ const styles = StyleSheet.create({
   description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "auto" },
   section: { gap: designTokens.spacing.md },
   sectionTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-  offerCard: { minHeight: 82 },
+  offerCard: { minHeight: 82, borderRadius: designTokens.radius.md },
   offerCardContent: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
   offerInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   offerStore: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-  stock: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   offerPriceDisplay: { justifyContent: "flex-start" },
-  purchaseCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  purchaseCardSurface: { borderRadius: designTokens.radius.md },
+  purchaseCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   optionGroup: { gap: designTokens.spacing.sm },
   optionLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   quantityRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
