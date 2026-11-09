@@ -177,7 +177,7 @@ export function ProductVariantSelector({
               minHeight: theme.dimensions.controlHeight.md,
               paddingHorizontal: designTokens.spacing.md,
               borderRadius: theme.radius.md,
-              backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface,
+              backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary,
               alignItems: "center",
               justifyContent: "center",
               opacity: option.disabled ? 0.45 : pressed ? 0.75 : 1
