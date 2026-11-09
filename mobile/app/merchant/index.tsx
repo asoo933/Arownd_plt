@@ -48,6 +48,7 @@ export default function MerchantEntryScreen() {
         theme={theme}
         title={translate("merchantLoadError")}
         actionLabel={translate("merchantRetry")}
+        busy={access.isFetching}
         onAction={() => void access.refetch()}
       />
     );
@@ -102,6 +103,7 @@ export default function MerchantEntryScreen() {
         theme={theme}
         title={translate("merchantDashboardError")}
         actionLabel={translate("merchantRetry")}
+        busy={dashboard.isFetching}
         onAction={() => void dashboard.refetch()}
       />
     );
@@ -304,17 +306,19 @@ function MessageScreen({
   theme,
   title,
   actionLabel,
-  onAction
+  onAction,
+  busy = false
 }: {
   theme: AppTheme;
   title: string;
   actionLabel: string;
   onAction: () => void;
+  busy?: boolean;
 }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
+        <ErrorState title={title} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
       </View>
     </SafeAreaView>
   );
