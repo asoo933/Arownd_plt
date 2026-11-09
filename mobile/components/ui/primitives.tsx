@@ -217,7 +217,6 @@ export function IconButton({
       : variant === "surface"
         ? theme.colors.surface
         : "transparent";
-  const borderColor = variant === "surface" ? theme.colors.border : "transparent";
 
   return (
     <Pressable
@@ -234,8 +233,6 @@ export function IconButton({
           width: targetSize,
           height: targetSize,
           borderRadius: theme.radius.pill,
-          borderWidth: variant === "surface" ? 1 : 0,
-          borderColor,
           backgroundColor,
           alignItems: "center",
           justifyContent: "center",
