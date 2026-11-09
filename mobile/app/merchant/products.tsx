@@ -166,7 +166,7 @@ export default function MerchantProductsScreen() {
           placeholder={translate("merchantProductsSearchPlaceholder")}
           accessibilityLabel={translate("merchantProductsSearchPlaceholder")}
           returnKeyType="search"
-          style={[styles.searchInput, { color: theme.colors.foreground, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+          style={[styles.searchInput, { color: theme.colors.foreground, backgroundColor: theme.colors.surfaceSecondary }]}
         />
 
         <FilterBar style={styles.filters}>
@@ -178,12 +178,12 @@ export default function MerchantProductsScreen() {
 
         {notice ? (
           <View style={[styles.feedback, { backgroundColor: theme.colors.successSurface, borderColor: theme.colors.successBorder }]}>
-            <UiText style={[styles.feedbackText, { color: theme.colors.success }]}>{notice}</UiText>
+            <UiText style={[styles.feedbackText, { color: theme.mode === "light" ? theme.colors.successText : theme.colors.success }]}>{notice}</UiText>
           </View>
         ) : null}
         {actionError ? (
           <View style={[styles.feedback, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-            <UiText style={[styles.feedbackText, { color: theme.colors.danger }]}>{actionError}</UiText>
+            <UiText style={[styles.feedbackText, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{actionError}</UiText>
           </View>
         ) : null}
 
@@ -314,7 +314,7 @@ function MerchantOfferCard({
             keyboardType="number-pad"
             editable={!anyBusy}
             accessibilityLabel={translate("merchantProductsPriceLabel")}
-            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.inputBorder, backgroundColor: theme.colors.background }]}
           />
         </View>
         <View style={styles.inputGroup}>
