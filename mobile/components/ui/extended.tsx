@@ -7,6 +7,7 @@ import {
 } from "react-native";
 
 import { useAppTheme } from "@/lib/theme";
+import { useLanguage } from "@/lib/i18n";
 import { Text as UiText } from "./typography";
 import { Icon } from "./icon";
 
@@ -30,6 +31,7 @@ export function SearchField({
   style
 }: SearchFieldProps) {
   const theme = useAppTheme();
+  const { language } = useLanguage();
 
   return (
     <View
@@ -65,7 +67,7 @@ export function SearchField({
           color: theme.colors.foreground,
           fontSize: theme.typography.body,
           fontWeight: theme.fontWeights.regular,
-          fontFamily: theme.fontFamilies.arabic,
+          fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin,
           textAlign: "auto",
           includeFontPadding: false
         }}
