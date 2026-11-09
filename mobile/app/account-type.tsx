@@ -65,7 +65,7 @@ function AccountTypeOption({
 
       <Icon
         name={selected ? "circle-check" : "chevron-left"}
-        color={selected ? theme.colors.accentMuted : theme.colors.muted}
+        color={selected ? (theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted) : theme.colors.muted}
         size={designTokens.dimensions.iconSize.md}
       />
     </PressableSurface>
