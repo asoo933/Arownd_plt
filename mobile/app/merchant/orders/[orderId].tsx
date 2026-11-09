@@ -23,7 +23,7 @@ import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
-import { Alert, AppHeader, Button, ConfirmDialog, ErrorState, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText, TextField, TrackingTimeline } from "@/components/ui";
+import { Alert, AppHeader, Button, ConfirmDialog, ErrorState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, OrderCardSkeleton, Text as UiText, TextField, TrackingTimeline } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
 
@@ -337,7 +337,9 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForComponents.center}>
-        <LoadingState label={label} />
+        <View style={{ width: "100%", gap: designTokens.spacing.md }}>
+          {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
+        </View>
       </View>
     </SafeAreaView>
   );
