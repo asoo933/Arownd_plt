@@ -157,13 +157,13 @@ export default function OrderDetailsScreen() {
     <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersCode") + ": " + orderCode}</UiText>
 
-    <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderSummary")}</UiText>
       <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderTotal")}</UiText><PriceDisplay value={formatDZD(order.total)} style={styles.priceDisplay} /></View>
       <UiText style={styles.meta}>{dateLabel(order.created_at, language)}</UiText>
     </View>
 
-    {showParentTimeline ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    {showParentTimeline ? <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderProgress")}</UiText>
       {parentCancelled ? <OrderStatusBadge status={order.status} /> : <TrackingTimeline steps={STEPS.map((step, index) => ({
         key: step.status,
@@ -171,12 +171,12 @@ export default function OrderDetailsScreen() {
         description: translate(step.hint),
         status: index < activeStep ? "complete" as const : index === activeStep ? "current" as const : "upcoming" as const
       }))} />}
-    </View> : <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    </View> : <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderPerStoreProgress")}</UiText>
       <UiText style={styles.meta}>{translate("orderPerStoreHint")}</UiText>
     </View>}
 
-    {merchantOrders.length === 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    {merchantOrders.length === 0 ? <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderItemsTitle")}</UiText>
       {order.items.map((item) => <View key={item.id} style={styles.itemRow}>
         <View style={styles.itemInfo}>
@@ -193,7 +193,7 @@ export default function OrderDetailsScreen() {
     {merchantOrders.map((merchantOrder) => {
       const cancelled = merchantOrder.status === "cancelled" || merchantOrder.status === "rejected";
       const subTotal = cancelled ? 0 : merchantOrder.subtotal + merchantOrder.shipping_fee;
-      return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+      return <View key={merchantOrder.id} style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
         <View style={styles.merchantHeader}>
           <UiText style={styles.sectionTitle}>{merchantOrder.store?.name ?? translate("ordersStore")}</UiText>
           <OrderStatusBadge status={merchantOrder.status} />
@@ -264,7 +264,7 @@ export default function OrderDetailsScreen() {
       </View>;
     })}
 
-    <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderRecipientTitle")}</UiText>
       <UiText style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</UiText>
       <UiText style={styles.meta}>{getLocalizedWilayaLabel(order.wilaya_id ?? 0, order.wilaya?.name_ar ?? "", language, order.wilaya?.name_fr)} · {order.commune ?? ""}</UiText>
@@ -274,7 +274,7 @@ export default function OrderDetailsScreen() {
       <UiText style={styles.meta}>{translate("orderPayment")}: {order.payment_method === "cod" ? translate("checkoutCodNote") : order.payment_method ?? ""}</UiText>
     </View>
 
-    {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).length > 0 ? <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
+    {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).length > 0 ? <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</UiText>
       {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).map((shipment) => <View key={shipment.id} style={styles.shipment}>
         <OrderStatusBadge status={shipment.status} />
@@ -337,11 +337,11 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   itemInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   itemName: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   merchantHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: designTokens.spacing.sm },
-  notice: { color: theme.colors.warning, fontSize: designTokens.typography.caption, textAlign: "auto", lineHeight: 18 },
-  cancelledNotice: { color: theme.colors.danger, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "auto", lineHeight: 18 },
+  notice: { color: theme.mode === "light" ? theme.colors.warningText : theme.colors.warning, fontSize: designTokens.typography.caption, textAlign: "auto", lineHeight: 18 },
+  cancelledNotice: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "auto", lineHeight: 18 },
   paymentInfo: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
-  paymentPaid: { color: theme.colors.success },
-  paymentUnpaid: { color: theme.colors.warning },
+  paymentPaid: { color: theme.mode === "light" ? theme.colors.successText : theme.colors.success },
+  paymentUnpaid: { color: theme.mode === "light" ? theme.colors.warningText : theme.colors.warning },
   recipient: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   shipment: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
   trackingEvent: { borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.sm, gap: designTokens.spacing.xs },
@@ -353,7 +353,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   declineButton: { flex: 1, minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
   declineButtonText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
   cancelButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
-  cancelButtonText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-  errorText: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "auto" },
+  cancelButtonText: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+  errorText: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "auto" },
 }); }
 
