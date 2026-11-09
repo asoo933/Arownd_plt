@@ -153,7 +153,7 @@ function OrderCard({ order, language, theme, onPress }: { order: MerchantDashboa
   const itemNames = order.productNames.length > 0
     ? order.productNames.slice(0, 3).join("، ")
     : translate("merchantOrderItems");
-  const wilayaName = order.wilayaId === null ? order.wilayaName : getLocalizedWilayaLabel(order.wilayaId, order.wilayaName, language);
+  const wilayaName = order.wilayaId === null ? order.wilayaName : getLocalizedWilayaLabel(order.wilayaId, order.wilayaName, language, order.wilayaNameFr);
   const location = [order.commune, wilayaName].filter(Boolean).join("، ");
 
   return (
