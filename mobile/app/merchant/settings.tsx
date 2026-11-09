@@ -33,6 +33,7 @@ export default function MerchantStoreSettingsScreen() {
   const [form, setForm] = useState<MerchantStoreSettings | null>(null);
   const [formDirty, setFormDirty] = useState(false);
   const [formError, setFormError] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
   const [wilayaPickerOpen, setWilayaPickerOpen] = useState(false);
   const [imageBusy, setImageBusy] = useState<"logo" | null>(null);
   const [imageError, setImageError] = useState(false);
@@ -41,12 +42,12 @@ export default function MerchantStoreSettingsScreen() {
   const mutation = useMutation({
     mutationFn: (values: MerchantStoreSettings) => updateMyMerchantStoreSettings(storeId ?? "", values),
     onSuccess: async (_data, values) => {
-      await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
-      await queryClient.invalidateQueries({ queryKey: ["merchant-dashboard", storeId] });
-      const refreshedSettings = queryClient.getQueryData<MerchantStoreSettings>(["merchant-store-settings", storeId]);
-      setForm(refreshedSettings ?? values);
+      queryClient.setQueryData<MerchantStoreSettings>(["merchant-store-settings", storeId], values);
+      setForm(values);
       setFormDirty(false);
       setFormError(false);
+      setFieldErrors({});
+      await queryClient.invalidateQueries({ queryKey: ["merchant-dashboard", storeId] });
     },
     onError: () => setFormError(true)
   });
@@ -66,16 +67,20 @@ export default function MerchantStoreSettingsScreen() {
 
   const selectedWilaya = wilayas.data?.find((item) => item.id === form.wilaya_id);
   const selectWilaya = (wilaya: Wilaya) => {
+    if (mutation.isPending) return;
     setForm((current) => current ? { ...current, wilaya_id: wilaya.id, commune: "" } : current);
     setFormDirty(true);
     setWilayaPickerOpen(false);
     setFormError(false);
+    setFieldErrors({});
     mutation.reset();
   };
   const update = <K extends keyof MerchantStoreSettings>(key: K, value: MerchantStoreSettings[K]) => {
+    if (mutation.isPending) return;
     setForm((current) => current ? { ...current, [key]: value } : current);
     setFormDirty(true);
     setFormError(false);
+    setFieldErrors({});
     mutation.reset();
   };
   const updateHours = (key: "open" | "close", value: string) => {
@@ -91,6 +96,7 @@ export default function MerchantStoreSettingsScreen() {
     { value: 5, key: "merchantWeekdayFriday" }
   ] as const;
   const toggleClosedDay = (day: number) => {
+    if (mutation.isPending) return;
     const closedDays = form.opening_hours.closed_days.includes(day)
       ? form.opening_hours.closed_days.filter((item) => item !== day)
       : [...form.opening_hours.closed_days, day];
@@ -122,7 +128,10 @@ export default function MerchantStoreSettingsScreen() {
       }
       const uploaded = await uploadMerchantStoreImage(storeId, asset, "logo");
       setForm((current) => current ? { ...current, logo_url: uploaded.url } : current);
-      await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
+      queryClient.setQueryData<MerchantStoreSettings>(
+        ["merchant-store-settings", storeId],
+        (current) => current ? { ...current, logo_url: uploaded.url } : current
+      );
       setImageSaved(true);
       setImageCleanupPending(uploaded.cleanupPending);
     } catch {
@@ -135,14 +144,20 @@ export default function MerchantStoreSettingsScreen() {
     if (imageBusy || mutation.isPending) return;
     const parsed = MerchantStoreSettingsSchema.safeParse(form);
     if (!parsed.success) {
+      const nextFieldErrors = parsed.error.issues.reduce<Record<string, boolean>>((errors, issue) => {
+        errors[issue.path.join(".")] = true;
+        return errors;
+      }, {});
+      setFieldErrors(nextFieldErrors);
       setFormError(true);
       return;
     }
+    setFieldErrors({});
     mutation.mutate(parsed.data);
   };
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right", "bottom"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <AppHeader
           title={translate("merchantStoreSettingsTitle")}
@@ -179,41 +194,42 @@ export default function MerchantStoreSettingsScreen() {
 
         <Card contentStyle={styles.sectionCard}>
           <Heading level={3}>{translate("merchantStoreDetailsTitle")}</Heading>
-          <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} />
-          <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline />
-          <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} />
-          <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} />
+          <Field label={translate("merchantStoreSettingsName")} value={form.name} onChangeText={(value) => update("name", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.name} />
+          <Field label={translate("merchantStoreSettingsDescription")} value={form.description} onChangeText={(value) => update("description", value)} theme={theme} multiline disabled={mutation.isPending} error={fieldErrors.description} />
+          <Field label={translate("merchantStoreSettingsPhone")} value={form.phone} onChangeText={(value) => update("phone", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.phone} />
+          <Field label={translate("merchantStoreSettingsWhatsapp")} value={form.whatsapp} onChangeText={(value) => update("whatsapp", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.whatsapp} />
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
           <Heading level={3}>{translate("merchantStoreLocationTitle")}</Heading>
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
-            <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
               <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr)}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
           </View>
-          <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} />
-          <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} />
+          <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.commune} />
+          <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.address_line} />
         </Card>
 
         <Card contentStyle={styles.sectionCard}>
           <Heading level={3}>{translate("merchantStoreHoursTitle")}</Heading>
           <View style={styles.row}>
             <View style={styles.half}>
-              <Field label={translate("merchantStoreSettingsOpen")} value={form.opening_hours.open} onChangeText={(value) => updateHours("open", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" />
+              <Field label={translate("merchantStoreSettingsOpen")} value={form.opening_hours.open} onChangeText={(value) => updateHours("open", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" disabled={mutation.isPending} error={fieldErrors["opening_hours.open"]} />
             </View>
             <View style={styles.half}>
-              <Field label={translate("merchantStoreSettingsClose")} value={form.opening_hours.close} onChangeText={(value) => updateHours("close", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" />
+              <Field label={translate("merchantStoreSettingsClose")} value={form.opening_hours.close} onChangeText={(value) => updateHours("close", value)} theme={theme} keyboardType="numbers-and-punctuation" maxLength={5} placeholder="HH:MM" disabled={mutation.isPending} error={fieldErrors["opening_hours.close"]} />
             </View>
           </View>
           <UiText style={[styles.hint, { color: theme.colors.muted }]}>HH:MM</UiText>
+          {fieldErrors["opening_hours.closed_days"] ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           <View style={styles.field}>
             <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreSettingsClosedDays")}</UiText>
             <View style={styles.days}>
               {weekdays.map((day) => {
                 const selected = form.opening_hours.closed_days.includes(day.value);
-                return <PressableSurface key={day.value} accessibilityRole="button" accessibilityLabel={translate(day.key)} accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
+                return <PressableSurface key={day.value} accessibilityRole="button" accessibilityLabel={translate(day.key)} accessibilityState={{ selected }} onPress={() => toggleClosedDay(day.value)} disabled={mutation.isPending} style={[styles.dayChip, { borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected ? theme.colors.accent : theme.colors.background }]}>
                   <UiText style={[styles.dayChipText, { color: selected ? theme.colors.accentForeground : theme.colors.foreground }]}>{translate(day.key)}</UiText>
                 </PressableSurface>;
               })}
@@ -223,8 +239,8 @@ export default function MerchantStoreSettingsScreen() {
 
         <Card contentStyle={styles.sectionCard}>
           <Heading level={3}>{translate("merchantStoreSocialTitle")}</Heading>
-          <Field label={translate("merchantStoreSettingsInstagram")} value={form.instagram_url} onChangeText={(value) => update("instagram_url", value)} theme={theme} keyboardType="url" />
-          <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" />
+          <Field label={translate("merchantStoreSettingsInstagram")} value={form.instagram_url} onChangeText={(value) => update("instagram_url", value)} theme={theme} keyboardType="url" disabled={mutation.isPending} error={fieldErrors.instagram_url} />
+          <Field label={translate("merchantStoreSettingsFacebook")} value={form.facebook_url} onChangeText={(value) => update("facebook_url", value)} theme={theme} keyboardType="url" disabled={mutation.isPending} error={fieldErrors.facebook_url} />
         </Card>
 
         {formError ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate(mutation.isError ? "merchantStoreSettingsSaveError" : "merchantStoreSettingsValidation")}</UiText> : null}
@@ -232,7 +248,7 @@ export default function MerchantStoreSettingsScreen() {
       </ScrollView>
 
       <View style={[styles.footer, { backgroundColor: theme.colors.background, borderTopColor: theme.colors.border }]}>
-        <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} disabled={imageBusy !== null} fullWidth />
+        <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} disabled={imageBusy !== null || mutation.isPending} fullWidth />
       </View>
 
       <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
@@ -254,7 +270,7 @@ export default function MerchantStoreSettingsScreen() {
   );
 }
 
-function Field({ label, value, onChangeText, theme, multiline = false, keyboardType = "default", maxLength, placeholder }: {
+function Field({ label, value, onChangeText, theme, multiline = false, keyboardType = "default", maxLength, placeholder, disabled = false, error = false }: {
   label: string;
   value: string;
   onChangeText: (value: string) => void;
@@ -263,11 +279,13 @@ function Field({ label, value, onChangeText, theme, multiline = false, keyboardT
   keyboardType?: "default" | "url" | "numbers-and-punctuation";
   maxLength?: number;
   placeholder?: string;
+  disabled?: boolean;
+  error?: boolean;
 }) {
   const styles = createStyles(theme);
   return <View style={styles.field}>
     <UiText style={[styles.label, { color: theme.colors.foreground }]}>{label}</UiText>
-    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} keyboardType={keyboardType} multiline={multiline} maxLength={maxLength ?? (multiline ? 2000 : 300)} placeholder={placeholder} textAlign="auto" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
+    <TextField accessibilityLabel={label} value={value} onChangeText={onChangeText} editable={!disabled} keyboardType={keyboardType} multiline={multiline} maxLength={maxLength ?? (multiline ? 2000 : 300)} placeholder={placeholder} textAlign="auto" textAlignVertical={multiline ? "top" : "center"} placeholderTextColor={theme.colors.placeholder} error={error ? translate("merchantStoreSettingsValidation") : undefined} style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.border }, multiline && styles.textarea]} />
   </View>;
 }
 
