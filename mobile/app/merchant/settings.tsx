@@ -207,6 +207,7 @@ export default function MerchantStoreSettingsScreen() {
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
               <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr)}` : translate("merchantStoreChooseWilaya")}</UiText>
             </PressableSurface>
+            {fieldErrors.wilaya_id ? <UiText style={[styles.error, { color: theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           </View>
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.commune} />
           <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.address_line} />
