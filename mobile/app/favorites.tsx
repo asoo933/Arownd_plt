@@ -75,7 +75,7 @@ export default function FavoritesScreen() {
     <CustomerScreen>
       <AppHeader
         title={translate("favoritesTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-left" size={20} />} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />}
       />
       <Caption>{translate("favoritesSubtitle")}</Caption>
       <SegmentedControl
