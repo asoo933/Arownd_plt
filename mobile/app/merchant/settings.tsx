@@ -135,7 +135,7 @@ export default function MerchantStoreSettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <AppHeader
           title={translate("merchantStoreSettingsTitle")}
@@ -248,7 +248,7 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
 }) {
   const styles = createStyles(theme);
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
         {loading ? (
           <LoadingState label={label} />
