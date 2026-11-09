@@ -119,7 +119,7 @@ export default function OrdersScreen() {
   });
 
   if (auth.isPending || (auth.data && orders.isPending)) return <CustomerScreen>
-    <AppHeader title={translate("ordersTitle")} />
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
   </CustomerScreen>;
   if (auth.isError || orders.isError) return <CustomerScreen>
