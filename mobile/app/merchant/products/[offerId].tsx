@@ -284,7 +284,7 @@ export default function MerchantEditProductScreen() {
         theme={theme}
         label={translate("merchantLoadError")}
         actionLabel={translate("merchantRetry")}
-        onAction={() => void access.refetch()}
+        busy={access.isFetching} onAction={() => void access.refetch()}
       />
     );
   }
@@ -309,7 +309,7 @@ export default function MerchantEditProductScreen() {
         theme={theme}
         label={translate("merchantProductEditLoadError")}
         actionLabel={translate("merchantRetry")}
-        onAction={() => void offerQuery.refetch()}
+        busy={offerQuery.isFetching} onAction={() => void offerQuery.refetch()}
       />
     );
   }
@@ -673,13 +673,15 @@ function MessageScreen({
   label,
   actionLabel,
   onAction,
-  loading = false
+  loading = false,
+  busy = false
 }: {
   theme: AppTheme;
   label: string;
   actionLabel?: string;
   onAction?: () => void;
   loading?: boolean;
+  busy?: boolean;
 }) {
   const styles = createStyles(theme);
   return (
@@ -688,7 +690,7 @@ function MessageScreen({
         {loading ? (
           <LoadingState label={label} />
         ) : actionLabel && onAction ? (
-          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+          <ErrorState title={label} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
         ) : (
           <UiText style={[styles.messageText, { color: theme.colors.foreground }]}>{label}</UiText>
         )}
