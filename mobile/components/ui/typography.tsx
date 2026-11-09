@@ -109,7 +109,7 @@ export function PriceText({
   fontFamily,
   style,
   ...props
-}: TextComponentProps & { value: string; previousValue?: string }) {
+}: TextComponentProps & { value: string; previousValue?: string | undefined }) {
   const theme = useAppTheme();
   const { language } = useLanguage();
   const flattenedStyle = StyleSheet.flatten(style);
