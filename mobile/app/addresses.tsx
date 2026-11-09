@@ -321,8 +321,8 @@ function Action({
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     addressCard: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+      borderColor: theme.mode === "light" ? "transparent" : theme.colors.border,
       borderRadius: theme.radius.xl
     },
     addressCardContent: {
