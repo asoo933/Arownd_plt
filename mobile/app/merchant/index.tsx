@@ -65,7 +65,7 @@ export default function MerchantEntryScreen() {
       <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
         <ScrollView contentContainerStyle={styles.entryContent}>
           <Button label={translate("merchantBackToProfile")} onPress={() => router.replace("/profile")} variant="ghost" size="sm" />
-          <View style={[styles.entryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+          <View style={[styles.entryCard, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderColor: theme.mode === "light" ? "transparent" : theme.colors.border }]}>
             <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>{translate("businessTitle")}</UiText>
             <UiText style={[styles.title, { color: theme.colors.foreground }]}>
               {translate("merchantEntryTitle")}
@@ -128,7 +128,7 @@ export default function MerchantEntryScreen() {
           />
         </View>
 
-        <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.storeCard}>
+        <Card style={{ backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }} contentStyle={styles.storeCard}>
           <View style={styles.storeHeader}>
             <View style={[styles.storeAvatar, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
               {data.store.logo_url ? (
@@ -370,12 +370,12 @@ function createStyles(theme: AppTheme) {
     eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     title: { fontSize: designTokens.typography.display - 4, lineHeight: 33, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     body: { fontSize: designTokens.typography.caption + 1, lineHeight: 20, textAlign: "auto" },
-    entryCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.xl, gap: designTokens.spacing.lg },
-    storeCard: { borderWidth: 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
+    entryCard: { borderWidth: theme.mode === "light" ? 0 : 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.xl, gap: designTokens.spacing.lg },
+    storeCard: { borderWidth: theme.mode === "light" ? 0 : 1, borderRadius: designTokens.radius.lg, padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     storeHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
     storeAvatar: { width: 58, height: 58, borderWidth: 1, borderRadius: designTokens.radius.pill, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     storeActions: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
-    managementCard: { borderWidth: 1, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.xs },
+    managementCard: { borderWidth: theme.mode === "light" ? 0 : 1, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.xs },
     managementRow: { minHeight: 62, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm },
     managementIcon: { width: 38, height: 38, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
     managementLabel: { flex: 1, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
@@ -393,11 +393,11 @@ function createStyles(theme: AppTheme) {
     sectionHeadingText: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
     sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
-    metricCard: { width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
+    metricCard: { width: "48%", minHeight: 112, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
     metricsGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     textButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 3 },
     textButtonLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    ordersCard: { borderWidth: 1, borderRadius: designTokens.radius.md, overflow: "hidden" },
+    ordersCard: { borderWidth: theme.mode === "light" ? 0 : 1, borderRadius: designTokens.radius.md, overflow: "hidden" },
     orderRow: { paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
     orderMain: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
     orderTopLine: { width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
@@ -405,7 +405,7 @@ function createStyles(theme: AppTheme) {
     orderCustomer: { width: "100%", fontSize: designTokens.typography.caption, textAlign: "auto" },
     orderItems: { width: "100%", fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "auto" },
     orderAmount: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    emptyCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-start" },
+    emptyCard: { borderWidth: theme.mode === "light" ? 0 : 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-start" },
     emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     primaryButton: { minHeight: 50, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", paddingHorizontal: designTokens.spacing.lg },
     primaryButtonText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
