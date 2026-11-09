@@ -29,15 +29,26 @@ export function TextArea({
   style,
   containerStyle,
   minHeight = 112,
+  onFocus,
+  onBlur,
   ...props
 }: TextAreaProps) {
   const theme = useAppTheme();
+  const [focused, setFocused] = useState(false);
   const { language } = useLanguage();
 
   return (
     <View style={containerStyle}>
       <TextInput
         {...props}
+        onFocus={(event) => {
+          setFocused(true);
+          onFocus?.(event);
+        }}
+        onBlur={(event) => {
+          setFocused(false);
+          onBlur?.(event);
+        }}
         multiline
         textAlignVertical="top"
         placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
@@ -45,7 +56,7 @@ export function TextArea({
           {
             minHeight,
             borderWidth: 1,
-            borderColor: theme.colors.inputBorder,
+            borderColor: focused ? theme.colors.focus : theme.colors.inputBorder,
             borderRadius: theme.radius.lg,
             padding: designTokens.spacing.md,
             color: theme.colors.foreground,
@@ -239,7 +250,7 @@ export function Select({
         disabled={disabled}
         onPress={() => setOpen(true)}
         style={({ pressed }) => [
-          { minHeight: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: theme.colors.inputBorder, borderRadius: theme.radius.pill, paddingHorizontal: designTokens.spacing.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: theme.colors.surface, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
+          { minHeight: theme.dimensions.controlHeight.lg, borderWidth: 1, borderColor: open ? theme.colors.focus : theme.colors.inputBorder, borderRadius: theme.radius.pill, paddingHorizontal: designTokens.spacing.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: theme.colors.surface, opacity: disabled ? 0.5 : pressed ? 0.75 : 1 },
           style
         ]}
       >
