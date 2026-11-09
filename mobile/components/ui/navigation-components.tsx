@@ -68,9 +68,7 @@ export function BottomNavigation({
           flexDirection: "row",
           justifyContent: "space-around",
           paddingVertical: designTokens.spacing.sm,
-          backgroundColor: theme.colors.surface,
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.border
+          backgroundColor: theme.colors.background
         },
         style
       ]}
