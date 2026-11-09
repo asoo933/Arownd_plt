@@ -104,7 +104,7 @@ export default function CartScreen() {
               <View style={style.details}>
                 <UiText numberOfLines={2} weight="800" style={style.name}>{offer?.product.name ?? item.name}</UiText>
                 {Object.keys(normalizeCartOptions(item.options)).length > 0 ? <Caption style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Caption> : null}
-                {line?.issues.map((issue) => <Caption key={issue} tone="warning" weight="700" style={style.issue}>{issueLabels[issue]}</Caption>)}
+                {line?.issues.map((issue) => <Caption key={issue} tone={issue === "priceChanged" ? "warning" : "danger"} weight="700" style={style.issue}>{issueLabels[issue]}</Caption>)}
                 <PriceText
                   value={formatDZD(currentPrice * item.quantity)}
                   previousValue={line?.issues.includes("priceChanged") && item.price != null ? formatDZD(item.price * item.quantity) : undefined}
