@@ -8,8 +8,8 @@ describe("getButtonPalette", () => {
   it("uses the Arownd accent for primary buttons in both themes", () => {
     for (const mode of ["light", "dark"] as const) {
       const palette = getButtonPalette(getAppTheme(mode), "primary");
-      expect(palette.backgroundColor).toBe("#C6F135");
-      expect(palette.foregroundColor).toBe("#0A0A0A");
+      expect(palette.backgroundColor).toBe("#FFF01F");
+      expect(palette.foregroundColor).toBe("#000000");
     }
   });
 
