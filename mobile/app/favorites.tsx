@@ -42,6 +42,7 @@ export default function FavoritesScreen() {
   const content = useQuery({
     queryKey: ["customer-favorites-content", tab, tab === "products" ? favorites.data?.products : favorites.data?.stores],
     enabled: Boolean(favorites.data),
+    staleTime: 30_000,
     queryFn: async () => {
       const ids = favorites.data;
       if (!ids) return { products: [], stores: [] };
