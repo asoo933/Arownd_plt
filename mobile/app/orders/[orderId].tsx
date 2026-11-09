@@ -121,7 +121,7 @@ export default function OrderDetailsScreen() {
   if (auth.isPending || (auth.data && query.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (auth.isError || query.isError) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
-    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} onRetry={() => void query.refetch()} />
+    <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={auth.isFetching || query.isFetching} onRetry={() => void query.refetch()} />
   </CustomerScreen>;
   if (!auth.data) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} subtitle={translate("ordersLoginHint")} />
@@ -133,7 +133,7 @@ export default function OrderDetailsScreen() {
   const order = query.data.order;
   if (!order) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
-    <EmptyState title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
+    <EmptyState icon="package" title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
     <PressableSurface accessibilityRole="button" accessibilityLabel={translate("ordersTitle")} onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
 
   </CustomerScreen>;
