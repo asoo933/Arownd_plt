@@ -51,7 +51,7 @@ describe("design system text contrast", () => {
 
   it("keeps semantic text readable on its semantic background surfaces", () => {
     const light = getAppTheme("light");
-    const statusPairs = [
+    const statusPairs: Array<[string, string]> = [
       [light.colors.dangerText, light.colors.dangerSurface],
       [light.colors.successText, light.colors.successSurface],
       [light.colors.warningText, light.colors.warningSurface],
