@@ -79,7 +79,7 @@ export function SegmentedControl({
               styles.segment,
               {
                 borderRadius: theme.radius.pill,
-                backgroundColor: selected ? theme.colors.surface : "transparent",
+                backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : "transparent",
                 opacity: pressed ? 0.75 : 1
               }
             ]}
@@ -87,7 +87,7 @@ export function SegmentedControl({
             <UiText
               numberOfLines={1}
               style={{
-                color: selected ? theme.colors.foreground : theme.colors.muted,
+                color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted,
                 fontSize: theme.typography.body,
                 fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.medium
               }}
