@@ -32,18 +32,23 @@ export function CustomerNavigation() {
         const destination = tabs.find((tab) => tab.id === key)?.path;
         if (destination && pathname !== destination) router.replace(destination);
       }}
-      items={tabs.map((tab) => ({
-        key: tab.id,
-        label: translate(tab.label),
-        icon: (
-          <Icon
-            name={tab.icon}
-            size={21}
-            color={activeTab === tab.id ? theme.colors.accentMuted : theme.colors.muted}
-            accessibilityHidden
-          />
-        )
-      }))}
+      items={tabs.map((tab) => {
+        const selected = activeTab === tab.id;
+        return {
+          key: tab.id,
+          label: translate(tab.label),
+          icon: (
+            <Icon
+              name={tab.icon}
+              size={22}
+              color={selected ? theme.colors.accentMuted : theme.colors.muted}
+              fill={selected ? theme.colors.accentMuted : "none"}
+              strokeWidth={selected ? 2 : 1.8}
+              accessibilityHidden
+            />
+          )
+        };
+      })}
     />
   );
 }
