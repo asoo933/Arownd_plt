@@ -95,7 +95,7 @@ export default function ProductDetailsScreen() {
     >
       <AppHeader
         title={translate("detailProductTitle")}
-        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />}
+        leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />}
         trailing={<CartButton />}
       />
       {imageUrl ? <ProductImageGallery images={[imageUrl]} accessibilityLabel={productDetails.name} onSelect={() => undefined} imageStyle={styles.heroImage} /> : <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" size={42} color={theme.colors.subtle} accessibilityHidden /></View>}
