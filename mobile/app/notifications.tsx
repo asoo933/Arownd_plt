@@ -16,7 +16,7 @@ import {
 import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { getSupabaseClient } from "@/lib/supabase";
-import { translate, useLanguage } from "@/lib/i18n";
+import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 function typeLabel(type: AppNotification["type"]): string {
@@ -30,14 +30,14 @@ function typeLabel(type: AppNotification["type"]): string {
   return labels[type];
 }
 
-function dateLabel(value: string): string {
+function dateLabel(value: string, language: Language): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("ar-DZ", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(date);
+  return new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(date);
 }
 
 export default function NotificationsScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [actionError, setActionError] = useState(false);
@@ -149,7 +149,7 @@ export default function NotificationsScreen() {
           >
             <View style={styles.cardHeader}>
               <Caption tone="accentMuted" weight="800">{typeLabel(item.type)}</Caption>
-              <Caption>{dateLabel(item.created_at)}</Caption>
+              <Caption>{dateLabel(item.created_at, language)}</Caption>
             </View>
             <UiText weight="800">{item.title}</UiText>
             {item.body ? <UiText tone="muted">{item.body}</UiText> : null}
