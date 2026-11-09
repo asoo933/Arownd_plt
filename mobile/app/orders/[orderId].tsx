@@ -104,16 +104,19 @@ export default function OrderDetailsScreen() {
     refetchInterval: 45_000
   });
 
+  const userId = auth.data?.id;
+  const refetchOrder = query.refetch;
+
   useEffect(() => {
-    if (!orderId || !auth.data) return;
+    if (!orderId || !userId) return;
     const client = getSupabaseClient();
     const channel = client.channel("native-customer-order-" + orderId)
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: "id=eq." + orderId }, () => { void query.refetch(); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "merchant_orders", filter: "order_id=eq." + orderId }, () => { void query.refetch(); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "shipments", filter: "order_id=eq." + orderId }, () => { void query.refetch(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: "id=eq." + orderId }, () => { void refetchOrder(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "merchant_orders", filter: "order_id=eq." + orderId }, () => { void refetchOrder(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "shipments", filter: "order_id=eq." + orderId }, () => { void refetchOrder(); })
       .subscribe();
     return () => { void client.removeChannel(channel); };
-  }, [orderId, auth.data?.id, query.refetch]);
+  }, [orderId, userId, refetchOrder]);
 
   if (auth.isPending || (auth.data && query.isPending)) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (auth.isError || query.isError) return <CustomerScreen>
