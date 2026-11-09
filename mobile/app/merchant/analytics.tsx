@@ -3,7 +3,7 @@ import { Redirect, router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { formatDZD } from "@/lib/catalog";
+import { formatDZD, formatNumber } from "@/lib/catalog";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -36,15 +36,15 @@ export default function MerchantAnalyticsScreen() {
   const data = analytics.data;
   const maxDaily = Math.max(1, ...data.daily_delivered.map((item) => item.amount));
   const cards: { label: string; value: string; tone: "default" | "success" | "warning" | "danger" | "accent" }[] = [
-    { label: translate("merchantAnalyticsOrders"), value: String(data.orders_total), tone: "default" },
-    { label: translate("merchantAnalyticsDelivered"), value: String(data.delivered_orders), tone: "success" },
-    { label: translate("merchantAnalyticsActive"), value: String(data.active_orders), tone: "warning" },
-    { label: translate("merchantAnalyticsCancelled"), value: String(data.cancelled_orders), tone: "danger" },
+    { label: translate("merchantAnalyticsOrders"), value: formatNumber(data.orders_total), tone: "default" },
+    { label: translate("merchantAnalyticsDelivered"), value: formatNumber(data.delivered_orders), tone: "success" },
+    { label: translate("merchantAnalyticsActive"), value: formatNumber(data.active_orders), tone: "warning" },
+    { label: translate("merchantAnalyticsCancelled"), value: formatNumber(data.cancelled_orders), tone: "danger" },
     { label: translate("merchantAnalyticsRevenue"), value: formatDZD(data.delivered_revenue), tone: "accent" },
     { label: translate("merchantAnalyticsAverage"), value: formatDZD(data.average_delivered_order), tone: "default" },
-    { label: translate("merchantAnalyticsProducts"), value: String(data.product_count), tone: "default" },
-    { label: translate("merchantAnalyticsLowStock"), value: String(data.low_stock_count), tone: "warning" },
-    { label: translate("merchantAnalyticsOutOfStock"), value: String(data.out_of_stock_count), tone: "danger" },
+    { label: translate("merchantAnalyticsProducts"), value: formatNumber(data.product_count), tone: "default" },
+    { label: translate("merchantAnalyticsLowStock"), value: formatNumber(data.low_stock_count), tone: "warning" },
+    { label: translate("merchantAnalyticsOutOfStock"), value: formatNumber(data.out_of_stock_count), tone: "danger" },
   ];
 
   return (
