@@ -79,7 +79,23 @@ export default function CartScreen() {
     priceChanged: translate("cartIssuePriceChanged")
   };
 
-  return <CustomerScreen>
+  return <CustomerScreen
+    footer={
+      <CartSummary style={style.summaryContent}>
+        <View style={style.summaryRow}>
+          <UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText>
+          <PriceText value={offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)} tone="accentMuted" style={style.total} />
+        </View>
+        <Caption style={style.note}>{translate("cartDeliveryNote")}</Caption>
+        <Button
+          label={translate("cartCheckout")}
+          onPress={() => router.push("/checkout")}
+          disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
+          fullWidth
+        />
+      </CartSummary>
+    }
+  >
     <AppHeader
       title={translate("cartTitle")}
       trailing={<Caption style={style.itemCount}>{translate("cartItemsCount") + formatNumber(cart.data.reduce((sum, item) => sum + item.quantity, 0))}</Caption>}
@@ -142,19 +158,6 @@ export default function CartScreen() {
         </CartItem>;
       })}
     </Card>)}
-    <CartSummary style={style.summaryContent}>
-      <View style={style.summaryRow}>
-        <UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText>
-        <PriceText value={offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)} tone="accentMuted" style={style.total} />
-      </View>
-      <Caption style={style.note}>{translate("cartDeliveryNote")}</Caption>
-      <Button
-        label={translate("cartCheckout")}
-        onPress={() => router.push("/checkout")}
-        disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
-        fullWidth
-      />
-    </CartSummary>
   </CustomerScreen>;
 }
 
