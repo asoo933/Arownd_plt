@@ -296,7 +296,7 @@ function Field({
         keyboardType={keyboardType ?? "default"}
         maxLength={240}
         style={styles.input}
-        textAlign="right"
+        textAlign="auto"
       />
     </View>
   );
