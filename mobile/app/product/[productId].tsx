@@ -143,7 +143,7 @@ export default function ProductDetailsScreen() {
             >
               <View style={styles.offerInfo}>
                 <UiText weight="800" style={styles.offerStore}>{offer.store.name}</UiText>
-                <UiText tone="muted" style={styles.metaText}>{offer.store.commune || offer.store.address_line || " "}</UiText>
+                <UiText tone="muted" style={[styles.metaText, active && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{offer.store.commune || offer.store.address_line || " "}</UiText>
                 <StockBadge
                   label={available ? offer.stock_quantity <= 3 ? translate("productLowStock") : translate("productAvailable") : translate("productUnavailable")}
                   tone={available ? offer.stock_quantity <= 3 ? "warning" : "success" : "danger"}
