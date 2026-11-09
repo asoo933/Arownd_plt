@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { Icon, type IconName } from "./icon";
+import { Text as UiText } from "./typography";
 import { Surface } from "./primitives";
 
 export type CardProps = {
@@ -84,6 +86,64 @@ export function StoreCard(props: ComposedCardProps) {
 
 export function OfferCard(props: ComposedCardProps) {
   return <ComposedCard {...props} />;
+}
+
+
+export type CategorySelectorTileProps = {
+  label: string;
+  icon: IconName;
+  selected: boolean;
+  onPress: () => void;
+  accessibilityLabel?: string;
+};
+
+export function CategorySelectorTile({
+  label,
+  icon,
+  selected,
+  onPress,
+  accessibilityLabel
+}: CategorySelectorTileProps) {
+  const theme = useAppTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        width: 112,
+        minHeight: 88,
+        borderWidth: 1,
+        borderColor: selected ? theme.colors.accent : theme.colors.border,
+        borderRadius: theme.radius.lg,
+        backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
+        alignItems: "center",
+        justifyContent: "center",
+        gap: designTokens.spacing.sm,
+        padding: designTokens.spacing.sm,
+        opacity: pressed ? 0.82 : 1
+      })}
+    >
+      <Icon
+        name={icon}
+        size={theme.dimensions.iconSize.lg}
+        color={selected ? theme.colors.accentForeground : theme.colors.accentMuted}
+        accessibilityHidden
+      />
+      <UiText
+        style={{
+          color: selected ? theme.colors.accentForeground : theme.colors.foreground,
+          fontSize: theme.typography.caption,
+          fontWeight: theme.fontWeights.extrabold,
+          textAlign: "center"
+        }}
+      >
+        {label}
+      </UiText>
+    </Pressable>
+  );
 }
 
 export function CategoryCard(props: ComposedCardProps) {
