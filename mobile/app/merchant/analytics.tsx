@@ -8,7 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, ChartCard, ErrorState, Heading, LoadingState, MerchantMetricCard, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, ChartCard, ErrorState, Heading, MetricCardSkeleton, Skeleton, MerchantMetricCard, Text as UiText } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const { language } = useLanguage();
@@ -129,7 +129,14 @@ function Message({ theme, label, loading = false, actionLabel, onAction, busy = 
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
         {loading ? (
-          <LoadingState label={label} />
+          <View style={{ width: "100%", gap: designTokens.spacing.md }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm }}>
+            {[0, 1, 2, 3].map((item) => <MetricCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
+          </View>
+          <View style={{ gap: designTokens.spacing.sm, padding: designTokens.spacing.md }}>
+            {[0, 1, 2, 3, 4, 5, 6].map((item) => <Skeleton key={item} height={9} width={`${55 + item * 5}%`} radius={designTokens.radius.pill} />)}
+          </View>
+        </View>
         ) : actionLabel && onAction ? (
           <ErrorState title={label} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
         ) : (
