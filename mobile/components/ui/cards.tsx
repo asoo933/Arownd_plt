@@ -32,7 +32,7 @@ export function Card({
     <Surface
       elevated={false}
       style={[
-        { overflow: "hidden", borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, padding: 0 },
+        { overflow: "hidden", borderRadius: theme.radius.xl, padding: 0 },
         style
       ]}
     >
@@ -115,8 +115,6 @@ export function CategorySelectorTile({
       style={({ pressed }) => ({
         width: 112,
         minHeight: 88,
-        borderWidth: 1,
-        borderColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.border,
         borderRadius: theme.radius.lg,
         backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface,
         alignItems: "center",
@@ -129,7 +127,7 @@ export function CategorySelectorTile({
       <Icon
         name={icon}
         size={theme.dimensions.iconSize.lg}
-        color={selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.accentMuted}
+        color={selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted}
         accessibilityHidden
       />
       <UiText
