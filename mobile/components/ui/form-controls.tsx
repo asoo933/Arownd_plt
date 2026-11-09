@@ -4,14 +4,15 @@ import { useLanguage } from "@/lib/i18n";
 import { Text as UiText } from "./typography";
 import { getQuantityStepState } from "./form-controls-state";
 
-type TextFieldProps = Omit<TextInputProps, "style"> & {
+type TextFieldProps = Omit<TextInputProps, "style" | "textAlign"> & {
+  textAlign?: TextInputProps["textAlign"] | "auto" | undefined;
   label?: string | undefined;
   error?: string | undefined;
   style?: StyleProp<TextStyle> | undefined;
   containerStyle?: StyleProp<ViewStyle> | undefined;
 };
 
-export function TextField({ label, error, style, containerStyle, accessibilityLabel, ...props }: TextFieldProps) {
+export function TextField({ label, error, style, containerStyle, accessibilityLabel, textAlign, ...props }: TextFieldProps) {
   const theme = useAppTheme();
   const { language } = useLanguage();
 
@@ -20,6 +21,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
       {label ? <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</UiText> : null}
       <TextInput
         {...props}
+        textAlign={textAlign === "auto" ? "start" : textAlign}
         accessibilityLabel={accessibilityLabel ?? label}
         placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
         style={[
