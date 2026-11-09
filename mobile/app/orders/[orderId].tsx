@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerHeading, CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
 import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, OrderCardSkeleton, Text as UiText, TrackingTimeline } from "@/components/ui";
 import { formatDZD, formatNumber } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
