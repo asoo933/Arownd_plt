@@ -397,7 +397,7 @@ export default function MerchantEditProductScreen() {
                   style={[
                     styles.imageAddItem,
                     {
-                      borderColor: theme.colors.inputBorder,
+                      borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border),
                       backgroundColor: theme.colors.surfaceMuted,
                       opacity: isBusy ? 0.55 : 1
                     }
@@ -440,7 +440,7 @@ export default function MerchantEditProductScreen() {
                   editable={!isBusy}
                   maxLength={120}
                   accessibilityLabel={translate("merchantProductNameLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
                 />
               </View>
               <View style={styles.field}>
@@ -453,7 +453,7 @@ export default function MerchantEditProductScreen() {
                   editable={!isBusy}
                   maxLength={80}
                   accessibilityLabel={translate("merchantProductBrandLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
                 />
               </View>
               <View style={styles.field}>
@@ -468,7 +468,7 @@ export default function MerchantEditProductScreen() {
                   multiline
                   textAlignVertical="top"
                   accessibilityLabel={translate("merchantProductDescriptionLabel")}
-                  style={[styles.input, styles.descriptionInput, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                  style={[styles.input, styles.descriptionInput, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
                 />
               </View>
               <View style={styles.field}>
@@ -480,7 +480,7 @@ export default function MerchantEditProductScreen() {
                   accessibilityLabel={translate("merchantProductCategoryLabel")}
                   disabled={isBusy || categoriesQuery.isPending || categoriesQuery.isError}
                   onPress={() => setCategoryPickerOpen(true)}
-                  style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder, opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
+                  style={[styles.categoryPicker, { backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border), opacity: isBusy || categoriesQuery.isPending || categoriesQuery.isError ? 0.55 : 1 }]}
                 >
                   <UiText style={[styles.categoryPickerText, { color: theme.colors.foreground }]}>
                     {selectedCategory
@@ -510,7 +510,7 @@ export default function MerchantEditProductScreen() {
                 editable={!isBusy}
                 keyboardType="number-pad"
                 accessibilityLabel={translate("merchantProductPriceLabel")}
-                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
               />
             </View>
 
@@ -524,7 +524,7 @@ export default function MerchantEditProductScreen() {
                 editable={!isBusy}
                 keyboardType="number-pad"
                 accessibilityLabel={translate("merchantProductStockLabel")}
-                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
               />
               <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
                 {translate("merchantProductsStockHint")}
@@ -546,7 +546,7 @@ export default function MerchantEditProductScreen() {
                   placeholder={translate("merchantProductOptionsPlaceholder")}
                   placeholderTextColor={theme.colors.placeholder}
                   accessibilityLabel={translate("merchantProductSizesLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
                 />
               </View>
               <View style={styles.field}>
@@ -560,7 +560,7 @@ export default function MerchantEditProductScreen() {
                   placeholder={translate("merchantProductOptionsPlaceholder")}
                   placeholderTextColor={theme.colors.placeholder}
                   accessibilityLabel={translate("merchantProductColorsLabel")}
-                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}
+                  style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
                 />
               </View>
               <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
@@ -578,7 +578,7 @@ export default function MerchantEditProductScreen() {
             </View>
           ) : null}
           {warning ? (
-            <View style={[styles.feedback, { backgroundColor: theme.colors.warningSurface, borderColor: theme.colors.warningBorder }]}>
+            <View style={[styles.feedback, { backgroundColor: theme.colors.warningSurface, borderColor: (theme.mode === "light" ? theme.colors.warningBorder : theme.colors.warning) }]}>
               <UiText style={[styles.feedbackText, { color: theme.mode === "light" ? theme.colors.warningText : theme.colors.warning }]}>{warning}</UiText>
             </View>
           ) : null}
@@ -644,7 +644,7 @@ export default function MerchantEditProductScreen() {
               accessibilityRole="button"
               accessibilityLabel={translate("merchantProductCategoryClose")}
               onPress={() => setCategoryPickerOpen(false)}
-              style={[styles.cancelButton, { borderColor: theme.colors.inputBorder }]}
+              style={[styles.cancelButton, { borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border) }]}
             >
               <UiText style={[styles.cancelText, { color: theme.colors.foreground }]}>
                 {translate("merchantProductCategoryClose")}
