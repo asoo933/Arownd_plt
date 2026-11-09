@@ -166,10 +166,10 @@ export default function MerchantEntryScreen() {
         </View>
 
         <View style={styles.metricsGrid}>
-          <MerchantMetricCard label={translate("merchantMetricProducts")} value={String(data.productCount)} hint={translate("merchantMetricProductsHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
-          <MerchantMetricCard label={translate("merchantMetricNeedsAction")} value={String(data.pendingOrderCount)} hint={translate("merchantMetricNeedsActionHint")} valueTone="warning" style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
-          <MerchantMetricCard label={translate("merchantMetricQuoted")} value={String(data.quotedOrderCount)} hint={translate("merchantMetricQuotedHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
-          <MerchantMetricCard label={translate("merchantMetricOrders")} value={String(data.orders.length)} hint={translate("merchantMetricOrdersHint")} style={{ width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: 13, gap: designTokens.spacing.xs }} />
+          <MerchantMetricCard label={translate("merchantMetricProducts")} value={String(data.productCount)} hint={translate("merchantMetricProductsHint")} style={styles.metricCard} />
+          <MerchantMetricCard label={translate("merchantMetricNeedsAction")} value={String(data.pendingOrderCount)} hint={translate("merchantMetricNeedsActionHint")} valueTone="warning" style={styles.metricCard} />
+          <MerchantMetricCard label={translate("merchantMetricQuoted")} value={String(data.quotedOrderCount)} hint={translate("merchantMetricQuotedHint")} style={styles.metricCard} />
+          <MerchantMetricCard label={translate("merchantMetricOrders")} value={String(data.orders.length)} hint={translate("merchantMetricOrdersHint")} style={styles.metricCard} />
         </View>
 
         <View style={styles.sectionHeading}>
@@ -367,6 +367,7 @@ function createStyles(theme: AppTheme) {
     sectionHeadingText: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
     sectionTitle: { fontSize: designTokens.typography.subtitle - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     sectionHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
+    metricCard: { width: "48%", minHeight: 112, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
     metricsGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
     textButton: { minHeight: 40, justifyContent: "center", paddingHorizontal: 3 },
     textButtonLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
