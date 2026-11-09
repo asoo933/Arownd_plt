@@ -13,7 +13,8 @@ import {
   fetchMerchantAccess,
   fetchMerchantDashboard
 } from "@/lib/merchant";
-import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
+import { translate, type Language, type TranslationKey, useLanguage } from "@/lib/i18n";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, LoadingState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, Text as UiText } from "@/components/ui";
@@ -31,7 +32,7 @@ const FILTERS: ReadonlyArray<{ value: OrderFilter; label: TranslationKey }> = [
 ];
 
 export default function MerchantOrdersScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const [filter, setFilter] = useState<OrderFilter>("all");
@@ -131,6 +132,7 @@ export default function MerchantOrdersScreen() {
               <OrderCard
                 key={order.id}
                 order={order}
+                language={language}
                 theme={theme}
                 onPress={() => router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } })}
               />
@@ -146,12 +148,13 @@ export default function MerchantOrdersScreen() {
   );
 }
 
-function OrderCard({ order, theme, onPress }: { order: MerchantDashboardOrder; theme: AppTheme; onPress: () => void }) {
+function OrderCard({ order, language, theme, onPress }: { order: MerchantDashboardOrder; language: Language; theme: AppTheme; onPress: () => void }) {
   const style = createStyles(theme);
   const itemNames = order.productNames.length > 0
     ? order.productNames.slice(0, 3).join("، ")
     : translate("merchantOrderItems");
-  const location = [order.commune, order.wilayaName].filter(Boolean).join("، ");
+  const wilayaName = order.wilayaId === null ? order.wilayaName : getLocalizedWilayaLabel(order.wilayaId, order.wilayaName, language);
+  const location = [order.commune, wilayaName].filter(Boolean).join("، ");
 
   return (
     <MerchantOrderCard onPress={onPress} style={style.orderCard} accessibilityLabel={translate("merchantOrderNumber") + " " + order.parentOrderId.slice(0, 8)}>
