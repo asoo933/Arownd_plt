@@ -73,7 +73,7 @@ export function StatCard({ label, value, hint, style }: { label: string; value: 
 
 export function ChartCard({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const theme = useAppTheme();
-  return <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border, gap: designTokens.spacing.md }, style]}>{children}</View>;
+  return <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }, style]}>{children}</View>;
 }
 
 export function Carousel({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
