@@ -15,7 +15,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { Button, Card, ErrorState, Icon, IconButton, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
+import { Button, Card, ErrorState, Icon, IconButton, Image as UiImage, MetricCardSkeleton, OrderCardSkeleton, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   useLanguage();
@@ -296,7 +296,18 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
-        <LoadingState label={label} />
+        <View style={{ width: "100%", gap: designTokens.spacing.md }}>
+          <View style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
+            <MetricCardSkeleton />
+            <MetricCardSkeleton />
+          </View>
+          <View style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
+            <MetricCardSkeleton />
+            <MetricCardSkeleton />
+          </View>
+          <OrderCardSkeleton />
+          <OrderCardSkeleton />
+        </View>
       </View>
     </SafeAreaView>
   );
