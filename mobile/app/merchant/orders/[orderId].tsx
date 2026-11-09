@@ -200,16 +200,18 @@ export default function MerchantOrderDetailsScreen() {
             {deliveryType === "desk" ? (
               <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantQuotePickupHint")}</UiText>
             ) : (
-              <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{translate("merchantOrderShippingFee")}</UiText>
-              <TextField
-                value={shippingFee}
-                onChangeText={setShippingFee}
-                keyboardType="number-pad"
-                placeholder={translate("merchantQuoteShippingPlaceholder")}
-                placeholderTextColor={theme.colors.placeholder}
-                style={[styles.input, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border, color: theme.colors.foreground }]}
-                textAlign="auto"
-              />
+              <>
+                <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{translate("merchantOrderShippingFee")}</UiText>
+                <TextField
+                  value={shippingFee}
+                  onChangeText={setShippingFee}
+                  keyboardType="number-pad"
+                  placeholder={translate("merchantQuoteShippingPlaceholder")}
+                  placeholderTextColor={theme.colors.placeholder}
+                  style={[styles.input, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border, color: theme.colors.foreground }]}
+                  textAlign="auto"
+                />
+              </>
             )}
             <Button label={translate("merchantQuoteSend")} onPress={sendQuote} loading={quoteMutation.isPending} fullWidth />
             {canReject ? (
