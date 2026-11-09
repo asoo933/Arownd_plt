@@ -225,7 +225,7 @@ export default function SettingsScreen() {
                 <DetailRow label={translate("fullNamePlaceholder")} value={address.recipient_name} />
                 <DetailRow label={translate("checkoutPhonePlaceholder")} value={address.phone} />
                 <DetailRow label={translate("checkoutCommune")} value={address.commune} />
-                <DetailRow label={translate("addressesTitle")} value={address.address_line} />
+                <DetailRow label={translate("addressesStreet")} value={address.address_line} />
               </Surface>
             ))}
           </View>
