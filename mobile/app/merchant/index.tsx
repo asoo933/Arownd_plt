@@ -198,6 +198,7 @@ export default function MerchantEntryScreen() {
           <View style={styles.sectionHeadingText}>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
               {translate("merchantRecentOrdersTitle")}
+            </UiText>
             <UiText style={[styles.sectionHint, { color: theme.colors.muted }]}>
               {translate("merchantRecentOrdersHint")}
             </UiText>
