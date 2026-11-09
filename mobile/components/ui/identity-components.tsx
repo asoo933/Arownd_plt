@@ -22,7 +22,7 @@ export function AvatarGroup({
   const remaining = Math.max(0, people.length - visible.length);
 
   return (
-    <View style={[{ flexDirection: "row-reverse", alignItems: "center" }, style]}>
+    <View style={[{ flexDirection: "row", alignItems: "center" }, style]}>
       {visible.map((person, index) => (
         <Avatar key={person.imageUri ?? person.name + index} {...person} size={size} style={{ marginStart: index === 0 ? 0 : -size * 0.22, borderWidth: 2, borderColor: theme.colors.surface }} />
       ))}
@@ -38,7 +38,7 @@ export function AvatarGroup({
 export function VerifiedBadge({ label, children }: { label: string; children?: ReactNode }) {
   const theme = useAppTheme();
   return (
-    <View accessibilityRole="text" accessibilityLabel={label} style={{ minHeight: 20, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs }}>
+    <View accessibilityRole="text" accessibilityLabel={label} style={{ minHeight: 20, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs }}>
       <View style={{ width: 16, height: 16, borderRadius: theme.radius.pill, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" }}>
         <Icon name="check" size={10} color={theme.colors.accentForeground} accessibilityHidden />
       </View>

@@ -129,14 +129,14 @@ export function IdentityRow({
       <View style={{ flex: 1, gap: theme.spacing.xs }}>
         <UiText
           numberOfLines={1}
-          style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.bold, textAlign: "right" }}
+          style={{ color: theme.colors.foreground, fontSize: theme.typography.subtitle, fontWeight: theme.fontWeights.bold, textAlign: "auto" }}
         >
           {name}
         </UiText>
         {subtitle ? (
           <UiText
             numberOfLines={2}
-            style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}
+            style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "auto" }}
           >
             {subtitle}
           </UiText>

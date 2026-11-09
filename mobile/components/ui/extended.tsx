@@ -66,7 +66,7 @@ export function SearchField({
           fontSize: theme.typography.body,
           fontWeight: theme.fontWeights.regular,
           fontFamily: theme.fontFamilies.arabic,
-          textAlign: "right",
+          textAlign: "auto",
           includeFontPadding: false
         }}
       />

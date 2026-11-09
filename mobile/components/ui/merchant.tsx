@@ -36,18 +36,18 @@ export function MerchantMetricCard({
 
   return (
     <Surface style={[{ flex: 1, gap: theme.spacing.sm }, style]}>
-      <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "right" }}>
+      <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption + 1, textAlign: "auto" }}>
         {label}
       </UiText>
       <UiText
         numberOfLines={1}
         adjustsFontSizeToFit
-        style={{ color: valueColor, fontSize: theme.typography.title, fontWeight: theme.fontWeights.extrabold, textAlign: "right" }}
+        style={{ color: valueColor, fontSize: theme.typography.title, fontWeight: theme.fontWeights.extrabold, textAlign: "auto" }}
       >
         {value}
       </UiText>
       {hint ? (
-        <UiText style={{ color: theme.colors.subtle, fontSize: theme.typography.caption, textAlign: "right" }}>
+        <UiText style={{ color: theme.colors.subtle, fontSize: theme.typography.caption, textAlign: "auto" }}>
           {hint}
         </UiText>
       ) : null}

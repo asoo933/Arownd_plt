@@ -25,7 +25,7 @@ export function MerchantOrderCard(props: { children: ReactNode; actions?: ReactN
 
 export function MerchantProductRow({ children, leading, trailing, style }: { children: ReactNode; leading?: ReactNode; trailing?: ReactNode; style?: StyleProp<ViewStyle> }) {
   const theme = useAppTheme();
-  return <View style={[{ minHeight: 72, flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm, borderBottomWidth: 1, borderBottomColor: theme.colors.border }, style]}>{leading}<View style={{ flex: 1 }}>{children}</View>{trailing}</View>;
+  return <View style={[{ minHeight: 72, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm, borderBottomWidth: 1, borderBottomColor: theme.colors.border }, style]}>{leading}<View style={{ flex: 1 }}>{children}</View>{trailing}</View>;
 }
 
 export function MerchantOnboardingStep({
@@ -39,13 +39,13 @@ export function MerchantOnboardingStep({
   return (
     <View style={[{ gap: designTokens.spacing.md }, style]}>
       {steps.map((step, index) => (
-        <View key={step.key} style={{ flexDirection: "row-reverse", alignItems: "flex-start", gap: designTokens.spacing.md }}>
+        <View key={step.key} style={{ flexDirection: "row", alignItems: "flex-start", gap: designTokens.spacing.md }}>
           <View style={{ width: theme.dimensions.avatarSize.md, height: theme.dimensions.avatarSize.md, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: step.status === "complete" ? theme.colors.successSurface : step.status === "current" ? theme.colors.accent : theme.colors.surfaceMuted }}>
             {step.icon ?? (step.status === "complete" ? <Icon name="check" size={theme.dimensions.iconSize.sm} color={theme.colors.success} accessibilityHidden /> : <UiText style={{ color: theme.colors.foreground, fontWeight: theme.fontWeights.extrabold }}>{index + 1}</UiText>)}
           </View>
           <View style={{ flex: 1, paddingTop: designTokens.spacing.xs, gap: designTokens.spacing.xs }}>
-            <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "right" }}>{step.label}</UiText>
-            {step.description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "right" }}>{step.description}</UiText> : null}
+            <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body, fontWeight: step.status === "current" ? "800" : "600", textAlign: "auto" }}>{step.label}</UiText>
+            {step.description ? <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, textAlign: "auto" }}>{step.description}</UiText> : null}
           </View>
         </View>
       ))}
@@ -64,7 +64,7 @@ export function BusinessHours({
   return (
     <View style={[{ gap: designTokens.spacing.sm }, style]}>
       {rows.map((row) => (
-        <View key={row.key} style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.xs, borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
+        <View key={row.key} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md, paddingVertical: designTokens.spacing.xs, borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
           <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.body }}>{row.dayLabel}</UiText>
           <UiText style={{ color: theme.colors.muted, fontSize: theme.typography.caption, fontVariant: ["tabular-nums"] }}>{row.hoursLabel}</UiText>
         </View>
