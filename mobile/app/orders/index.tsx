@@ -8,7 +8,7 @@ import { AppHeader, Icon, IconButton, OrderCard, OrderStatusBadge, PriceDisplay,
 import { formatDZD } from "@/lib/catalog";
 import { fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
-import { translate, useLanguage } from "@/lib/i18n";
+import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
@@ -42,10 +42,10 @@ function statusLabel(status: string): string {
   return labels[status] ?? translate("orderStatusUnknown");
 }
 
-function dateLabel(value: string): string {
+function dateLabel(value: string, language: Language): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("ar-DZ", { day: "numeric", month: "long", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { day: "numeric", month: "long", year: "numeric" }).format(date);
 }
 
 function toRows(orders: CustomerOrder[]): OrderRow[] {
@@ -74,7 +74,7 @@ function toRows(orders: CustomerOrder[]): OrderRow[] {
 }
 
 export default function OrdersScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const [tab, setTab] = useState<OrdersTab>("all");
@@ -148,7 +148,7 @@ export default function OrdersScreen() {
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <UiText style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</UiText>
-            <UiText style={styles.date}>{dateLabel(row.order.created_at)}</UiText>
+            <UiText style={styles.date}>{dateLabel(row.order.created_at, language)}</UiText>
           </View>
           <OrderStatusBadge label={statusLabel(row.status)} tone={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "neutral"} />
         </View>
