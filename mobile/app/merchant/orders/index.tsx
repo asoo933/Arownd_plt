@@ -91,7 +91,7 @@ export default function MerchantOrdersScreen() {
     : dashboard.data.orders.filter((order) => order.status === filter);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <AppHeader
           title={translate("merchantOrdersPageTitle")}
@@ -213,7 +213,7 @@ function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
 
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
-    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <LoadingState label={label} />
       </View>
@@ -233,7 +233,7 @@ function MessageScreen({
   onAction: () => void;
 }) {
   return (
-    <SafeAreaView style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
         <ErrorState title={title} retryLabel={actionLabel} onRetry={onAction} />
       </View>
