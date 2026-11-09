@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { formatDZD } from "@/lib/catalog";
+import { formatDZD, formatNumber } from "@/lib/catalog";
 import {
   fetchMerchantAccess,
   fetchMerchantDashboard
@@ -108,7 +108,7 @@ export default function MerchantOrdersScreen() {
 
         <View style={styles.listHeading}>
           <UiText style={[styles.countText, { color: theme.colors.muted }]}>
-            {visibleOrders.length} / {dashboard.data.orders.length}
+            {formatNumber(visibleOrders.length)} / {formatNumber(dashboard.data.orders.length)}
           </UiText>
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
             {translate("merchantRecentOrdersTitle")}
@@ -168,7 +168,7 @@ function OrderCard({ order, language, theme, onPress }: { order: MerchantDashboa
         {order.customerName || translate("merchantCustomerUnknown")}
       </UiText>
       <UiText style={[style.orderMeta, { color: theme.colors.muted }]} numberOfLines={2}>
-        {itemNames} · {order.totalQuantity} {translate("merchantOrderQuantity")}
+        {itemNames} · {formatNumber(order.totalQuantity)} {translate("merchantOrderQuantity")}
       </UiText>
       {location ? (
         <UiText style={[style.orderMeta, { color: theme.colors.muted }]}>{location}</UiText>
