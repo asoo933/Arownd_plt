@@ -66,6 +66,7 @@ export default function ProfileScreen() {
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
+          busy={user.isFetching}
           onRetry={() => void user.refetch()}
         />
       </CustomerScreen>
@@ -197,6 +198,7 @@ export default function ProfileScreen() {
             <ErrorState
               title={translate("profileStatsLoadError")}
               retryLabel={translate("retry")}
+              busy={orders.isFetching || favorites.isFetching || reviews.isFetching}
               onRetry={() => { void orders.refetch(); void favorites.refetch(); void reviews.refetch(); }}
             />
           ) : null}
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
   stats: { flexDirection: "row", gap: designTokens.spacing.sm },
   statCardOuter: { flex: 1, minWidth: 0 },
   statCard: { padding: designTokens.spacing.md },
-  statHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
+  statHeader: { flexDirection: "column", alignItems: "flex-start", gap: designTokens.spacing.sm },
   statIcon: { width: 34, height: 34, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
-  stat: { flex: 1, minWidth: 0, padding: 0, backgroundColor: "transparent" },
+  stat: { width: "100%", minWidth: 0, padding: 0, backgroundColor: "transparent" },
 });
