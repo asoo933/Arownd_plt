@@ -225,8 +225,8 @@ export default function CheckoutScreen() {
       <PressableSurface accessibilityLabel={translate("deliveryProfileManage")} onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <UiText style={styles.retryText}>{translate("deliveryProfileManage")}</UiText>
       </PressableSurface>
-      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" maxLength={120} />
-      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" keyboardType="phone-pad" maxLength={20} />
+      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={120} />
+      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" keyboardType="phone-pad" maxLength={20} />
     </View>
 
     <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
@@ -298,13 +298,13 @@ export default function CheckoutScreen() {
           <UiText style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</UiText>
         </PressableSurface>
       ) : (
-        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="right" editable={wilayaId !== null && !communes.isPending} />
+        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" editable={wilayaId !== null && !communes.isPending} />
       )}
       {communes.isError ? <UiText style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</UiText> : null}
 
       {deliveryType === "home" ? <>
         <UiText style={styles.fieldLabel}>{translate("checkoutAddress")}</UiText>
-        <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="right" multiline maxLength={300} />
+        <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="auto" multiline maxLength={300} />
       </> : <UiText style={styles.fieldHint}>{translate("checkoutPickupNote")}</UiText>}
     </View>
 
