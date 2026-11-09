@@ -3,14 +3,13 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   Alert,
   AppHeader,
   Button,
   Caption,
   NotificationCard,
-  OrderCardSkeleton,
   StatusBadge,
   Text as UiText
 } from "@/components/ui";
@@ -92,10 +91,7 @@ export default function NotificationsScreen() {
   });
 
   if (auth.isPending || (auth.data && notifications.isPending)) {
-    return <CustomerScreen>
-      <AppHeader title={translate("notificationsTitle")} />
-      {[0, 1, 2, 3].map((item) => <OrderCardSkeleton key={item} />)}
-    </CustomerScreen>;
+    return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   }
   if (auth.isError || notifications.isError) {
     return (
