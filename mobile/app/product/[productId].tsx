@@ -72,7 +72,25 @@ export default function ProductDetailsScreen() {
     <CustomerScreen
       footer={selectedOffer ? (
         <View style={styles.purchaseFooter}>
-        </Card>
+          <Button
+            label={addMutation.isPending ? translate("productAddingToCart") : addMutation.isSuccess ? translate("productAddedToCart") : translate("productAddToCart")}
+            onPress={() => addMutation.mutate({
+              offerId: selectedOffer.id,
+              productId: selectedOffer.product_id,
+              name: product.data?.name ?? selectedOffer.product.name,
+              price: selectedOffer.price,
+              quantity,
+              options: {
+                ...(selectedColor ? { color: selectedColor } : {}),
+                ...(selectedSize ? { size: selectedSize } : {})
+              }
+            })}
+            loading={addMutation.isPending}
+            disabled={!canAdd}
+            fullWidth
+          />
+          {addMutation.isError ? <UiText tone="danger" style={styles.mutationError}>{translate("genericError")}</UiText> : null}
+        </View>
       ) : undefined}
     >
       <AppHeader
@@ -166,25 +184,7 @@ export default function ProductDetailsScreen() {
               disabled={!selectedOffer.is_available || selectedOffer.stock_quantity <= 0}
             />
           </View>
-          <Button
-            label={addMutation.isPending ? translate("productAddingToCart") : addMutation.isSuccess ? translate("productAddedToCart") : translate("productAddToCart")}
-            onPress={() => addMutation.mutate({
-              offerId: selectedOffer.id,
-              productId: selectedOffer.product_id,
-              name: product.data?.name ?? selectedOffer.product.name,
-              price: selectedOffer.price,
-              quantity,
-              options: {
-                ...(selectedColor ? { color: selectedColor } : {}),
-                ...(selectedSize ? { size: selectedSize } : {})
-              }
-            })}
-            loading={addMutation.isPending}
-            disabled={!canAdd}
-            fullWidth
-          />
-          {addMutation.isError ? <UiText tone="danger" style={styles.mutationError}>{translate("genericError")}</UiText> : null}
-        </View>
+        </Card>
       ) : null}
 
       {selectedOffer ? (
