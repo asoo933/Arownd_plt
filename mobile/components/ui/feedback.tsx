@@ -126,7 +126,7 @@ export function ProductCardSkeleton({ style }: SkeletonLayoutProps) {
 export function StoreCardSkeleton({ style }: SkeletonLayoutProps) {
   const theme = useAppTheme();
   return (
-    <View accessibilityElementsHidden style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface }, style]}>
+    <View accessibilityElementsHidden style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }, style]}>
       <Skeleton width={56} height={56} radius={theme.radius.pill} />
       <View style={{ flex: 1, gap: designTokens.spacing.sm }}>
         <Skeleton width="68%" height={14} />
@@ -140,7 +140,7 @@ export function StoreCardSkeleton({ style }: SkeletonLayoutProps) {
 export function OrderCardSkeleton({ style }: SkeletonLayoutProps) {
   const theme = useAppTheme();
   return (
-    <View accessibilityElementsHidden style={[{ gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface }, style]}>
+    <View accessibilityElementsHidden style={[{ gap: designTokens.spacing.md, padding: designTokens.spacing.md, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }, style]}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }}>
         <Skeleton width="42%" height={14} />
         <Skeleton width={76} height={24} radius={theme.radius.pill} />
@@ -157,7 +157,7 @@ export function OrderCardSkeleton({ style }: SkeletonLayoutProps) {
 export function MetricCardSkeleton({ style }: SkeletonLayoutProps) {
   const theme = useAppTheme();
   return (
-    <View accessibilityElementsHidden style={[{ flex: 1, gap: designTokens.spacing.sm, padding: designTokens.spacing.md, borderWidth: 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface }, style]}>
+    <View accessibilityElementsHidden style={[{ flex: 1, gap: designTokens.spacing.sm, padding: designTokens.spacing.md, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, borderRadius: theme.radius.xl, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }, style]}>
       <Skeleton width="62%" height={12} />
       <Skeleton width="76%" height={26} />
       <Skeleton width="48%" height={10} />
