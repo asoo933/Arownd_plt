@@ -28,10 +28,10 @@ export default function MerchantAnalyticsScreen() {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
   }
   if (access.isError) {
-    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} onAction={() => void access.refetch()} />;
+    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} busy={access.isFetching} onAction={() => void access.refetch()} />;
   }
   if (analytics.isError) {
-    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} onAction={() => void analytics.refetch()} />;
+    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} busy={analytics.isFetching} onAction={() => void analytics.refetch()} />;
   }
   if (!access.data) return <Redirect href="/login" />;
   if (!ready || !analytics.data) return <Redirect href="/merchant" />;
@@ -121,8 +121,8 @@ export default function MerchantAnalyticsScreen() {
   );
 }
 
-function Message({ theme, label, loading = false, actionLabel, onAction }: {
-  theme: AppTheme; label: string; loading?: boolean; actionLabel?: string; onAction?: () => void;
+function Message({ theme, label, loading = false, actionLabel, onAction, busy = false }: {
+  theme: AppTheme; label: string; loading?: boolean; actionLabel?: string; onAction?: () => void; busy?: boolean;
 }) {
   const styles = createStyles(theme);
   return (
@@ -131,7 +131,7 @@ function Message({ theme, label, loading = false, actionLabel, onAction }: {
         {loading ? (
           <LoadingState label={label} />
         ) : actionLabel && onAction ? (
-          <ErrorState title={label} retryLabel={actionLabel} onRetry={onAction} />
+          <ErrorState title={label} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
         ) : (
           <UiText style={[styles.subtitle, { color: theme.colors.foreground }]}>{label}</UiText>
         )}
