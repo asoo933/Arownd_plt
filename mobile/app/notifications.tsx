@@ -15,6 +15,7 @@ import {
 } from "@/components/ui";
 import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
 import { getNotificationDestination } from "@/lib/notifications-state";
+import { formatOrderCode } from "@/lib/orders-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -136,6 +137,13 @@ export default function NotificationsScreen() {
         <EmptyState title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} />
       ) : rows.map((item) => {
         const destination = getNotificationDestination(item);
+        const orderId = typeof item.data.order_id === "string" ? item.data.order_id : null;
+        const orderCode = item.type === "order" && orderId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orderId)
+          ? formatOrderCode(orderId)
+          : null;
+        const body = orderCode && item.body && orderId
+          ? item.body.replace(new RegExp(orderId.slice(0, 8), "i"), orderCode)
+          : item.body;
         return (
           <NotificationCard
             key={item.id}
@@ -152,7 +160,8 @@ export default function NotificationsScreen() {
               <Caption>{dateLabel(item.created_at, language)}</Caption>
             </View>
             <UiText weight="800">{item.title}</UiText>
-            {item.body ? <UiText tone="muted">{item.body}</UiText> : null}
+            {orderCode && body === item.body ? <Caption>{translate("ordersCode")}: {orderCode}</Caption> : null}
+            {body ? <UiText tone="muted">{body}</UiText> : null}
             {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} /> : null}
           </NotificationCard>
         );
