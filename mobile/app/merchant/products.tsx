@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, LoadingState, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, ProductCardSkeleton, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import {
   fetchMerchantAccess
 } from "@/lib/merchant";
@@ -404,7 +404,9 @@ function MessageScreen({
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.messageContainer}>
         {loading ? (
-          <LoadingState label={label ?? ""} />
+          <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md }}>
+            {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
+          </View>
         ) : onAction && actionLabel ? (
           <ErrorState title={title ?? label ?? ""} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
         ) : (
