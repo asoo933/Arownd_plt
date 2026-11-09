@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Text as UiText } from "./typography";
 import { Button } from "./primitives";
-import { Icon } from "./icon";
+import { Icon, type IconName } from "./icon";
 
 export function LoadingState({ label }: { label: string }) {
   const theme = useAppTheme();
@@ -15,27 +15,28 @@ export function LoadingState({ label }: { label: string }) {
   );
 }
 
-export function EmptyState({ title, hint }: { title: string; hint: string }) {
+export function EmptyState({ title, hint, icon = "search" }: { title: string; hint: string; icon?: IconName }) {
   const theme = useAppTheme();
   return (
     <View style={styles.state}>
-      <Icon name="search" size={30} color={theme.colors.accentMuted} accessibilityHidden />
+      <Icon name={icon} size={30} color={theme.colors.accentMuted} accessibilityHidden />
       <UiText style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</UiText>
       <UiText style={[styles.stateText, { color: theme.colors.muted }]}>{hint}</UiText>
     </View>
   );
 }
 
-export function ErrorState({ title, retryLabel, onRetry }: {
+export function ErrorState({ title, retryLabel, onRetry, busy = false }: {
   title: string;
   retryLabel: string;
   onRetry: () => void;
+  busy?: boolean;
 }) {
   const theme = useAppTheme();
   return (
     <View style={styles.state}>
       <UiText style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</UiText>
-      <Button label={retryLabel} onPress={onRetry} size="md" />
+      <Button label={retryLabel} onPress={onRetry} size="md" loading={busy} />
     </View>
   );
 }
