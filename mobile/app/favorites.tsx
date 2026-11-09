@@ -63,7 +63,9 @@ export default function FavoritesScreen() {
   if (favorites.isPending) {
     return <CustomerScreen>
       <AppHeader title={translate("favoritesTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />} />
-      {[0, 1, 2].map((item) => <StoreCardSkeleton key={item} />)}
+      {<View style={styles.productGrid}>
+        {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={styles.productItem} />)}
+      </View>}
     </CustomerScreen>;
   }
   if (favorites.isError) {
