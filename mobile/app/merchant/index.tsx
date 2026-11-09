@@ -172,7 +172,7 @@ export default function MerchantEntryScreen() {
           {[
             { key: "orders", label: translate("merchantManageOrders"), icon: "shopping-bag", path: "/merchant/orders" },
             { key: "products", label: translate("merchantManageProducts"), icon: "package", path: "/merchant/products" },
-            { key: "analytics", label: translate("merchantAnalyticsTitle"), icon: "chart-no-axes-combined", path: "/merchant/analytics" },
+            { key: "analytics", label: translate("merchantAnalyticsTitle"), icon: "layout-grid", path: "/merchant/analytics" },
             { key: "settings", label: translate("merchantStoreSettingsTitle"), icon: "settings", path: "/merchant/settings" }
           ].map((item, index, items) => (
             <PressableSurface
@@ -186,7 +186,7 @@ export default function MerchantEntryScreen() {
               ]}
             >
               <View style={[styles.managementIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
-                <Icon name={item.icon as "shopping-bag" | "package" | "chart-no-axes-combined" | "settings"} color={theme.colors.accentMuted} size={19} accessibilityHidden />
+                <Icon name={item.icon as "shopping-bag" | "package" | "layout-grid" | "settings"} color={theme.colors.accentMuted} size={19} accessibilityHidden />
               </View>
               <UiText style={[styles.managementLabel, { color: theme.colors.foreground }]}>{item.label}</UiText>
               <Icon name="chevron-left" color={theme.colors.muted} size={18} accessibilityHidden />
