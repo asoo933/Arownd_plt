@@ -119,6 +119,19 @@ export async function fetchFeaturedStores(): Promise<FeaturedStore[]> {
   return FeaturedStoreSchema.array().parse(data as unknown);
 }
 
+
+export async function fetchVerifiedStoresByWilaya(wilayaId: number): Promise<FeaturedStore[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("stores")
+    .select("id, name, description, logo_url, commune, rating, is_verified")
+    .eq("wilaya_id", wilayaId)
+    .eq("is_verified", true)
+    .order("rating", { ascending: false });
+
+  if (error) throw error;
+  return FeaturedStoreSchema.array().parse(data as unknown);
+}
+
 const CATEGORY_FILTERS: Record<string, readonly string[]> = {
   fashion: ["fashion", "clothes", "shoes", "bags"],
   electronics: ["electronics", "phones", "computers", "gadgets", "phone-accessories"],
