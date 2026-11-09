@@ -108,17 +108,7 @@ export default function MerchantEditProductScreen() {
     setStock(String(offer.stock_quantity));
     setSizes(offer.options.sizes.join(", "));
     setColors(offer.options.colors.join(", "));
-  }, [
-    offer?.id,
-    offer?.product.name,
-    offer?.product.description,
-    offer?.product.brand,
-    offer?.product.category,
-    offer?.price,
-    offer?.stock_quantity,
-    offer?.options.sizes,
-    offer?.options.colors
-  ]);
+  }, [offer]);
 
   const refreshProductData = async (): Promise<void> => {
     if (!storeId || !offerId) return;
