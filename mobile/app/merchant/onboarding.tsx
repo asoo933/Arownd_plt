@@ -267,7 +267,7 @@ export default function MerchantOnboardingScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={translate("merchantStoreWilayaLabel")}
                     onPress={() => setWilayaPickerOpen(true)}
-                    style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}
+                    style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border }]}
                   >
                     <UiText style={[styles.selectText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>
                       {selectedWilaya
