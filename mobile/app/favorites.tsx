@@ -14,6 +14,8 @@ import {
   Image,
   PriceText,
   ProductCard,
+  ProductCardSkeleton,
+  StoreCardSkeleton,
   RatingStars,
   SegmentedControl,
   StoreCard,
@@ -23,7 +25,6 @@ import {
   CustomerScreen,
   EmptyState,
   ErrorState,
-  LoadingState
 } from "@/components/customer-ui";
 import { chooseBestProductOffer, fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { getFavorites } from "@/lib/favorites";
@@ -60,7 +61,10 @@ export default function FavoritesScreen() {
   });
 
   if (favorites.isPending) {
-    return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+    return <CustomerScreen>
+      <AppHeader title={translate("favoritesTitle")} />
+      {[0, 1, 2].map((item) => <StoreCardSkeleton key={item} />)}
+    </CustomerScreen>;
   }
   if (favorites.isError) {
     return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={favorites.isFetching} onRetry={() => void favorites.refetch()} /></CustomerScreen>;
@@ -88,7 +92,15 @@ export default function FavoritesScreen() {
         ]}
       />
 
-      {content.isPending ? <LoadingState label={translate("stateLoading")} /> : content.isError ? (
+      {content.isPending ? (tab === "products" ? (
+        <View style={styles.productGrid}>
+          {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={styles.productItem} />)}
+        </View>
+      ) : (
+        <View style={{ gap: designTokens.spacing.md }}>
+          {[0, 1, 2].map((item) => <StoreCardSkeleton key={item} />)}
+        </View>
+      )) : content.isError ? (
         <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={content.isFetching} onRetry={() => void content.refetch()} />
       ) : visibleCount === 0 ? (
         <EmptyState icon="heart"
