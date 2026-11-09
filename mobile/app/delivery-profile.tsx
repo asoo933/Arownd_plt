@@ -78,8 +78,8 @@ export default function DeliveryProfileScreen() {
   const fieldStyle = [
     styles.input,
     {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border,
       color: theme.colors.foreground
     }
   ];
@@ -209,7 +209,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     justifyContent: "center"
   },
   suggestionText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-  error: { color: theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "auto" },
+  error: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption, textAlign: "auto" },
   success: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
   note: { color: theme.colors.muted, fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
   disabled: { opacity: 0.5 },
