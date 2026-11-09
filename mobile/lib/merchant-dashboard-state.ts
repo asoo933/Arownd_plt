@@ -16,7 +16,7 @@ export type MerchantOrderRow = {
     commune: string | null;
     delivery_type: string;
     created_at: string;
-    wilaya: { name_ar: string | null } | null;
+    wilaya: { id: number; name_ar: string | null } | null;
   } | null;
 };
 
@@ -31,6 +31,7 @@ export type MerchantDashboardOrder = {
   customerName: string;
   commune: string;
   wilayaName: string;
+  wilayaId: number | null;
   deliveryType: string;
   itemCount: number;
   totalQuantity: number;
@@ -74,6 +75,7 @@ export function groupMerchantOrderRows(rows: MerchantOrderRow[]): MerchantOrderS
       customerName: parentOrder.full_name?.trim() ?? "",
       commune: parentOrder.commune?.trim() ?? "",
       wilayaName: parentOrder.wilaya?.name_ar?.trim() ?? "",
+      wilayaId: parentOrder.wilaya?.id ?? null,
       deliveryType: parentOrder.delivery_type,
       itemCount: 1,
       totalQuantity: row.quantity,
