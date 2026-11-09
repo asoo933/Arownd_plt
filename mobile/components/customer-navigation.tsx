@@ -1,39 +1,58 @@
+import { useQuery } from "@tanstack/react-query";
 import { router, usePathname } from "expo-router";
 
 import { BottomNavigation, Icon } from "@/components/ui";
+import { fetchMerchantAccess } from "@/lib/merchant";
 import { translate } from "@/lib/i18n";
 import { getCustomerTab, type CustomerTab } from "@/lib/customer-navigation-state";
 import { useAppTheme } from "@/lib/theme";
 
-const tabs: {
-  id: Exclude<CustomerTab, "none">;
-  label: "navHome" | "navExplore" | "navCart" | "navAccount";
-  icon: "home" | "search" | "shopping-cart" | "user";
+type NavigationTab = {
+  id: Exclude<CustomerTab, "none"> | "studio";
+  label: "navHome" | "navExplore" | "navCart" | "navAccount" | "navStudio";
+  icon: "home" | "search" | "shopping-cart" | "user" | "store";
   path: string;
-}[] = [
+};
+
+const customerTabs: NavigationTab[] = [
   { id: "home", label: "navHome", icon: "home", path: "/home" },
   { id: "explore", label: "navExplore", icon: "search", path: "/explore" },
   { id: "cart", label: "navCart", icon: "shopping-cart", path: "/cart" },
   { id: "profile", label: "navAccount", icon: "user", path: "/profile" }
 ];
 
+const merchantTabs: NavigationTab[] = [
+  { id: "home", label: "navHome", icon: "home", path: "/home" },
+  { id: "explore", label: "navExplore", icon: "search", path: "/explore" },
+  { id: "cart", label: "navCart", icon: "shopping-cart", path: "/cart" },
+  { id: "studio", label: "navStudio", icon: "store", path: "/merchant" }
+];
+
 export function CustomerNavigation() {
   const pathname = usePathname();
   const theme = useAppTheme();
+  const access = useQuery({
+    queryKey: ["merchant-access"],
+    queryFn: fetchMerchantAccess,
+    retry: false
+  });
+  const isMerchant = access.data?.status === "merchant_ready" && Boolean(access.data.store?.id);
+  const tabs = isMerchant ? merchantTabs : customerTabs;
   const activeTab = getCustomerTab(pathname);
+  const selectedTab = isMerchant && activeTab === "profile" ? "studio" : activeTab;
 
   if (!activeTab) return null;
 
   return (
     <BottomNavigation
       accessibilityLabel={translate("navMain")}
-      value={activeTab === "none" ? "" : activeTab}
+      value={selectedTab === "none" ? "" : selectedTab ?? ""}
       onChange={(key) => {
         const destination = tabs.find((tab) => tab.id === key)?.path;
         if (destination && pathname !== destination) router.replace(destination);
       }}
       items={tabs.map((tab) => {
-        const selected = activeTab === tab.id;
+        const selected = selectedTab === tab.id;
         return {
           key: tab.id,
           label: translate(tab.label),
