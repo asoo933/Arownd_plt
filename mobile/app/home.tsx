@@ -114,9 +114,9 @@ export default function CustomerHomeScreen() {
       <View>
         <SectionTitle title={translate("homeFeaturedStores")} />
         {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
-          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void stores.refetch()} />
+          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={stores.isFetching} onRetry={() => void stores.refetch()} />
         ) : stores.data.length === 0 ? (
-          <EmptyState title={translate("homeNoStores")} hint={translate("homeNoStoresHint")} />
+          <EmptyState icon="store" title={translate("homeNoStores")} hint={translate("homeNoStoresHint")} />
         ) : (
           <View
             style={styles.storeViewport}
@@ -158,9 +158,9 @@ export default function CustomerHomeScreen() {
       <View>
         <SectionTitle title={translate("homeNewArrivals")} />
         {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
-          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void products.refetch()} />
+          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={products.isFetching} onRetry={() => void products.refetch()} />
         ) : products.data.length === 0 ? (
-          <EmptyState title={translate("homeNoProducts")} hint={translate("homeNoProductsHint")} />
+          <EmptyState icon="package" title={translate("homeNoProducts")} hint={translate("homeNoProductsHint")} />
         ) : (
           <ScrollView
             horizontal
