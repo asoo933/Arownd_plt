@@ -8,11 +8,12 @@ import { designTokens } from "@/lib/theme";
 import { ActionButton, AuthField, AuthLayout, FormError, SuccessPanel } from "@/components/auth-ui";
 import { getSupabaseClient } from "@/lib/supabase";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/auth-validation";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 
 type RecoveryState = "loading" | "ready" | "invalid" | "updated";
 
 export default function ResetPasswordScreen() {
+  useLanguage();
   const params = useLocalSearchParams<{ code?: string }>();
   const code = typeof params.code === "string" ? params.code : undefined;
   const [state, setState] = useState<RecoveryState>("loading");

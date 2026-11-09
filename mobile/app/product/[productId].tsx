@@ -9,11 +9,12 @@ import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function ProductDetailsScreen() {
+  useLanguage();
   const { productId } = useLocalSearchParams<{ productId: string }>();
   const theme = useAppTheme();
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
@@ -167,26 +168,26 @@ function OptionPicker({ label, values, value, onSelect }: { label: string; value
 const styles = StyleSheet.create({
   heroImage: { height: 300, borderRadius: designTokens.radius.lg, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   infoCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
-  productName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  productName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   priceDisplay: { justifyContent: "flex-end" },
-  price: { fontSize: designTokens.typography.title, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  metadata: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.md },
-  metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "right" },
-  description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "right" },
+  price: { fontSize: designTokens.typography.title, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  metadata: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md },
+  metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "auto" },
+  description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "auto" },
   section: { gap: designTokens.spacing.md },
-  sectionTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  offerCard: { minHeight: 82, borderWidth: 1.5, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
-  offerInfo: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-  offerStore: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
+  sectionTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  offerCard: { minHeight: 82, borderWidth: 1.5, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
+  offerInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+  offerStore: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   stock: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   offerPriceDisplay: { justifyContent: "flex-start" },
   offerPrice: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
   purchaseCard: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   optionGroup: { gap: designTokens.spacing.sm },
-  optionLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  optionValues: { flexDirection: "row-reverse", flexWrap: "wrap", gap: designTokens.spacing.sm },
+  optionLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  optionValues: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
   optionChip: { minWidth: designTokens.dimensions.controlHeight.md, minHeight: designTokens.dimensions.controlHeight.md, paddingHorizontal: 13, borderRadius: designTokens.radius.sm, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   optionChipText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.bold },
-  quantityRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  mutationError: { fontSize: designTokens.typography.caption, textAlign: "right" },
+  quantityRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  mutationError: { fontSize: designTokens.typography.caption, textAlign: "auto" },
 });

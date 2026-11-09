@@ -6,7 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { CustomerScreen, EmptyState, ErrorState, ProductTile, LoadingState } from "@/components/customer-ui";
 import { FavoriteButton } from "@/components/favorite-button";
 import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { AppHeader, Card, Icon, IconButton, Image as UiImage, RatingStars, SegmentedControl, Text as UiText } from "@/components/ui";
@@ -14,6 +14,7 @@ import { AppHeader, Card, Icon, IconButton, Image as UiImage, RatingStars, Segme
 type StoreTab = "products" | "about";
 
 export default function StoreDetailsScreen() {
+  useLanguage();
   const { storeId } = useLocalSearchParams<{ storeId: string }>();
   const theme = useAppTheme();
   const [tab, setTab] = useState<StoreTab>("products");
@@ -99,16 +100,16 @@ export default function StoreDetailsScreen() {
 
 const styles = StyleSheet.create({
   cover: { height: 150, borderRadius: designTokens.radius.lg, overflow: "hidden" },
-  storeHeader: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.md, marginTop: -2 },
+  storeHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, marginTop: -2 },
   logo: { width: 76, height: 76, borderRadius: designTokens.radius.lg, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  storeTitleWrap: { flex: 1, alignItems: "flex-end", gap: designTokens.spacing.xs },
-  storeName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "right" },
+  storeTitleWrap: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+  storeName: { fontSize: designTokens.typography.title - 2, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  metaText: { fontSize: designTokens.typography.caption + 1, textAlign: "auto" },
   verified: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   tabs: { width: "100%" },
-  productGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
+  productGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
   aboutCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
-  aboutTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  fieldTitle: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "right" },
-  description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "right" }
+  aboutTitle: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  fieldTitle: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  description: { fontSize: designTokens.typography.body - 1, lineHeight: 22, textAlign: "auto" }
 });

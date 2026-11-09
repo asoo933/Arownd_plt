@@ -9,9 +9,10 @@ import { Text as UiText } from "@/components/ui";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { signUpPersonal } from "@/lib/auth-service";
 import { personalSignupSchema, type PersonalSignupInput } from "@/lib/auth-validation";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 
 export default function PersonalSignupScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const [serverError, setServerError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
@@ -72,7 +73,7 @@ export default function PersonalSignupScreen() {
 
 const styles = StyleSheet.create({
   form: { gap: designTokens.spacing.lg },
-  loginRow: { flexDirection: "row-reverse", justifyContent: "center", gap: designTokens.spacing.xs, marginTop: 2 },
+  loginRow: { flexDirection: "row", justifyContent: "center", gap: designTokens.spacing.xs, marginTop: 2 },
   secondaryText: { fontSize: designTokens.typography.body - 1 },
   link: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
 });

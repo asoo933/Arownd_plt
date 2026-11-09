@@ -17,13 +17,14 @@ import {
 } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { getFavorites } from "@/lib/favorites";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { fetchMyOrders } from "@/lib/orders";
 import { getProfileDisplayName } from "@/lib/profile-state";
 import { fetchMyReviews } from "@/lib/reviews";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export default function ProfileScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const user = useQuery({
     queryKey: ["current-user"],
@@ -206,20 +207,20 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  headerActions: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   identityCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
-  identityRow: { flexDirection: "row-reverse" },
+  identityRow: { flexDirection: "row" },
   phoneRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     gap: designTokens.spacing.sm,
     paddingTop: designTokens.spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth
   },
-  stats: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+  stats: { flexDirection: "row", gap: designTokens.spacing.sm },
   statCardOuter: { flex: 1, minWidth: 0 },
   statCard: { padding: designTokens.spacing.md },
-  statHeader: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
+  statHeader: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   statIcon: { width: 34, height: 34, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
   stat: { flex: 1, minWidth: 0, padding: 0, backgroundColor: "transparent" },
 });
