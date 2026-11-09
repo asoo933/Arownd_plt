@@ -166,7 +166,7 @@ function OrderCard({ order, language, theme, onPress }: { order: MerchantDashboa
   const location = [order.commune, wilayaName].filter(Boolean).join("، ");
 
   return (
-    <MerchantOrderCard onPress={onPress} style={style.orderCard} accessibilityLabel={translate("merchantOrderNumber") + " " + order.parentOrderId.slice(0, 8)}>
+    <MerchantOrderCard onPress={onPress} accessibilityLabel={translate("merchantOrderNumber") + " " + order.parentOrderId.slice(0, 8)}>
       <View style={style.orderHeader}>
         <UiText style={[style.orderCode, { color: theme.colors.foreground }]}>
           {translate("merchantOrderNumber")} {order.parentOrderId.slice(0, 8)}
@@ -265,15 +265,13 @@ function MessageScreen({
 const stylesForScreen = StyleSheet.create({
   safe: { flex: 1 },
   center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
-  message: { fontSize: designTokens.typography.body, lineHeight: 22, textAlign: "center", fontWeight: designTokens.fontWeights.bold },
-  action: { minHeight: 46, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.xl, alignItems: "center", justifyContent: "center" },
-  actionText: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
+  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg }
 });
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     safe: { flex: 1 },
-    content: { padding: designTokens.spacing.xl, paddingBottom: 35, gap: designTokens.spacing.lg },
+    content: { padding: designTokens.spacing.lg, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.lg },
     eyebrow: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
     filters: { paddingVertical: designTokens.spacing.xs },
@@ -281,7 +279,6 @@ function createStyles(theme: AppTheme) {
     sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     countText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     orderList: { gap: designTokens.spacing.md },
-    orderCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.sm },
     orderHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
     orderCode: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     customerName: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
@@ -296,6 +293,6 @@ function createStyles(theme: AppTheme) {
     orderAction: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs, alignSelf: "flex-start", paddingTop: designTokens.spacing.xs },
     emptyCard: { padding: designTokens.spacing.xl, gap: designTokens.spacing.sm, alignItems: "flex-start" },
     emptyTitle: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    limitHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto", paddingHorizontal: 3 }
+    limitHint: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto", paddingHorizontal: designTokens.spacing.xs }
   });
 }
