@@ -15,7 +15,7 @@ import { formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
+import { Button, Card, ErrorState, Icon, IconButton, Image as UiImage, LoadingState, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   useLanguage();
@@ -113,7 +113,14 @@ export default function MerchantEntryScreen() {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
+        <View style={styles.headerActions}>
+          <IconButton
+            icon={<Icon name="settings" size={20} color={theme.colors.foreground} accessibilityHidden />}
+            accessibilityLabel={translate("merchantStoreSettingsTitle")}
+            onPress={() => router.push("/merchant/settings")}
+            variant="surface"
+          />
+        </View>
 
         <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.storeCard}>
           <View style={styles.storeHeader}>
