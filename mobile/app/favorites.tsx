@@ -50,7 +50,11 @@ export default function FavoritesScreen() {
       if (!ids) return { products: [], stores: [] };
       if (tab === "products") {
         const productResults = await Promise.all(ids.products.map(async (id) => {
-          const offers = await fetchProductOffers(id);
+          const offers = await queryClient.fetchQuery({
+            queryKey: ["customer-product-offers", id],
+            queryFn: () => fetchProductOffers(id),
+            staleTime: 30_000
+          });
           const best = chooseBestProductOffer(offers);
           return best ? { id, offer: best } : null;
         }));
@@ -61,7 +65,11 @@ export default function FavoritesScreen() {
       }
       const storeResults = await Promise.all(ids.stores.map(async (id) => ({
         id,
-        store: await fetchStoreDetails(id)
+        store: await queryClient.fetchQuery({
+          queryKey: ["customer-store", id],
+          queryFn: () => fetchStoreDetails(id),
+          staleTime: 60_000
+        })
       })));
       return {
         products: [],
