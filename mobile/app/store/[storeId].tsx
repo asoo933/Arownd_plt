@@ -9,7 +9,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from 
 import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { AppHeader, Avatar, Card, Icon, IconButton, RatingStars, SegmentedControl, Text as UiText } from "@/components/ui";
+import { AppHeader, Avatar, Card, Icon, IconButton, RatingStars, SegmentedControl, StoreCardSkeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 
 type StoreTab = "products" | "about";
 
@@ -29,7 +29,13 @@ export default function StoreDetailsScreen() {
     enabled: Boolean(storeId)
   });
 
-  if (store.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  if (store.isPending) return <CustomerScreen>
+    <AppHeader title={translate("storeTitle")} />
+    <StoreCardSkeleton />
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md }}>
+      {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
+    </View>
+  </CustomerScreen>;
   if (store.isError) {
     return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={store.isFetching} onRetry={() => void store.refetch()} /></CustomerScreen>;
   }
@@ -74,7 +80,11 @@ export default function StoreDetailsScreen() {
       />
 
       {tab === "products" ? (
-        offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
+        offers.isPending ? (
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md }}>
+            {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
+          </View>
+        ) : offers.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={offers.isFetching} onRetry={() => void offers.refetch()} />
         ) : offers.data.length === 0 ? (
           <EmptyState icon="package" title={translate("storeNoProducts")} hint={translate("storeNoDescription")} />
