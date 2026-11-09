@@ -31,7 +31,7 @@ export default function StoreDetailsScreen() {
 
   if (store.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   if (store.isError) {
-    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void store.refetch()} /></CustomerScreen>;
+    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={store.isFetching} onRetry={() => void store.refetch()} /></CustomerScreen>;
   }
   if (!store.data) return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("storeNoDescription")} /></CustomerScreen>;
 
@@ -75,9 +75,9 @@ export default function StoreDetailsScreen() {
 
       {tab === "products" ? (
         offers.isPending ? <LoadingState label={translate("stateLoading")} /> : offers.isError ? (
-          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} />
+          <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={offers.isFetching} onRetry={() => void offers.refetch()} />
         ) : offers.data.length === 0 ? (
-          <EmptyState title={translate("storeNoProducts")} hint={translate("storeNoDescription")} />
+          <EmptyState icon="package" title={translate("storeNoProducts")} hint={translate("storeNoDescription")} />
         ) : (
           <View style={styles.productGrid}>
             {offers.data.map((item) => (
