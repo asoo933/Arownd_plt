@@ -16,7 +16,7 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { getLocalizedProductCategoryLabel } from "@/lib/locale-data";
 
 export default function ProductDetailsScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const { productId } = useLocalSearchParams<{ productId: string }>();
   const theme = useAppTheme();
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
