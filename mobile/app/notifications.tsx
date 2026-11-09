@@ -100,6 +100,7 @@ export default function NotificationsScreen() {
         <ErrorState
           title={translate("notificationsLoadError")}
           retryLabel={translate("retry")}
+          busy={auth.isFetching || notifications.isFetching}
           onRetry={() => { void auth.refetch(); void notifications.refetch(); }}
         />
       </CustomerScreen>
@@ -134,7 +135,7 @@ export default function NotificationsScreen() {
         />
       ) : null}
       {rows.length === 0 ? (
-        <EmptyState title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} />
+        <EmptyState icon="bell" title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} />
       ) : rows.map((item) => {
         const destination = getNotificationDestination(item);
         const orderId = typeof item.data.order_id === "string" ? item.data.order_id : null;
