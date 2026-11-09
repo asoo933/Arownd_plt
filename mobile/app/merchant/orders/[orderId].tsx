@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { formatDZD } from "@/lib/catalog";
+import { formatDZD, formatNumber } from "@/lib/catalog";
 import {
   collectMerchantOrderCod,
   fetchMerchantAccess,
@@ -157,7 +157,7 @@ export default function MerchantOrderDetailsScreen() {
             <View key={item.id} style={[styles.itemRow, { borderBottomColor: theme.colors.border }]}>
               <View style={styles.itemInfo}>
                 <UiText style={[styles.itemName, { color: theme.colors.foreground }]}>{item.product_name || translate("merchantOrderItems")}</UiText>
-                <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderQuantity")}: {item.quantity}</UiText>
+                <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderQuantity")}: {formatNumber(item.quantity)}</UiText>
                 {Object.entries(readCartOptions(item.options)).length > 0 ? <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</UiText> : null}
               </View>
               <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
