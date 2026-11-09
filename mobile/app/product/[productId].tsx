@@ -13,6 +13,7 @@ import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { getLocalizedProductCategoryLabel } from "@/lib/locale-data";
 
 export default function ProductDetailsScreen() {
   useLanguage();
@@ -111,7 +112,7 @@ export default function ProductDetailsScreen() {
         </View>
         <View style={styles.metadata}>
           {productDetails.brand ? <UiText tone="muted" style={styles.metaText}>{translate("productBrand")}: {productDetails.brand}</UiText> : null}
-          {productDetails.category ? <UiText tone="muted" style={styles.metaText}>{translate("productCategory")}: {productDetails.category}</UiText> : null}
+          {productDetails.category ? <UiText tone="muted" style={styles.metaText}>{translate("productCategory")}: {getLocalizedProductCategoryLabel(productDetails.category, language)}</UiText> : null}
         </View>
         <UiText tone="muted" style={styles.description}>{productDetails.description || translate("productNoDescription")}</UiText>
       </Card>
