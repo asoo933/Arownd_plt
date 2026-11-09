@@ -79,7 +79,6 @@ export default function DeliveryProfileScreen() {
     styles.input,
     {
       backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
-      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border,
       color: theme.colors.foreground
     }
   ];
@@ -87,7 +86,7 @@ export default function DeliveryProfileScreen() {
     styles.picker,
     {
       backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border
+      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border
     }
   ];
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
@@ -181,8 +180,8 @@ export default function DeliveryProfileScreen() {
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   panel: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+    borderColor: theme.mode === "light" ? "transparent" : theme.colors.border,
     borderRadius: theme.radius.xl,
     padding: 0
   },
