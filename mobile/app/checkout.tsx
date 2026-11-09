@@ -49,6 +49,7 @@ export default function CheckoutScreen() {
   const [profileApplied, setProfileApplied] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [addressesApplied, setAddressesApplied] = useState(false);
+  const [formEdited, setFormEdited] = useState(false);
 
   const auth = useQuery({
     queryKey: ["checkout-auth"],
@@ -93,16 +94,19 @@ export default function CheckoutScreen() {
       return;
     }
     if (!profile.isSuccess || profileApplied || selectedAddressId !== null) return;
-    setFullName(profile.data?.full_name ?? auth.data?.user_metadata?.["full_name"] ?? "");
-    setPhone(profile.data?.phone ?? auth.data?.phone ?? "");
-    setWilayaId(profile.data?.wilaya_id ?? null);
-    setCommune(profile.data?.commune ?? "");
+    if (!formEdited) {
+      setFullName(profile.data?.full_name ?? auth.data?.user_metadata?.["full_name"] ?? "");
+      setPhone(profile.data?.phone ?? auth.data?.phone ?? "");
+      setWilayaId(profile.data?.wilaya_id ?? null);
+      setCommune(profile.data?.commune ?? "");
+    }
     setProfileApplied(true);
-  }, [profile.data, profile.isSuccess, profileApplied, auth.data, selectedAddressId]);
+  }, [profile.data, profile.isSuccess, profileApplied, auth.data, selectedAddressId, formEdited]);
 
-  const applySavedAddress = (address: UserAddress) => {
+  const applySavedAddress = (address: UserAddress, userInitiated = true) => {
     setSelectedAddressId(address.id);
     setProfileApplied(true);
+    if (userInitiated) setFormEdited(true);
     setFullName(address.recipient_name);
     setPhone(address.phone);
     setWilayaId(address.wilaya_id);
@@ -113,9 +117,9 @@ export default function CheckoutScreen() {
   useEffect(() => {
     if (!savedAddresses.isSuccess || addressesApplied) return;
     const preferred = savedAddresses.data.find((address) => address.is_default) ?? savedAddresses.data[0];
-    if (preferred) applySavedAddress(preferred);
+    if (preferred && !formEdited) applySavedAddress(preferred, false);
     setAddressesApplied(true);
-  }, [savedAddresses.data, savedAddresses.isSuccess, addressesApplied]);
+  }, [savedAddresses.data, savedAddresses.isSuccess, addressesApplied, formEdited]);
 
   const selectedWilaya = useMemo(
     () => wilayas.data?.find((item) => item.id === wilayaId) ?? null,
@@ -220,7 +224,7 @@ export default function CheckoutScreen() {
         label={translate("checkoutConfirm")}
         onPress={submit}
         loading={mutation.isPending}
-        disabled={mutation.isPending || offers.isPending || offers.isError || hasBlockingItems || wilayas.isError}
+        disabled={mutation.isPending || offers.isPending || offers.isError || hasBlockingItems || wilayas.isPending || wilayas.isError}
         fullWidth
       />
     }
@@ -231,18 +235,22 @@ export default function CheckoutScreen() {
     />
     <UiText style={styles.fieldHint}>{translate("checkoutSubtitle")}</UiText>
 
-    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+    <Card style={styles.sectionCard} contentStyle={styles.section}>
       <UiText style={styles.sectionTitle}>{translate("checkoutContactTitle")}</UiText>
       <PressableSurface accessibilityLabel={translate("deliveryProfileManage")} onPress={() => router.push("/delivery-profile")} hitSlop={8}>
         <UiText style={styles.retryText}>{translate("deliveryProfileManage")}</UiText>
       </PressableSurface>
-      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={120} />
-      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" keyboardType="phone-pad" maxLength={20} />
+      <UiText style={styles.fieldLabel}>{translate("fullName")}</UiText>
+      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={120} />
+      <UiText style={styles.fieldLabel}>{translate("checkoutPhoneLabel")}</UiText>
+      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" keyboardType="phone-pad" maxLength={20} />
     </View>
 
-    <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
+    <Card style={styles.sectionCard} contentStyle={styles.section}>
       <UiText style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</UiText>
-      {savedAddresses.isError ? (
+      {savedAddresses.isPending ? (
+        <LoadingState label={translate("checkoutAddressesLoading")} />
+      ) : savedAddresses.isError ? (
         <PressableSurface accessibilityLabel={translate("checkoutSavedAddressesError")} onPress={() => void savedAddresses.refetch()}><UiText style={styles.retryText}>{translate("checkoutSavedAddressesError")}</UiText></PressableSurface>
       ) : savedAddresses.data && savedAddresses.data.length > 0 ? (
         <View style={styles.savedAddresses}>
@@ -278,7 +286,7 @@ export default function CheckoutScreen() {
           accessibilityRole="radio"
           accessibilityLabel={translate("checkoutHomeDelivery")}
           accessibilityState={{ selected: deliveryType === "home" }}
-          onPress={() => setDeliveryType("home")}
+          onPress={() => { setFormEdited(true); setDeliveryType("home"); }}
           style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}
         >
           <UiText style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</UiText>
@@ -288,7 +296,7 @@ export default function CheckoutScreen() {
           accessibilityRole="radio"
           accessibilityLabel={translate("checkoutStorePickup")}
           accessibilityState={{ selected: deliveryType === "desk" }}
-          onPress={() => setDeliveryType("desk")}
+          onPress={() => { setFormEdited(true); setDeliveryType("desk"); }}
           style={[styles.deliveryOption, deliveryType === "desk" && styles.deliverySelected]}
         >
           <UiText style={[styles.deliveryTitle, deliveryType === "desk" && styles.deliveryTextSelected]}>{translate("checkoutStorePickup")}</UiText>
@@ -297,7 +305,7 @@ export default function CheckoutScreen() {
       </View>
 
       <UiText style={styles.fieldLabel}>{translate("checkoutWilaya")}</UiText>
-      <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => { setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
+      <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => { setFormEdited(true); setSelectedAddressId(null); setPicker("wilaya"); }} disabled={wilayas.isPending || wilayas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
         <UiText style={[styles.selectText, !selectedWilaya && styles.placeholder]}>{selectedWilaya ? String(selectedWilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr) : wilayas.isError ? translate("checkoutWilayaError") : translate("checkoutChooseWilaya")}</UiText>
         {wilayas.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
@@ -309,13 +317,13 @@ export default function CheckoutScreen() {
           <UiText style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</UiText>
         </PressableSurface>
       ) : (
-        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" editable={wilayaId !== null && !communes.isPending} />
+        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" editable={wilayaId !== null && !communes.isPending} />
       )}
       {communes.isError ? <UiText style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</UiText> : null}
 
       <UiText style={styles.fieldLabel}>{translate("checkoutAddress")}</UiText>
-      <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="auto" multiline maxLength={300} />
-    </View>
+      <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="auto" multiline maxLength={300} />
+    </Card>
 
     <CheckoutSummary style={styles.summaryCard}>
       <UiText style={styles.sectionTitle}>{translate("checkoutSummary")}</UiText>
@@ -325,6 +333,7 @@ export default function CheckoutScreen() {
         return <View key={cartLineKey(item)} style={styles.summaryRow}>
           <View style={styles.summaryInfo}>
             <UiText style={[styles.summaryName, { color: theme.colors.foreground }]}>{offer?.product.name ?? item.name ?? translate("cartUnknownStore")}</UiText>
+            {offer?.store.name ? <UiText style={styles.fieldHint}>{translate("checkoutStoreLabel")}: {offer.store.name}</UiText> : null}
             <UiText style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</UiText>
             {optionSummary ? <UiText style={styles.fieldHint}>{optionSummary}</UiText> : null}
           </View>
@@ -335,12 +344,27 @@ export default function CheckoutScreen() {
       {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
       {hasBlockingItems ? <UiText style={styles.errorText}>{translate("checkoutFixCart")}</UiText> : null}
       <View style={styles.totalRow}>
-        <UiText style={styles.sectionTitle}>{translate("cartSubtotal")}</UiText>
+        <UiText style={styles.totalLabel}>{translate("checkoutProductsTotal")}</UiText>
         <PriceDisplay value={offers.data ? formatDZD(evaluation.subtotal) : "—"} style={styles.totalDisplay} />
       </View>
-      <UiText style={styles.fieldHint}>{translate("cartDeliveryNote")}</UiText>
-      <UiText style={styles.fieldHint}>{translate("checkoutCodNote")}</UiText>
+      <View style={styles.shippingRow}>
+        <UiText style={styles.fieldHint}>{translate("checkoutShippingFee")}</UiText>
+        <UiText style={styles.shippingValue}>{deliveryType === "desk" ? translate("checkoutPickupFree") : translate("checkoutShippingPending")}</UiText>
+      </View>
+      {deliveryType === "home" ? <UiText style={styles.fieldHint}>{translate("checkoutFinalTotalPending")}</UiText> : null}
     </CheckoutSummary>
+
+    <Card style={styles.sectionCard} contentStyle={styles.paymentSection}>
+      <UiText style={styles.sectionTitle}>{translate("checkoutPaymentTitle")}</UiText>
+      <View style={styles.paymentMethod}>
+        <Icon name="wallet" size={24} color={theme.colors.accentMuted} accessibilityHidden />
+        <View style={styles.paymentInfo}>
+          <UiText style={styles.paymentTitle}>{translate("checkoutPaymentCod")}</UiText>
+          <UiText style={styles.fieldHint}>{translate("checkoutPaymentCodHint")}</UiText>
+        </View>
+        <Icon name="circle-check" size={20} color={theme.colors.success} accessibilityHidden />
+      </View>
+    </Card>
 
     {formError ? <UiText accessibilityRole="alert" style={styles.errorText}>{formError}</UiText> : null}
     <Modal visible={picker !== null} transparent animationType="slide" onRequestClose={() => setPicker(null)}>
@@ -354,9 +378,12 @@ export default function CheckoutScreen() {
           <ScrollView keyboardShouldPersistTaps="handled">
             {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {
+                setFormEdited(true);
                 setWilayaId(item.wilaya.id);
                 setCommune("");
+                setAddressLine("");
               } else if (picker === "commune") {
+                setFormEdited(true);
                 setCommune(item.label);
               }
               setPicker(null);
@@ -373,8 +400,13 @@ export default function CheckoutScreen() {
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
   back: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
-  section: { borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  sectionCard: { borderRadius: designTokens.radius.xl },
+  section: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   summaryCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  paymentSection: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  paymentMethod: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
+  paymentInfo: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-start" },
+  paymentTitle: { color: theme.colors.foreground, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   totalDisplay: { justifyContent: "flex-start" },
   sectionTitle: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   input: { minHeight: 49, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body },
@@ -405,7 +437,9 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   summaryName: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   summaryPrice: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
   totalRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingTop: 8 },
-  total: { color: theme.colors.accentMuted, fontSize: designTokens.typography.title - 3, fontWeight: designTokens.fontWeights.extrabold },
+  totalLabel: { color: theme.colors.foreground, fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  shippingRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: designTokens.spacing.md },
+  shippingValue: { flex: 1, color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
   errorText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto", lineHeight: 18 },
   successPanel: { borderRadius: designTokens.radius.lg },
   successContent: { padding: designTokens.spacing.xl, gap: designTokens.spacing.lg, alignItems: "center" },
