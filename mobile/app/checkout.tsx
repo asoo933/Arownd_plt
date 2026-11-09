@@ -272,10 +272,10 @@ export default function CheckoutScreen() {
                 <UiText style={styles.savedAddressName}>{address.recipient_name}</UiText>
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
               </View>
-              <UiText style={styles.fieldHint}>{address.phone}</UiText>
-              <UiText style={styles.fieldHint}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_fr)}، {address.commune}</UiText>
-              <UiText style={styles.fieldHint}>{address.address_line}</UiText>
-              {address.is_default ? <UiText style={styles.savedDefault}>{translate("addressesDefault")}</UiText> : null}
+              <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{address.phone}</UiText>
+              <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_fr)}، {address.commune}</UiText>
+              <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{address.address_line}</UiText>
+              {address.is_default ? <UiText style={[styles.savedDefault, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{translate("addressesDefault")}</UiText> : null}
             </PressableSurface>
           ))}
         </View>
@@ -291,7 +291,7 @@ export default function CheckoutScreen() {
           style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}
         >
           <UiText style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</UiText>
-          <UiText style={styles.deliveryHint}>{translate("checkoutHomeDeliveryHint")}</UiText>
+          <UiText style={[styles.deliveryHint, deliveryType === "home" && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{translate("checkoutHomeDeliveryHint")}</UiText>
         </PressableSurface>
         <PressableSurface
           accessibilityRole="radio"
@@ -301,7 +301,7 @@ export default function CheckoutScreen() {
           style={[styles.deliveryOption, deliveryType === "desk" && styles.deliverySelected]}
         >
           <UiText style={[styles.deliveryTitle, deliveryType === "desk" && styles.deliveryTextSelected]}>{translate("checkoutStorePickup")}</UiText>
-          <UiText style={styles.deliveryHint}>{translate("checkoutStorePickupHint")}</UiText>
+          <UiText style={[styles.deliveryHint, deliveryType === "desk" && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{translate("checkoutStorePickupHint")}</UiText>
         </PressableSurface>
       </View>
 
