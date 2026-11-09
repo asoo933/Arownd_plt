@@ -48,7 +48,7 @@ export default function ProductDetailsScreen() {
   });
 
   if (product.isPending) return <CustomerScreen>
-    <AppHeader title={translate("productDetailsTitle")} />
+    <AppHeader title={translate("detailProductTitle")} />
     <ProductCardSkeleton style={{ width: "100%", flex: 0, minHeight: 320 }} />
   </CustomerScreen>;
   if (product.isError) {
