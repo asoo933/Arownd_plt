@@ -35,6 +35,14 @@ type AuthLayoutProps = {
 export function AuthLayout({ title, subtitle, children, showBack = false }: AuthLayoutProps) {
   const theme = useAppTheme();
 
+  const handleBack = (): void => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+    router.replace("/login");
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -43,7 +51,7 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
             {showBack ? (
               <IconButton
                 accessibilityLabel={translate("back")}
-                onPress={() => router.back()}
+                onPress={handleBack}
                 icon={<Icon name="chevron-left" color={theme.colors.foreground} size={designTokens.dimensions.iconSize.md} />}
                 variant="surface"
                 size={designTokens.dimensions.controlHeight.md}
@@ -149,6 +157,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start"
   },
   eyebrow: { marginBottom: designTokens.spacing.md },
+  title: { textAlign: "auto" },
   subtitle: { textAlign: "auto", marginTop: designTokens.spacing.sm },
   content: { gap: designTokens.spacing.lg },
   link: { fontSize: designTokens.typography.caption + 2 },
