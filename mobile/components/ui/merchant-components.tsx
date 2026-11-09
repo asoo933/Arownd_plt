@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { Card } from "./cards";
+import { Card, type CardProps } from "./cards";
 import { StatusBadge, type StatusBadgeTone } from "./extended";
 import { Icon } from "./icon";
 import { Text as UiText } from "./typography";
@@ -19,7 +19,7 @@ export function MerchantStatusBadge({ label, tone }: { label: string; tone: Stat
   return <StatusBadge label={label} tone={tone} />;
 }
 
-export function MerchantOrderCard(props: { children: ReactNode; actions?: ReactNode; style?: StyleProp<ViewStyle>; onPress?: () => void; accessibilityLabel?: string }) {
+export function MerchantOrderCard(props: CardProps) {
   return <Card {...props} />;
 }
 
