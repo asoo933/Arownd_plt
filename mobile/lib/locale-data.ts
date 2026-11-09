@@ -52,6 +52,58 @@ const MERCHANT_CATEGORY_NAMES_EN: Record<string, string> = {
   misc: "Other Products"
 };
 
+const PRODUCT_CATEGORY_NAMES_AR: Record<string, string> = {
+  fashion: "الأزياء والملابس",
+  clothes: "الملابس",
+  shoes: "الأحذية",
+  bags: "الحقائب والإكسسوارات",
+  electronics: "الإلكترونيات",
+  phones: "الهواتف والأجهزة اللوحية",
+  computers: "الحواسيب ومستلزماتها",
+  gadgets: "الأجهزة الإلكترونية",
+  "phone-accessories": "إكسسوارات الهواتف",
+  beauty: "الجمال والعناية الشخصية",
+  perfumes: "العطور",
+  makeup: "مستحضرات التجميل",
+  skincare: "العناية بالبشرة والشعر",
+  home: "المنزل والديكور",
+  furniture: "الأثاث",
+  "home-tools": "الأدوات المنزلية",
+  decor: "الديكور والإضاءة",
+  kitchenware: "أدوات المطبخ",
+  kids: "الأطفال والألعاب",
+  "kids-clothes": "ملابس الأطفال",
+  toys: "ألعاب الأطفال",
+  "kids-essentials": "مستلزمات الأطفال",
+  sports: "الرياضة والترفيه",
+  sportswear: "الملابس والأحذية الرياضية",
+  "sports-gear": "المعدات الرياضية",
+  hobbies: "مستلزمات الهوايات",
+  food: "الأغذية والحلويات",
+  sweets: "الحلويات والمخبوزات",
+  groceries: "المنتجات الغذائية",
+  "home-food": "المأكولات المنزلية",
+  "gifts-crafts": "الهدايا والحرف اليدوية",
+  gifts: "الهدايا",
+  handmade: "المنتجات اليدوية",
+  stationery: "القرطاسية ومستلزمات المكتب",
+  digital: "الخدمات والمشاريع الرقمية",
+  design: "التصميم والجرافيك",
+  "web-dev": "تطوير المواقع والتطبيقات",
+  "digital-services": "الخدمات الرقمية",
+  "digital-products": "المنتجات الرقمية",
+  cars: "السيارات وملحقاتها",
+  "car-accessories": "إكسسوارات السيارات",
+  "car-parts": "قطع الغيار",
+  "car-maintenance": "مستلزمات الصيانة",
+  books: "الكتب والتعليم",
+  industrial: "الأدوات المهنية والصناعية",
+  used: "المنتجات المستعملة",
+  flowers: "الزهور والنباتات",
+  pets: "مستلزمات الحيوانات الأليفة",
+  misc: "منتجات أخرى"
+};
+
 export function getLocalizedWilayaLabel(_id: number, fallback: string, language: Language, nameFr?: string | null): string {
   if (language === "ar") return fallback;
   return nameFr?.trim() || fallback;
