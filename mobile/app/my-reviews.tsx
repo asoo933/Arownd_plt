@@ -49,6 +49,7 @@ export default function MyReviewsScreen() {
         <ErrorState
           title={translate("myReviewsLoadError")}
           retryLabel={translate("retry")}
+          busy={auth.isFetching || query.isFetching}
           onRetry={() => { void auth.refetch(); void query.refetch(); }}
         />
       ) : null}
@@ -56,7 +57,7 @@ export default function MyReviewsScreen() {
         <Button label={translate("profileLogin")} onPress={() => router.push("/login")} fullWidth />
       ) : null}
       {query.isSuccess && query.data.length === 0 ? (
-        <EmptyState title={translate("myReviewsEmpty")} hint={translate("myReviewsEmptyHint")} />
+        <EmptyState icon="star" title={translate("myReviewsEmpty")} hint={translate("myReviewsEmptyHint")} />
       ) : null}
       {query.data?.map((review) => (
         <ReviewRow key={review.id} review={review} language={language} onPress={() => router.push(getReviewTargetPath(review) as never)} />
