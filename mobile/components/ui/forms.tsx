@@ -310,7 +310,7 @@ export function MultiSelect({
             accessibilityState={{ checked: selected, disabled: option.disabled }}
             disabled={option.disabled}
             onPress={() => onChange(selected ? value.filter((item) => item !== option.value) : [...value, option.value])}
-            style={{ minHeight: theme.dimensions.controlHeight.md, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: selected ? theme.colors.accent : theme.colors.border, backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
+            style={{ minHeight: theme.dimensions.controlHeight.md, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface, justifyContent: "center", opacity: option.disabled ? 0.45 : 1 }}
           >
             <UiText style={{ color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>
               {option.label}
