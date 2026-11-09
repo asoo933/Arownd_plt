@@ -73,7 +73,7 @@ export function StatCard({ label, value, hint, style }: { label: string; value: 
 
 export function ChartCard({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const theme = useAppTheme();
-  return <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surface, gap: designTokens.spacing.md }, style]}>{children}</View>;
+  return <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surfaceSecondary, gap: designTokens.spacing.md }, style]}>{children}</View>;
 }
 
 export function Carousel({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
@@ -99,7 +99,7 @@ export function FilterChip({
 }) {
   const theme = useAppTheme();
   return (
-    <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: theme.dimensions.controlHeight.md, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surface, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }]}>
+    <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [{ minHeight: theme.dimensions.controlHeight.md, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.pill, backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary, opacity: disabled ? 0.45 : pressed ? 0.72 : 1 }]}>
       {leading}
       <UiText style={{ color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.foreground, fontSize: theme.typography.caption + 1 }}>{label}</UiText>
     </Pressable>
