@@ -18,7 +18,7 @@ import {
   updateMerchantOrderTracking,
   type MerchantTrackingStatus
 } from "@/lib/merchant";
-import { getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
+import { canCollectMerchantOrderCod, canManageMerchantOrderFulfillment, getNextMerchantTrackingStatus } from "@/lib/merchant-dashboard-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
@@ -128,10 +128,13 @@ export default function MerchantOrderDetailsScreen() {
   const order = detail.data.merchantOrder;
   const customerOrder = order.order;
   const total = order.subtotal + order.shipping_fee;
-  const nextStatus = isCarrierManaged ? null : getNextMerchantTrackingStatus(latestTrackingStatus, deliveryType ?? "");
+  const canManageFulfillment = canManageMerchantOrderFulfillment(order.status) && customerOrder.status !== "cancelled";
+  const nextStatus = !isCarrierManaged && canManageFulfillment
+    ? getNextMerchantTrackingStatus(latestTrackingStatus, deliveryType ?? "")
+    : null;
   const nextStatusLabel = nextStatus ? trackingTranslationKeys[nextStatus] : null;
-  const canCollectCod = deliveryType === "desk" && order.status === "delivered" && order.payment_status !== "paid";
-  const canQuote = order.status === "pending" && !order.quoted_at;
+  const canCollectCod = canCollectMerchantOrderCod(order.status, order.payment_status, deliveryType ?? "", isCarrierManaged);
+  const canQuote = customerOrder.status !== "cancelled" && order.status === "pending" && !order.quoted_at;
   const canReject = canQuote;
 
   const sendQuote = () => {
@@ -257,7 +260,7 @@ export default function MerchantOrderDetailsScreen() {
           <MerchantOrderCard>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantCodTitle")}</UiText>
             <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
-            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantCodPickupHint")}</UiText>
+            <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate(deliveryType === "home" ? "merchantCodDeliveryHint" : "merchantCodPickupHint")}</UiText>
             <Button label={translate("merchantCodCollect")} onPress={() => setConfirmAction("collect")} fullWidth />
           </MerchantOrderCard>
         ) : null}
