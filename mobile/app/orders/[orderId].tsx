@@ -7,7 +7,7 @@ import { CustomerHeading, CustomerScreen, EmptyState, ErrorState, LoadingState }
 import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, Text as UiText, TrackingTimeline } from "@/components/ui";
 import { formatDZD, formatNumber } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
-import { canCancelLegacyOrder, canCancelMerchantOrder } from "@/lib/orders-state";
+import { canCancelLegacyOrder, canCancelMerchantOrder, formatOrderCode } from "@/lib/orders-state";
 import { readCartOptions } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -142,7 +142,7 @@ export default function OrderDetailsScreen() {
   const showParentTimeline = merchantOrders.length === 0;
   const parentCancelled = order.status === "cancelled" || order.status === "rejected";
   const activeStep = getOrderTrackingSteps(order.status);
-  const orderCode = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
+  const orderCode = formatOrderCode(order.id);
 
   return <CustomerScreen>
     <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
