@@ -195,21 +195,22 @@ export default function MerchantProductsScreen() {
             <UiText style={[styles.emptyTitle, { color: theme.colors.foreground }]}>{translate("merchantProductsNoResults")}</UiText>
           </Card>
         ) : (
-          <View style={styles.offerList}>
+          <View style={styles.offerGrid}>
             {visibleOffers.map((offer) => (
-              <MerchantOfferCard
-                key={offer.id}
-                offer={offer}
-                theme={theme}
-                busy={busyOfferId === offer.id}
-                anyBusy={busyOfferId !== null}
-                onSave={(price, stock) => void saveOffer(offer, price, stock)}
-                onToggleVisibility={() => void toggleVisibility(offer)}
-                onEdit={() => router.push({
-                  pathname: "/merchant/products/[offerId]",
-                  params: { offerId: offer.id }
-                })}
-              />
+              <View key={offer.id} style={styles.offerGridItem}>
+                <MerchantOfferCard
+                  offer={offer}
+                  theme={theme}
+                  busy={busyOfferId === offer.id}
+                  anyBusy={busyOfferId !== null}
+                  onSave={(price, stock) => void saveOffer(offer, price, stock)}
+                  onToggleVisibility={() => void toggleVisibility(offer)}
+                  onEdit={() => router.push({
+                    pathname: "/merchant/products/[offerId]",
+                    params: { offerId: offer.id }
+                  })}
+                />
+              </View>
             ))}
           </View>
         )}
@@ -254,71 +255,104 @@ function MerchantOfferCard({
       : translate("merchantProductsAvailable");
 
   return (
-    <Card style={{ backgroundColor: theme.colors.surface }} contentStyle={styles.offerCard}>
-      <View style={styles.productHeader}>
-        <PressableSurface
-          accessibilityRole={image ? "button" : undefined}
-          accessibilityLabel={translate("merchantProductImagesLabel")}
-          disabled={!image}
-          onPress={() => setGalleryOpen(true)}
-          style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}
-        >
-          {image ? (
-            <UiImage uri={image.image_url} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.image} />
-          ) : (
-            <Icon name="image" color={theme.colors.muted} size={24} accessibilityHidden />
-          )}
-        </PressableSurface>
-        <View style={styles.productInfo}>
-          <UiText style={[styles.productName, { color: theme.colors.foreground }]} numberOfLines={2}>
-            {offer.product.name}
+    <Card style={{ backgroundColor: theme.colors.surface, width: "100%" }} contentStyle={styles.offerCard}>
+      <PressableSurface
+        accessibilityRole={image ? "button" : undefined}
+        accessibilityLabel={translate("merchantProductImagesLabel")}
+        disabled={!image}
+        onPress={() => setGalleryOpen(true)}
+        style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}
+      >
+        {image ? (
+          <UiImage
+            uri={image.image_url}
+            accessibilityLabel={translate("merchantProductImagesLabel")}
+            aspectRatio={1}
+            style={styles.image}
+          />
+        ) : (
+          <Icon name="image" color={theme.colors.muted} size={28} accessibilityHidden />
+        )}
+      </PressableSurface>
+
+      <View style={styles.badgeRow}>
+        <MerchantStatusBadge
+          label={inventoryLabel}
+          tone={inventoryLevel === "out" ? "danger" : inventoryLevel === "low" ? "warning" : "success"}
+        />
+        <MerchantStatusBadge
+          label={offer.is_merchant_hidden ? translate("merchantProductsHidden") : translate("merchantProductsVisible")}
+          tone={offer.is_merchant_hidden ? "neutral" : "accent"}
+        />
+      </View>
+
+      <View style={styles.productInfo}>
+        <UiText style={[styles.productName, { color: theme.colors.foreground }]} numberOfLines={2}>
+          {offer.product.name}
+        </UiText>
+        {offer.product.brand ? (
+          <UiText style={[styles.productBrand, { color: theme.colors.muted }]} numberOfLines={1}>
+            {offer.product.brand}
           </UiText>
-          {offer.product.brand ? (
-            <UiText style={[styles.productBrand, { color: theme.colors.muted }]} numberOfLines={1}>
-              {offer.product.brand}
-            </UiText>
-          ) : null}
-          <View style={styles.badgeRow}>
-            <MerchantStatusBadge
-              label={inventoryLabel}
-              tone={inventoryLevel === "out" ? "danger" : inventoryLevel === "low" ? "warning" : "success"}
-            />
-            <MerchantStatusBadge
-              label={offer.is_merchant_hidden ? translate("merchantProductsHidden") : translate("merchantProductsVisible")}
-              tone={offer.is_merchant_hidden ? "neutral" : "accent"}
-            />
-          </View>
-          <PriceDisplay value={formatDZD(offer.price)} />
-        </View>
+        ) : null}
+        <PriceDisplay value={formatDZD(offer.price)} />
       </View>
 
       <View style={styles.inputsRow}>
         <View style={styles.inputGroup}>
           <UiText style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsPriceLabel")}</UiText>
-          <TextField value={price} onChangeText={setPrice} keyboardType="number-pad" editable={!anyBusy} accessibilityLabel={translate("merchantProductsPriceLabel")} style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]} />
+          <TextField
+            value={price}
+            onChangeText={setPrice}
+            keyboardType="number-pad"
+            editable={!anyBusy}
+            accessibilityLabel={translate("merchantProductsPriceLabel")}
+            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+          />
         </View>
         <View style={styles.inputGroup}>
           <UiText style={[styles.inputLabel, { color: theme.colors.muted }]}>{translate("merchantProductsStockLabel")}</UiText>
-          <TextField value={stock} onChangeText={setStock} keyboardType="number-pad" editable={!anyBusy} accessibilityLabel={translate("merchantProductsStockLabel")} style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]} />
+          <TextField
+            value={stock}
+            onChangeText={setStock}
+            keyboardType="number-pad"
+            editable={!anyBusy}
+            accessibilityLabel={translate("merchantProductsStockLabel")}
+            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+          />
           <UiText style={[styles.stockHint, { color: theme.colors.subtle }]}>
             {translate("merchantProductsStockHint")}
           </UiText>
         </View>
       </View>
 
+      <Button
+        label={translate("merchantProductsSave")}
+        onPress={() => onSave(price, stock)}
+        loading={busy}
+        disabled={anyBusy}
+        fullWidth
+      />
       <View style={styles.actionsRow}>
-        <Button label={translate("merchantProductsSave")} onPress={() => onSave(price, stock)} loading={busy} disabled={anyBusy} fullWidth style={{ flex: 1 }} />
         <Button
           label={offer.is_merchant_hidden ? translate("merchantProductsShow") : translate("merchantProductsHide")}
           onPress={onToggleVisibility}
           disabled={anyBusy}
           variant="outline"
           size="sm"
-          style={{ minWidth: 104 }}
+          fullWidth
+          style={{ flex: 1 }}
+        />
+        <Button
+          label={translate("merchantProductEditOpen")}
+          onPress={onEdit}
+          disabled={anyBusy}
+          variant="ghost"
+          size="sm"
+          fullWidth
+          style={{ flex: 1 }}
         />
       </View>
-
-      <Button label={translate("merchantProductEditOpen")} onPress={onEdit} disabled={anyBusy} variant="ghost" size="sm" fullWidth />
 
       <MediaViewer
         visible={galleryOpen}
@@ -398,10 +432,10 @@ function createStyles(theme: AppTheme) {
     emptyCard: { gap: designTokens.spacing.sm, alignItems: "flex-start" },
     emptyTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     emptyHint: { fontSize: designTokens.typography.caption, lineHeight: 18, textAlign: "auto" },
-    offerList: { gap: designTokens.spacing.md },
-    offerCard: { padding: 13, gap: designTokens.spacing.lg },
-    productHeader: { flexDirection: "row", alignItems: "flex-start", gap: 11 },
-    productImage: { width: 76, height: 76, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+    offerGrid: { flexDirection: "row", flexWrap: "wrap", alignItems: "flex-start", gap: designTokens.spacing.md },
+    offerGridItem: { flexBasis: "47%", flexGrow: 1, maxWidth: "50%", minWidth: 0 },
+    offerCard: { padding: designTokens.spacing.sm, gap: designTokens.spacing.sm },
+    productImage: { width: "100%", aspectRatio: 1, borderRadius: designTokens.radius.md, overflow: "hidden", alignItems: "center", justifyContent: "center" },
     image: { width: "100%", height: "100%" },
     galleryOverlay: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg },
     galleryCard: { borderWidth: 1, borderRadius: designTokens.radius.md, padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
@@ -411,16 +445,16 @@ function createStyles(theme: AppTheme) {
     galleryImages: { flexDirection: "row", gap: designTokens.spacing.md, paddingVertical: 4 },
     galleryImage: { width: 260, height: 300, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
     imageFallback: { fontSize: designTokens.typography.title + 2, fontWeight: designTokens.fontWeights.extrabold },
-    productInfo: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    productInfo: { width: "100%", alignItems: "flex-start", gap: designTokens.spacing.xs },
     productName: { width: "100%", fontSize: designTokens.typography.body - 1, lineHeight: 19, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     productBrand: { width: "100%", fontSize: designTokens.typography.caption - 1, textAlign: "auto" },
     badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.xs, marginTop: 2 },
     currentPrice: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, marginTop: 1 },
-    inputsRow: { flexDirection: "row", gap: designTokens.spacing.sm },
+    inputsRow: { flexDirection: "row", gap: designTokens.spacing.xs },
     inputGroup: { flex: 1, gap: designTokens.spacing.xs },
     inputLabel: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
     stockHint: { fontSize: designTokens.typography.caption - 2, lineHeight: 14, textAlign: "auto" },
-    valueInput: { minHeight: 46, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: 11, textAlign: "auto", fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold },
+    valueInput: { minHeight: 42, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.xs, textAlign: "auto", fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     actionsRow: { flexDirection: "row", gap: designTokens.spacing.sm },
     messageContainer: { flex: 1, padding: designTokens.spacing.xxl, justifyContent: "center", alignItems: "center", gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, lineHeight: 21, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" }
