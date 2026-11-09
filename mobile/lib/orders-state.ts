@@ -29,3 +29,7 @@ export function getOrderStatusTone(status: string): "pending" | "success" | "dan
   if (status === "pending" || status === "quoted") return "pending";
   return "muted";
 }
+
+export function formatOrderCode(orderId: string): string {
+  return orderId.replace(/-/g, "").slice(0, 8).toUpperCase();
+}
