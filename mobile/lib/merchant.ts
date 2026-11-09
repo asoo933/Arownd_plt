@@ -237,6 +237,7 @@ const MerchantOrderDetailSchema = z.object({
     full_name: z.string().nullable(),
     phone: z.string().nullable(),
     commune: z.string().nullable(),
+    wilaya_id: z.number().nullable(),
     address_line: z.string().nullable(),
     delivery_type: z.string(),
     payment_method: z.string().nullable(),
@@ -301,7 +302,7 @@ export async function fetchMerchantOrderDetails(
 
   const { data: merchantOrderData, error: merchantOrderError } = await client
     .from("merchant_orders")
-    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(id, name_ar))")
+    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, wilaya_id, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(id, name_ar))")
     .eq("id", merchantOrderId)
     .eq("store_id", storeId)
     .maybeSingle();
