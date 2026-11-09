@@ -12,6 +12,7 @@ import { readCartOptions } from "@/lib/cart-state";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 
 const STEPS = [
   { status: "pending", title: "orderStepPending" as const, hint: "orderStepPendingHint" as const },
@@ -62,7 +63,7 @@ function dateLabel(value: string | null | undefined): string {
 }
 
 export default function OrderDetailsScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
@@ -239,7 +240,7 @@ export default function OrderDetailsScreen() {
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderRecipientTitle")}</UiText>
       <UiText style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</UiText>
-      <UiText style={styles.meta}>{order.wilaya?.name_ar ?? ""} · {order.commune ?? ""}</UiText>
+      <UiText style={styles.meta}>{getLocalizedWilayaLabel(order.wilaya_id ?? 0, order.wilaya?.name_ar ?? "", language)} · {order.commune ?? ""}</UiText>
       {order.delivery_type === "home" && order.address_line ? <UiText style={styles.meta}>{order.address_line}</UiText> : null}
       <UiText style={styles.meta}>{order.phone ?? ""}</UiText>
       <UiText style={styles.meta}>{order.delivery_type === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")}</UiText>
