@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState, StoreTile } from "@/components/customer-ui";
 import { AppHeader, Icon, IconButton, PressableSurface, Text as UiText } from "@/components/ui";
-import { fetchVerifiedStoresByWilaya } from "@/lib/catalog";
+import { fetchStoreDetails, fetchStoreOffers, fetchVerifiedStoresByWilaya } from "@/lib/catalog";
 import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
 import { translate, useLanguage } from "@/lib/i18n";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
@@ -14,6 +14,7 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 export default function StoresScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
   const [selectedWilayaId, setSelectedWilayaId] = useState<number | null>(null);
   const wilayas = useQuery({
     queryKey: ["customer-wilayas"],
@@ -97,7 +98,11 @@ export default function StoresScreen() {
                   commune={store.commune}
                   rating={store.rating}
                   verified={store.is_verified}
-                  onPress={() => router.push({ pathname: "/store/[storeId]", params: { storeId: store.id } })}
+                  onPress={() => {
+                    void queryClient.prefetchQuery({ queryKey: ["customer-store", store.id], queryFn: () => fetchStoreDetails(store.id), staleTime: 60_000 });
+                    void queryClient.prefetchQuery({ queryKey: ["customer-store-offers", store.id], queryFn: () => fetchStoreOffers(store.id), staleTime: 30_000 });
+                    router.push({ pathname: "/store/[storeId]", params: { storeId: store.id } });
+                  }}
                 />
               ))}
             </View>
