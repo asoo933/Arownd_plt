@@ -295,7 +295,7 @@ function OrderStatus({ order }: { order: MerchantDashboardOrder }) {
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
-      <View style={stylesForScreen.center}>
+      <View accessible accessibilityLabel={label} style={stylesForScreen.center}>
         <View style={{ width: "100%", gap: designTokens.spacing.md }}>
           <View style={{ flexDirection: "row", gap: designTokens.spacing.sm }}>
             <MetricCardSkeleton />
