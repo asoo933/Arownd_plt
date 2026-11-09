@@ -32,7 +32,7 @@ import {
 import { translate, useLanguage } from "@/lib/i18n";
 import { getLocalizedMerchantCategoryLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { BottomSheet, AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { BottomSheet, AppHeader, Button, Card, ErrorState, Icon, Image as UiImage, LoadingState, MediaViewer, Spinner, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
 type ProductForm = {
   name: string;
@@ -65,6 +65,7 @@ export default function MerchantNewProductScreen() {
   const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedImages, setSelectedImages] = useState<ImagePickerAsset[]>([]);
+  const [previewImage, setPreviewImage] = useState<{ uri: string } | null>(null);
   const [imagePickerBusy, setImagePickerBusy] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -224,6 +225,92 @@ export default function MerchantNewProductScreen() {
           <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("merchantProductCreateSubtitle")}</UiText>
 
           <Card contentStyle={styles.card}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitles}>
+                <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
+                  {translate("merchantProductImagesLabel")}
+                </UiText>
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
+                  {translate("merchantProductImagesHint")}
+                </UiText>
+              </View>
+              <UiText style={[styles.imageCount, { color: theme.colors.accentMuted }]}>
+                {selectedImages.length}/{PRODUCT_IMAGE_MAX_COUNT}
+              </UiText>
+            </View>
+
+            <View style={styles.imageGrid}>
+              {selectedImages.map((asset) => (
+                <View key={asset.assetId ?? asset.uri} style={styles.imageItem}>
+                  <PressableSurface
+                    accessibilityRole="button"
+                    accessibilityLabel={translate("merchantProductImagesLabel")}
+                    disabled={submitting || imagePickerBusy}
+                    onPress={() => setPreviewImage({ uri: asset.uri })}
+                    style={[styles.imagePreviewPressable, { opacity: submitting || imagePickerBusy ? 0.65 : 1 }]}
+                  >
+                    <UiImage
+                      uri={asset.uri}
+                      accessibilityLabel={translate("merchantProductImagesLabel")}
+                      aspectRatio={1}
+                      style={styles.imagePreview}
+                    />
+                  </PressableSurface>
+                  <PressableSurface
+                    accessibilityRole="button"
+                    accessibilityLabel={translate("merchantProductImageRemove")}
+                    disabled={submitting || imagePickerBusy}
+                    onPress={() => removeProductImage(asset.uri)}
+                    style={[styles.imageRemove, { backgroundColor: theme.colors.danger, opacity: submitting || imagePickerBusy ? 0.55 : 1 }]}
+                    hitSlop={8}
+                  >
+                    <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
+                  </PressableSurface>
+                </View>
+              ))}
+
+              {selectedImages.length < PRODUCT_IMAGE_MAX_COUNT ? (
+                <PressableSurface
+                  accessibilityRole="button"
+                  accessibilityLabel={translate("merchantProductImagesChoose")}
+                  accessibilityState={{ disabled: submitting || imagePickerBusy, busy: imagePickerBusy }}
+                  disabled={imagePickerBusy || submitting}
+                  onPress={() => void pickProductImages()}
+                  style={[
+                    styles.imageAddItem,
+                    {
+                      borderColor: theme.colors.border,
+                      backgroundColor: theme.colors.surfaceMuted,
+                      opacity: submitting || imagePickerBusy ? 0.55 : 1
+                    }
+                  ]}
+                >
+                  {imagePickerBusy ? (
+                    <Spinner size="small" />
+                  ) : (
+                    <>
+                      <Icon name="plus" size={22} color={theme.colors.accentMuted} accessibilityHidden />
+                      <UiText style={[styles.imageAddText, { color: theme.colors.accentMuted }]}>
+                        {translate("merchantProductImagesChoose")}
+                      </UiText>
+                    </>
+                  )}
+                </PressableSurface>
+              ) : null}
+            </View>
+            {selectedImages.length === 0 ? (
+              <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
+                {translate("merchantProductImagesEmpty")}
+              </UiText>
+            ) : null}
+            {imageError ? (
+              <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
+                <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{imageError}</UiText>
+              </View>
+            ) : null}
+          </Card>
+
+          <Card contentStyle={styles.card}>
             <FormField label={translate("merchantProductNameLabel")} theme={theme}>
               <TextField
                 value={form.name}
@@ -341,55 +428,6 @@ export default function MerchantNewProductScreen() {
               />
             </FormField>
 
-            <FormField
-              label={translate("merchantProductImagesLabel")}
-              hint={translate("merchantProductImagesHint")}
-              theme={theme}
-            >
-              <PressableSurface
-                accessibilityRole="button"
-                accessibilityLabel={translate("merchantProductImagesChoose")}
-                disabled={imagePickerBusy || submitting || selectedImages.length >= PRODUCT_IMAGE_MAX_COUNT}
-                onPress={() => void pickProductImages()}
-                style={[styles.imagePickerButton, { borderColor: theme.colors.border, backgroundColor: theme.colors.background, opacity: imagePickerBusy ? 0.6 : 1 }]}
-              >
-                {imagePickerBusy ? (
-                  <Spinner size="small" />
-                ) : (
-                  <UiText style={[styles.imagePickerText, { color: theme.colors.accentMuted }]}>
-                    {translate("merchantProductImagesChoose")}
-                  </UiText>
-                )}
-              </PressableSurface>
-              {selectedImages.length > 0 ? (
-                <View style={styles.imageGrid}>
-                  {selectedImages.map((asset) => (
-                    <View key={asset.assetId ?? asset.uri} style={styles.imageItem}>
-                      <UiImage uri={asset.uri} accessibilityLabel={translate("merchantProductImagesLabel")} aspectRatio={1} style={styles.imagePreview} />
-                      <PressableSurface
-                        accessibilityRole="button"
-                        accessibilityLabel={translate("merchantProductImageRemove")}
-                        onPress={() => removeProductImage(asset.uri)}
-                        style={[styles.imageRemove, { backgroundColor: theme.colors.danger }]}
-                        hitSlop={8}
-                      >
-                        <Icon name="x" color={designTokens.brand.white} size={15} accessibilityHidden />
-                      </PressableSurface>
-                    </View>
-                  ))}
-                </View>
-              ) : (
-                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>
-                  {translate("merchantProductImagesEmpty")}
-                </UiText>
-              )}
-            </FormField>
-
-            {imageError ? (
-              <View style={[styles.errorBox, { backgroundColor: theme.colors.dangerSurface, borderColor: theme.colors.dangerBorder }]}>
-                <UiText style={[styles.errorText, { color: theme.colors.danger }]}>{imageError}</UiText>
-              </View>
-            ) : null}
 
             <View style={[styles.note, { backgroundColor: theme.colors.surfaceMuted }]}>
               <UiText style={[styles.noteText, { color: theme.colors.muted }]}>
@@ -407,6 +445,22 @@ export default function MerchantNewProductScreen() {
           </Card>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <MediaViewer
+        visible={previewImage !== null}
+        onRequestClose={() => setPreviewImage(null)}
+        closeLabel={translate("merchantProductCategoryClose")}
+      >
+        {previewImage ? (
+          <UiImage
+            uri={previewImage.uri}
+            accessibilityLabel={translate("merchantProductImagesLabel")}
+            aspectRatio={1}
+            resizeMode="contain"
+            style={styles.fullscreenImage}
+          />
+        ) : null}
+      </MediaViewer>
 
       <BottomSheet visible={categoryPickerOpen} onRequestClose={() => setCategoryPickerOpen(false)} maxHeight="85%">
             <View style={styles.modalHeader}>
@@ -583,12 +637,18 @@ function createStyles(theme: AppTheme) {
     selectButton: { minHeight: 47, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, justifyContent: "center" },
     selectText: { fontSize: designTokens.typography.caption + 1, textAlign: "auto", fontWeight: designTokens.fontWeights.bold },
     note: { borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
-    imagePickerButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderStyle: "dashed", borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
-    imagePickerText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
-    imageGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm },
-    imageItem: { width: 88, height: 88, borderRadius: designTokens.radius.sm, overflow: "visible" },
-    imagePreview: { width: 88, height: 88, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
-    imageRemove: { position: "absolute", top: -7, end: -7, width: 25, height: 25, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
+    sectionHeader: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: designTokens.spacing.sm },
+    sectionTitles: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
+    sectionTitle: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+    imageCount: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+    imageGrid: { flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md },
+    imageItem: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "visible" },
+    imagePreview: { width: 94, height: 94, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.surfaceMuted },
+    imagePreviewPressable: { width: 94, height: 94, borderRadius: designTokens.radius.sm, overflow: "hidden" },
+    imageAddItem: { width: 94, height: 94, borderWidth: 1, borderStyle: "dashed", borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.xs, padding: designTokens.spacing.xs },
+    imageAddText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
+    fullscreenImage: { width: "100%", maxHeight: 520, borderRadius: designTokens.radius.md },
+    imageRemove: { position: "absolute", top: -7, end: -7, width: 26, height: 26, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     imageRemoveText: { color: designTokens.brand.white, fontSize: 19, lineHeight: 22, fontWeight: designTokens.fontWeights.extrabold },
     noteText: { fontSize: designTokens.typography.caption - 1, lineHeight: 16, textAlign: "auto" },
     errorBox: { borderWidth: 1, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md },
