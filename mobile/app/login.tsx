@@ -9,9 +9,10 @@ import { Text as UiText } from "@/components/ui";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { signIn } from "@/lib/auth-service";
 import { loginSchema, type LoginInput } from "@/lib/auth-validation";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 
 export default function LoginScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const [serverError, setServerError] = useState<string | null>(null);
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginInput>({
@@ -87,7 +88,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   form: { gap: designTokens.spacing.lg },
   forgotRow: { alignItems: "flex-start" },
-  signupRow: { flexDirection: "row-reverse", justifyContent: "center", alignItems: "center", gap: designTokens.spacing.xs, marginTop: 4 },
+  signupRow: { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: designTokens.spacing.xs, marginTop: 4 },
   secondaryText: { fontSize: designTokens.typography.body - 1 },
   link: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold }
 });

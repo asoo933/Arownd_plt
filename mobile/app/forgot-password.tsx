@@ -8,9 +8,10 @@ import { designTokens } from "@/lib/theme";
 import { ActionButton, AuthField, AuthLayout, FormError, InlineLink, SuccessPanel } from "@/components/auth-ui";
 import { requestPasswordRecovery } from "@/lib/auth-service";
 import { recoverySchema, type RecoveryInput } from "@/lib/auth-validation";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 
 export default function ForgotPasswordScreen() {
+  useLanguage();
   const [serverError, setServerError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<RecoveryInput>({

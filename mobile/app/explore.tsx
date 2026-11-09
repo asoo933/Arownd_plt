@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, CustomerSearch, EmptyState, ErrorState, LoadingState, ProductTile, SectionTitle } from "@/components/customer-ui";
 import { fetchHomeProducts, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Icon, IconButton, PressableSurface, Text as UiText } from "@/components/ui";
 
@@ -19,6 +19,7 @@ const categories = [
 ] as const;
 
 export default function ExploreScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const params = useLocalSearchParams<{ q?: string; category?: string }>();
   const initialQuery = typeof params.q === "string" ? params.q : "";
@@ -111,12 +112,12 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.sm },
+  header: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   search: { flex: 1 },
-  subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "right" },
-  categoryRail: { flexDirection: "row-reverse", gap: designTokens.spacing.sm },
+  subtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" },
+  categoryRail: { flexDirection: "row", gap: designTokens.spacing.sm },
   category: { width: 112, minHeight: 88, borderWidth: 1, borderRadius: designTokens.radius.lg, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, padding: designTokens.spacing.sm },
   categoryLabel: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
-  grid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: designTokens.spacing.md },
   footer: { fontSize: designTokens.typography.caption, textAlign: "center", padding: designTokens.spacing.lg }
 });

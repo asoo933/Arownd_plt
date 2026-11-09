@@ -28,11 +28,12 @@ import {
 import { chooseBestProductOffer, fetchProductOffers, fetchStoreDetails, formatDZD, getPrimaryImage } from "@/lib/catalog";
 import { getFavorites } from "@/lib/favorites";
 import type { FavoriteKind } from "@/lib/favorites-state";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 
 type FavoriteTab = FavoriteKind;
 
 export default function FavoritesScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const styles = createStyles(theme);
   const [tab, setTab] = useState<FavoriteTab>("products");
@@ -160,7 +161,7 @@ export default function FavoritesScreen() {
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     productGrid: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
       gap: designTokens.spacing.md
@@ -182,7 +183,7 @@ function createStyles(theme: AppTheme) {
       borderRadius: designTokens.radius.xl
     },
     storeContent: {
-      flexDirection: "row-reverse",
+      flexDirection: "row",
       alignItems: "center",
       gap: designTokens.spacing.md,
       padding: designTokens.spacing.md
@@ -190,7 +191,7 @@ function createStyles(theme: AppTheme) {
     storeInfo: {
       flex: 1,
       minWidth: 0,
-      alignItems: "flex-end",
+      alignItems: "flex-start",
       gap: designTokens.spacing.xs
     },
     storeLogo: {

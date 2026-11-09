@@ -13,11 +13,12 @@ import {
   StoreTile
 } from "@/components/customer-ui";
 import { fetchFeaturedStores, fetchHomeProducts, formatDZD, getPrimaryImage } from "@/lib/catalog";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 
 export default function CustomerHomeScreen() {
+  useLanguage();
   const theme = useAppTheme();
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
@@ -97,8 +98,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  location: { flexDirection: "row-reverse", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, minHeight: designTokens.dimensions.controlHeight.sm },
+  location: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, minHeight: designTokens.dimensions.controlHeight.sm },
   locationText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-  productRail: { flexDirection: "row-reverse", gap: designTokens.spacing.md },
+  productRail: { flexDirection: "row", gap: designTokens.spacing.md },
   storeList: { gap: designTokens.spacing.sm }
 });
