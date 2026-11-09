@@ -87,10 +87,10 @@ export function StatusBadge({
 }) {
   const theme = useAppTheme();
   const palette = {
-    neutral: { backgroundColor: theme.colors.surfaceMuted, color: theme.colors.muted },
-    success: { backgroundColor: theme.colors.successSurface, color: theme.colors.success },
-    warning: { backgroundColor: theme.colors.warningSurface, color: theme.colors.warning },
-    danger: { backgroundColor: theme.colors.dangerSurface, color: theme.colors.danger },
+    neutral: { backgroundColor: theme.colors.surfaceMuted, color: theme.colors.subtle },
+    success: { backgroundColor: theme.colors.successSurface, color: theme.colors.successText },
+    warning: { backgroundColor: theme.colors.warningSurface, color: theme.colors.warningText },
+    danger: { backgroundColor: theme.colors.dangerSurface, color: theme.colors.dangerText },
     accent: { backgroundColor: theme.colors.accent, color: theme.colors.accentForeground }
   } satisfies Record<StatusBadgeTone, { backgroundColor: string; color: string }>;
   const colors = palette[tone];
