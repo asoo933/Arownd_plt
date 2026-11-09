@@ -103,7 +103,7 @@ export function StatusBadge({
     success: { backgroundColor: theme.colors.successSurface, color: theme.colors.successText },
     warning: { backgroundColor: theme.colors.warningSurface, color: theme.colors.warningText },
     danger: { backgroundColor: theme.colors.dangerSurface, color: theme.colors.dangerText },
-    accent: { backgroundColor: theme.colors.accent, color: theme.colors.accentForeground }
+    accent: { backgroundColor: theme.mode === "light" ? theme.colors.accent : "transparent", color: theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground }
   } satisfies Record<StatusBadgeTone, { backgroundColor: string; color: string }>;
   const colors = palette[tone];
 
