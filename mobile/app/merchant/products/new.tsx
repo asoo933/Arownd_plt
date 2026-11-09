@@ -231,7 +231,7 @@ export default function MerchantNewProductScreen() {
                 placeholder={translate("merchantProductNamePlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={120}
-                textAlign="right"
+                textAlign="auto"
                 style={styles.input}
                 returnKeyType="next"
               />
@@ -289,7 +289,7 @@ export default function MerchantNewProductScreen() {
                 placeholder={translate("merchantProductBrandPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={80}
-                textAlign="right"
+                textAlign="auto"
                 style={styles.input}
               />
             </FormField>
@@ -306,7 +306,7 @@ export default function MerchantNewProductScreen() {
                 placeholder={translate("merchantProductSizesPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={850}
-                textAlign="right"
+                textAlign="auto"
                 style={styles.input}
               />
             </FormField>
@@ -319,7 +319,7 @@ export default function MerchantNewProductScreen() {
                 placeholder={translate("merchantProductColorsPlaceholder")}
                 placeholderTextColor={theme.colors.placeholder}
                 maxLength={850}
-                textAlign="right"
+                textAlign="auto"
                 style={styles.input}
               />
             </FormField>
@@ -334,7 +334,7 @@ export default function MerchantNewProductScreen() {
                 maxLength={3000}
                 multiline
                 numberOfLines={5}
-                textAlign="right"
+                textAlign="auto"
                 textAlignVertical="top"
                 style={[styles.input, styles.textarea]}
               />
