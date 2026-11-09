@@ -145,7 +145,7 @@ export default function OrderDetailsScreen() {
   const orderCode = order.id.replace(/-/g, "").slice(0, 8).toUpperCase();
 
   return <CustomerScreen>
-    <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="arrow-right" size={22} color={theme.colors.foreground} />} />} />
+    <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersCode") + ": " + orderCode}</UiText>
 
     <View style={[styles.panel, { backgroundColor: theme.colors.surface }]}>
