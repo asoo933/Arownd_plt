@@ -2,12 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { Avatar, Icon, PressableSurface, Text as UiText } from "@/components/ui";
+import { Avatar, Icon, PressableSurface, Skeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 import {
   CustomerScreen,
   EmptyState,
   ErrorState,
-  LoadingState,
   ProductTile,
   SectionTitle
 } from "@/components/customer-ui";
@@ -61,7 +60,16 @@ export default function CustomerHomeScreen() {
 
       <View>
         <SectionTitle title={translate("homeFeaturedStores")} />
-        {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
+        {stores.isPending ? (
+          <View style={styles.storeTrack}>
+            {[0, 1, 2, 3].map((item) => (
+              <View key={item} style={styles.storeTile}>
+                <Skeleton width={STORE_AVATAR_SIZE} height={STORE_AVATAR_SIZE} radius={designTokens.radius.pill} />
+                <Skeleton width={68} height={10} />
+              </View>
+            ))}
+          </View>
+        ) : stores.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={stores.isFetching} onRetry={() => void stores.refetch()} />
         ) : stores.data.length === 0 ? (
           <EmptyState icon="store" title={translate("homeNoStores")} hint={translate("homeNoStoresHint")} />
@@ -83,7 +91,11 @@ export default function CustomerHomeScreen() {
 
       <View>
         <SectionTitle title={translate("homeNewArrivals")} />
-        {products.isPending ? <LoadingState label={translate("stateLoading")} /> : products.isError ? (
+        {products.isPending ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productRail}>
+            {[0, 1, 2].map((item) => <ProductCardSkeleton key={item} style={{ width: 156, flex: 0 }} />)}
+          </ScrollView>
+        ) : products.isError ? (
           <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={products.isFetching} onRetry={() => void products.refetch()} />
         ) : products.data.length === 0 ? (
           <EmptyState icon="package" title={translate("homeNoProducts")} hint={translate("homeNoProductsHint")} />
