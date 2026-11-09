@@ -71,7 +71,7 @@ export default function DeliveryProfileScreen() {
   if (profile.isError || wilayas.isError) {
     return <CustomerScreen>
       <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />} />
-      <ErrorState title={translate("deliveryProfileLoadError")} retryLabel={translate("retry")} onRetry={() => { void profile.refetch(); void wilayas.refetch(); }} />
+      <ErrorState title={translate("deliveryProfileLoadError")} retryLabel={translate("retry")} busy={profile.isFetching || wilayas.isFetching} onRetry={() => { void profile.refetch(); void wilayas.refetch(); }} />
     </CustomerScreen>;
   }
 
