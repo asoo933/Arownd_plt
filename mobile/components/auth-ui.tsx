@@ -44,9 +44,9 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
               <IconButton
                 accessibilityLabel={translate("back")}
                 onPress={() => router.back()}
-                icon={<Icon name="chevron-left" color={theme.colors.foreground} size={22} />}
+                icon={<Icon name="chevron-left" color={theme.colors.foreground} size={designTokens.dimensions.iconSize.md} />}
                 variant="surface"
-                size={44}
+                size={designTokens.dimensions.controlHeight.md}
               />
             ) : <View style={styles.backPlaceholder} />}
             <UiText weight="900" align="center" style={styles.brand}>arownd</UiText>
@@ -132,14 +132,25 @@ const styles = StyleSheet.create({
     paddingTop: designTokens.spacing.md,
     paddingBottom: designTokens.spacing.xxl
   },
-  header: { minHeight: 48, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  brand: { fontSize: 24, letterSpacing: -1 },
-  backPlaceholder: { width: 44, height: 44 },
-  hero: { marginTop: 38, marginBottom: 28, alignItems: "flex-start" },
+  header: {
+    minHeight: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  brand: { fontSize: designTokens.typography.title },
+  backPlaceholder: {
+    width: designTokens.dimensions.controlHeight.md,
+    height: designTokens.dimensions.controlHeight.md
+  },
+  hero: {
+    marginTop: designTokens.spacing.xxl + designTokens.spacing.sm,
+    marginBottom: designTokens.spacing.xxl,
+    alignItems: "flex-start"
+  },
   eyebrow: { marginBottom: designTokens.spacing.md },
-  title: { lineHeight: 39 },
-  subtitle: { lineHeight: 25, textAlign: "auto", marginTop: designTokens.spacing.sm },
-  content: { gap: 18 },
-  link: { fontSize: 13 },
-  footer: { marginTop: "auto", paddingTop: 28, lineHeight: 19 }
+  subtitle: { textAlign: "auto", marginTop: designTokens.spacing.sm },
+  content: { gap: designTokens.spacing.lg },
+  link: { fontSize: designTokens.typography.caption + 2 },
+  footer: { marginTop: "auto", paddingTop: designTokens.spacing.xxl }
 });
