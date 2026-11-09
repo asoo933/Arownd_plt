@@ -66,7 +66,7 @@ export default function StoresScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}
                   onPress={() => setSelectedWilayaId(wilaya.id)}
-                  style={[styles.wilayaRow, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                  style={[styles.wilayaRow, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderColor: theme.colors.border, borderWidth: theme.mode === "light" ? 0 : 1 }]}
                 >
                   <View style={styles.wilayaNumber}>
                     <UiText weight="700" style={{ color: theme.colors.accentMuted }}>{String(wilaya.id).padStart(2, "0")}</UiText>
