@@ -9,17 +9,20 @@ import {
   Button,
   Card,
   CartItem,
+  CartSummary,
+  Caption,
   Icon,
   IconButton,
   Image as UiImage,
   PressableSurface,
+  PriceText,
   QuantityStepper,
   Text as UiText
 } from "@/components/ui";
 import { fetchOffersByIds, formatDZD, formatNumber, getPrimaryImage } from "@/lib/catalog";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem as CartLine } from "@/lib/cart-state";
-import {  translate, useLanguage } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function CartScreen() {
@@ -73,7 +76,7 @@ export default function CartScreen() {
   return <CustomerScreen>
     <AppHeader
       title={translate("cartTitle")}
-      trailing={<UiText tone="muted" style={{ fontSize: designTokens.typography.caption + 1 }}>{translate("cartItemsCount") + formatNumber(cart.data.reduce((sum, item) => sum + item.quantity, 0))}</UiText>}
+      trailing={<Caption style={style.itemCount}>{translate("cartItemsCount") + formatNumber(cart.data.reduce((sum, item) => sum + item.quantity, 0))}</Caption>}
     />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
@@ -100,10 +103,10 @@ export default function CartScreen() {
               <View style={style.thumb}>{image ? <UiImage uri={image} accessibilityLabel={offer?.product.name ?? item.name ?? ""} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={28} color={theme.colors.subtle} accessibilityHidden />}</View>
               <View style={style.details}>
                 <UiText weight="800" style={style.name}>{offer?.product.name ?? item.name}</UiText>
-                <UiText tone="muted" style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</UiText>
-                {line?.issues.map((issue) => <UiText key={issue} tone="warning" style={[style.issue, issue === "priceChanged" && style.priceIssue]}>{issueLabels[issue]}</UiText>)}
-                <UiText tone="accentMuted" weight="900" style={style.price}>{formatDZD(currentPrice * item.quantity)}</UiText>
-                {item.quantity > 1 ? <UiText tone="muted" style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</UiText> : null}
+                <Caption style={style.options}>{Object.entries(normalizeCartOptions(item.options)).map(([optionName, value]) => (optionName === "size" ? translate("productSizeOption") : optionName === "color" ? translate("productColorOption") : optionName) + ": " + value).join(" · ")}</Caption>
+                {line?.issues.map((issue) => <Caption key={issue} tone="warning" weight="700" style={style.issue}>{issueLabels[issue]}</Caption>)}
+                <PriceText value={formatDZD(currentPrice * item.quantity)} tone="accentMuted" style={style.price} />
+                {item.quantity > 1 ? <Caption style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Caption> : null}
               </View>
             </PressableSurface>
             <View style={style.controls}>
@@ -123,41 +126,43 @@ export default function CartScreen() {
                 icon={<Icon name="trash-2" size={19} color={theme.colors.danger} accessibilityHidden />}
               />
             </View>
-            {blocking ? <UiText tone="danger" style={style.blockedHint}>{translate("cartLineBlocked")}</UiText> : null}
+            {blocking ? <Caption tone="danger" style={style.blockedHint}>{translate("cartLineBlocked")}</Caption> : null}
           </View>
         </CartItem>;
       })}
     </Card>)}
-    <Card style={style.summary} contentStyle={style.summaryContent}>
-      <View style={style.summaryRow}><UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText><UiText tone="accentMuted" weight="900" style={style.total}>{offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)}</UiText></View>
-      <UiText tone="muted" style={style.note}>{translate("cartDeliveryNote")}</UiText>
+    <CartSummary style={style.summaryContent}>
+      <View style={style.summaryRow}>
+        <UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText>
+        <PriceText value={offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)} tone="accentMuted" style={style.total} />
+      </View>
+      <Caption style={style.note}>{translate("cartDeliveryNote")}</Caption>
       <Button
         label={translate("cartCheckout")}
         onPress={() => router.push("/checkout")}
         disabled={offers.isPending || offers.isError || evaluation.blockingCount > 0}
         fullWidth
       />
-    </Card>
+    </CartSummary>
   </CustomerScreen>;
 }
 
 const styles = (theme: ReturnType<typeof useAppTheme>) => StyleSheet.create({
   group: { backgroundColor: theme.colors.surface },
   groupContent: { padding: designTokens.spacing.md, gap: designTokens.spacing.md },
+  itemCount: { fontSize: designTokens.typography.caption + 1 },
   store: { fontSize: designTokens.typography.body - 1, textAlign: "auto" },
   line: { paddingVertical: 0 },
   itemContent: { flex: 1, gap: designTokens.spacing.sm },
   lineMain: { flexDirection: "row", gap: designTokens.spacing.md },
-  thumb: { width: 76, height: 76, borderRadius: 13, backgroundColor: theme.colors.surfaceMuted, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  thumb: { width: 76, height: 76, borderRadius: designTokens.radius.md, backgroundColor: theme.colors.surfaceMuted, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   details: { flex: 1, alignItems: "flex-start", gap: designTokens.spacing.xs },
   name: { fontSize: designTokens.typography.body - 1, textAlign: "auto" },
   options: { fontSize: designTokens.typography.caption, textAlign: "auto" },
-  issue: { color: theme.colors.warning, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
-  priceIssue: { color: theme.colors.warning },
+  issue: { textAlign: "auto" },
   price: { fontSize: designTokens.typography.body - 1 },
   controls: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm },
-  blockedHint: { fontSize: designTokens.typography.caption, textAlign: "auto" },
-  summary: { backgroundColor: theme.colors.surface },
+  blockedHint: { textAlign: "auto" },
   summaryContent: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   summaryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   summaryLabel: { fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
