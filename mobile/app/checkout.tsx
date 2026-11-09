@@ -244,7 +244,7 @@ export default function CheckoutScreen() {
       <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setFullName(value); }} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={120} />
       <UiText style={styles.fieldLabel}>{translate("checkoutPhoneLabel")}</UiText>
       <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setPhone(value); }} placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" keyboardType="phone-pad" maxLength={20} />
-    </View>
+    </Card>
 
     <Card style={styles.sectionCard} contentStyle={styles.section}>
       <UiText style={styles.sectionTitle}>{translate("checkoutDeliveryTitle")}</UiText>
@@ -286,7 +286,7 @@ export default function CheckoutScreen() {
           accessibilityRole="radio"
           accessibilityLabel={translate("checkoutHomeDelivery")}
           accessibilityState={{ selected: deliveryType === "home" }}
-          onPress={() => { setFormEdited(true); setDeliveryType("home"); }}
+          onPress={() => setDeliveryType("home")}
           style={[styles.deliveryOption, deliveryType === "home" && styles.deliverySelected]}
         >
           <UiText style={[styles.deliveryTitle, deliveryType === "home" && styles.deliveryTextSelected]}>{translate("checkoutHomeDelivery")}</UiText>
@@ -296,7 +296,7 @@ export default function CheckoutScreen() {
           accessibilityRole="radio"
           accessibilityLabel={translate("checkoutStorePickup")}
           accessibilityState={{ selected: deliveryType === "desk" }}
-          onPress={() => { setFormEdited(true); setDeliveryType("desk"); }}
+          onPress={() => setDeliveryType("desk")}
           style={[styles.deliveryOption, deliveryType === "desk" && styles.deliverySelected]}
         >
           <UiText style={[styles.deliveryTitle, deliveryType === "desk" && styles.deliveryTextSelected]}>{translate("checkoutStorePickup")}</UiText>
