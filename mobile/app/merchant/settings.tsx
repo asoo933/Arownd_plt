@@ -41,10 +41,11 @@ export default function MerchantStoreSettingsScreen() {
   const mutation = useMutation({
     mutationFn: (values: MerchantStoreSettings) => updateMyMerchantStoreSettings(storeId ?? "", values),
     onSuccess: async (_data, values) => {
-      setForm(values);
-      setFormDirty(false);
       await queryClient.invalidateQueries({ queryKey: ["merchant-store-settings", storeId] });
       await queryClient.invalidateQueries({ queryKey: ["merchant-dashboard", storeId] });
+      const refreshedSettings = queryClient.getQueryData<MerchantStoreSettings>(["merchant-store-settings", storeId]);
+      setForm(refreshedSettings ?? values);
+      setFormDirty(false);
       setFormError(false);
     },
     onError: () => setFormError(true)
