@@ -19,13 +19,13 @@ export function getButtonPalette(theme: AppTheme, variant: ButtonVariant): Butto
     case "outline":
       return {
         backgroundColor: "transparent",
-        foregroundColor: theme.colors.foreground,
+        foregroundColor: theme.mode === "dark" ? theme.colors.accent : theme.colors.foreground,
         borderColor: theme.colors.border
       };
     case "ghost":
       return {
         backgroundColor: "transparent",
-        foregroundColor: theme.colors.foreground
+        foregroundColor: theme.mode === "dark" ? theme.colors.accent : theme.colors.foreground
       };
     case "danger":
       return {
