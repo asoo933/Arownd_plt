@@ -76,7 +76,7 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
             multiline
             maxLength={1000}
             placeholder={translate("reviewsCommentPlaceholder")}
-            textAlign="right"
+            textAlign="auto"
             style={[styles.input, { color: theme.colors.foreground, borderColor: theme.colors.border }]}
           />
           <Button
