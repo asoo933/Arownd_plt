@@ -261,7 +261,7 @@ export default function MerchantStoreSettingsScreen() {
         </View>
         <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
           {(wilayas.data ?? []).map((wilaya) => (
-            <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? theme.colors.surfaceMuted : "transparent" }]}>
+            <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted) : "transparent" }]}>
               <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}</UiText>
             </PressableSurface>
           ))}
