@@ -31,6 +31,8 @@ export default function StoreDetailsScreen() {
     enabled: Boolean(storeId) && tab === "products"
   });
 
+  if (!storeId) return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("storeNoDescription")} /></CustomerScreen>;
+
   if (store.isPending) return <CustomerScreen>
     <AppHeader title="" leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />} />
     <StoreCardSkeleton />
