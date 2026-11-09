@@ -331,7 +331,7 @@ function createStyles(theme: AppTheme) {
     wilayaText: { textAlign: "auto", fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.bold },
     field: { gap: designTokens.spacing.xs, flex: 1 },
     label: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
-    input: { minHeight: 47, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body - 1 },
+    input: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.md, fontSize: designTokens.typography.body - 1 },
     textarea: { minHeight: 92, paddingTop: 12 },
     row: { flexDirection: "row", gap: designTokens.spacing.md },
     half: { flex: 1 },
