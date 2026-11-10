@@ -137,7 +137,7 @@ function RootLayoutContent() {
                 if (error) console.warn("[push-notifications] Could not sync the notification language", error);
               });
             }
-            if (!pushTokenSubscription) {
+            if (Platform.OS === "android" && !pushTokenSubscription) {
               pushTokenSubscription = listenForPushTokenChanges();
             }
             void registerDeviceForPushNotifications(language).catch((error: unknown) => {
