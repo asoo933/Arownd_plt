@@ -26,12 +26,12 @@ async function persistDeviceToken(token: string): Promise<void> {
   await AsyncStorage.setItem(DEVICE_TOKEN_STORAGE_KEY, token);
 }
 
-export async function registerDeviceForPushNotifications(): Promise<void> {
+export async function registerDeviceForPushNotifications(language: "ar" | "en"): Promise<void> {
   if (Platform.OS !== "android" && Platform.OS !== "ios") return;
 
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
-      name: "تحديثات Arownd",
+      name: language === "ar" ? "تحديثات Arownd" : "Arownd updates",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: "#FFF01F"
