@@ -18,20 +18,26 @@ export type CartFlyRequest = {
 type CartFlyListener = (request: CartFlyRequest) => void;
 
 let cartTarget: CartFlyTarget | null = null;
-let pendingRequest: CartFlyRequest | null = null;
+let pendingRequests: CartFlyRequest[] = [];
 const listeners = new Set<CartFlyListener>();
 
 function notifyListeners(request: CartFlyRequest): void {
   listeners.forEach((listener) => listener(request));
 }
 
+function flushPendingRequests(): void {
+  if (!cartTarget || listeners.size === 0) return;
+
+  while (pendingRequests.length > 0) {
+    const request = pendingRequests.shift();
+    if (request) notifyListeners(request);
+  }
+}
+
 export function registerCartFlyTarget(target: CartFlyTarget): () => void {
   cartTarget = target;
-  if (pendingRequest && listeners.size > 0) {
-    const request = pendingRequest;
-    pendingRequest = null;
-    notifyListeners(request);
-  }
+  flushPendingRequests();
+
   return () => {
     if (cartTarget === target) cartTarget = null;
   };
@@ -43,11 +49,8 @@ export function getCartFlyTarget(): CartFlyTarget | null {
 
 export function subscribeCartFly(listener: CartFlyListener): () => void {
   listeners.add(listener);
-  if (cartTarget && pendingRequest) {
-    const request = pendingRequest;
-    pendingRequest = null;
-    listener(request);
-  }
+  flushPendingRequests();
+
   return () => {
     listeners.delete(listener);
   };
@@ -55,8 +58,9 @@ export function subscribeCartFly(listener: CartFlyListener): () => void {
 
 export function emitCartFly(request: CartFlyRequest): void {
   if (!cartTarget || listeners.size === 0) {
-    pendingRequest = request;
+    pendingRequests.push(request);
     return;
   }
+
   notifyListeners(request);
 }
