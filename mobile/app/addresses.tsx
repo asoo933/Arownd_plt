@@ -305,15 +305,17 @@ function SwipeToDelete({
     onMoveShouldSetPanResponder: (_, gesture) =>
       Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2,
     onPanResponderMove: (_, gesture) => {
+      const minOffset = direction === 1 ? 0 : -revealDistance;
+      const maxOffset = direction === 1 ? revealDistance : 0;
       const next = revealed
-        ? direction * revealDistance + Math.min(0, Math.max(-revealDistance, gesture.dx))
-        : Math.min(0, Math.max(-revealDistance, gesture.dx * direction)) * direction;
+        ? Math.min(maxOffset, Math.max(minOffset, direction * revealDistance + gesture.dx))
+        : direction * Math.min(revealDistance, Math.max(0, gesture.dx * direction));
       translateX.setValue(next);
     },
     onPanResponderRelease: (_, gesture) => {
       const shouldReveal = revealed
-        ? direction * gesture.dx > 35
-        : direction * gesture.dx < -55;
+        ? direction * gesture.dx < -35
+        : direction * gesture.dx > 55;
       setRevealed(shouldReveal);
       animateTo(shouldReveal ? direction * revealDistance : 0);
     },
