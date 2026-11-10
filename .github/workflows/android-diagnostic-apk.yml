@@ -3,6 +3,12 @@ name: Arownd Native Android diagnostic APK (Expo)
 # Manual diagnostic build with additional Android lint and unit-test tasks.
 # The automatic preview APK is produced after the mobile quality workflow.
 on:
+  push:
+    branches:
+      - Arownd-native-v2
+    paths:
+      - "mobile/app.json"
+      - "mobile/plugins/with-optional-camera-feature.js"
   workflow_dispatch:
 
 permissions:
