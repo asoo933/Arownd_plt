@@ -349,7 +349,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   secondaryText: { color: theme.colors.accentMuted, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold },
   quoteActions: { flexDirection: "row", gap: designTokens.spacing.sm },
   acceptButton: { flex: 1, minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
-  acceptButtonText: { color: theme.colors.foreground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
+  acceptButtonText: { color: theme.colors.accentForeground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
   declineButton: { flex: 1, minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, borderWidth: 1, borderColor: theme.colors.danger, alignItems: "center", justifyContent: "center" },
   declineButtonText: { color: theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
   cancelButton: { minHeight: designTokens.dimensions.controlHeight.lg, borderRadius: designTokens.radius.sm, borderWidth: 1, borderColor: theme.colors.danger, justifyContent: "center", alignItems: "center" },
