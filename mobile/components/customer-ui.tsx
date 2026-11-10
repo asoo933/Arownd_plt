@@ -91,7 +91,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
       accessibilityLabel={`${name}، ${store}، ${price}`}
       style={[styles.productTile, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }, style]}
       media={
-        <View style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}>
+        <View style={[styles.productImage, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
           {imageUrl ? <UiImage uri={imageUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="image" size={32} color={theme.colors.subtle} accessibilityHidden />}
         </View>
       }
