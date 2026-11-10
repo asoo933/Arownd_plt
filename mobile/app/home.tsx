@@ -48,7 +48,10 @@ export default function CustomerHomeScreen() {
   );
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={stores.isFetching || products.isFetching}
+      onRefresh={() => { void Promise.all([stores.refetch(), products.refetch()]); }}
+    >
       <View style={styles.header}>
         <Logo color={theme.colors.foreground} width={148} />
         <View style={styles.headerActions}>
