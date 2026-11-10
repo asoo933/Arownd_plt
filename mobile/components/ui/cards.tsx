@@ -33,7 +33,7 @@ export function Card({
       elevated={false}
       style={[
         { overflow: "hidden", borderRadius: theme.radius.xl, padding: 0, backgroundColor: theme.colors.surfaceSecondary },
-        style
+        onPress ? undefined : style
       ]}
     >
       {media}
@@ -53,7 +53,10 @@ export function Card({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => ({ opacity: disabled ? 0.5 : pressed ? 0.82 : 1 })}
+      style={({ pressed }) => [
+        style,
+        { opacity: disabled ? 0.5 : pressed ? 0.82 : 1 }
+      ]}
     >
       {content}
     </Pressable>
