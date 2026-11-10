@@ -172,7 +172,7 @@ function RootLayoutContent() {
       const responseId = response.notification.request.identifier;
       if (lastHandledResponseId === responseId) return;
       lastHandledResponseId = responseId;
-      const data = response.notification.request.content.data;
+      const data = response.notification.request.content.data ?? {};
       if (typeof data.notification_id === "string") {
         void markNotificationRead(data.notification_id).catch((error: unknown) => {
           console.warn("[push-notifications] Could not mark the notification as read", error);
