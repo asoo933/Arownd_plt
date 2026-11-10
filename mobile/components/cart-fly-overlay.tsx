@@ -17,8 +17,9 @@ type Flight = {
 export function CartFlyOverlay() {
   const theme = useAppTheme();
   const progress = useRef(new Animated.Value(0)).current;
-  const [flight, setFlight] = useState<Flight | null>(null);
+  const [flights, setFlights] = useState<Flight[]>([]);
   const [reduceMotion, setReduceMotion] = useState(true);
+  const flight = flights[0] ?? null;
 
   useEffect(() => {
     let active = true;
@@ -53,20 +54,29 @@ export function CartFlyOverlay() {
         const destinationCenterX = destination.x + destination.width / 2;
         const destinationCenterY = destination.y + destination.height / 2;
 
-        setFlight({
-          left: sourceCenterX - 22,
-          top: sourceCenterY - 22,
-          translateX: destinationCenterX - sourceCenterX,
-          translateY: destinationCenterY - sourceCenterY,
-          imageUri: request.imageUri,
-          target
-        });
+        setFlights((current) => [
+          ...current,
+          {
+            left: sourceCenterX - 22,
+            top: sourceCenterY - 22,
+            translateX: destinationCenterX - sourceCenterX,
+            translateY: destinationCenterY - sourceCenterY,
+            imageUri: request.imageUri,
+            target
+          }
+        ]);
       });
     });
   }, [reduceMotion]);
 
   useEffect(() => {
     if (!flight) return;
+
+    if (reduceMotion) {
+      flight.target.onArrive();
+      setFlights((current) => current[0] === flight ? current.slice(1) : current);
+      return;
+    }
 
     progress.setValue(0);
     const animation = Animated.timing(progress, {
@@ -78,13 +88,13 @@ export function CartFlyOverlay() {
     animation.start(({ finished }) => {
       if (!finished) return;
       flight.target.onArrive();
-      setFlight(null);
+      setFlights((current) => current[0] === flight ? current.slice(1) : current);
     });
 
     return () => animation.stop();
-  }, [flight, progress]);
+  }, [flight, progress, reduceMotion]);
 
-  if (!flight) return null;
+  if (!flight || reduceMotion) return null;
 
   const translateX = progress.interpolate({
     inputRange: [0, 1],
