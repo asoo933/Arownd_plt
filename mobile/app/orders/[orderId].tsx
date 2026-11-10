@@ -144,7 +144,6 @@ export default function OrderDetailsScreen() {
   if (!order) return <CustomerScreen>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <EmptyState icon="package" title={translate("orderNotFound")} hint={translate("orderNotFoundHint")} />
-    <PressableSurface accessibilityRole="button" accessibilityLabel={translate("ordersTitle")} onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
 
   </CustomerScreen>;
 
