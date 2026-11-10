@@ -294,7 +294,8 @@ These packages provide shared infrastructure; they do not replace Supabase migra
 │   ├── test/                      # Test setup and adapters
 │   ├── app.json                   # Expo configuration
 │   ├── eas.json                   # EAS build profiles
-│   └── package.json               # Mobile scripts/dependencies
+│   ├── package.json               # Independent mobile scripts/dependencies
+│   └── package-lock.json          # Independent npm lockfile
 ├── supabase/
 │   ├── functions/                 # Supabase Edge Functions
 │   ├── migrations/                # Versioned SQL migrations
@@ -302,8 +303,6 @@ These packages provide shared infrastructure; they do not replace Supabase migra
 ├── package.json                  # Root pnpm workspace scripts/version pin
 ├── pnpm-workspace.yaml
 ├── pnpm-lock.yaml                # Backend/shared workspace lockfile
-├── mobile/
-│   └── package-lock.json         # Independent Expo mobile lockfile
 ├── tsconfig.base.json
 └── README.md
 ```
@@ -373,16 +372,22 @@ Use the Supabase **publishable key** in the mobile app. Never put a service-role
 
 ### 2. Install dependencies | تثبيت الاعتماديات
 
-Run from the mobile directory نفّذ من مجلد الهاتف:
+**Root workspace (backend/shared packages only) | Workspace الجذر (حزم الخلفية والمكتبات المشتركة فقط):**
+
+Run from the repository root نفّذ من جذر المستودع:
 
 ```bash
 corepack enable
 pnpm install --frozen-lockfile
 ```
 
-The root workspace install covers `artifacts/*` and `lib/*`; it does not install the independent mobile application. Root workspace scripts include `pnpm run typecheck:libs`, `pnpm run typecheck:api-server`, `pnpm run build:api-server`, and `pnpm run codegen`.
+The root workspace covers `artifacts/*` and `lib/*`; it does not install the independent mobile application. Available root scripts include `pnpm run typecheck:libs`, `pnpm run typecheck:api-server`, `pnpm run build:api-server`, and `pnpm run codegen`.
 
-يثبّت أمر الجذر حزم `artifacts/*` و`lib/*` فقط، ولا يثبت تطبيق الهاتف المستقل. تتضمن أوامر Workspace الجذرية فحص المكتبات وAPI Server وبناءه وتوليد عقود API.
+يغطي Workspace الجذري حزم `artifacts/*` و`lib/*)، ولا يثبت تطبيق الهاتف المستقل. تتضمن أوامر الجذر فحص المكتبات وAPI Server وبناءه وتوليد عقود API.
+
+**Expo mobile application | تطبيق Expo للهاتف:**
+
+Run from `mobile/` نفّذ من داخل مجلد الهاتف:
 
 ```bash
 cd mobile
