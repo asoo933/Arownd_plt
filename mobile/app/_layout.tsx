@@ -177,11 +177,16 @@ function RootLayoutContent() {
           console.warn("[push-notifications] Could not mark the notification as read", error);
         });
       }
-      const destination = typeof data.url === "string" && data.url.startsWith("/") && !data.url.startsWith("//")
-        ? data.url
-        : typeof data.order_id === "string" && data.order_id.length > 0
-          ? "/orders/" + encodeURIComponent(data.order_id)
-          : null;
+      const merchantOrderId = typeof data.url === "string"
+        ? data.url.match(/^\/studio\/orders\/([^/?#]+)/)?.[1]
+        : undefined;
+      const destination = merchantOrderId
+        ? "/merchant/orders/" + encodeURIComponent(merchantOrderId)
+        : typeof data.url === "string" && data.url.startsWith("/") && !data.url.startsWith("//")
+          ? data.url
+          : typeof data.order_id === "string" && data.order_id.length > 0
+            ? "/orders/" + encodeURIComponent(data.order_id)
+            : null;
       if (destination) router.push(destination as never);
     };
 
