@@ -122,7 +122,7 @@ export type ScrollAreaProps = PropsWithChildren<
 
 export type RefreshableScrollViewProps = PropsWithChildren<{
   refreshing?: boolean;
-  onRefresh?: () => void;
+  onRefresh?: (() => void) | undefined;
   contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
   style?: ScrollViewProps["style"];
   keyboardShouldPersistTaps?: ScrollViewProps["keyboardShouldPersistTaps"];
