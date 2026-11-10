@@ -39,7 +39,7 @@ describe("merchant store images", () => {
       "user-1"
     )).toBeNull();
     expect(getStoreImageStoragePath(
-      "https://example.supabase.co/storage/v1/object/sign/store-media/user-1/stores/%252e%252e/logo.webp?token=x",
+      "https://example.supabase.co/storage/v1/object/sign/store-media/user-1/stores/%2e%2e/logo.webp?token=x",
       "user-1"
     )).toBeNull();
   });
