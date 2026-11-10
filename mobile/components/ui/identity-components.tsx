@@ -65,7 +65,7 @@ export function RatingStars({
   return (
     <View accessibilityRole="image" accessibilityLabel={String(value)} style={[{ flexDirection: "row", alignItems: "center", gap: designTokens.spacing.xs }, style]}>
       {Array.from({ length: count }, (_, index) => (
-        <Icon key={index} name="star" size={size} color={index < Math.round(normalized) ? theme.colors.warning : theme.colors.border} fill={index < Math.round(normalized) ? theme.colors.warning : "none"} accessibilityHidden />
+        <Icon key={index} name="star" size={size} color={index < Math.round(normalized) ? theme.colors.warning : theme.colors.muted} fill={index < Math.round(normalized) ? theme.colors.warning : "none"} accessibilityHidden />
       ))}
       {showValue ? <UiText style={{ marginStart: designTokens.spacing.xs, color: theme.colors.muted, fontSize: theme.typography.caption }}>{value.toFixed(1)}</UiText> : null}
     </View>
@@ -93,7 +93,7 @@ export function RatingSelector({
         const selected = rating <= value;
         return (
           <Pressable key={rating} accessibilityRole="radio" accessibilityLabel={`${accessibilityLabel} ${rating}`} accessibilityState={{ checked: value === rating, disabled }} disabled={disabled} onPress={() => onChange(rating)} hitSlop={4} style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
-            <Icon name="star" size={size * 0.72} color={selected ? theme.colors.warning : theme.colors.border} fill={selected ? theme.colors.warning : "none"} accessibilityHidden />
+            <Icon name="star" size={size * 0.72} color={selected ? theme.colors.warning : theme.colors.muted} fill={selected ? theme.colors.warning : "none"} accessibilityHidden />
           </Pressable>
         );
       })}
