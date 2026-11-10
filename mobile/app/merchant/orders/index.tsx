@@ -242,6 +242,14 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View accessible accessibilityLabel={label} style={stylesForScreen.center}>
+        <View style={stylesForScreen.heading}>
+          <UiText accessibilityRole="header" style={[stylesForScreen.headingTitle, { color: theme.colors.foreground }]}>
+            {translate("merchantOrdersPageTitle")}
+          </UiText>
+          <UiText style={[stylesForScreen.headingSubtitle, { color: theme.colors.muted }]}>
+            {translate("merchantOrdersPageSubtitle")}
+          </UiText>
+        </View>
         <View style={{ width: "100%", gap: designTokens.spacing.md }}>
           {[0, 1, 2, 3].map((item) => <OrderCardSkeleton key={item} />)}
         </View>
@@ -266,6 +274,14 @@ function MessageScreen({
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
+        <View style={stylesForScreen.heading}>
+          <UiText accessibilityRole="header" style={[stylesForScreen.headingTitle, { color: theme.colors.foreground }]}>
+            {translate("merchantOrdersPageTitle")}
+          </UiText>
+          <UiText style={[stylesForScreen.headingSubtitle, { color: theme.colors.muted }]}>
+            {translate("merchantOrdersPageSubtitle")}
+          </UiText>
+        </View>
         <ErrorState title={title} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
       </View>
     </SafeAreaView>
@@ -274,7 +290,10 @@ function MessageScreen({
 
 const stylesForScreen = StyleSheet.create({
   safe: { flex: 1 },
-  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg }
+  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
+  heading: { width: "100%", alignItems: "flex-start", gap: designTokens.spacing.xs },
+  headingTitle: { fontSize: designTokens.typography.title, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
+  headingSubtitle: { fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "auto" }
 });
 
 function createStyles(theme: AppTheme) {
