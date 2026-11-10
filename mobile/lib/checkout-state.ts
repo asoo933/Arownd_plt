@@ -10,14 +10,27 @@ export type CheckoutIdentityInput = {
   phone: string;
 };
 
-export function checkoutRequestIdentity(input: CheckoutIdentityInput): string {
-  const items = input.items
+export function normalizeCheckoutItems(items: CartItem[]): CartItem[] {
+  return items
     .map((item) => ({
-      offerId: item.offerId,
-      quantity: item.quantity,
-      options: Object.entries(normalizeCartOptions(item.options)).sort(([a], [b]) => a.localeCompare(b))
+      ...item,
+      options: Object.fromEntries(
+        Object.entries(normalizeCartOptions(item.options)).sort(([a], [b]) => a.localeCompare(b))
+      )
     }))
-    .sort((a, b) => a.offerId.localeCompare(b.offerId) || JSON.stringify(a.options).localeCompare(JSON.stringify(b.options)));
+    .sort((a, b) =>
+      a.offerId.localeCompare(b.offerId) ||
+      JSON.stringify(a.options).localeCompare(JSON.stringify(b.options)) ||
+      a.quantity - b.quantity
+    );
+}
+
+export function checkoutRequestIdentity(input: CheckoutIdentityInput): string {
+  const items = normalizeCheckoutItems(input.items).map((item) => ({
+    offerId: item.offerId,
+    quantity: item.quantity,
+    options: Object.entries(item.options)
+  }));
   return JSON.stringify({
     items,
     deliveryType: input.deliveryType,
