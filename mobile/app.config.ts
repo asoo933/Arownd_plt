@@ -9,6 +9,7 @@ const config: ExpoConfig = {
   ...expo,
   android: {
     ...expo.android,
+    softwareKeyboardLayoutMode: "resize",
     ...(googleServicesFile ? { googleServicesFile } : {})
   }
 };
