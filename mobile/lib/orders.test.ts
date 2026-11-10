@@ -1,8 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { canCancelLegacyOrder, canCancelMerchantOrder, getOrderStatusTone, getOrderTrackingSteps } from "@/lib/orders-state";
+import { canCancelLegacyOrder, canCancelMerchantOrder, getOrderStatusTone, getOrderTrackingSteps, isHideableOrderStatus } from "@/lib/orders-state";
 
 describe("customer order display", () => {
+  it("allows hiding only completed, cancelled, and rejected orders", () => {
+    expect(isHideableOrderStatus("delivered")).toBe(true);
+    expect(isHideableOrderStatus("cancelled")).toBe(true);
+    expect(isHideableOrderStatus("rejected")).toBe(true);
+    expect(isHideableOrderStatus("pending")).toBe(false);
+    expect(isHideableOrderStatus("quoted")).toBe(false);
+    expect(isHideableOrderStatus("confirmed")).toBe(false);
+    expect(isHideableOrderStatus("shipped")).toBe(false);
+  });
+
   it("maps order statuses to tracking steps", () => {
     expect(getOrderTrackingSteps("pending")).toBe(0);
     expect(getOrderTrackingSteps("confirmed")).toBe(1);
