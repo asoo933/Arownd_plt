@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { AccessibilityInfo, Animated, Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { useLanguage } from "@/lib/i18n";
 import { Text as UiText } from "./typography";
@@ -16,10 +16,51 @@ type TextFieldProps = Omit<TextInputProps, "style" | "textAlign"> & {
 export function TextField({ label, error, style, containerStyle, accessibilityLabel, textAlign, onFocus, onBlur, ...props }: TextFieldProps) {
   const theme = useAppTheme();
   const [focused, setFocused] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(true);
+  const shake = useRef(new Animated.Value(0)).current;
+  const previousError = useRef<string | undefined>(undefined);
+  const shakeAnimation = useRef<Animated.CompositeAnimation | null>(null);
   const { language } = useLanguage();
 
+  useEffect(() => {
+    let active = true;
+    void AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (active) setReduceMotion(enabled);
+      })
+      .catch(() => {
+        if (active) setReduceMotion(true);
+      });
+
+    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduceMotion);
+    return () => {
+      active = false;
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const hasNewError = Boolean(error) && error !== previousError.current;
+    previousError.current = error;
+    if (!hasNewError) return;
+
+    shakeAnimation.current?.stop();
+    shake.setValue(0);
+    if (reduceMotion) return;
+
+    shakeAnimation.current = Animated.sequence([
+      Animated.timing(shake, { toValue: -5, duration: 45, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 5, duration: 45, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: -3, duration: 40, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 3, duration: 40, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 0, duration: 35, useNativeDriver: true })
+    ]);
+    shakeAnimation.current.start();
+    return () => shakeAnimation.current?.stop();
+  }, [error, reduceMotion, shake]);
+
   return (
-    <View style={[styles.field, containerStyle]}>
+    <Animated.View style={[styles.field, containerStyle, { transform: [{ translateX: shake }] }]}>
       {label ? <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</UiText> : null}
       <TextInput
         {...props}
@@ -33,6 +74,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
         }}
         textAlign={textAlign === "auto" ? "start" : textAlign}
         accessibilityLabel={accessibilityLabel ?? label}
+        accessibilityState={error ? { invalid: true } : undefined}
         placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
         style={[
           styles.textInput,
@@ -46,7 +88,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
         ]}
       />
       {error ? <UiText accessibilityRole="alert" style={[styles.fieldError, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{error}</UiText> : null}
-    </View>
+    </Animated.View>
   );
 }
 
