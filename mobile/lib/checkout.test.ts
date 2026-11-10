@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { checkoutRequestIdentity } from "@/lib/checkout-state";
+import { checkoutRequestIdentity, normalizeCheckoutItems } from "@/lib/checkout-state";
 import type { CartItem } from "@/lib/cart-state";
 
 const item = (offerId: string, quantity: number, options: Record<string, string>): CartItem => ({
@@ -45,6 +45,34 @@ describe("checkoutRequestIdentity", () => {
     expect(checkoutRequestIdentity(base)).toBe(checkoutRequestIdentity({
       ...base,
       items: [item("offer-1", 1, { "اللون": "Black", "المقاس": "M" })]
+    }));
+  });
+
+  it("uses the same canonical item order for identity and the RPC payload", () => {
+    const items = [
+      item("offer-2", 1, { color: "Black" }),
+      item("offer-1", 2, { "المقاس": "M", "اللون": "أزرق" })
+    ];
+    const reordered = [...items].reverse();
+    expect(normalizeCheckoutItems(items)).toEqual(normalizeCheckoutItems(reordered));
+    expect(normalizeCheckoutItems(items).map((entry) => entry.offerId)).toEqual(["offer-1", "offer-2"]);
+    expect(normalizeCheckoutItems(items)[0]?.options).toEqual({ color: "أزرق", size: "M" });
+    expect(checkoutRequestIdentity({
+      items,
+      deliveryType: "home",
+      wilayaId: 16,
+      commune: "الجزائر الوسطى",
+      addressLine: "شارع 1",
+      fullName: "أحمد",
+      phone: "0550000000"
+    })).toBe(checkoutRequestIdentity({
+      items: reordered,
+      deliveryType: "home",
+      wilayaId: 16,
+      commune: "الجزائر الوسطى",
+      addressLine: "شارع 1",
+      fullName: "أحمد",
+      phone: "0550000000"
     }));
   });
 
