@@ -1,4 +1,5 @@
-import { LocaleProvider, Stack } from "expo-router";
+import { LocaleProvider, Stack, router } from "expo-router";
+import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -23,6 +24,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Logo from "@/components/logo";
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
+import { listenForPushTokenChanges, registerDeviceForPushNotifications } from "@/lib/push-notifications";
 import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
 
 const SPLASH_DURATION_MS = 2500;
@@ -97,10 +99,27 @@ function RootLayoutContent() {
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
+    let pushTokenSubscription: Notifications.EventSubscription | null = null;
     try {
-      const { data } = getSupabaseClient().auth.onAuthStateChange((event) => {
+      const { data } = getSupabaseClient().auth.onAuthStateChange((event, session) => {
         if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
           queryClient.clear();
+        }
+
+        if ((event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user) {
+          queueMicrotask(() => {
+            if (!pushTokenSubscription) {
+              pushTokenSubscription = listenForPushTokenChanges();
+            }
+            void registerDeviceForPushNotifications().catch((error: unknown) => {
+              console.warn("[push-notifications] Device registration failed", error);
+            });
+          });
+        }
+
+        if (event === "SIGNED_OUT") {
+          pushTokenSubscription?.remove();
+          pushTokenSubscription = null;
         }
       });
       unsubscribe = () => data.subscription.unsubscribe();
@@ -110,8 +129,32 @@ function RootLayoutContent() {
       }
     }
 
-    return () => unsubscribe?.();
+    return () => {
+      unsubscribe?.();
+      pushTokenSubscription?.remove();
+    };
   }, [queryClient]);
+
+  useEffect(() => {
+    const openNotificationDestination = (response: Notifications.NotificationResponse) => {
+      const data = response.notification.request.content.data;
+      const destination = typeof data.url === "string" && data.url.startsWith("/") && !data.url.startsWith("//")
+        ? data.url
+        : typeof data.order_id === "string" && data.order_id.length > 0
+          ? "/orders/" + encodeURIComponent(data.order_id)
+          : null;
+      if (destination) router.push(destination as never);
+    };
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(openNotificationDestination);
+    void Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (response) openNotificationDestination(response);
+    }).catch((error: unknown) => {
+      console.warn("[push-notifications] Could not read the launch notification", error);
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   if (!appReady) return null;
 
