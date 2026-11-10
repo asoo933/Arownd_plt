@@ -14,52 +14,52 @@ import { CategorySelectorTile, Icon, IconButton, ProductCardSkeleton, SearchFiel
 const categories = [
   { id: "fashion", icon: "shirt" },
   { id: "clothes", icon: "shirt" },
-  { id: "shoes", icon: "footprints" },
+  { id: "shoes", icon: "shopping-bag" },
   { id: "bags", icon: "shopping-bag" },
   { id: "electronics", icon: "smartphone" },
   { id: "phones", icon: "smartphone" },
-  { id: "computers", icon: "laptop" },
-  { id: "gadgets", icon: "headphones" },
-  { id: "phone-accessories", icon: "cable" },
+  { id: "computers", icon: "smartphone" },
+  { id: "gadgets", icon: "smartphone" },
+  { id: "phone-accessories", icon: "settings" },
   { id: "beauty", icon: "sparkles" },
-  { id: "perfumes", icon: "spray-can" },
-  { id: "makeup", icon: "palette" },
-  { id: "skincare", icon: "droplet" },
+  { id: "perfumes", icon: "sparkles" },
+  { id: "makeup", icon: "sparkles" },
+  { id: "skincare", icon: "sparkles" },
   { id: "home", icon: "house" },
-  { id: "furniture", icon: "armchair" },
-  { id: "home-tools", icon: "wrench" },
-  { id: "decor", icon: "lamp" },
-  { id: "kitchenware", icon: "utensils" },
+  { id: "furniture", icon: "house" },
+  { id: "home-tools", icon: "settings" },
+  { id: "decor", icon: "house" },
+  { id: "kitchenware", icon: "cake-slice" },
   { id: "kids", icon: "baby" },
   { id: "kids-clothes", icon: "shirt" },
-  { id: "toys", icon: "puzzle" },
+  { id: "toys", icon: "gift" },
   { id: "kids-essentials", icon: "baby" },
-  { id: "sports", icon: "trophy" },
-  { id: "sportswear", icon: "footprints" },
-  { id: "sports-gear", icon: "dumbbell" },
-  { id: "hobbies", icon: "paintbrush" },
+  { id: "sports", icon: "star" },
+  { id: "sportswear", icon: "shopping-bag" },
+  { id: "sports-gear", icon: "star" },
+  { id: "hobbies", icon: "sparkles" },
   { id: "food", icon: "cake-slice" },
   { id: "sweets", icon: "cake-slice" },
   { id: "groceries", icon: "shopping-cart" },
-  { id: "home-food", icon: "cooking-pot" },
+  { id: "home-food", icon: "cake-slice" },
   { id: "gifts-crafts", icon: "gift" },
   { id: "gifts", icon: "gift" },
-  { id: "handmade", icon: "scissors" },
-  { id: "stationery", icon: "notebook" },
-  { id: "digital", icon: "monitor" },
-  { id: "design", icon: "palette" },
-  { id: "web-dev", icon: "code" },
-  { id: "digital-services", icon: "briefcase-business" },
+  { id: "handmade", icon: "settings" },
+  { id: "stationery", icon: "list" },
+  { id: "digital", icon: "smartphone" },
+  { id: "design", icon: "sparkles" },
+  { id: "web-dev", icon: "settings" },
+  { id: "digital-services", icon: "store" },
   { id: "digital-products", icon: "package" },
-  { id: "cars", icon: "car" },
-  { id: "car-accessories", icon: "car-front" },
+  { id: "cars", icon: "package" },
+  { id: "car-accessories", icon: "package" },
   { id: "car-parts", icon: "settings" },
-  { id: "car-maintenance", icon: "wrench" },
-  { id: "books", icon: "book-open" },
-  { id: "industrial", icon: "factory" },
-  { id: "used", icon: "recycle" },
-  { id: "flowers", icon: "flower-2" },
-  { id: "pets", icon: "paw-print" },
+  { id: "car-maintenance", icon: "settings" },
+  { id: "books", icon: "list" },
+  { id: "industrial", icon: "store" },
+  { id: "used", icon: "package" },
+  { id: "flowers", icon: "sparkles" },
+  { id: "pets", icon: "heart" },
   { id: "misc", icon: "package" }
 ] as const;
 
@@ -78,12 +78,20 @@ export default function ExploreScreen() {
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gestureStartX = useRef(0);
+  const currentTranslateX = useRef(0);
   const categoryMetrics = useRef({ viewportWidth: 0, railWidth: 0, language });
   categoryMetrics.current = { viewportWidth, railWidth, language };
+  useEffect(() => {
+    const listenerId = translateX.addListener(({ value }) => {
+      currentTranslateX.current = value;
+    });
+    return () => translateX.removeListener(listenerId);
+  }, [translateX]);
+
   const resumeCategoryAnimation = () => {
     const { viewportWidth: width, railWidth: contentWidth } = categoryMetrics.current;
     if (width <= 0 || contentWidth <= width) return;
-    const currentX = translateX.__getValue();
+    const currentX = currentTranslateX.current;
     const animation = Animated.loop(
       Animated.timing(translateX, {
         toValue: currentX - contentWidth,
@@ -101,7 +109,7 @@ export default function ExploreScreen() {
     onPanResponderGrant: () => {
       animationRef.current?.stop();
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-      gestureStartX.current = translateX.__getValue();
+      gestureStartX.current = currentTranslateX.current;
     },
     onPanResponderMove: (_event, gesture) => {
       const { viewportWidth: width, railWidth: contentWidth, language: currentLanguage } = categoryMetrics.current;
