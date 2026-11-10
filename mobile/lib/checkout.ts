@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
-import { checkoutRequestIdentity } from "@/lib/checkout-state";
+import { checkoutRequestIdentity, normalizeCheckoutItems } from "@/lib/checkout-state";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
@@ -119,7 +119,7 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
   const identity = checkoutRequestIdentity(input);
   const idempotencyKey = await getOrCreateIdempotencyKey(input.userId, identity);
   const { data, error } = await getSupabaseClient().rpc("create_order_with_delivery", {
-    _items: input.items.map((item) => ({
+    _items: normalizeCheckoutItems(input.items).map((item) => ({
       offer_id: item.offerId,
       quantity: item.quantity,
       options: item.options
