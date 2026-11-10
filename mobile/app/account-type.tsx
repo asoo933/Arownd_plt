@@ -44,7 +44,7 @@ function AccountTypeOption({
       <View
         style={[
           styles.iconCircle,
-          { backgroundColor: selected ? theme.colors.accent : theme.colors.surfaceMuted }
+          { backgroundColor: selected ? theme.colors.accent : (theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted) }
         ]}
       >
         <Icon
