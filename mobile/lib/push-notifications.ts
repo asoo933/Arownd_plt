@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const DEVICE_TOKEN_STORAGE_KEY = "arownd.push-device-token.v1";
-const ANDROID_CHANNEL_ID = "arownd_updates_v2";
+const ANDROID_CHANNEL_ID = "arownd_updates";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
