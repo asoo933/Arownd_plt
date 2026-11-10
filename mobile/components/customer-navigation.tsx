@@ -61,9 +61,9 @@ export function CustomerNavigation() {
             <Icon
               name={tab.icon}
               size={22}
-              color={selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted}
-              fill={selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : "none"}
-              strokeWidth={selected ? 2 : 1.8}
+              color={selected ? theme.colors.accent : theme.colors.muted}
+              fill="none"
+              strokeWidth={selected ? 2.1 : 1.8}
               accessibilityHidden
             />
           )
