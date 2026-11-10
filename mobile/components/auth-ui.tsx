@@ -120,6 +120,52 @@ export function InlineLink({ label, onPress }: { label: string; onPress: () => v
   );
 }
 
+export function PasswordStrengthMeter({ password }: { password: string }) {
+  const theme = useAppTheme();
+  if (!password) return null;
+
+  const score = [
+    password.length >= 8,
+    password.length >= 12,
+    /[a-z]/.test(password) && /[A-Z]/.test(password),
+    /\\d/.test(password) && /[^A-Za-z0-9]/.test(password)
+  ].filter(Boolean).length;
+  const labelKey = score <= 1
+    ? "passwordStrengthWeak"
+    : score === 2
+      ? "passwordStrengthFair"
+      : score === 3
+        ? "passwordStrengthGood"
+        : "passwordStrengthStrong";
+  const strengthColor = score <= 1
+    ? theme.colors.danger
+    : score === 2
+      ? theme.colors.warning
+      : score === 3
+        ? theme.colors.accent
+        : theme.colors.success;
+
+  return (
+    <View accessibilityLabel={`${translate("passwordStrength")}: ${translate(labelKey)}`} style={styles.passwordStrength}>
+      <View style={styles.passwordStrengthHeader}>
+        <Caption tone="muted">{translate("passwordStrength")}</Caption>
+        <Caption style={{ color: strengthColor }} weight="700">{translate(labelKey)}</Caption>
+      </View>
+      <View style={styles.passwordStrengthBars}>
+        {[1, 2, 3, 4].map((segment) => (
+          <View
+            key={segment}
+            style={[
+              styles.passwordStrengthBar,
+              { backgroundColor: segment <= score ? strengthColor : theme.colors.border }
+            ]}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export function FormError({ message }: { message: string }) {
   return <Alert description={message} tone="danger" />;
 }
@@ -161,5 +207,9 @@ const styles = StyleSheet.create({
   subtitle: { textAlign: "auto", marginTop: designTokens.spacing.sm },
   content: { gap: designTokens.spacing.lg },
   link: { fontSize: designTokens.typography.caption + 2 },
+  passwordStrength: { gap: designTokens.spacing.xs, marginTop: -designTokens.spacing.sm },
+  passwordStrengthHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  passwordStrengthBars: { flexDirection: "row", gap: designTokens.spacing.xs },
+  passwordStrengthBar: { flex: 1, height: 4, borderRadius: designTokens.radius.pill },
   footer: { marginTop: "auto", paddingTop: designTokens.spacing.xxl }
 });
