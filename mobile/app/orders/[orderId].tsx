@@ -240,7 +240,7 @@ export default function OrderDetailsScreen() {
               onPress={() => quoteMutation.mutate({ merchantOrderId: merchantOrder.id, accept: true })}
               style={styles.acceptButton}
             >
-              {quoteMutation.isPending ? <Spinner color={theme.colors.foreground} size="small" /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
+              {quoteMutation.isPending ? <Spinner color={theme.colors.accentForeground} size="small" /> : <UiText style={styles.acceptButtonText}>{translate("orderQuoteAccept")}</UiText>}
             </PressableSurface>
             <PressableSurface
               accessibilityLabel={translate("orderQuoteDecline")}
