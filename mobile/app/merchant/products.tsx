@@ -269,7 +269,7 @@ function MerchantOfferCard({
         accessibilityLabel={translate("merchantProductImagesLabel")}
         disabled={!image}
         onPress={() => setGalleryOpen(true)}
-        style={[styles.productImage, { backgroundColor: theme.colors.surfaceMuted }]}
+        style={[styles.productImage, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}
       >
         {image ? (
           <UiImage
