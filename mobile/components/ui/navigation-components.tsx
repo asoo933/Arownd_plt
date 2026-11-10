@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentRef, ReactNode } from "react";
 import {
   AccessibilityInfo,
   Animated,
@@ -61,7 +61,7 @@ function NavigationTab({
 }) {
   const theme = useAppTheme();
   const scale = useRef(new Animated.Value(1)).current;
-  const cartTargetRef = useRef<View>(null);
+  const cartTargetRef = useRef<ComponentRef<typeof View>>(null);
   const wasSelected = useRef(selected);
   const [reduceMotion, setReduceMotion] = useState(true);
 
