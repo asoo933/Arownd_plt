@@ -83,7 +83,7 @@ export function PressableSurface({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       accessibilityState={{ ...accessibilityState, disabled: unavailable }}
-      onPress={onPress ? () => { triggerSelectionHaptic(); onPress(); } : undefined}
+      onPress={onPress ? (event) => { triggerSelectionHaptic(); onPress(event); } : undefined}
       testID={testID}
       hitSlop={hitSlop}
       disabled={unavailable}
