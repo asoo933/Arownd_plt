@@ -35,7 +35,10 @@ function localizedNotificationCopy(item: AppNotification): { title: string; body
   if (item.type !== "order") return { title: item.title, body: item.body };
 
   const status = typeof item.data.status === "string" ? item.data.status : null;
-  if (item.data.recipient_role === "merchant" && status === "pending") {
+  const notificationUrl = typeof item.data.url === "string" ? item.data.url : "";
+  const isMerchantNewOrder = (item.data.recipient_role === "merchant" && status === "pending")
+    || notificationUrl.startsWith("/studio/orders/");
+  if (isMerchantNewOrder) {
     return {
       title: translate("notificationsMerchantNewOrderTitle"),
       body: translate("notificationsMerchantNewOrderBody")
