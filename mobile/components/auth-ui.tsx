@@ -125,8 +125,8 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
   if (!password) return null;
 
   const passwordLength = Array.from(password).length;
-  const hasNumber = /\\p{N}/u.test(password);
-  const hasSymbol = /[\\p{P}\\p{S}]/u.test(password);
+  const hasNumber = /\p{N}/u.test(password);
+  const hasSymbol = /[\p{P}\p{S}]/u.test(password);
   const score = [
     passwordLength >= 8,
     passwordLength >= 12,
