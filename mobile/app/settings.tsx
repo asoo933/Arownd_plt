@@ -152,6 +152,20 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
+        <Heading level={3}>{translate("settingsSupportSection")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="help-circle"
+            label={translate("settingsSupportTitle")}
+            onPress={() => router.push("/support")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
+
+      <View style={styles.section}>
         <Heading level={3}>{translate("settingsPreferencesTitle")}</Heading>
         <Card contentStyle={styles.sectionContent}>
           <SettingsRow
