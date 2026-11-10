@@ -535,6 +535,13 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
+        <AppHeader
+          title={translate("merchantOnboardingTitle")}
+          leading={<Button label={translate("merchantOnboardingBack")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
+        <UiText style={[stylesForScreen.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantOnboardingSubtitle")}
+        </UiText>
         <LoadingState label={label} />
       </View>
     </SafeAreaView>
@@ -557,6 +564,13 @@ function MessageScreen({
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForScreen.safe, { backgroundColor: theme.colors.background }]}>
       <View style={stylesForScreen.center}>
+        <AppHeader
+          title={translate("merchantOnboardingTitle")}
+          leading={<Button label={translate("merchantOnboardingBack")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
+        <UiText style={[stylesForScreen.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantOnboardingSubtitle")}
+        </UiText>
         <ErrorState title={title} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
       </View>
     </SafeAreaView>
@@ -618,7 +632,8 @@ function WilayaOption({
 
 const stylesForScreen = StyleSheet.create({
   safe: { flex: 1 },
-  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
+  center: { flex: 1, padding: designTokens.spacing.lg, justifyContent: "center", gap: designTokens.spacing.lg },
+  subtitle: { fontSize: designTokens.typography.body - 1, lineHeight: 21, textAlign: "auto" },
   message: { fontSize: designTokens.typography.body, lineHeight: 22, textAlign: "center", fontWeight: designTokens.fontWeights.bold },
   field: { gap: designTokens.spacing.sm },
   fieldLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
