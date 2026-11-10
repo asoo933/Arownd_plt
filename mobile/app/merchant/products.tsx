@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, ProductCardSkeleton, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PressableSurface, Text as UiText, TextField } from "@/components/ui";
+import { RefreshableScrollView, AppHeader, Button, Card, ErrorState, FilterBar, FilterChip, Icon, Image as UiImage, ProductCardSkeleton, MediaViewer, MerchantMetricCard, MerchantStatusBadge, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import {
   fetchMerchantAccess
 } from "@/lib/merchant";
@@ -145,7 +145,7 @@ export default function MerchantProductsScreen() {
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <RefreshableScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} refreshing={access.isFetching || products.isFetching} onRefresh={() => { void Promise.all([access.refetch(), products.refetch()]); }}>
         <AppHeader
           title={translate("merchantProductsTitle")}
           leading={<Button label={translate("merchantProductsBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />}
@@ -222,7 +222,7 @@ export default function MerchantProductsScreen() {
             ))}
           </View>
         )}
-      </ScrollView>
+      </RefreshableScrollView>
     </SafeAreaView>
   );
 }
