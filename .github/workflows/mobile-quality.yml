@@ -3,6 +3,7 @@ name: Arownd Native quality checks
 on:
   push:
     branches:
+      - main
       - Arownd-native-v2
       - cleanup/remove-legacy-web
     paths:
