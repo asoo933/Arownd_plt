@@ -336,8 +336,12 @@ function InfoRow({ label, value, theme }: { label: string; value: string; theme:
 function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
-      <View accessible accessibilityLabel={label} style={stylesForComponents.center}>
-        <View style={{ width: "100%", gap: designTokens.spacing.md }}>
+      <View accessible accessibilityLabel={label} style={stylesForComponents.screenContent}>
+        <AppHeader
+          title={translate("merchantOrderDetailTitle")}
+          leading={<Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
+        <View style={stylesForComponents.skeletonList}>
           {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
         </View>
       </View>
@@ -348,7 +352,11 @@ function LoadingScreen({ theme, label }: { theme: AppTheme; label: string }) {
 function MessageScreen({ theme, title, actionLabel, onAction, busy = false }: { theme: AppTheme; title: string; actionLabel: string; onAction: () => void; busy?: boolean }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[stylesForComponents.safe, { backgroundColor: theme.colors.background }]}>
-      <View style={stylesForComponents.center}>
+      <View style={stylesForComponents.screenContent}>
+        <AppHeader
+          title={translate("merchantOrderDetailTitle")}
+          leading={<Button label={translate("merchantOrderDetailBack")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
         <ErrorState title={title} retryLabel={actionLabel} busy={busy} onRetry={onAction} />
       </View>
     </SafeAreaView>
@@ -357,7 +365,8 @@ function MessageScreen({ theme, title, actionLabel, onAction, busy = false }: { 
 
 const stylesForComponents = StyleSheet.create({
   safe: { flex: 1 },
-  center: { flex: 1, padding: designTokens.spacing.xxl, alignItems: "center", justifyContent: "center", gap: designTokens.spacing.lg },
+  screenContent: { flex: 1, padding: designTokens.spacing.lg, justifyContent: "center", gap: designTokens.spacing.lg },
+  skeletonList: { width: "100%", gap: designTokens.spacing.md },
   infoRow: { minHeight: designTokens.dimensions.controlHeight.md, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md }
 });
 
