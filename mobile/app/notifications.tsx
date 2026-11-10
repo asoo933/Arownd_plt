@@ -17,7 +17,7 @@ import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRea
 import { getNotificationDestination } from "@/lib/notifications-state";
 import { formatOrderCode } from "@/lib/orders-state";
 import { getSupabaseClient } from "@/lib/supabase";
-import { translate, type Language, useLanguage } from "@/lib/i18n";
+import { translate, type Language, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 function typeLabel(type: AppNotification["type"]): string {
