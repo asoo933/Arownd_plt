@@ -39,8 +39,8 @@ export default function MyReviewsScreen() {
 
   return (
     <CustomerScreen
-      refreshing={auth.isFetching || query.isFetching}
-      onRefresh={() => { void Promise.all([auth.refetch(), query.refetch()]); }}
+      refreshing={auth.isFetching || (Boolean(auth.data) && query.isFetching)}
+      onRefresh={() => { void auth.refetch().then((result) => { if (result.data) void query.refetch(); }); }}
     >
       <AppHeader
         title={translate("myReviewsTitle")}
