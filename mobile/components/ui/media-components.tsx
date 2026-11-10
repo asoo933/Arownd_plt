@@ -32,7 +32,7 @@ export function Image({
   const theme = useAppTheme();
   const imageSource = source ?? (uri ? { uri } : undefined);
   if (!imageSource) return <View accessibilityLabel={accessibilityLabel} style={[{ width: "100%", aspectRatio, borderRadius: theme.radius.md, backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }, style as StyleProp<ViewStyle>]} />;
-  return <NativeImage accessibilityLabel={accessibilityLabel} source={imageSource} resizeMode={resizeMode} style={[{ width: "100%", aspectRatio, borderRadius: theme.radius.md, backgroundColor: theme.colors.surfaceMuted }, style]} />;
+  return <NativeImage accessibilityLabel={accessibilityLabel} source={imageSource} resizeMode={resizeMode} style={[{ width: "100%", aspectRatio, borderRadius: theme.radius.md, backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }, style]} />;
 }
 
 export function ImageGallery({
