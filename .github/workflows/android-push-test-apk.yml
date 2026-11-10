@@ -29,6 +29,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -44,8 +46,8 @@ jobs:
           test -n "$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY" || { echo "::error::Missing secret EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"; exit 1; }
           node --input-type=module -e 'const u = new URL(process.env.EXPO_PUBLIC_SUPABASE_URL); if (u.protocol !== "https:") process.exit(1);'
 
-      - name: Install Expo mobile dependencies
-        run: npm install --no-audit --no-fund --legacy-peer-deps
+      - name: Install locked Expo mobile dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Validate Expo configuration
         run: npm run doctor
