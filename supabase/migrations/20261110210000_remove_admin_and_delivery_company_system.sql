@@ -779,11 +779,13 @@ drop function if exists private.sync_approved_delivery_company_public_directory(
 drop view if exists public.approved_delivery_companies;
 drop table if exists private.approved_delivery_companies_public;
 drop table if exists public.delivery_coverage_areas;
-drop table if exists public.delivery_companies;
-drop table if exists public.platform_admin_audit_logs;
 
+-- Remove the only remaining FK to delivery_companies before dropping it.
 alter table public.shipments drop constraint if exists shipments_company_id_fkey;
 alter table public.shipments drop column if exists company_id;
+
+drop table if exists public.delivery_companies;
+drop table if exists public.platform_admin_audit_logs;
 
 drop function if exists public.is_platform_admin();
 
