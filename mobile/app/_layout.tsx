@@ -93,27 +93,6 @@ function RootLayoutContent() {
     return () => clearTimeout(timeout);
   }, [appReady]);
 
-  useEffect(() => {
-    let cancelled = false;
-    try {
-      const client = getSupabaseClient();
-      void client.auth.getUser().then(async ({ data, error }) => {
-        if (cancelled || error || !data.user) return;
-        if (data.user.user_metadata?.preferred_language === language) return;
-        const { error: updateError } = await client.auth.updateUser({
-          data: { preferred_language: language }
-        });
-        if (!cancelled && updateError) {
-          console.warn("[push-notifications] Could not sync the notification language", updateError);
-        }
-      }).catch((error: unknown) => {
-        if (!cancelled) console.warn("[push-notifications] Could not read the notification language", error);
-      });
-    } catch (error) {
-      if (!(error instanceof Error) || error.message !== "SUPABASE_CONFIG_MISSING") throw error;
-    }
-    return () => { cancelled = true; };
-  }, [language]);
 
   useEffect(() => {
     if (restartNoticeVersion > 0) {
@@ -132,13 +111,6 @@ function RootLayoutContent() {
 
         if ((event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user) {
           queueMicrotask(() => {
-            if (session.user.user_metadata?.preferred_language !== language) {
-              void getSupabaseClient().auth.updateUser({
-                data: { preferred_language: language }
-              }).then(({ error }) => {
-                if (error) console.warn("[push-notifications] Could not sync the notification language", error);
-              });
-            }
             if (Platform.OS === "android" && !pushTokenSubscription) {
               pushTokenSubscription = listenForPushTokenChanges();
             }
