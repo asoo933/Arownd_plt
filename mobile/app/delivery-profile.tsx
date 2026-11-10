@@ -236,6 +236,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     borderRadius: theme.radius.md,
     backgroundColor: theme.colors.accent
   },
-  closeText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold, fontSize: designTokens.typography.caption + 1 }
+  closeText: { color: theme.colors.accentForeground, fontWeight: designTokens.fontWeights.extrabold, fontSize: designTokens.typography.caption + 1 }
 }); }
 
