@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import {
-  ScrollView,
   StyleSheet,
   View
 } from "react-native";
