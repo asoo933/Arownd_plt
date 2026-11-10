@@ -30,6 +30,7 @@ import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
 import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
 import { formatOrderCode } from "@/lib/orders-state";
+import { MAX_CHECKOUT_ITEMS } from "@/lib/checkout-state";
 
 type Picker = "wilaya" | "commune" | null;
 
@@ -180,6 +181,10 @@ export default function CheckoutScreen() {
       setFormError(translate("checkoutOffersNotReady"));
       return;
     }
+    if (cart.data.length > MAX_CHECKOUT_ITEMS) {
+      setFormError(translate("checkoutTooManyItems"));
+      return;
+    }
     if (hasBlockingItems) {
       setFormError(translate("checkoutFixCart"));
       return;
@@ -194,6 +199,10 @@ export default function CheckoutScreen() {
     }
     if (wilayaId === null || !commune.trim()) {
       setFormError(translate("checkoutAreaRequired"));
+      return;
+    }
+    if (commune.trim().length < 2 || commune.trim().length > 100) {
+      setFormError(translate("checkoutAreaInvalid"));
       return;
     }
     if (!addressLine.trim()) {
@@ -318,7 +327,7 @@ export default function CheckoutScreen() {
           <UiText style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</UiText>
         </PressableSurface>
       ) : (
-        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" editable={wilayaId !== null && !communes.isPending} />
+        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={100} editable={wilayaId !== null && !communes.isPending} />
       )}
       {communes.isError ? <UiText style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</UiText> : null}
 
