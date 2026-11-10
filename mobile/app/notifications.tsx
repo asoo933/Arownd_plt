@@ -48,7 +48,13 @@ function localizedNotificationCopy(item: AppNotification): { title: string; body
     confirmed: "notificationsOrderConfirmed",
     shipped: "notificationsOrderShipped",
     delivered: "notificationsOrderDelivered",
-    cancelled: "notificationsOrderCancelled"
+    cancelled: "notificationsOrderCancelled",
+    accepted: "notificationsShipmentAccepted",
+    picked_up: "notificationsShipmentPickedUp",
+    in_transit: "notificationsShipmentInTransit",
+    failed: "notificationsShipmentFailed",
+    returned: "notificationsShipmentReturned",
+    rejected: "notificationsShipmentRejected"
   };
   const bodyKey = status ? statusKeys[status] : undefined;
   if (!bodyKey) return { title: item.title, body: item.body };
@@ -193,7 +199,7 @@ export default function NotificationsScreen() {
               <Caption>{dateLabel(item.created_at, language)}</Caption>
             </View>
             <UiText weight="800">{copy.title}</UiText>
-            {orderCode && body === item.body ? <Caption>{translate("ordersCode")}: {orderCode}</Caption> : null}
+            {orderCode ? <Caption>{translate("ordersCode")}: {orderCode}</Caption> : null}
             {body ? <UiText tone="muted">{body}</UiText> : null}
             {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} /> : null}
           </NotificationCard>
