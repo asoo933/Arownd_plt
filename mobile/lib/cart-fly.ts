@@ -1,6 +1,3 @@
-import type { RefObject } from "react";
-import type { View } from "react-native";
-
 export type CartFlyRect = {
   x: number;
   y: number;
