@@ -95,7 +95,7 @@ export default function MerchantAnalyticsScreen() {
           ) : data.daily_delivered.map((item) => (
             <View key={item.day} style={styles.dayRow}>
               <UiText style={[styles.dayLabel, { color: theme.colors.muted }]}>{new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { day: "numeric", month: "short" }).format(new Date(item.day + "T12:00:00"))}</UiText>
-              <View style={[styles.track, { backgroundColor: theme.colors.surfaceMuted }]}>
+              <View style={[styles.track, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
                 <View style={[styles.bar, { backgroundColor: theme.colors.accent, width: Math.max(item.amount > 0 ? 3 : 0, item.amount / maxDaily * 100) + "%" }]} />
               </View>
               <UiText numberOfLines={1} adjustsFontSizeToFit style={[styles.amount, { color: theme.colors.foreground }]}>{formatDZD(item.amount)}</UiText>
