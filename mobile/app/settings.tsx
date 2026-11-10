@@ -132,11 +132,18 @@ export default function SettingsScreen() {
             onPress={() => openSheet("addresses")}
             theme={theme}
             styles={styles}
+            last
           />
+        </Card>
+      </View>
+
+      <View style={styles.section}>
+        <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
           <SettingsRow
-            icon="lock"
-            label={translate("settingsPasswordChangeTitle")}
-            onPress={() => openSheet("password")}
+            icon="bell"
+            label={translate("notificationsTitle")}
+            onPress={() => router.push("/notifications")}
             theme={theme}
             styles={styles}
             last
@@ -158,6 +165,20 @@ export default function SettingsScreen() {
             icon="list"
             label={translate("settingsLanguageTitle")}
             onPress={() => openSheet("language")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
+
+      <View style={styles.section}>
+        <Heading level={3}>{translate("settingsPrivacyTitle")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="lock"
+            label={translate("settingsPasswordChangeTitle")}
+            onPress={() => openSheet("password")}
             theme={theme}
             styles={styles}
             last
