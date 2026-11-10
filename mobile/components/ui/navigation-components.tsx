@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { triggerSelectionHaptic } from "@/lib/haptics";
+import { registerCartFlyTarget } from "@/lib/cart-fly";
 import { Text as UiText } from "./typography";
 
 export type NavigationItem = {
@@ -60,6 +61,7 @@ function NavigationTab({
 }) {
   const theme = useAppTheme();
   const scale = useRef(new Animated.Value(1)).current;
+  const cartTargetRef = useRef<View>(null);
   const wasSelected = useRef(selected);
   const [reduceMotion, setReduceMotion] = useState(true);
 
@@ -102,6 +104,28 @@ function NavigationTab({
     return () => animation.stop();
   }, [reduceMotion, scale, selected]);
 
+  useEffect(() => {
+    if (item.key !== "cart") return;
+
+    return registerCartFlyTarget({
+      measure: (onMeasured) => {
+        cartTargetRef.current?.measureInWindow((x, y, width, height) => {
+          onMeasured({ x, y, width, height });
+        });
+      },
+      onArrive: () => {
+        scale.setValue(1.14);
+        Animated.spring(scale, {
+          toValue: 1,
+          damping: 8,
+          stiffness: 260,
+          mass: 0.6,
+          useNativeDriver: true
+        }).start();
+      }
+    });
+  }, [item.key, scale]);
+
   return (
     <Pressable
       accessibilityRole="tab"
@@ -123,20 +147,22 @@ function NavigationTab({
         }
       ]}
     >
-      <Animated.View
+      <View
+        ref={cartTargetRef}
+        collapsable={false}
         style={{
           minWidth: 44,
           minHeight: 32,
           paddingHorizontal: designTokens.spacing.md,
           borderRadius: theme.radius.pill,
           alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "transparent",
-          transform: [{ scale }]
+          justifyContent: "center"
         }}
       >
-        {item.icon}
-      </Animated.View>
+        <Animated.View style={{ transform: [{ scale }] }}>
+          {item.icon}
+        </Animated.View>
+      </View>
       <UiText
         numberOfLines={1}
         style={{
