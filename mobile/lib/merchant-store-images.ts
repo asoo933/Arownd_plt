@@ -35,10 +35,12 @@ export function getStoreImageStoragePath(imageUrl: string, userId: string): stri
       "/storage/v1/object/public/store-media/",
       "/storage/v1/object/sign/store-media/"
     ];
-    const marker = markers.find((item) => url.pathname.includes(item));
+    const rawPath = imageUrl.match(/^https:\/\/[^/?#]+([^?#]*)/i)?.[1];
+    if (!rawPath) return null;
+    const marker = markers.find((item) => rawPath.includes(item));
     if (!marker) return null;
-    const markerIndex = url.pathname.indexOf(marker);
-    const storagePath = decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
+    const markerIndex = rawPath.indexOf(marker);
+    const storagePath = decodeURIComponent(rawPath.slice(markerIndex + marker.length));
     const segments = storagePath.split("/");
     if (!storagePath.startsWith(userId + "/stores/") || segments.length !== 3 ||
       segments.some((segment) => !segment || segment === "." || segment === "..")) return null;
