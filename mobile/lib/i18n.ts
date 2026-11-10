@@ -1542,9 +1542,10 @@ export function LanguageProvider({ children }: PropsWithChildren) {
         const nextLanguage = isLanguage(storedValue) ? storedValue : "ar";
         activeLanguage = nextLanguage;
         setLanguageState(nextLanguage);
-        I18nManager.allowRTL(true);
-        if (I18nManager.isRTL !== (nextLanguage === "ar")) {
-          I18nManager.forceRTL(nextLanguage === "ar");
+        const shouldUseRTL = nextLanguage === "ar";
+        I18nManager.allowRTL(shouldUseRTL);
+        I18nManager.forceRTL(shouldUseRTL);
+        if (I18nManager.isRTL !== shouldUseRTL) {
           void reloadAppAsync("Apply saved Arownd language direction").catch(() => setRestartNoticeVersion(1));
         }
       })
@@ -1552,8 +1553,8 @@ export function LanguageProvider({ children }: PropsWithChildren) {
         if (!mounted) return;
         activeLanguage = "ar";
         I18nManager.allowRTL(true);
+        I18nManager.forceRTL(true);
         if (!I18nManager.isRTL) {
-          I18nManager.forceRTL(true);
           void reloadAppAsync("Apply default Arownd RTL direction").catch(() => setRestartNoticeVersion(1));
         }
       })
@@ -1569,12 +1570,13 @@ export function LanguageProvider({ children }: PropsWithChildren) {
     if (nextLanguage === language) return;
     await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
     activeLanguage = nextLanguage;
-    setLanguageState(nextLanguage);
-    I18nManager.allowRTL(true);
-    I18nManager.forceRTL(nextLanguage === "ar");
+    const shouldUseRTL = nextLanguage === "ar";
+    I18nManager.allowRTL(shouldUseRTL);
+    I18nManager.forceRTL(shouldUseRTL);
     try {
       await reloadAppAsync("Arownd language changed");
     } catch {
+      setLanguageState(nextLanguage);
       setRestartNoticeVersion((version) => version + 1);
     }
   }, [language]);
