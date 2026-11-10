@@ -128,6 +128,18 @@ export default function MerchantEntryScreen() {
           />
         </View>
 
+        <View style={styles.dashboardHeading}>
+          <UiText style={[styles.eyebrow, { color: theme.colors.accentMuted }]}>
+            {translate("merchantDashboardEyebrow")}
+          </UiText>
+          <UiText accessibilityRole="header" style={[styles.title, { color: theme.colors.foreground }]}>
+            {translate("merchantDashboardTitle")}
+          </UiText>
+          <UiText style={[styles.body, { color: theme.colors.muted }]}>
+            {translate("merchantDashboardSubtitle")}
+          </UiText>
+        </View>
+
         <Card style={{ backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }} contentStyle={styles.storeCard}>
           <View style={styles.storeHeader}>
             <View style={[styles.storeAvatar, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
@@ -363,6 +375,7 @@ function createStyles(theme: AppTheme) {
     safe: { flex: 1 },
     content: { padding: designTokens.spacing.xl, paddingBottom: 36, gap: designTokens.spacing.lg },
     headerActions: { flexDirection: "row", justifyContent: "flex-end" },
+    dashboardHeading: { alignItems: "flex-start", gap: designTokens.spacing.xs },
     entryContent: { flexGrow: 1, padding: designTokens.spacing.xl, gap: designTokens.spacing.xl },
     header: { alignItems: "flex-start", gap: designTokens.spacing.sm },
     backButton: { minHeight: 42, alignSelf: "flex-start", justifyContent: "center", paddingHorizontal: 3 },
