@@ -182,7 +182,7 @@ export default function ProfileScreen() {
             >
               <Card contentStyle={styles.statCard}>
               <View style={styles.statHeader}>
-                <View style={[styles.statIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+                <View style={[styles.statIcon, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
                   <Icon name="star" size={designTokens.dimensions.iconSize.sm} />
                 </View>
                 <StatCard
