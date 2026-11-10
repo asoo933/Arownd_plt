@@ -1,0 +1,21 @@
+revoke all on function private.dispatch_notification_push() from public, anon, authenticated, service_role;
+revoke all on function public.get_my_account_type() from public, anon;
+grant execute on function public.get_my_account_type() to authenticated, service_role;
+
+drop function if exists public.archive_my_activity(text, uuid) restrict;
+drop function if exists public.become_merchant() restrict;
+drop function if exists public.cancel_account_deletion_request(uuid) restrict;
+drop function if exists public.cancel_reservation(uuid) restrict;
+drop function if exists public.category_stats() restrict;
+drop function if exists public.create_reservation(uuid, integer, integer, jsonb) restrict;
+drop function if exists public.get_most_viewed_products(integer, integer) restrict;
+drop function if exists public.increment_product_view(uuid) restrict;
+drop function if exists public.link_order_shipment(uuid, uuid, text) restrict;
+drop function if exists public.merchant_archive_order_items(uuid, uuid) restrict;
+drop function if exists public.merchant_archive_reservation(uuid) restrict;
+drop function if exists public.merchant_confirm_all_stock(uuid) restrict;
+drop function if exists public.merchant_confirm_reservation(text) restrict;
+drop function if exists public.merchant_update_order_note(uuid, text) restrict;
+drop function if exists public.request_account_deletion() restrict;
+drop function if exists public.set_my_profile_visibility(boolean) restrict;
+drop function if exists public.submit_content_report(text, uuid, text, text) restrict;
