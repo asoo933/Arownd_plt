@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
 import {
+  AccessibilityInfo,
+  Animated,
   Pressable,
   View,
   type StyleProp,
   type ViewStyle
 } from "react-native";
+import { useEffect, useRef, useState } from "react";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { Text as UiText } from "./typography";
@@ -45,6 +48,109 @@ export function BackButton({
   );
 }
 
+function NavigationTab({
+  item,
+  selected,
+  onChange
+}: {
+  item: NavigationItem;
+  selected: boolean;
+  onChange: (key: string) => void;
+}) {
+  const theme = useAppTheme();
+  const scale = useRef(new Animated.Value(1)).current;
+  const wasSelected = useRef(selected);
+  const [reduceMotion, setReduceMotion] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    void AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (active) setReduceMotion(enabled);
+      })
+      .catch(() => {
+        if (active) setReduceMotion(true);
+      });
+
+    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduceMotion);
+    return () => {
+      active = false;
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const becameSelected = selected && !wasSelected.current;
+    wasSelected.current = selected;
+    if (!becameSelected) return;
+
+    if (reduceMotion) {
+      scale.setValue(1);
+      return;
+    }
+
+    scale.setValue(0.88);
+    const animation = Animated.spring(scale, {
+      toValue: 1,
+      damping: 9,
+      stiffness: 240,
+      mass: 0.65,
+      useNativeDriver: true
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [reduceMotion, scale, selected]);
+
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityLabel={item.label}
+      accessibilityState={{ selected, disabled: item.disabled }}
+      disabled={item.disabled}
+      onPress={() => onChange(item.key)}
+      hitSlop={4}
+      style={({ pressed }) => [
+        {
+          flex: 1,
+          minWidth: 0,
+          minHeight: theme.dimensions.controlHeight.lg,
+          paddingHorizontal: designTokens.spacing.xs,
+          alignItems: "center",
+          justifyContent: "center",
+          gap: designTokens.spacing.xs,
+          opacity: item.disabled ? 0.45 : pressed ? 0.72 : 1
+        }
+      ]}
+    >
+      <Animated.View
+        style={{
+          minWidth: 44,
+          minHeight: 32,
+          paddingHorizontal: designTokens.spacing.md,
+          borderRadius: theme.radius.pill,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "transparent",
+          transform: [{ scale }]
+        }}
+      >
+        {item.icon}
+      </Animated.View>
+      <UiText
+        numberOfLines={1}
+        style={{
+          color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted,
+          fontSize: theme.typography.caption,
+          fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular,
+          flexShrink: 1
+        }}
+      >
+        {item.label}
+      </UiText>
+    </Pressable>
+  );
+}
+
 export function BottomNavigation({
   items,
   value,
@@ -73,57 +179,14 @@ export function BottomNavigation({
         style
       ]}
     >
-      {items.map((item) => {
-        const selected = item.key === value;
-        return (
-          <Pressable
-            key={item.key}
-            accessibilityRole="tab"
-            accessibilityLabel={item.label}
-            accessibilityState={{ selected, disabled: item.disabled }}
-            disabled={item.disabled}
-            onPress={() => onChange(item.key)}
-            hitSlop={4}
-            style={({ pressed }) => [
-              {
-                flex: 1,
-                minWidth: 0,
-                minHeight: theme.dimensions.controlHeight.lg,
-                paddingHorizontal: designTokens.spacing.xs,
-                alignItems: "center",
-                justifyContent: "center",
-                gap: designTokens.spacing.xs,
-                opacity: item.disabled ? 0.45 : pressed ? 0.72 : 1
-              }
-            ]}
-          >
-            <View
-              style={{
-                minWidth: 44,
-                minHeight: 32,
-                paddingHorizontal: designTokens.spacing.md,
-                borderRadius: theme.radius.pill,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "transparent"
-              }}
-            >
-              {item.icon}
-            </View>
-            <UiText
-              numberOfLines={1}
-              style={{
-                color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted,
-                fontSize: theme.typography.caption,
-                fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular,
-                flexShrink: 1
-              }}
-            >
-              {item.label}
-            </UiText>
-          </Pressable>
-        );
-      })}
+      {items.map((item) => (
+        <NavigationTab
+          key={item.key}
+          item={item}
+          selected={item.key === value}
+          onChange={onChange}
+        />
+      ))}
     </View>
   );
 }
