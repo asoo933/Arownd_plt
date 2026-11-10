@@ -130,7 +130,7 @@ export default function MerchantEntryScreen() {
 
         <Card style={{ backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }} contentStyle={styles.storeCard}>
           <View style={styles.storeHeader}>
-            <View style={[styles.storeAvatar, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
+            <View style={[styles.storeAvatar, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted, borderColor: theme.colors.border }]}>
               {data.store.logo_url ? (
                 <UiImage uri={data.store.logo_url} accessibilityLabel={data.store.name} aspectRatio={1} style={styles.storeImage} />
               ) : (
@@ -146,7 +146,7 @@ export default function MerchantEntryScreen() {
               </UiText>
               <View style={styles.storeBadges}>
                 <MerchantStatusBadge label={data.store.is_verified ? translate("merchantStoreVerified") : translate("merchantStoreNotVerified")} tone={data.store.is_verified ? "success" : "warning"} />
-                <View style={[styles.statusPill, { backgroundColor: theme.colors.surfaceMuted }]}>
+                <View style={[styles.statusPill, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
                   <UiText style={[styles.statusPillText, { color: theme.colors.muted }]}>
                     {translate("merchantStoreRating")}: {data.store.rating == null ? "—" : data.store.rating.toFixed(1)}
                   </UiText>
