@@ -124,11 +124,14 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
   const theme = useAppTheme();
   if (!password) return null;
 
+  const passwordLength = Array.from(password).length;
+  const hasNumber = /\\p{N}/u.test(password);
+  const hasSymbol = /[\\p{P}\\p{S}]/u.test(password);
   const score = [
-    password.length >= 8,
-    password.length >= 12,
+    passwordLength >= 8,
+    passwordLength >= 12,
     /[a-z]/.test(password) && /[A-Z]/.test(password),
-    /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)
+    hasNumber && hasSymbol
   ].filter(Boolean).length;
   const labelKey = score <= 1
     ? "passwordStrengthWeak"
