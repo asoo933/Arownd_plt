@@ -274,9 +274,9 @@ export default function OrderDetailsScreen() {
       <UiText style={styles.meta}>{translate("orderPayment")}: {order.payment_method === "cod" ? translate("checkoutCodNote") : order.payment_method ?? ""}</UiText>
     </View>
 
-    {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).length > 0 ? <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
+    {(query.data.shipments).length > 0 ? <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderShipmentsTitle")}</UiText>
-      {(merchantOrders.length === 0 ? query.data.shipments : query.data.shipments.filter((shipment) => Boolean(shipment.company_id))).map((shipment) => <View key={shipment.id} style={styles.shipment}>
+      {(query.data.shipments).map((shipment) => <View key={shipment.id} style={styles.shipment}>
         <OrderStatusBadge status={shipment.status} />
         {shipment.updated_at ? <UiText style={styles.meta}>{translate("orderUpdatedAt")}: {dateLabel(shipment.updated_at, language)}</UiText> : null}
         {shipment.notes ? <UiText style={styles.meta}>{shipment.notes}</UiText> : null}
