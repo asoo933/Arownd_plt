@@ -25,6 +25,7 @@ import Logo from "@/components/logo";
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
 import { listenForPushTokenChanges, registerDeviceForPushNotifications } from "@/lib/push-notifications";
+import { markNotificationRead } from "@/lib/notifications";
 import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
 
 const SPLASH_DURATION_MS = 2500;
@@ -165,8 +166,17 @@ function RootLayoutContent() {
   }, [queryClient, language]);
 
   useEffect(() => {
+    let lastHandledResponseId: string | null = null;
     const openNotificationDestination = (response: Notifications.NotificationResponse) => {
+      const responseId = response.notification.request.identifier;
+      if (lastHandledResponseId === responseId) return;
+      lastHandledResponseId = responseId;
       const data = response.notification.request.content.data;
+      if (typeof data.notification_id === "string") {
+        void markNotificationRead(data.notification_id).catch((error: unknown) => {
+          console.warn("[push-notifications] Could not mark the notification as read", error);
+        });
+      }
       const destination = typeof data.url === "string" && data.url.startsWith("/") && !data.url.startsWith("//")
         ? data.url
         : typeof data.order_id === "string" && data.order_id.length > 0
