@@ -46,7 +46,10 @@ export default function StoresScreen() {
   };
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={selectedWilayaId === null ? wilayas.isFetching : stores.isFetching}
+      onRefresh={() => { void (selectedWilayaId === null ? wilayas.refetch() : stores.refetch()); }}
+    >
       <AppHeader
         title={title}
         leading={<IconButton accessibilityLabel={translate("back")} onPress={handleBack} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} /> }
