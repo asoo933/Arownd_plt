@@ -92,6 +92,28 @@ function RootLayoutContent() {
   }, [appReady]);
 
   useEffect(() => {
+    let cancelled = false;
+    try {
+      const client = getSupabaseClient();
+      void client.auth.getUser().then(async ({ data, error }) => {
+        if (cancelled || error || !data.user) return;
+        if (data.user.user_metadata?.preferred_language === language) return;
+        const { error: updateError } = await client.auth.updateUser({
+          data: { preferred_language: language }
+        });
+        if (!cancelled && updateError) {
+          console.warn("[push-notifications] Could not sync the notification language", updateError);
+        }
+      }).catch((error: unknown) => {
+        if (!cancelled) console.warn("[push-notifications] Could not read the notification language", error);
+      });
+    } catch (error) {
+      if (!(error instanceof Error) || error.message !== "SUPABASE_CONFIG_MISSING") throw error;
+    }
+    return () => { cancelled = true; };
+  }, [language]);
+
+  useEffect(() => {
     if (restartNoticeVersion > 0) {
       Alert.alert(translate("settingsLanguageRestartTitle"), translate("settingsLanguageRestartMessage"));
     }
@@ -111,7 +133,7 @@ function RootLayoutContent() {
             if (!pushTokenSubscription) {
               pushTokenSubscription = listenForPushTokenChanges();
             }
-            void registerDeviceForPushNotifications().catch((error: unknown) => {
+            void registerDeviceForPushNotifications(language).catch((error: unknown) => {
               console.warn("[push-notifications] Device registration failed", error);
             });
           });
