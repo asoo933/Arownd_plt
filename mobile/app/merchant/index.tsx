@@ -83,9 +83,7 @@ export default function MerchantEntryScreen() {
   }
 
   if (access.data.status !== "merchant_ready" || !storeId) {
-    const message = access.data.status === "delivery_company"
-      ? translate("merchantStatusDeliveryHint")
-      : translate("merchantStatusInconsistentHint");
+    const message = translate("merchantStatusInconsistentHint");
 
     return (
       <MessageScreen
