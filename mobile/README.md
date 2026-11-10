@@ -42,6 +42,14 @@ npm run doctor
 npx expo start
 ```
 
+## Push notifications (FCM)
+
+The app uses `expo-notifications` to obtain the native Android FCM device token and registers it through the existing authenticated Supabase RPCs. Push delivery continues through the existing `send-push-notification` Edge Function.
+
+For Android builds, create a Firebase Android app with package name `com.arownd.app` and provide its `google-services.json` as a protected EAS file environment variable named `GOOGLE_SERVICES_JSON`. The dynamic Expo config reads the file path from that variable. For local builds, place the file at `mobile/google-services.json` and set `GOOGLE_SERVICES_JSON=./google-services.json` in the local environment. The file is ignored by Git and must not be committed.
+
+The app asks for notification permission after sign-in, registers token refreshes, unregisters the current device before sign-out, and opens an in-app destination when a notification is tapped. The account's selected language is stored as the non-authoritative `preferred_language` user metadata value so the server can localize order push copy. No service-role key is included in the mobile app.
+
 ## EAS profiles
 
 `eas.json` contains an internal-preview APK profile and a production Android App Bundle profile for a later release. No EAS build has been started. Before the first EAS build, link this Expo app to its EAS project and configure Android signing credentials securely.
