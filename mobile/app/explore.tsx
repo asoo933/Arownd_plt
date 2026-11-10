@@ -7,16 +7,60 @@ import { CustomerScreen, CustomerHeading, EmptyState, ErrorState, ProductTile, S
 import { fetchHomeProducts, fetchProductDetails, fetchProductOffers, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
+import { getLocalizedProductCategoryLabel } from "@/lib/locale-data";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { CategorySelectorTile, Icon, IconButton, ProductCardSkeleton, SearchField, Text as UiText } from "@/components/ui";
 
 const categories = [
-  { id: "fashion", icon: "shirt", label: "categoryFashion" },
-  { id: "electronics", icon: "smartphone", label: "categoryElectronics" },
-  { id: "beauty", icon: "sparkles", label: "categoryBeauty" },
-  { id: "home", icon: "house", label: "categoryHome" },
-  { id: "kids", icon: "baby", label: "categoryKids" },
-  { id: "food", icon: "cake-slice", label: "categoryFood" }
+  { id: "fashion", icon: "shirt" },
+  { id: "clothes", icon: "shirt" },
+  { id: "shoes", icon: "footprints" },
+  { id: "bags", icon: "shopping-bag" },
+  { id: "electronics", icon: "smartphone" },
+  { id: "phones", icon: "smartphone" },
+  { id: "computers", icon: "laptop" },
+  { id: "gadgets", icon: "headphones" },
+  { id: "phone-accessories", icon: "cable" },
+  { id: "beauty", icon: "sparkles" },
+  { id: "perfumes", icon: "spray-can" },
+  { id: "makeup", icon: "palette" },
+  { id: "skincare", icon: "droplet" },
+  { id: "home", icon: "house" },
+  { id: "furniture", icon: "armchair" },
+  { id: "home-tools", icon: "wrench" },
+  { id: "decor", icon: "lamp" },
+  { id: "kitchenware", icon: "utensils" },
+  { id: "kids", icon: "baby" },
+  { id: "kids-clothes", icon: "shirt" },
+  { id: "toys", icon: "puzzle" },
+  { id: "kids-essentials", icon: "baby" },
+  { id: "sports", icon: "trophy" },
+  { id: "sportswear", icon: "footprints" },
+  { id: "sports-gear", icon: "dumbbell" },
+  { id: "hobbies", icon: "paintbrush" },
+  { id: "food", icon: "cake-slice" },
+  { id: "sweets", icon: "cake-slice" },
+  { id: "groceries", icon: "shopping-cart" },
+  { id: "home-food", icon: "cooking-pot" },
+  { id: "gifts-crafts", icon: "gift" },
+  { id: "gifts", icon: "gift" },
+  { id: "handmade", icon: "scissors" },
+  { id: "stationery", icon: "notebook" },
+  { id: "digital", icon: "monitor" },
+  { id: "design", icon: "palette" },
+  { id: "web-dev", icon: "code" },
+  { id: "digital-services", icon: "briefcase-business" },
+  { id: "digital-products", icon: "package" },
+  { id: "cars", icon: "car" },
+  { id: "car-accessories", icon: "car-front" },
+  { id: "car-parts", icon: "settings" },
+  { id: "car-maintenance", icon: "wrench" },
+  { id: "books", icon: "book-open" },
+  { id: "industrial", icon: "factory" },
+  { id: "used", icon: "recycle" },
+  { id: "flowers", icon: "flower-2" },
+  { id: "pets", icon: "paw-print" },
+  { id: "misc", icon: "package" }
 ] as const;
 
 export default function ExploreScreen() {
@@ -124,8 +168,8 @@ export default function ExploreScreen() {
     return (
       <CategorySelectorTile
         key={`${instance}-${item.id}`}
-        label={translate(item.label)}
-        accessibilityLabel={translate(item.label)}
+        label={getLocalizedProductCategoryLabel(item.id, language)}
+        accessibilityLabel={getLocalizedProductCategoryLabel(item.id, language)}
         icon={item.icon}
         selected={selected}
         onPress={() => {
