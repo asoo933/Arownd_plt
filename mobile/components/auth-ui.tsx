@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
+import Logo from "@/components/logo";
 import {
   Alert,
   Button,
@@ -57,7 +58,7 @@ export function AuthLayout({ title, subtitle, children, showBack = false }: Auth
                 size={designTokens.dimensions.controlHeight.md}
               />
             ) : <View style={styles.backPlaceholder} />}
-            <UiText weight="900" align="center" style={styles.brand}>arownd</UiText>
+            <Logo color={theme.colors.foreground} width={160} />
             <View style={styles.backPlaceholder} />
           </View>
 
@@ -146,7 +147,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between"
   },
-  brand: { fontSize: designTokens.typography.title },
   backPlaceholder: {
     width: designTokens.dimensions.controlHeight.md,
     height: designTokens.dimensions.controlHeight.md
