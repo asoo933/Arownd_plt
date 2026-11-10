@@ -123,7 +123,7 @@ export default function OrdersScreen() {
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
   </CustomerScreen>;
-  if (auth.isError || orders.isError) return <CustomerScreen refreshing={auth.isFetching || orders.isFetching} onRefresh={() => { void Promise.all([auth.refetch(), refetchOrders()]); }}>
+  if (auth.isError || orders.isError) return <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && orders.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.data) void refetchOrders(); }); }}>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={auth.isFetching || orders.isFetching} onRetry={() => { void auth.refetch(); void refetchOrders(); }} />
   </CustomerScreen>;
@@ -133,7 +133,7 @@ export default function OrdersScreen() {
     <PressableSurface accessibilityRole="button" accessibilityLabel={translate("login")} onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
 
-  return <CustomerScreen refreshing={auth.isFetching || orders.isFetching} onRefresh={() => { void Promise.all([auth.refetch(), refetchOrders()]); }}>
+  return <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && orders.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.data) void refetchOrders(); }); }}>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersSubtitle")}</UiText>
     <SegmentedControl
