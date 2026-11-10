@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { formatDZD, formatNumber } from "@/lib/catalog";
