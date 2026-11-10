@@ -292,7 +292,6 @@ export default function OrderDetailsScreen() {
       <UiText style={styles.cancelButtonText}>{translate("orderCancel")}</UiText>
     </PressableSurface> : null}
     {cancelMutation.isError ? <UiText style={styles.errorText}>{translate("orderCancelError")}</UiText> : null}
-    <PressableSurface accessibilityRole="button" onPress={() => router.replace("/orders")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("ordersTitle")}</UiText></PressableSurface>
     <ConfirmDialog
       visible={cancelTarget !== null}
       onRequestClose={() => setCancelTarget(null)}
