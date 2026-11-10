@@ -27,7 +27,7 @@ export function AvatarGroup({
         <Avatar key={person.imageUri ?? person.name + index} {...person} size={size} style={{ marginStart: index === 0 ? 0 : -size * 0.22, borderWidth: 2, borderColor: theme.colors.surface }} />
       ))}
       {remaining > 0 ? (
-        <View style={{ width: size, height: size, marginStart: -size * 0.22, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.surfaceMuted, borderWidth: 2, borderColor: theme.colors.surface }}>
+        <View style={{ width: size, height: size, marginStart: -size * 0.22, borderRadius: theme.radius.pill, alignItems: "center", justifyContent: "center", backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted, borderWidth: 2, borderColor: theme.colors.surface }}>
           <UiText style={{ color: theme.colors.foreground, fontSize: theme.typography.caption, fontWeight: theme.fontWeights.bold }}>+{remaining}</UiText>
         </View>
       ) : null}
