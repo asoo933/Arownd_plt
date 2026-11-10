@@ -197,9 +197,9 @@ export default function MerchantOrderDetailsScreen() {
           <InfoRow label={translate("merchantStoreCommuneLabel")} value={customerOrder.commune || "—"} theme={theme} />
           <InfoRow label={translate("merchantStoreAddressLabel")} value={customerOrder.address_line || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderDeliveryType")} value={deliveryType === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")} theme={theme} />
-          <InfoRow label={translate("merchantOrderPaymentMethod")} value={customerOrder.payment_method || "—"} theme={theme} />
+          <InfoRow label={translate("merchantOrderPaymentMethod")} value={customerOrder.payment_method === "cod" ? translate("checkoutPaymentCod") : customerOrder.payment_method || "—"} theme={theme} />
           {detail.data.shipment ? (
-            <InfoRow label={translate("merchantOrderShipmentStatus")} value={detail.data.shipment.status} theme={theme} />
+            <InfoRow label={translate("merchantOrderShipmentStatus")} value={merchantShipmentStatusLabel(detail.data.shipment.status)} theme={theme} />
           ) : null}
         </MerchantOrderCard>
 
@@ -287,6 +287,18 @@ export default function MerchantOrderDetailsScreen() {
       />
     </SafeAreaView>
   );
+}
+
+function merchantShipmentStatusLabel(status: string): string {
+  const labels: Record<string, TranslationKey> = {
+    accepted: "shipmentStatusAccepted",
+    picked_up: "shipmentStatusPickedUp",
+    in_transit: "shipmentStatusTransit",
+    failed: "shipmentStatusFailed",
+    returned: "shipmentStatusReturned"
+  };
+  const key = labels[status];
+  return key ? translate(key) : translate("orderStatusUnknown");
 }
 
 function getErrorMessage(error: unknown): string {
