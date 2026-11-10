@@ -101,7 +101,7 @@ export default function ProfileScreen() {
       refreshing={user.isFetching || (Boolean(user.data) && (profile.isFetching || orders.isFetching || favorites.isFetching || reviews.isFetching))}
       onRefresh={() => {
         void user.refetch().then((result) => {
-          if (result.data) void Promise.all([profile.refetch(), orders.refetch(), favorites.refetch(), reviews.refetch()]);
+          if (result.isSuccess && result.data) void Promise.all([profile.refetch(), orders.refetch(), favorites.refetch(), reviews.refetch()]);
         });
       }}
     >
