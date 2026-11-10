@@ -410,6 +410,13 @@ function MessageScreen({
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.messageContainer}>
+        <AppHeader
+          title={translate("merchantProductsTitle")}
+          leading={<Button label={translate("merchantProductsBack")} onPress={() => router.replace("/merchant")} variant="ghost" size="sm" />}
+        />
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantProductsSubtitle")}
+        </UiText>
         {loading ? (
           <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.md }}>
             {[0, 1, 2, 3].map((item) => <ProductCardSkeleton key={item} style={{ width: "47%", flex: 0 }} />)}
@@ -467,7 +474,7 @@ function createStyles(theme: AppTheme) {
     stockHint: { fontSize: designTokens.typography.caption - 2, lineHeight: 14, textAlign: "auto" },
     valueInput: { width: "100%", minHeight: 42, borderWidth: 1, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.sm, textAlign: "auto", fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     actionsRow: { flexDirection: "row", gap: designTokens.spacing.sm },
-    messageContainer: { flex: 1, padding: designTokens.spacing.xxl, justifyContent: "center", alignItems: "center", gap: designTokens.spacing.lg },
+    messageContainer: { flex: 1, padding: designTokens.spacing.lg, justifyContent: "center", gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, lineHeight: 21, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" }
   });
 }
