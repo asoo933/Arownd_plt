@@ -69,7 +69,7 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     brandAccent: {
       width: 48,
       height: 5,
-      borderRadius: designTokens.radius.full,
+      borderRadius: designTokens.radius.pill,
       backgroundColor: theme.colors.accent
     },
     descriptionBlock: {
