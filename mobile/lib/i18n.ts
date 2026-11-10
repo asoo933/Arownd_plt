@@ -472,7 +472,7 @@ export const messages = {
     merchantStoreSettingsAddressHint: "اذكر الحي والشارع ورقم المبنى لتسهيل العثور على المتجر.",
     merchantStoreSettingsHoursHint: "استخدم نظام 24 ساعة، مثل 09:00 للفتح و18:00 للإغلاق.",
     merchantStoreSettingsClosedDaysHint: "حدّد الأيام التي يكون فيها المتجر مغلقًا.",
-    merchantStoreSettingsSocialHint: "أدخل رابطًا كاملًا يبدأ بـ https:// لكل حساب.";
+    merchantStoreSettingsSocialHint: "أدخل رابطًا كاملًا يبدأ بـ https:// لكل حساب.",
     merchantStoreSocialTitle: "روابط التواصل",
     merchantStoreSettingsName: "اسم المتجر",
     merchantStoreSettingsDescription: "وصف المتجر",
@@ -1233,7 +1233,7 @@ export const messages = {
     merchantStoreSettingsAddressHint: "Include the district, street and building number to help customers find your store.",
     merchantStoreSettingsHoursHint: "Use the 24-hour format, such as 09:00 to open and 18:00 to close.",
     merchantStoreSettingsClosedDaysHint: "Select the days when your store is closed.",
-    merchantStoreSettingsSocialHint: "Enter the full URL for each account, starting with https://.";
+    merchantStoreSettingsSocialHint: "Enter the full URL for each account, starting with https://.",
     merchantStoreSocialTitle: "Social links",
     merchantStoreSettingsName: "Store name",
     merchantStoreSettingsDescription: "Store description",
