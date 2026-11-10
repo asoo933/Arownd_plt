@@ -51,15 +51,19 @@ export function CustomerSearch({ value, onChangeText, placeholder }: {
   );
 }
 
-export function SectionTitle({ title, action, onAction }: {
+export function SectionTitle({ title, subtitle, action, onAction }: {
   title: string;
+  subtitle?: string;
   action?: string;
   onAction?: () => void;
 }) {
   const theme = useAppTheme();
   return (
     <View style={styles.sectionTitle}>
-      <Heading level={3}>{title}</Heading>
+      <View style={styles.sectionCopy}>
+        <Heading level={3}>{title}</Heading>
+        {subtitle ? <Caption>{subtitle}</Caption> : null}
+      </View>
       {action && onAction ? (
         <Button
           label={action}
@@ -141,7 +145,8 @@ const styles = StyleSheet.create({
   footer: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.sm, borderTopWidth: StyleSheet.hairlineWidth },
   content: { paddingHorizontal: designTokens.spacing.xl, paddingTop: designTokens.spacing.sm, paddingBottom: designTokens.spacing.xxl, gap: designTokens.spacing.xxl },
   heading: { gap: designTokens.spacing.xs, alignItems: "flex-start" },
-  sectionTitle: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md },
+  sectionTitle: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: designTokens.spacing.md, gap: designTokens.spacing.sm },
+  sectionCopy: { flex: 1, gap: designTokens.spacing.xs, alignItems: "flex-start" },
   sectionAction: { fontSize: designTokens.typography.caption + 1, fontWeight: "700" },
   productTile: { width: 158 },
   productContent: { padding: designTokens.spacing.sm + 1, gap: designTokens.spacing.xs + 1 },
