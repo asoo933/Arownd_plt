@@ -269,7 +269,7 @@ export default function CheckoutScreen() {
               style={[styles.savedAddress, selectedAddressId === address.id && styles.savedAddressSelected]}
             >
               <View style={styles.savedAddressTop}>
-                <UiText style={styles.savedAddressName}>{address.recipient_name}</UiText>
+                <UiText style={[styles.savedAddressName, selectedAddressId === address.id && theme.mode === "dark" && { color: theme.colors.accentMuted }]}>{address.recipient_name}</UiText>
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
               </View>
               <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{address.phone}</UiText>
@@ -421,7 +421,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   savedAddresses: { gap: designTokens.spacing.sm },
   savedHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   savedAddress: { borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderRadius: designTokens.radius.sm, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
-  savedAddressSelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface },
+  savedAddressSelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary },
   savedAddressTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   savedAddressName: { color: theme.colors.foreground, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
   savedDefault: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
