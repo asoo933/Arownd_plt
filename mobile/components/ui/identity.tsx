@@ -48,7 +48,7 @@ export function Avatar({
           borderRadius: theme.radius.pill,
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: theme.colors.surfaceMuted
+          backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted
         }}
       >
         {imageSource ? (
