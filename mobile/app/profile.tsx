@@ -62,7 +62,7 @@ export default function ProfileScreen() {
   }
   if (user.isError) {
     return (
-      <CustomerScreen>
+      <CustomerScreen refreshing={user.isFetching} onRefresh={() => { void user.refetch(); }}>
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
@@ -82,7 +82,7 @@ export default function ProfileScreen() {
   }
   if (profile.isError) {
     return (
-      <CustomerScreen>
+      <CustomerScreen refreshing={profile.isFetching} onRefresh={() => { void profile.refetch(); }}>
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
@@ -97,7 +97,10 @@ export default function ProfileScreen() {
   const favoriteCount = (favorites.data?.products.length ?? 0) + (favorites.data?.stores.length ?? 0);
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={user.isFetching || profile.isFetching || orders.isFetching || favorites.isFetching || reviews.isFetching}
+      onRefresh={() => { void Promise.all([user.refetch(), profile.refetch(), orders.refetch(), favorites.refetch(), reviews.refetch()]); }}
+    >
       <AppHeader
         title=""
         leading={
