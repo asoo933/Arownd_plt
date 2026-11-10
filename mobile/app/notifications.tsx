@@ -95,7 +95,7 @@ export default function NotificationsScreen() {
   }
   if (auth.isError || notifications.isError) {
     return (
-      <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && notifications.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.data) void notifications.refetch(); }); }}>
+      <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && notifications.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void notifications.refetch(); }); }}>
         <AppHeader title={translate("notificationsTitle")} />
         <ErrorState
           title={translate("notificationsLoadError")}
@@ -121,7 +121,7 @@ export default function NotificationsScreen() {
   return (
     <CustomerScreen
       refreshing={auth.isFetching || (Boolean(auth.data) && notifications.isFetching)}
-      onRefresh={() => { void auth.refetch().then((result) => { if (result.data) void notifications.refetch(); }); }}
+      onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void notifications.refetch(); }); }}
     >
       <AppHeader
         title={translate("notificationsTitle")}
