@@ -26,6 +26,7 @@ export default function SupportScreen() {
   const { language } = useLanguage();
   const queryClient = useQueryClient();
   const [formError, setFormError] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
   const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<SupportConversationInput>({
     resolver: zodResolver(supportConversationInputSchema),
     defaultValues: { subject: "", message: "" },
@@ -102,6 +103,33 @@ export default function SupportScreen() {
       </View>
 
       <View style={styles.section}>
+        <Heading level={3}>{translate("supportFaqTitle")}</Heading>
+        {[
+          { id: "orders", question: translate("supportFaqOrdersQuestion"), answer: translate("supportFaqOrdersAnswer") },
+          { id: "payment", question: translate("supportFaqPaymentQuestion"), answer: translate("supportFaqPaymentAnswer") },
+          { id: "addresses", question: translate("supportFaqAddressesQuestion"), answer: translate("supportFaqAddressesAnswer") },
+          { id: "notifications", question: translate("supportFaqNotificationsQuestion"), answer: translate("supportFaqNotificationsAnswer") }
+        ].map((item) => {
+          const expanded = expandedFaq === item.id;
+          return (
+            <PressableSurface
+              key={item.id}
+              onPress={() => setExpandedFaq(expanded ? null : item.id)}
+              style={styles.faqItem}
+              accessibilityRole="button"
+              accessibilityLabel={item.question}
+            >
+              <View style={styles.faqHeader}>
+                <UiText weight="700" style={styles.faqQuestion}>{item.question}</UiText>
+                <Icon name={expanded ? "chevron-down" : "chevron-left"} size={18} color={theme.colors.foregroundSecondary} />
+              </View>
+              {expanded ? <Caption>{item.answer}</Caption> : null}
+            </PressableSurface>
+          );
+        })}
+      </View>
+
+      <View style={styles.section}>
         <Heading level={3}>{translate("supportNewMessage")}</Heading>
         <Controller
           control={control}
@@ -175,6 +203,9 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     hero: { alignItems: "flex-start", gap: designTokens.spacing.sm, paddingVertical: designTokens.spacing.lg },
     heroMark: { width: 54, height: 54, borderRadius: designTokens.radius.lg, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center", marginBottom: designTokens.spacing.sm },
     section: { gap: designTokens.spacing.md },
+    faqItem: { paddingVertical: designTokens.spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: designTokens.spacing.sm },
+    faqHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
+    faqQuestion: { flex: 1 },
     input: { minHeight: 52, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, color: theme.colors.foreground, backgroundColor: theme.colors.surface, textAlign: "auto", fontFamily: "IBMPlexSansArabic" },
     messageInput: { minHeight: 120 },
     conversation: { paddingVertical: designTokens.spacing.md, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: designTokens.spacing.xs },
