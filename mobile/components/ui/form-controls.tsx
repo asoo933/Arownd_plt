@@ -84,7 +84,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
               {
                 backgroundColor: theme.colors.surface,
                 transform: [
-                  { translateY: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [0, -11] }) },
+                  { translateY: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [0, -designTokens.spacing.lg] }) },
                   { scale: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.82] }) }
                 ],
                 opacity: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] })
@@ -183,7 +183,7 @@ export function QuantityStepper({
 const styles = StyleSheet.create({
   field: { gap: designTokens.spacing.xs },
   inputContainer: { position: "relative", justifyContent: "center" },
-  floatingLabel: { position: "absolute", zIndex: 1, start: designTokens.spacing.lg, top: 0, maxWidth: "82%", paddingHorizontal: 3 },
+  floatingLabel: { position: "absolute", zIndex: 1, start: designTokens.spacing.lg, top: designTokens.spacing.lg, maxWidth: "82%", paddingHorizontal: 3 },
   fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
   textInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
   textInputWithLabel: { paddingTop: designTokens.spacing.lg + 2 },
