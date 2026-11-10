@@ -314,7 +314,7 @@ function MerchantOfferCard({
             keyboardType="number-pad"
             editable={!anyBusy}
             accessibilityLabel={translate("merchantProductsPriceLabel")}
-            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border), backgroundColor: theme.colors.background }]}
+            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: (theme.colors.inputBorder), backgroundColor: theme.colors.background }]}
           />
         </View>
         <View style={styles.inputGroup}>
@@ -325,7 +325,7 @@ function MerchantOfferCard({
             keyboardType="number-pad"
             editable={!anyBusy}
             accessibilityLabel={translate("merchantProductsStockLabel")}
-            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: (theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border), backgroundColor: theme.colors.background }]}
+            style={[styles.valueInput, { color: theme.colors.foreground, borderColor: (theme.colors.inputBorder), backgroundColor: theme.colors.background }]}
           />
           <UiText style={[styles.stockHint, { color: theme.colors.subtle }]}>
             {translate("merchantProductsStockHint")}
