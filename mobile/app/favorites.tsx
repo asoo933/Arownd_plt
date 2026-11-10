@@ -87,7 +87,7 @@ export default function FavoritesScreen() {
     </CustomerScreen>;
   }
   if (favorites.isError) {
-    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={favorites.isFetching} onRetry={() => void favorites.refetch()} /></CustomerScreen>;
+    return <CustomerScreen refreshing={favorites.isFetching} onRefresh={() => { void favorites.refetch(); }}><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={favorites.isFetching} onRetry={() => void favorites.refetch()} /></CustomerScreen>;
   }
 
   const count = tab === "products" ? favorites.data.products.length : favorites.data.stores.length;
