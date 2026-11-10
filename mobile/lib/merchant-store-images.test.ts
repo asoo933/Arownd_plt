@@ -14,7 +14,14 @@ describe("merchant store images", () => {
     expect(validateStoreImageAsset({ mimeType: "image/png", fileName: "logo.png", fileSize: 0 })).toBe(false);
   });
 
-  it("extracts signed URLs and ignores their token query string", () => {\n    expect(getStoreImageStoragePath(\n      "https://example.supabase.co/storage/v1/object/sign/store-media/user-1/stores/logo.webp?token=abc.def.ghi",\n      "user-1"\n    )).toBe("user-1/stores/logo.webp");\n  });\n\n  it("returns only this user's store-media object path", () => {
+  it("extracts signed URLs and ignores their token query string", () => {
+    expect(getStoreImageStoragePath(
+      "https://example.supabase.co/storage/v1/object/sign/store-media/user-1/stores/logo.webp?token=abc.def.ghi",
+      "user-1"
+    )).toBe("user-1/stores/logo.webp");
+  });
+
+  it("returns only this user's store-media object path", () => {
     expect(getStoreImageStoragePath(
       "https://example.supabase.co/storage/v1/object/public/store-media/user-1/stores/logo.webp",
       "user-1"
@@ -29,6 +36,10 @@ describe("merchant store images", () => {
     )).toBeNull();
     expect(getStoreImageStoragePath(
       "https://example.supabase.co/storage/v1/object/public/store-media/user-1/stores/../logo.webp",
+      "user-1"
+    )).toBeNull();
+    expect(getStoreImageStoragePath(
+      "https://example.supabase.co/storage/v1/object/sign/store-media/user-1/stores/%252e%252e/logo.webp?token=x",
       "user-1"
     )).toBeNull();
   });
