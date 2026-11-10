@@ -3,6 +3,7 @@ import { AccessibilityInfo, Animated, Pressable, StyleSheet, TextInput, View, ty
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { triggerSelectionHaptic } from "@/lib/haptics";
 import { useLanguage } from "@/lib/i18n";
+import { Icon as UiIcon } from "./icon";
 import { Text as UiText } from "./typography";
 import { getQuantityStepState } from "./form-controls-state";
 
@@ -14,9 +15,10 @@ type TextFieldProps = Omit<TextInputProps, "style" | "textAlign"> & {
   containerStyle?: StyleProp<ViewStyle> | undefined;
 };
 
-export function TextField({ label, error, style, containerStyle, accessibilityLabel, textAlign, onFocus, onBlur, ...props }: TextFieldProps) {
+export function TextField({ label, error, style, containerStyle, accessibilityLabel, textAlign, onFocus, onBlur, secureTextEntry, editable = true, ...props }: TextFieldProps) {
   const theme = useAppTheme();
   const [focused, setFocused] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(true);
   const shake = useRef(new Animated.Value(0)).current;
   const labelProgress = useRef(new Animated.Value(props.value || props.defaultValue ? 1 : 0)).current;
@@ -96,6 +98,8 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
         ) : null}
         <TextInput
           {...props}
+          editable={editable}
+          secureTextEntry={Boolean(secureTextEntry) && !passwordVisible}
           onFocus={(event) => {
             setFocused(true);
             onFocus?.(event);
@@ -111,6 +115,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           style={[
             styles.textInput,
             label ? styles.textInputWithLabel : null,
+            secureTextEntry ? styles.textInputWithPasswordToggle : null,
             {
               backgroundColor: theme.colors.surface,
               borderColor: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.inputBorder,
@@ -120,6 +125,24 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
             style
           ]}
         />
+        {secureTextEntry ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={language === "ar" ? (passwordVisible ? "إخفاء كلمة المرور" : "إظهار كلمة المرور") : (passwordVisible ? "Hide password" : "Show password")}
+            accessibilityState={{ disabled: !editable, selected: passwordVisible }}
+            disabled={!editable}
+            hitSlop={10}
+            onPress={() => setPasswordVisible((visible) => !visible)}
+            style={styles.passwordVisibilityToggle}
+          >
+            <UiIcon
+              name={passwordVisible ? "eye-off" : "eye"}
+              size={designTokens.dimensions.iconSize.md}
+              color={theme.colors.muted}
+              accessibilityHidden
+            />
+          </Pressable>
+        ) : null}
       </View>
       {error ? <UiText accessibilityRole="alert" style={[styles.fieldError, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{error}</UiText> : null}
     </Animated.View>
@@ -187,6 +210,8 @@ const styles = StyleSheet.create({
   fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
   textInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
   textInputWithLabel: { paddingTop: designTokens.spacing.lg + 2 },
+  textInputWithPasswordToggle: { paddingEnd: designTokens.spacing.xxl + designTokens.spacing.md },
+  passwordVisibilityToggle: { position: "absolute", end: designTokens.spacing.md, minWidth: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" },
   fieldError: { fontSize: designTokens.typography.caption, textAlign: "auto" },
   stepper: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   stepButton: { width: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
