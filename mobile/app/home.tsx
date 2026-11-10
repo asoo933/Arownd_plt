@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { Avatar, Icon, PressableSurface, Skeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
+import Logo from "@/components/logo";
 import {
   CustomerScreen,
   EmptyState,
@@ -49,9 +50,7 @@ export default function CustomerHomeScreen() {
   return (
     <CustomerScreen>
       <View style={styles.header}>
-        <UiText accessibilityRole="header" style={[styles.brand, { color: theme.colors.foreground }]}>
-          AROWND
-        </UiText>
+        <Logo color={theme.colors.foreground} width={148} />
         <View style={styles.headerActions}>
           <PressableSurface
             accessibilityRole="button"
@@ -139,11 +138,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between"
-  },
-  brand: {
-    fontSize: designTokens.typography.title,
-    fontWeight: designTokens.fontWeights.extrabold,
-    letterSpacing: 1.2
   },
   headerActions: {
     flexDirection: "row",
