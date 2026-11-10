@@ -103,7 +103,7 @@ export function Skeleton({
   style?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
-  return <View accessibilityElementsHidden style={[{ width, height, borderRadius: radius ?? theme.radius.sm, backgroundColor: theme.colors.surfaceMuted }, style]} />;
+  return <View accessibilityElementsHidden style={[{ width, height, borderRadius: radius ?? theme.radius.sm, backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }, style]} />;
 }
 
 
