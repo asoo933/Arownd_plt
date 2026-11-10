@@ -18,6 +18,9 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
   const [focused, setFocused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(true);
   const shake = useRef(new Animated.Value(0)).current;
+  const labelProgress = useRef(new Animated.Value(props.value || props.defaultValue ? 1 : 0)).current;
+  const hasValue = String(props.value ?? props.defaultValue ?? "").length > 0;
+  const isLabelFloating = focused || hasValue;
   const previousError = useRef<string | undefined>(undefined);
   const shakeAnimation = useRef<Animated.CompositeAnimation | null>(null);
   const { language } = useLanguage();
@@ -38,6 +41,16 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    const animation = Animated.timing(labelProgress, {
+      toValue: isLabelFloating ? 1 : 0,
+      duration: reduceMotion ? 0 : 150,
+      useNativeDriver: false
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [isLabelFloating, labelProgress, reduceMotion]);
 
   useEffect(() => {
     const hasNewError = Boolean(error) && error !== previousError.current;
@@ -61,31 +74,52 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
 
   return (
     <Animated.View style={[styles.field, containerStyle, { transform: [{ translateX: shake }] }]}>
-      {label ? <UiText style={[styles.fieldLabel, { color: theme.colors.foreground }]}>{label}</UiText> : null}
-      <TextInput
-        {...props}
-        onFocus={(event) => {
-          setFocused(true);
-          onFocus?.(event);
-        }}
-        onBlur={(event) => {
-          setFocused(false);
-          onBlur?.(event);
-        }}
-        textAlign={textAlign === "auto" ? "start" : textAlign}
-        accessibilityLabel={accessibilityLabel ?? label}
-        placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
-        style={[
-          styles.textInput,
-          {
-            backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.inputBorder,
-            color: theme.colors.foreground,
-            fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
-          },
-          style
-        ]}
-      />
+      <View style={styles.inputContainer}>
+        {label ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.floatingLabel,
+              {
+                backgroundColor: theme.colors.surface,
+                transform: [
+                  { translateY: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [0, -11] }) },
+                  { scale: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.82] }) }
+                ],
+                opacity: labelProgress.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] })
+              }
+            ]}
+          >
+            <UiText numberOfLines={1} style={[styles.fieldLabel, { color: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.muted }]}>{label}</UiText>
+          </Animated.View>
+        ) : null}
+        <TextInput
+          {...props}
+          onFocus={(event) => {
+            setFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
+          textAlign={textAlign === "auto" ? "start" : textAlign}
+          accessibilityLabel={accessibilityLabel ?? label}
+          placeholder={label && !isLabelFloating ? undefined : props.placeholder}
+          placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
+          style={[
+            styles.textInput,
+            label ? styles.textInputWithLabel : null,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.inputBorder,
+              color: theme.colors.foreground,
+              fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
+            },
+            style
+          ]}
+        />
+      </View>
       {error ? <UiText accessibilityRole="alert" style={[styles.fieldError, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{error}</UiText> : null}
     </Animated.View>
   );
@@ -147,8 +181,11 @@ export function QuantityStepper({
 
 const styles = StyleSheet.create({
   field: { gap: designTokens.spacing.xs },
+  inputContainer: { position: "relative", justifyContent: "center" },
+  floatingLabel: { position: "absolute", zIndex: 1, start: designTokens.spacing.lg, top: 0, maxWidth: "82%", paddingHorizontal: 3 },
   fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
   textInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
+  textInputWithLabel: { paddingTop: designTokens.spacing.lg + 2 },
   fieldError: { fontSize: designTokens.typography.caption, textAlign: "auto" },
   stepper: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   stepButton: { width: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
