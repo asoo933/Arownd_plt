@@ -58,11 +58,12 @@ export default function ProfileScreen() {
   });
 
   if (user.isPending) {
-    return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+    return <CustomerScreen><AppHeader title={translate("profileTitle")} /><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   }
   if (user.isError) {
     return (
       <CustomerScreen refreshing={user.isFetching} onRefresh={() => { void user.refetch(); }}>
+        <AppHeader title={translate("profileTitle")} />
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
@@ -75,6 +76,8 @@ export default function ProfileScreen() {
   if (!user.data) {
     return (
       <CustomerScreen>
+        <AppHeader title={translate("profileTitle")} />
+        <Caption>{translate("profileSubtitle")}</Caption>
         <Caption>{translate("profileLoginHint")}</Caption>
         <Button label={translate("profileLogin")} onPress={() => router.push("/login")} fullWidth />
       </CustomerScreen>
@@ -83,6 +86,7 @@ export default function ProfileScreen() {
   if (profile.isError) {
     return (
       <CustomerScreen refreshing={profile.isFetching} onRefresh={() => { void profile.refetch(); }}>
+        <AppHeader title={translate("profileTitle")} />
         <ErrorState
           title={translate("profileLoadError")}
           retryLabel={translate("retry")}
@@ -106,7 +110,7 @@ export default function ProfileScreen() {
       }}
     >
       <AppHeader
-        title=""
+        title={translate("profileTitle")}
         leading={
           <View style={styles.headerActions}>
             <IconButton
@@ -122,6 +126,7 @@ export default function ProfileScreen() {
           </View>
         }
       />
+      <Caption>{translate("profileSubtitle")}</Caption>
 
       {profile.isPending ? (
         <LoadingState label={translate("stateLoading")} />
