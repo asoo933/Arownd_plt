@@ -56,7 +56,7 @@ export default function ProductDetailsScreen() {
     <ProductCardSkeleton style={{ width: "100%", flex: 0, minHeight: 320 }} />
   </CustomerScreen>;
   if (product.isError) {
-    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={product.isFetching} onRetry={() => void product.refetch()} /></CustomerScreen>;
+    return <CustomerScreen refreshing={product.isFetching} onRefresh={() => { void product.refetch(); }}><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={product.isFetching} onRetry={() => void product.refetch()} /></CustomerScreen>;
   }
   if (!product.data) {
     return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("productNoDescription")} /></CustomerScreen>;
@@ -78,6 +78,8 @@ export default function ProductDetailsScreen() {
 
   return (
     <CustomerScreen
+      refreshing={product.isFetching || offers.isFetching || reviews.isFetching}
+      onRefresh={() => { void Promise.all([product.refetch(), offers.refetch(), reviews.refetch()]); }}
       footer={selectedOffer ? (
         <View style={styles.purchaseFooter}>
           <Button
