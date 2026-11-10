@@ -128,7 +128,7 @@ export default function OrderDetailsScreen() {
     <CustomerHeading title={translate("orderDetailsTitle")} />
     {[0, 1, 2].map((item) => <OrderCardSkeleton key={item} />)}
   </CustomerScreen>;
-  if (auth.isError || query.isError) return <CustomerScreen>
+  if (auth.isError || query.isError) return <CustomerScreen refreshing={auth.isFetching || query.isFetching} onRefresh={() => { void Promise.all([auth.refetch(), query.refetch()]); }}>
     <CustomerHeading title={translate("orderDetailsTitle")} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={auth.isFetching || query.isFetching} onRetry={() => void query.refetch()} />
   </CustomerScreen>;
@@ -153,7 +153,7 @@ export default function OrderDetailsScreen() {
   const activeStep = getOrderTrackingSteps(order.status);
   const orderCode = formatOrderCode(order.id);
 
-  return <CustomerScreen>
+  return <CustomerScreen refreshing={auth.isFetching || query.isFetching} onRefresh={() => { void Promise.all([auth.refetch(), query.refetch()]); }}>
     <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersCode") + ": " + orderCode}</UiText>
 
