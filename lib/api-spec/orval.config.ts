@@ -4,7 +4,7 @@ import path from "path";
 const root = path.resolve(__dirname, "..", "..");
 const apiZodSrc = path.resolve(root, "lib", "api-zod", "src");
 
-// Our exports make assumptions about the title of the API being "Api" (i.e. generated output is `api.ts`).
+// Keep the generated API module name stable for lib/api-zod exports.
 const titleTransformer: InputTransformerFn = (config) => {
   config.info ??= {};
   config.info.title = "Api";
@@ -30,9 +30,7 @@ export default defineConfig({
       prettier: true,
       override: {
         zod: {
-          // Orval resolves "auto" from this package, which does not declare
-          // zod directly. Keep generated schemas aligned with the workspace
-          // zod catalog (Zod 3).
+          // Keep generated schemas aligned with the workspace's Zod 3 catalog.
           version: 3,
           coerce: {
             query: ["boolean", "number", "string"],
