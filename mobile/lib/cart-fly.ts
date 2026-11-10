@@ -33,7 +33,9 @@ export function getCartFlyTarget(): CartFlyTarget | null {
 
 export function subscribeCartFly(listener: CartFlyListener): () => void {
   listeners.add(listener);
-  return () => listeners.delete(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }
 
 export function emitCartFly(request: CartFlyRequest): void {
