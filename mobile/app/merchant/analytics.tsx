@@ -8,7 +8,7 @@ import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { AppHeader, Button, ChartCard, ErrorState, Heading, MetricCardSkeleton, Skeleton, MerchantMetricCard, Text as UiText } from "@/components/ui";
+import { RefreshableScrollView, AppHeader, Button, ChartCard, ErrorState, Heading, MetricCardSkeleton, Skeleton, MerchantMetricCard, Text as UiText } from "@/components/ui";
 
 export default function MerchantAnalyticsScreen() {
   const { language } = useLanguage();
@@ -52,7 +52,7 @@ export default function MerchantAnalyticsScreen() {
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <RefreshableScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} refreshing={access.isFetching || analytics.isFetching} onRefresh={() => { void Promise.all([access.refetch(), analytics.refetch()]); }}>
         <AppHeader
           title={translate("merchantAnalyticsTitle")}
           leading={<Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />}
@@ -116,7 +116,7 @@ export default function MerchantAnalyticsScreen() {
           ))}
         </View>
         <UiText style={[styles.note, { color: theme.colors.muted }]}>{translate("merchantAnalyticsRevenueNote")}</UiText>
-      </ScrollView>
+      </RefreshableScrollView>
     </SafeAreaView>
   );
 }
