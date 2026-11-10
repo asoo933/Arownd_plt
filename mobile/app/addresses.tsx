@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import { Animated, I18nManager, PanResponder, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -283,7 +283,7 @@ function SwipeToDelete({
   deleteLabel,
   onDelete
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   deleteLabel: string;
   onDelete: () => void;
 }) {
@@ -292,14 +292,14 @@ function SwipeToDelete({
   const direction = I18nManager.isRTL ? 1 : -1;
   const revealDistance = 104;
 
-  const animateTo = (value: number) => {
+  const animateTo = useCallback((value: number) => {
     Animated.spring(translateX, {
       toValue: value,
       useNativeDriver: true,
       speed: 22,
       bounciness: 0
     }).start();
-  };
+  }, [translateX]);
 
   const panResponder = useMemo(() => PanResponder.create({
     onMoveShouldSetPanResponder: (_, gesture) =>
@@ -320,7 +320,7 @@ function SwipeToDelete({
       animateTo(shouldReveal ? direction * revealDistance : 0);
     },
     onPanResponderTerminate: () => animateTo(revealed ? direction * revealDistance : 0)
-  }), [direction, revealed, translateX]);
+  }), [animateTo, direction, revealed, translateX]);
 
   return (
     <View style={{ overflow: "hidden", borderRadius: 20 }}>
