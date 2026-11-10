@@ -13,7 +13,7 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, RatingStars, RefreshableScrollView, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
-export function CustomerScreen({ children, footer, showNavigation = true, onRefresh, refreshing = false }: { children: ReactNode; footer?: ReactNode; showNavigation?: boolean; onRefresh?: () => void; refreshing?: boolean }) {
+export function CustomerScreen({ children, footer, showNavigation = true, onRefresh, refreshing = false }: { children: ReactNode; footer?: ReactNode; showNavigation?: boolean; onRefresh?: (() => void) | undefined; refreshing?: boolean }) {
   const theme = useAppTheme();
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
