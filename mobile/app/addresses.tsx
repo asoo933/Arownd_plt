@@ -34,6 +34,7 @@ import {
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
+import { triggerSuccessHaptic } from "@/lib/haptics";
 
 type EditorState = { address: UserAddress | null } | null;
 type AddressLabel = UserAddressInput["label"];
@@ -69,6 +70,7 @@ export default function AddressesScreen() {
       ? updateMyAddress(editor.address.id, input)
       : createMyAddress(input),
     onSuccess: async () => {
+      triggerSuccessHaptic();
       await refresh();
       setEditor(null);
       setFormError(null);
@@ -78,12 +80,16 @@ export default function AddressesScreen() {
 
   const defaultMutation = useMutation({
     mutationFn: setMyDefaultAddress,
-    onSuccess: refresh
+    onSuccess: async () => {
+      triggerSuccessHaptic();
+      await refresh();
+    }
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteMyAddress,
     onSuccess: async () => {
+      triggerSuccessHaptic();
       await refresh();
       setDeleteTarget(null);
     }
