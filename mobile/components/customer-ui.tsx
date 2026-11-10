@@ -122,7 +122,7 @@ export function StoreTile({ name, description, logoUrl, commune, rating, verifie
       disabled={!onPress}
       style={[styles.storeTile, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border }]}
     >
-      <View style={[styles.storeLogo, { backgroundColor: theme.colors.surfaceMuted }]}>
+      <View style={[styles.storeLogo, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
         {logoUrl ? <UiImage uri={logoUrl} accessibilityLabel={name} aspectRatio={1} style={StyleSheet.absoluteFill} /> : <Icon name="store" size={28} color={theme.colors.subtle} accessibilityHidden />}
       </View>
       <View style={styles.storeInfo}>
