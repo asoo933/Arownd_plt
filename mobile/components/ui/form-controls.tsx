@@ -74,7 +74,6 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
         }}
         textAlign={textAlign === "auto" ? "start" : textAlign}
         accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityState={error ? { invalid: true } : undefined}
         placeholderTextColor={props.placeholderTextColor ?? theme.colors.placeholder}
         style={[
           styles.textInput,
