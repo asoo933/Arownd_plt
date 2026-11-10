@@ -214,7 +214,7 @@ function createStyles(theme: AppTheme) {
       borderRadius: designTokens.radius.xl
     },
     productContent: { gap: designTokens.spacing.xs, padding: designTokens.spacing.md },
-    productMedia: { position: "relative", backgroundColor: theme.colors.surfaceMuted },
+    productMedia: { position: "relative", backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted },
     productImage: { borderRadius: 0 },
     favoriteOverlay: { position: "absolute", top: 7, end: 7 },
     storeList: { gap: designTokens.spacing.md },
@@ -239,7 +239,7 @@ function createStyles(theme: AppTheme) {
       width: 76,
       aspectRatio: 1,
       borderRadius: designTokens.radius.md,
-      backgroundColor: theme.colors.surfaceMuted
+      backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted
     },
     storeFavorite: { alignSelf: "center" }
   });
