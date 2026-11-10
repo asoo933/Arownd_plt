@@ -86,7 +86,7 @@ export default function DeliveryProfileScreen() {
     styles.picker,
     {
       backgroundColor: theme.colors.surface,
-      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border
+      borderColor: theme.colors.inputBorder
     }
   ];
   const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
