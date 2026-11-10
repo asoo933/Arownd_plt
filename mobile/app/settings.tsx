@@ -458,7 +458,7 @@ function createStyles(theme: AppTheme) {
       justifyContent: "space-between",
       paddingHorizontal: designTokens.spacing.md,
       borderRadius: designTokens.radius.md,
-      backgroundColor: theme.colors.surfaceMuted
+      backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted
     },
     signOutButton: {
       marginTop: designTokens.spacing.sm
