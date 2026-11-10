@@ -99,7 +99,10 @@ export default function ExploreScreen() {
   };
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={hasActiveFilter && products.isFetching}
+      onRefresh={hasActiveFilter ? () => { void products.refetch(); } : undefined}
+    >
       <View style={styles.topSection}>
         <View style={styles.header}>
           <View style={styles.search}>
