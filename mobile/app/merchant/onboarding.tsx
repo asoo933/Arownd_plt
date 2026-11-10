@@ -362,7 +362,7 @@ export default function MerchantOnboardingScreen() {
                       styles.categoryOption,
                       {
                         borderColor: categoryId === category.id ? (theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted) : theme.colors.border,
-                        backgroundColor: categoryId === category.id ? (theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface) : theme.colors.surfaceMuted
+                        backgroundColor: categoryId === category.id ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary) : theme.colors.surfaceMuted
                       }
                     ]}
                   >
@@ -408,7 +408,7 @@ export default function MerchantOnboardingScreen() {
                             styles.chip,
                             {
                               borderColor: selected ? (theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted) : theme.colors.border,
-                              backgroundColor: selected ? (theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface) : theme.colors.surfaceMuted
+                              backgroundColor: selected ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary) : theme.colors.surfaceMuted
                             }
                           ]}
                         >
