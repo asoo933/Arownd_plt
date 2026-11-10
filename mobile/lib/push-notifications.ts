@@ -17,7 +17,7 @@ Notifications.setNotificationHandler({
 });
 
 async function persistDeviceToken(token: string): Promise<void> {
-  const platform = Platform.OS === "ios" ? "ios" : "android";
+  const platform = "android";
   const { error } = await getSupabaseClient().rpc("register_my_push_device", {
     _token: token,
     _platform: platform
@@ -27,7 +27,7 @@ async function persistDeviceToken(token: string): Promise<void> {
 }
 
 export async function registerDeviceForPushNotifications(language: "ar" | "en"): Promise<void> {
-  if (Platform.OS !== "android" && Platform.OS !== "ios") return;
+  if (Platform.OS !== "android") return;
 
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
