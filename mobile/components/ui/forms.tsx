@@ -210,7 +210,7 @@ export function SwitchControl({
         value={value}
         onValueChange={onValueChange}
         disabled={disabled}
-        trackColor={{ false: theme.colors.border, true: theme.colors.accentMuted }}
+        trackColor={{ false: theme.colors.inputBorder, true: theme.colors.accentMuted }}
         thumbColor={value ? theme.colors.accentForeground : theme.colors.foreground}
         accessibilityLabel={label}
       />
