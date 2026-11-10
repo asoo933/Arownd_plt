@@ -442,6 +442,7 @@ export default function MerchantEditProductScreen() {
                   accessibilityLabel={translate("merchantProductNameLabel")}
                   style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.colors.inputBorder) }]}
                 />
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>{translate("merchantProductNameHint")}</UiText>
               </View>
               <View style={styles.field}>
                 <UiText style={[styles.label, { color: theme.colors.foreground }]}>
@@ -455,6 +456,7 @@ export default function MerchantEditProductScreen() {
                   accessibilityLabel={translate("merchantProductBrandLabel")}
                   style={[styles.input, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.colors.inputBorder) }]}
                 />
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>{translate("merchantProductBrandHint")}</UiText>
               </View>
               <View style={styles.field}>
                 <UiText style={[styles.label, { color: theme.colors.foreground }]}>
@@ -470,6 +472,7 @@ export default function MerchantEditProductScreen() {
                   accessibilityLabel={translate("merchantProductDescriptionLabel")}
                   style={[styles.input, styles.descriptionInput, { color: theme.colors.foreground, backgroundColor: theme.colors.background, borderColor: (theme.colors.inputBorder) }]}
                 />
+                <UiText style={[styles.hint, { color: theme.colors.subtle }]}>{translate("merchantProductDescriptionHint")}</UiText>
               </View>
               <View style={styles.field}>
                 <UiText style={[styles.label, { color: theme.colors.foreground }]}>
