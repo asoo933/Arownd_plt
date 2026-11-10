@@ -186,6 +186,20 @@ export default function SettingsScreen() {
         </Card>
       </View>
 
+      <View style={styles.section}>
+        <Heading level={3}>{translate("settingsAboutSection")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="info"
+            label={translate("settingsAboutTitle")}
+            onPress={() => router.push("/about")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
+
       <Button
         label={translate("settingsSignOut")}
         onPress={() => {
