@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import {
+  RefreshControl,
   ScrollView,
   View,
   type ScrollViewProps,
@@ -118,6 +119,48 @@ export type ScrollAreaProps = PropsWithChildren<
     style?: ScrollViewProps["style"];
   }
 >;
+
+export type RefreshableScrollViewProps = PropsWithChildren<{
+  refreshing?: boolean;
+  onRefresh?: () => void;
+  contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
+  style?: ScrollViewProps["style"];
+  keyboardShouldPersistTaps?: ScrollViewProps["keyboardShouldPersistTaps"];
+  showsVerticalScrollIndicator?: boolean;
+}>;
+
+export function RefreshableScrollView({
+  children,
+  refreshing = false,
+  onRefresh,
+  contentContainerStyle,
+  style,
+  keyboardShouldPersistTaps = "handled",
+  showsVerticalScrollIndicator = false
+}: RefreshableScrollViewProps) {
+  const theme = useAppTheme();
+  const indicatorColor = theme.mode === "light" ? theme.colors.foreground : theme.colors.accent;
+
+  return (
+    <ScrollView
+      style={style}
+      contentContainerStyle={contentContainerStyle}
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+      showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+      refreshControl={onRefresh ? (
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[indicatorColor]}
+          progressBackgroundColor={theme.colors.background}
+          tintColor={indicatorColor}
+        />
+      ) : undefined}
+    >
+      {children}
+    </ScrollView>
+  );
+}
 
 export function ScrollArea({
   children,
