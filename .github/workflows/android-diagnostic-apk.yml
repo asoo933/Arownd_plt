@@ -1,7 +1,7 @@
 name: Arownd Native Android diagnostic APK (Expo)
 
-# Manual diagnostic build with additional Android lint and unit-test tasks.
-# The automatic preview APK is produced after the mobile quality workflow.
+# Builds the Expo Android diagnostic APK when native app configuration changes
+# or when manually dispatched. The workflow runs from mobile/, never root android/.
 on:
   push:
     branches:
