@@ -77,7 +77,7 @@ export default function SupportScreen() {
       </PressableSurface>
       <AppHeader title={translate("supportTitle")} />
       <View style={styles.hero}>
-        <View style={styles.heroMark}><Icon name="headphones" size={28} color={theme.colors.foreground} /></View>
+        <View style={styles.heroMark}><Icon name="message-circle" size={28} color={theme.colors.foreground} /></View>
         <Heading level={2}>{translate("supportHeadline")}</Heading>
         <Caption>{translate("supportSubtitle")}</Caption>
       </View>
