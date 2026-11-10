@@ -138,7 +138,11 @@ const CATEGORY_FILTERS: Record<string, readonly string[]> = {
   beauty: ["beauty", "perfumes", "makeup", "skincare"],
   home: ["home", "furniture", "home-tools", "decor", "kitchenware"],
   kids: ["kids", "kids-clothes", "toys", "kids-essentials"],
-  food: ["food", "sweets", "groceries", "home-food"]
+  food: ["food", "sweets", "groceries", "home-food"],
+  sports: ["sports", "sportswear", "sports-gear", "hobbies"],
+  "gifts-crafts": ["gifts-crafts", "gifts", "handmade", "stationery"],
+  digital: ["digital", "design", "web-dev", "digital-services", "digital-products"],
+  cars: ["cars", "car-accessories", "car-parts", "car-maintenance"]
 };
 
 export function getCategoryFilterIds(category: string): readonly string[] {
