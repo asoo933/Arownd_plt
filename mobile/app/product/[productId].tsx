@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -9,6 +9,7 @@ import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
 import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
+import { emitCartFly } from "@/lib/cart-fly";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
@@ -23,12 +24,20 @@ export default function ProductDetailsScreen() {
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const imageAnchorRef = useRef<View>(null);
+  const cartFlyImageRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
   const addMutation = useMutation({
     mutationFn: addToCart,
     onSuccess: (next) => {
       queryClient.setQueryData(CART_QUERY_KEY, next);
       void queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+      imageAnchorRef.current?.measureInWindow((x, y, width, height) => {
+        emitCartFly({
+          source: { x, y, width, height },
+          imageUri: cartFlyImageRef.current
+        });
+      });
     }
   });
   const product = useQuery({
@@ -67,6 +76,7 @@ export default function ProductDetailsScreen() {
   const bestOffer = chooseBestProductOffer(productOffers);
   const selectedOffer = productOffers.find((offer) => offer.id === selectedOfferId) ?? bestOffer;
   const imageUrl = selectedOffer ? getPrimaryImage(selectedOffer) : productOffers.map(getPrimaryImage).find(Boolean) ?? null;
+  cartFlyImageRef.current = imageUrl;
   const variants = getOfferVariantOptions(selectedOffer);
   const selectedSize = variants.sizes.includes(size) ? size : variants.sizes[0] ?? "";
   const selectedColor = variants.colors.includes(color) ? color : variants.colors[0] ?? "";
@@ -108,7 +118,9 @@ export default function ProductDetailsScreen() {
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />}
         trailing={<CartButton />}
       />
-      {imageUrl ? <ProductImageGallery images={[imageUrl]} accessibilityLabel={productDetails.name} onSelect={() => undefined} imageStyle={styles.heroImage} /> : <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" size={42} color={theme.colors.subtle} accessibilityHidden /></View>}
+      <View ref={imageAnchorRef} collapsable={false}>
+        {imageUrl ? <ProductImageGallery images={[imageUrl]} accessibilityLabel={productDetails.name} onSelect={() => undefined} imageStyle={styles.heroImage} /> : <View style={[styles.heroImage, { backgroundColor: theme.colors.surfaceMuted }]}><Icon name="image" size={42} color={theme.colors.subtle} accessibilityHidden /></View>}
+      </View>
       <Card contentStyle={styles.infoCard}>
         <UiText weight="700" style={styles.productName}>{productDetails.name}</UiText>
         {selectedOffer ? <PriceDisplay value={formatDZD(selectedOffer.price)} style={styles.priceDisplay} /> : null}
