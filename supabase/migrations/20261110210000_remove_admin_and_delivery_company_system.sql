@@ -579,7 +579,10 @@ begin
   normalized_hash := md5(jsonb_build_object(
     'items',_items,'delivery_type',_delivery_type,'wilaya_id',_wilaya_id,
     'commune',_commune,'address_line',_address_line,'full_name',_full_name,
-    'phone',_phone,'payment_method',_payment_method,'receipt_url',_receipt_url
+    'phone',_phone,'payment_method',_payment_method,'receipt_url',_receipt_url,
+    -- Keep the previous null carrier key in the hash so an in-flight checkout
+    -- retry created by an older app build remains idempotent.
+    'delivery_company_id',null
   )::text);
 
   perform pg_advisory_xact_lock(
