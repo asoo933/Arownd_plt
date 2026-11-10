@@ -5,11 +5,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 export const STORE_IMAGE_MAX_BYTES = 8 * 1024 * 1024;
 
 const MIME_EXTENSIONS: Readonly<Record<string, string>> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-  "image/heic": "heic",
-  "image/heif": "heif"
+  "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic", "image/heif": "heif"
 };
 
 type StoreImageMetadata = Pick<ImagePickerAsset, "mimeType" | "fileName" | "fileSize">;
@@ -25,22 +21,28 @@ function getStoreImageExtension(asset: StoreImageMetadata): string | null {
 
 export function validateStoreImageAsset(asset: StoreImageMetadata): boolean {
   const extension = getStoreImageExtension(asset);
-  return Boolean(extension)
-    && (asset.fileSize === null || asset.fileSize === undefined
-      || (Number.isFinite(asset.fileSize) && asset.fileSize > 0 && asset.fileSize <= STORE_IMAGE_MAX_BYTES));
+  return Boolean(extension) && (asset.fileSize === null || asset.fileSize === undefined ||
+    (Number.isFinite(asset.fileSize) && asset.fileSize > 0 && asset.fileSize <= STORE_IMAGE_MAX_BYTES));
 }
 
-export function getStoreImageStoragePath(publicUrl: string, userId: string): string | null {
+/** Extracts public or signed object paths restricted to this user's stores folder. */
+export function getStoreImageStoragePath(imageUrl: string, userId: string): string | null {
+  if (!userId.trim()) return null;
   try {
-    const url = new URL(publicUrl);
-    const marker = "/storage/v1/object/public/store-media/";
+    const url = new URL(imageUrl);
+    if (url.protocol !== "https:") return null;
+    const markers = [
+      "/storage/v1/object/public/store-media/",
+      "/storage/v1/object/sign/store-media/"
+    ];
+    const marker = markers.find((item) => url.pathname.includes(item));
+    if (!marker) return null;
     const markerIndex = url.pathname.indexOf(marker);
-    if (url.protocol !== "https:" || markerIndex < 0) return null;
-    const path = decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
-    const segments = path.split("/");
-    if (!path.startsWith(`${userId}/stores/`) || segments.length !== 3
-      || segments.some((segment) => !segment || segment === "." || segment === "..")) return null;
-    return path;
+    const storagePath = decodeURIComponent(url.pathname.slice(markerIndex + marker.length));
+    const segments = storagePath.split("/");
+    if (!storagePath.startsWith(userId + "/stores/") || segments.length !== 3 ||
+      segments.some((segment) => !segment || segment === "." || segment === "..")) return null;
+    return storagePath;
   } catch {
     return null;
   }
@@ -73,12 +75,11 @@ export async function uploadMerchantStoreImage(
   const body = await response.arrayBuffer();
   if (body.byteLength === 0 || body.byteLength > STORE_IMAGE_MAX_BYTES) throw new Error("invalid_store_image_size");
 
-  const path = `${auth.user.id}/stores/${kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}.${extension}`;
-  const contentType = asset.mimeType?.toLowerCase() ?? (extension === "jpg" ? "image/jpeg" : `image/${extension}`);
+  const path = auth.user.id + "/stores/" + kind + "-" + Date.now().toString(36) + "-" +
+    Math.random().toString(36).slice(2, 10) + "." + extension;
+  const contentType = asset.mimeType?.toLowerCase() ?? (extension === "jpg" ? "image/jpeg" : "image/" + extension);
   const { error: uploadError } = await client.storage.from("store-media").upload(path, body, {
-    contentType,
-    cacheControl: "3600",
-    upsert: false
+    contentType, cacheControl: "3600", upsert: false
   });
   if (uploadError) throw uploadError;
 
@@ -102,9 +103,25 @@ export async function uploadMerchantStoreImage(
   let cleanupPending = false;
   if (oldUrl) {
     const oldPath = getStoreImageStoragePath(oldUrl, auth.user.id);
-    if (oldPath) {
-      const { error: cleanupError } = await client.storage.from("store-media").remove([oldPath]);
-      cleanupPending = !!cleanupError;
+    if (!oldPath) {
+      cleanupPending = true;
+    } else {
+      const { data: currentStore, error: referenceError } = await client.from("stores")
+        .select("logo_url, cover_url")
+        .eq("id", storeId)
+        .eq("owner_id", auth.user.id)
+        .maybeSingle();
+
+      if (referenceError || !currentStore) {
+        cleanupPending = true;
+      } else {
+        const stillReferenced = [currentStore.logo_url, currentStore.cover_url]
+          .some((url) => url !== null && getStoreImageStoragePath(url, auth.user.id) === oldPath);
+        if (!stillReferenced) {
+          const { error: cleanupError } = await client.storage.from("store-media").remove([oldPath]);
+          cleanupPending = !!cleanupError;
+        }
+      }
     }
   }
   return { url: publicUrl, cleanupPending };
