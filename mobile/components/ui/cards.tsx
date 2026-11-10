@@ -116,7 +116,7 @@ export function CategorySelectorTile({
         width: 112,
         minHeight: 88,
         borderRadius: theme.radius.lg,
-        backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary,
+        backgroundColor: theme.colors.surfaceSecondary,
         alignItems: "center",
         justifyContent: "center",
         gap: designTokens.spacing.sm,
@@ -127,12 +127,12 @@ export function CategorySelectorTile({
       <Icon
         name={icon}
         size={theme.dimensions.iconSize.lg}
-        color={selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted}
+        color={selected ? theme.colors.accent : theme.colors.muted}
         accessibilityHidden
       />
       <UiText
         style={{
-          color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.foreground,
+          color: selected ? theme.colors.accent : theme.colors.foreground,
           fontSize: theme.typography.caption,
           fontWeight: theme.fontWeights.extrabold,
           textAlign: "center"
