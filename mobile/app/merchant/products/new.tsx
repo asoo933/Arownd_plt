@@ -554,7 +554,7 @@ function CategoryOption({
     >
       <View style={styles.categoryOptionContent}>
         <UiText style={styles.categoryEmojiSmall}>{category.emoji}</UiText>
-        <UiText style={[styles.categoryLabel, { color: theme.colors.foreground }]}>
+        <UiText style={[styles.categoryLabel, { color: selected && theme.mode === "dark" ? theme.colors.accentMuted : theme.colors.foreground }]}>
           {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
         </UiText>
       </View>
