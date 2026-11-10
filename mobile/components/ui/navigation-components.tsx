@@ -10,6 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { triggerSelectionHaptic } from "@/lib/haptics";
 import { Text as UiText } from "./typography";
 
 export type NavigationItem = {
@@ -107,7 +108,7 @@ function NavigationTab({
       accessibilityLabel={item.label}
       accessibilityState={{ selected, disabled: item.disabled }}
       disabled={item.disabled}
-      onPress={() => onChange(item.key)}
+      onPress={() => { triggerSelectionHaptic(); onChange(item.key); }}
       hitSlop={4}
       style={({ pressed }) => [
         {
