@@ -383,7 +383,7 @@ pnpm install --frozen-lockfile
 
 The root workspace covers `artifacts/*` and `lib/*`; it does not install the independent mobile application. Available root scripts include `pnpm run typecheck:libs`, `pnpm run typecheck:api-server`, `pnpm run build:api-server`, and `pnpm run codegen`.
 
-يغطي Workspace الجذري حزم `artifacts/*` و`lib/*)، ولا يثبت تطبيق الهاتف المستقل. تتضمن أوامر الجذر فحص المكتبات وAPI Server وبناءه وتوليد عقود API.
+يغطي Workspace الجذري حزم `artifacts/*` و`lib/*`، ولا يثبت تطبيق الهاتف المستقل. تتضمن أوامر الجذر فحص المكتبات وAPI Server وبناءه وتوليد عقود API.
 
 **Expo mobile application | تطبيق Expo للهاتف:**
 
