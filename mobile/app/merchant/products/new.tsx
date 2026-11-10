@@ -311,7 +311,7 @@ export default function MerchantNewProductScreen() {
           </Card>
 
           <Card contentStyle={styles.card}>
-            <FormField label={translate("merchantProductNameLabel")} theme={theme}>
+            <FormField label={translate("merchantProductNameLabel")} hint={translate("merchantProductNameHint")} theme={theme}>
               <TextField
                 value={form.name}
                 onChangeText={(value) => update("name", value)}
@@ -369,7 +369,7 @@ export default function MerchantNewProductScreen() {
               </PressableSurface>
             </FormField>
 
-            <FormField label={translate("merchantProductBrandLabel")} theme={theme}>
+            <FormField label={translate("merchantProductBrandLabel")} hint={translate("merchantProductBrandHint")} theme={theme}>
               <TextField
                 value={form.brand}
                 onChangeText={(value) => update("brand", value)}
@@ -399,7 +399,7 @@ export default function MerchantNewProductScreen() {
               />
             </FormField>
 
-            <FormField label={translate("merchantProductColorsLabel")} theme={theme}>
+            <FormField label={translate("merchantProductColorsLabel")} hint={translate("merchantProductColorsHint")} theme={theme}>
               <TextField
                 value={form.colors}
                 onChangeText={(value) => update("colors", value)}
@@ -412,7 +412,7 @@ export default function MerchantNewProductScreen() {
               />
             </FormField>
 
-            <FormField label={translate("merchantProductDescriptionLabel")} theme={theme}>
+            <FormField label={translate("merchantProductDescriptionLabel")} hint={translate("merchantProductDescriptionHint")} theme={theme}>
               <TextField
                 value={form.description}
                 onChangeText={(value) => update("description", value)}
