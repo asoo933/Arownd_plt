@@ -1,16 +1,20 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Animated, I18nManager, PanResponder, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
-import { AppHeader, Icon, IconButton, OrderCard, OrderCardSkeleton, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
+import { AppHeader, Button, Icon, IconButton, OrderCard, OrderCardSkeleton, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
 import { formatDZD, formatNumber } from "@/lib/catalog";
 import { fetchCustomerOrderDetails, fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, type Language, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { formatOrderCode } from "@/lib/orders-state";
+import { formatOrderCode, isHideableOrderStatus } from "@/lib/orders-state";
+import { triggerSuccessHaptic } from "@/lib/haptics";
+
+const HIDDEN_ORDER_ROWS_STORAGE_KEY = "arownd:hidden-order-rows:v1:";
 
 type OrdersTab = "all" | "active" | "delivered" | "cancelled";
 type OrderRow = {
@@ -80,6 +84,9 @@ export default function OrdersScreen() {
   const styles = createStyles(theme);
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<OrdersTab>("all");
+  const [hiddenRowIds, setHiddenRowIds] = useState<string[]>([]);
+  const [hiddenRowsReady, setHiddenRowsReady] = useState(false);
+  const hiddenRowIdsRef = useRef<string[]>([]);
   const auth = useQuery({
     queryKey: ["customer-orders-auth"],
     queryFn: async () => {
@@ -95,6 +102,58 @@ export default function OrdersScreen() {
   });
 
   const userId = auth.data?.id;
+  const hiddenRowsStorageKey = userId ? HIDDEN_ORDER_ROWS_STORAGE_KEY + userId : null;
+
+  useEffect(() => {
+    let active = true;
+    hiddenRowIdsRef.current = [];
+    setHiddenRowIds([]);
+
+    if (!hiddenRowsStorageKey) {
+      setHiddenRowsReady(true);
+      return () => { active = false; };
+    }
+
+    setHiddenRowsReady(false);
+    void AsyncStorage.getItem(hiddenRowsStorageKey)
+      .then((storedValue) => {
+        if (!active) return;
+        if (!storedValue) return;
+        try {
+          const parsed: unknown = JSON.parse(storedValue);
+          if (Array.isArray(parsed)) {
+            const ids = parsed.filter((value): value is string => typeof value === "string");
+            hiddenRowIdsRef.current = ids;
+            setHiddenRowIds(ids);
+          }
+        } catch {
+          hiddenRowIdsRef.current = [];
+          setHiddenRowIds([]);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setHiddenRowsReady(true);
+      });
+
+    return () => { active = false; };
+  }, [hiddenRowsStorageKey]);
+
+  const hideOrderRow = useCallback((row: OrderRow) => {
+    if (!hiddenRowsStorageKey || !isHideableOrderStatus(row.status)) return;
+    const rowId = row.merchantOrderId ?? row.order.id;
+    const previousIds = hiddenRowIdsRef.current;
+    const nextIds = Array.from(new Set([...previousIds, rowId]));
+    hiddenRowIdsRef.current = nextIds;
+    setHiddenRowIds(nextIds);
+    void AsyncStorage.setItem(hiddenRowsStorageKey, JSON.stringify(nextIds))
+      .then(() => triggerSuccessHaptic())
+      .catch(() => {
+        hiddenRowIdsRef.current = previousIds;
+        setHiddenRowIds(previousIds);
+      });
+  }, [hiddenRowsStorageKey]);
+
   const refetchOrders = orders.refetch;
 
   useEffect(() => {
@@ -113,6 +172,7 @@ export default function OrdersScreen() {
 
   const rows = useMemo(() => toRows(orders.data ?? []), [orders.data]);
   const filtered = rows.filter((row) => {
+    if (hiddenRowIds.includes(row.merchantOrderId ?? row.order.id)) return false;
     if (tab === "all") return true;
     if (tab === "active") return ["pending", "quoted", "confirmed", "shipped"].includes(row.status);
     if (tab === "delivered") return row.status === "delivered";
@@ -136,6 +196,12 @@ export default function OrdersScreen() {
     <PressableSurface accessibilityRole="button" accessibilityLabel={translate("login")} onPress={() => router.push("/login")} style={styles.primary}><UiText style={styles.primaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
 
+  if (!hiddenRowsReady) return <CustomerScreen>
+    <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
+    <OrderCardSkeleton />
+    <OrderCardSkeleton />
+  </CustomerScreen>;
+
   return <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && orders.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void refetchOrders(); }); }}>
     <AppHeader title={translate("ordersTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
     <UiText style={{ color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, textAlign: "auto" }}>{translate("ordersSubtitle")}</UiText>
@@ -154,7 +220,8 @@ export default function OrdersScreen() {
       const orderCode = formatOrderCode(row.order.id);
       const tone = getOrderStatusTone(row.status);
       const total = row.status === "cancelled" || row.status === "rejected" ? 0 : row.subtotal + row.shippingFee;
-      return <OrderCard key={row.merchantOrderId ?? row.order.id} onPress={() => {
+      const rowKey = row.merchantOrderId ?? row.order.id;
+      const orderCard = <OrderCard key={rowKey} onPress={() => {
         void queryClient.prefetchQuery({ queryKey: ["customer-order-details", row.order.id], queryFn: () => fetchCustomerOrderDetails(row.order.id), staleTime: 15_000 });
         router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } });
       }} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card} contentStyle={styles.cardContent}>
@@ -175,8 +242,67 @@ export default function OrdersScreen() {
           <PriceDisplay value={formatDZD(total)} style={styles.priceDisplay} />
         </View>
       </OrderCard>;
+      return isHideableOrderStatus(row.status)
+        ? <SwipeToHide key={rowKey} hideLabel={translate("ordersHide")} onHide={() => hideOrderRow(row)}>{orderCard}</SwipeToHide>
+        : orderCard;
     })}
   </CustomerScreen>;
+}
+
+function SwipeToHide({
+  children,
+  hideLabel,
+  onHide
+}: {
+  children: ReactNode;
+  hideLabel: string;
+  onHide: () => void;
+}) {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const [revealed, setRevealed] = useState(false);
+  const direction = I18nManager.isRTL ? 1 : -1;
+  const revealDistance = 104;
+
+  const animateTo = useCallback((value: number) => {
+    Animated.spring(translateX, {
+      toValue: value,
+      useNativeDriver: true,
+      speed: 22,
+      bounciness: 0
+    }).start();
+  }, [translateX]);
+
+  const panResponder = useMemo(() => PanResponder.create({
+    onMoveShouldSetPanResponder: (_, gesture) =>
+      Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2,
+    onPanResponderMove: (_, gesture) => {
+      const minOffset = direction === 1 ? 0 : -revealDistance;
+      const maxOffset = direction === 1 ? revealDistance : 0;
+      const next = revealed
+        ? Math.min(maxOffset, Math.max(minOffset, direction * revealDistance + gesture.dx))
+        : direction * Math.min(revealDistance, Math.max(0, gesture.dx * direction));
+      translateX.setValue(next);
+    },
+    onPanResponderRelease: (_, gesture) => {
+      const shouldReveal = revealed
+        ? direction * gesture.dx < -35
+        : direction * gesture.dx > 55;
+      setRevealed(shouldReveal);
+      animateTo(shouldReveal ? direction * revealDistance : 0);
+    },
+    onPanResponderTerminate: () => animateTo(revealed ? direction * revealDistance : 0)
+  }), [animateTo, direction, revealed, translateX]);
+
+  return (
+    <View style={{ overflow: "hidden", borderRadius: 20 }}>
+      <View style={{ position: "absolute", top: 0, bottom: 0, [I18nManager.isRTL ? "left" : "right"]: 0, width: revealDistance, alignItems: "center", justifyContent: "center" }}>
+        <Button label={hideLabel} onPress={onHide} variant="outline" size="sm" />
+      </View>
+      <Animated.View style={{ transform: [{ translateX }] }} {...panResponder.panHandlers}>
+        {children}
+      </Animated.View>
+    </View>
+  );
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
