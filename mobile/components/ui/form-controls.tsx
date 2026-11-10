@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from "react-native";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { triggerSelectionHaptic } from "@/lib/haptics";
 import { useLanguage } from "@/lib/i18n";
 import { Text as UiText } from "./typography";
 import { getQuantityStepState } from "./form-controls-state";
@@ -157,7 +158,7 @@ export function QuantityStepper({
         accessibilityLabel={decreaseLabel}
         accessibilityState={{ disabled: disabled || !state.canDecrease }}
         disabled={disabled || !state.canDecrease}
-        onPress={() => onChange(value - 1)}
+        onPress={() => { triggerSelectionHaptic(); onChange(value - 1); }}
         hitSlop={6}
         style={({ pressed }) => [styles.stepButton, buttonStyle, { opacity: disabled || !state.canDecrease ? 0.4 : pressed ? 0.7 : 1 }]}
       >
@@ -169,7 +170,7 @@ export function QuantityStepper({
         accessibilityLabel={increaseLabel}
         accessibilityState={{ disabled: disabled || !state.canIncrease }}
         disabled={disabled || !state.canIncrease}
-        onPress={() => onChange(value + 1)}
+        onPress={() => { triggerSelectionHaptic(); onChange(value + 1); }}
         hitSlop={6}
         style={({ pressed }) => [styles.stepButton, buttonStyle, { opacity: disabled || !state.canIncrease ? 0.4 : pressed ? 0.7 : 1 }]}
       >
