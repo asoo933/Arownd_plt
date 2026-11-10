@@ -41,13 +41,16 @@ export default function StoreDetailsScreen() {
     </View>
   </CustomerScreen>;
   if (store.isError) {
-    return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={store.isFetching} onRetry={() => void store.refetch()} /></CustomerScreen>;
+    return <CustomerScreen refreshing={store.isFetching} onRefresh={() => { void store.refetch(); }}><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={store.isFetching} onRetry={() => void store.refetch()} /></CustomerScreen>;
   }
   if (!store.data) return <CustomerScreen><EmptyState title={translate("detailNotFound")} hint={translate("storeNoDescription")} /></CustomerScreen>;
 
   const details = store.data;
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={store.isFetching || (tab === "products" && offers.isFetching)}
+      onRefresh={() => { void store.refetch(); if (tab === "products") void offers.refetch(); }}
+    >
       <AppHeader
         title=""
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} />}
