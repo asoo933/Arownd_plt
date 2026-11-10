@@ -38,7 +38,10 @@ export default function MyReviewsScreen() {
   });
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={auth.isFetching || query.isFetching}
+      onRefresh={() => { void Promise.all([auth.refetch(), query.refetch()]); }}
+    >
       <AppHeader
         title={translate("myReviewsTitle")}
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />}
