@@ -37,7 +37,7 @@ export default function ExploreScreen() {
   const categoryMetrics = useRef({ viewportWidth: 0, railWidth: 0, language });
   categoryMetrics.current = { viewportWidth, railWidth, language };
   const resumeCategoryAnimation = () => {
-    const { viewportWidth: width, railWidth: contentWidth, language: currentLanguage } = categoryMetrics.current;
+    const { viewportWidth: width, railWidth: contentWidth } = categoryMetrics.current;
     if (width <= 0 || contentWidth <= width) return;
     const currentX = translateX.__getValue();
     const animation = Animated.loop(
@@ -174,6 +174,7 @@ export default function ExploreScreen() {
         <View
           style={styles.categoryViewport}
           onLayout={(event) => setViewportWidth(event.nativeEvent.layout.width)}
+          {...categoryPanResponder.panHandlers}
         >
           <Animated.View
             style={[
