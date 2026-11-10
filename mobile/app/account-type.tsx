@@ -44,12 +44,12 @@ function AccountTypeOption({
       <View
         style={[
           styles.iconCircle,
-          { backgroundColor: selected ? theme.colors.accent : (theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted) }
+          { backgroundColor: "transparent" }
         ]}
       >
         <Icon
           name={icon}
-          color={selected ? theme.colors.accentForeground : theme.colors.foreground}
+          color={selected ? theme.colors.accent : theme.colors.muted}
           size={designTokens.dimensions.iconSize.md}
         />
       </View>
@@ -65,7 +65,7 @@ function AccountTypeOption({
 
       <Icon
         name={selected ? "circle-check" : "chevron-left"}
-        color={selected ? (theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted) : theme.colors.muted}
+        color={selected ? theme.colors.accent : theme.colors.muted}
         size={designTokens.dimensions.iconSize.md}
       />
     </PressableSurface>
