@@ -1,0 +1,112 @@
+name: Arownd repository cleanup
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arownd-repository-cleanup
+  cancel-in-progress: false
+
+jobs:
+  generate-lockfiles:
+    name: Generate candidate lockfiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Verify target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != "refs/heads/Arownd-native-v2" ]]; then
+            echo "::error::Run this workflow only on Arownd-native-v2."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Record repository package-manager state
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "Commit: $GITHUB_SHA"
+            echo "Node: $(node --version)"
+            echo "npm: $(npm --version)"
+            echo "Root package.json: $([[ -f package.json ]] && echo present || echo missing)"
+            echo "pnpm workspace: $([[ -f pnpm-workspace.yaml ]] && echo present || echo missing)"
+            echo "Mobile package-lock: $([[ -f mobile/package-lock.json ]] && echo present || echo missing)"
+          } | tee cleanup-report.txt
+
+      - name: Generate mobile npm lockfile
+        id: npm-lock
+        continue-on-error: true
+        working-directory: mobile
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund --legacy-peer-deps
+
+      - name: Setup pnpm 10
+        id: setup-pnpm
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@10 --activate
+          pnpm --version | tee -a cleanup-report.txt
+
+      - name: Generate candidate pnpm workspace lockfile
+        id: pnpm-lock
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The repository currently has no root package.json. Use a temporary
+          # private workspace manifest only for lockfile resolution; never upload it.
+          temporary_root_manifest=false
+          if [[ ! -f package.json ]]; then
+            printf '{\n  "name": "arownd-workspace-root",\n  "private": true\n}\n' > package.json
+            temporary_root_manifest=true
+            echo "Temporary root package manifest used for pnpm resolution." | tee -a cleanup-report.txt
+          fi
+
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
+          if [[ "$temporary_root_manifest" == true ]]; then
+            rm package.json
+          fi
+
+      - name: Record generation results
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo ""
+            echo "npm lockfile step: ${{ steps.npm-lock.outcome }}"
+            echo "pnpm setup step: ${{ steps.setup-pnpm.outcome }}"
+            echo "pnpm lockfile step: ${{ steps.pnpm-lock.outcome }}"
+            echo "Generated mobile/package-lock.json: $([[ -f mobile/package-lock.json ]] && echo yes || echo no)"
+            echo "Generated pnpm-lock.yaml: $([[ -f pnpm-lock.yaml ]] && echo yes || echo no)"
+            echo "NOTE: pnpm-lock.yaml is provisional while the root package manifest and API client/codegen ownership remain unresolved."
+          } >> cleanup-report.txt
+
+      - name: Upload candidate lockfiles and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arownd-cleanup-candidates-${{ github.run_number }}
+          path: |
+            mobile/package-lock.json
+            pnpm-lock.yaml
+            cleanup-report.txt
+          if-no-files-found: warn
+          retention-days: 7
