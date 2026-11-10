@@ -137,6 +137,7 @@ export default function OrderDetailsScreen() {
     <PressableSurface accessibilityRole="button" accessibilityLabel={translate("login")} onPress={() => router.push("/login")} style={styles.secondary}><UiText style={styles.secondaryText}>{translate("login")}</UiText></PressableSurface>
   </CustomerScreen>;
   if (!query.data) return <CustomerScreen>
+    <CustomerHeading title={translate("orderDetailsTitle")} />
     <ErrorState title={translate("ordersLoadError")} retryLabel={translate("retry")} busy={query.isFetching} onRetry={() => void query.refetch()} />
   </CustomerScreen>;
   const order = query.data.order;
