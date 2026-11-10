@@ -1,6 +1,10 @@
 import type { AppNotification } from "@/lib/notifications";
 
 export function getNotificationDestination(item: AppNotification): string | null {
+  if (item.type === "system" && item.data.kind === "support_reply") {
+    const notificationUrl = typeof item.data.url === "string" ? item.data.url : "";
+    return /^\/support\/[0-9a-f-]{36}$/i.test(notificationUrl) ? notificationUrl : null;
+  }
   if (item.type !== "order") return null;
 
   const notificationUrl = typeof item.data.url === "string" ? item.data.url : "";
