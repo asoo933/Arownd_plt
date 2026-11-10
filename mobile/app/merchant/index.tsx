@@ -18,7 +18,7 @@ import { fetchStoreDetails, fetchStoreOffers, formatDZD } from "@/lib/catalog";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
-import { Button, Card, ErrorState, Icon, IconButton, Image as UiImage, MetricCardSkeleton, OrderCardSkeleton, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
+import { RefreshableScrollView, Button, Card, ErrorState, Icon, IconButton, Image as UiImage, MetricCardSkeleton, OrderCardSkeleton, MerchantMetricCard, MerchantStatusBadge, PriceDisplay, PressableSurface, Text as UiText } from "@/components/ui";
 
 export default function MerchantEntryScreen() {
   useLanguage();
@@ -118,7 +118,7 @@ export default function MerchantEntryScreen() {
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <RefreshableScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} refreshing={access.isFetching || dashboard.isFetching} onRefresh={() => { void Promise.all([access.refetch(), dashboard.refetch()]); }}>
         <View style={styles.headerActions}>
           <IconButton
             icon={<Icon name="settings" size={20} color={theme.colors.foreground} accessibilityHidden />}
@@ -279,7 +279,7 @@ export default function MerchantEntryScreen() {
         </Card>
 
 
-      </ScrollView>
+      </RefreshableScrollView>
     </SafeAreaView>
   );
 }
