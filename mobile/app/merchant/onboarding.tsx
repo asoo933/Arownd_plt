@@ -366,7 +366,7 @@ export default function MerchantOnboardingScreen() {
                       }
                     ]}
                   >
-                    <UiText style={[styles.categoryText, { color: theme.colors.foreground }]}>
+                    <UiText style={[styles.categoryText, { color: categoryId === category.id && theme.mode === "dark" ? theme.colors.accentMuted : theme.colors.foreground }]}>
                       {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                     </UiText>
                   </PressableSurface>
@@ -412,7 +412,7 @@ export default function MerchantOnboardingScreen() {
                             }
                           ]}
                         >
-                          <UiText style={[styles.chipText, { color: theme.colors.foreground }]}>
+                          <UiText style={[styles.chipText, { color: selected && theme.mode === "dark" ? theme.colors.accentMuted : theme.colors.foreground }]}>
                             {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                           </UiText>
                         </PressableSurface>
