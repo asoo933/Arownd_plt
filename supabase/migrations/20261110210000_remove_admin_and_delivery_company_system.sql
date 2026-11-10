@@ -15,6 +15,8 @@ begin
         or coalesce(with_check,'') ilike '%is_platform_admin%'
         or coalesce(qual,'') ilike '%has_role(%'
         or coalesce(with_check,'') ilike '%has_role(%'
+        or coalesce(qual,'') ilike '%get_my_account_type%'
+        or coalesce(with_check,'') ilike '%get_my_account_type%'
         or coalesce(qual,'') ilike '%delivery_companies%'
         or coalesce(with_check,'') ilike '%delivery_companies%'
         or coalesce(qual,'') ilike '%delivery_coverage_areas%'
@@ -491,8 +493,11 @@ begin
   expected_amount := mo.subtotal + mo.shipping_fee;
   if expected_amount < 0 then raise exception 'invalid_cod_amount'; end if;
   if mo.status <> 'delivered' then
-    raise exception case when parent_order.delivery_type = 'desk'
-      then 'store_pickup_not_completed' else 'merchant_delivery_not_completed' end;
+    if parent_order.delivery_type = 'desk' then
+      raise exception 'store_pickup_not_completed';
+    else
+      raise exception 'merchant_delivery_not_completed';
+    end if;
   end if;
   channel := case parent_order.delivery_type
     when 'home' then 'merchant_delivery'
@@ -643,6 +648,36 @@ begin
 end;
 $function$;
 
+create policy "Creators update single-offer products" on public.products
+  for update to authenticated
+  using (
+    created_by = (select auth.uid())
+    and public.get_my_account_type() = 'merchant'::public.account_type
+    and exists (
+      select 1 from public.user_roles ur
+      where ur.user_id = (select auth.uid())
+        and ur.role = 'merchant'::public.app_role
+    )
+    and exists (
+      select 1 from public.store_offers so
+      join public.stores s on s.id = so.store_id
+      where so.product_id = products.id and s.owner_id = (select auth.uid())
+    )
+  )
+  with check (
+    created_by = (select auth.uid())
+    and public.get_my_account_type() = 'merchant'::public.account_type
+    and exists (
+      select 1 from public.user_roles ur
+      where ur.user_id = (select auth.uid())
+        and ur.role = 'merchant'::public.app_role
+    )
+    and exists (
+      select 1 from public.store_offers so
+      join public.stores s on s.id = so.store_id
+      where so.product_id = products.id and s.owner_id = (select auth.uid())
+    )
+  );
 create policy "Merchants add products" on public.products
   for insert to authenticated
   with check (
