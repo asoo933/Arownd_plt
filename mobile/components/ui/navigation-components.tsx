@@ -114,6 +114,10 @@ function NavigationTab({
         });
       },
       onArrive: () => {
+        if (reduceMotion) {
+          scale.setValue(1);
+          return;
+        }
         scale.setValue(1.14);
         Animated.spring(scale, {
           toValue: 1,
@@ -124,7 +128,7 @@ function NavigationTab({
         }).start();
       }
     });
-  }, [item.key, scale]);
+  }, [item.key, reduceMotion, scale]);
 
   return (
     <Pressable
