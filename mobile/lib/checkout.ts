@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
-import { checkoutRequestIdentity, normalizeCheckoutItems } from "@/lib/checkout-state";
+import { checkoutRequestIdentity, MAX_CHECKOUT_ITEMS, normalizeCheckoutItems } from "@/lib/checkout-state";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
@@ -116,6 +116,19 @@ async function removeIdempotencyKey(userId: string, identity: string): Promise<v
 export async function submitCheckout(input: CheckoutInput): Promise<string> {
   if (!input.userId) throw new Error("not_authenticated");
   if (input.items.length === 0) throw new Error("empty_cart");
+  if (input.items.length > MAX_CHECKOUT_ITEMS) throw new Error("too_many_items");
+  if (input.commune.trim().length < 2 || input.commune.trim().length > 100) {
+    throw new Error("invalid_commune");
+  }
+  if (input.addressLine.trim().length === 0 || input.addressLine.trim().length > 300) {
+    throw new Error("invalid_address");
+  }
+  if (input.fullName.trim().length < 2 || input.fullName.trim().length > 120) {
+    throw new Error("invalid_full_name");
+  }
+  if (input.phone.trim().length < 8 || input.phone.trim().length > 30) {
+    throw new Error("invalid_phone");
+  }
   const identity = checkoutRequestIdentity(input);
   const idempotencyKey = await getOrCreateIdempotencyKey(input.userId, identity);
   const { data, error } = await getSupabaseClient().rpc("create_order_with_delivery", {
