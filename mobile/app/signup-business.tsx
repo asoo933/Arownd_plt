@@ -8,6 +8,7 @@ import {
   ActionButton,
   AuthField,
   AuthLayout,
+  PasswordStrengthMeter,
   FormError,
   InlineLink,
   SuccessPanel
@@ -140,6 +141,11 @@ export default function BusinessSignupScreen() {
                 error={errors.password ? translate("passwordMin") : undefined}
               />
             )}
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value } }) => <PasswordStrengthMeter password={value} />}
           />
 
           <Controller
