@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, TextInput, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
-import { createSupportConversation, fetchMySupportConversations } from "@/lib/support";
+import { createSupportConversation, fetchMySupportConversations, supportConversationInputSchema, type SupportConversationInput } from "@/lib/support";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -23,9 +25,12 @@ export default function SupportScreen() {
   const styles = createStyles(theme);
   const { language } = useLanguage();
   const queryClient = useQueryClient();
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
   const [formError, setFormError] = useState(false);
+  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<SupportConversationInput>({
+    resolver: zodResolver(supportConversationInputSchema),
+    defaultValues: { subject: "", message: "" },
+    mode: "onChange"
+  });
 
   const auth = useQuery({
     queryKey: ["support-auth"],
@@ -57,10 +62,9 @@ export default function SupportScreen() {
     return () => { void client.removeChannel(channel); };
   }, [auth.data?.id, queryClient]);
   const createMutation = useMutation({
-    mutationFn: () => createSupportConversation(subject, message),
+    mutationFn: (values: SupportConversationInput) => createSupportConversation(values.subject, values.message),
     onSuccess: async (id) => {
-      setSubject("");
-      setMessage("");
+      reset({ subject: "", message: "" });
       setFormError(false);
       await queryClient.invalidateQueries({ queryKey: ["my-support-conversations", auth.data?.id] });
       router.push("/support/" + id);
@@ -99,32 +103,48 @@ export default function SupportScreen() {
 
       <View style={styles.section}>
         <Heading level={3}>{translate("supportNewMessage")}</Heading>
-        <TextInput
-          value={subject}
-          onChangeText={setSubject}
-          placeholder={translate("supportSubjectPlaceholder")}
-          placeholderTextColor={theme.colors.subtle}
-          maxLength={120}
-          style={styles.input}
-          accessibilityLabel={translate("supportSubjectPlaceholder")}
+        <Controller
+          control={control}
+          name="subject"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder={translate("supportSubjectPlaceholder")}
+              placeholderTextColor={theme.colors.subtle}
+              maxLength={120}
+              style={styles.input}
+              accessibilityLabel={translate("supportSubjectPlaceholder")}
+            />
+          )}
         />
-        <TextInput
-          value={message}
-          onChangeText={setMessage}
-          placeholder={translate("supportMessagePlaceholder")}
-          placeholderTextColor={theme.colors.subtle}
-          maxLength={4000}
-          multiline
-          textAlignVertical="top"
-          style={[styles.input, styles.messageInput]}
-          accessibilityLabel={translate("supportMessagePlaceholder")}
+        {errors.subject ? <UiText tone="danger">{translate("supportSubjectInvalid")}</UiText> : null}
+        <Controller
+          control={control}
+          name="message"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              placeholder={translate("supportMessagePlaceholder")}
+              placeholderTextColor={theme.colors.subtle}
+              maxLength={4000}
+              multiline
+              textAlignVertical="top"
+              style={[styles.input, styles.messageInput]}
+              accessibilityLabel={translate("supportMessagePlaceholder")}
+            />
+          )}
         />
+        {errors.message ? <UiText tone="danger">{translate("supportMessageInvalid")}</UiText> : null}
         {formError ? <UiText tone="danger">{translate("supportSendError")}</UiText> : null}
         <Button
           label={translate("supportSend")}
-          onPress={() => createMutation.mutate()}
+          onPress={() => { void handleSubmit((values) => createMutation.mutate(values))(); }}
           loading={createMutation.isPending}
-          disabled={subject.trim().length < 3 || message.trim().length === 0}
+          disabled={!isValid}
           fullWidth
         />
       </View>
