@@ -128,6 +128,13 @@ function Message({ theme, label, loading = false, actionLabel, onAction, busy = 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
+        <AppHeader
+          title={translate("merchantAnalyticsTitle")}
+          leading={<Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantAnalyticsSubtitle")}
+        </UiText>
         {loading ? (
           <View style={{ width: "100%", gap: designTokens.spacing.md }}>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: designTokens.spacing.sm }}>
@@ -167,6 +174,6 @@ function createStyles(theme: AppTheme) {
     amount: { minWidth: 54, maxWidth: 104, flexShrink: 1, fontSize: designTokens.typography.caption - 2, textAlign: "auto" },
     empty: { textAlign: "center", fontSize: designTokens.typography.caption, paddingVertical: designTokens.spacing.md },
     note: { fontSize: designTokens.typography.caption - 1, lineHeight: 17, textAlign: "auto" },
-    message: { flex: 1, justifyContent: "center", alignItems: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg }
+    message: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, gap: designTokens.spacing.lg }
   });
 }
