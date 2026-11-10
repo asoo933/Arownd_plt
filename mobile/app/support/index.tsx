@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -41,6 +41,21 @@ export default function SupportScreen() {
     queryFn: fetchMySupportConversations,
     enabled: auth.isSuccess && Boolean(auth.data)
   });
+
+  useEffect(() => {
+    const userId = auth.data?.id;
+    if (!userId) return;
+    const client = getSupabaseClient();
+    const channel = client.channel("support-inbox-" + userId)
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "support_conversations",
+        filter: "user_id=eq." + userId
+      }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["my-support-conversations", userId] });
+      })
+      .subscribe();
+    return () => { void client.removeChannel(channel); };
+  }, [auth.data?.id, queryClient]);
   const createMutation = useMutation({
     mutationFn: () => createSupportConversation(subject, message),
     onSuccess: async (id) => {
