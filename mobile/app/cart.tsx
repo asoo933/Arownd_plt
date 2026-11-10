@@ -104,7 +104,7 @@ export default function CartScreen() {
     />
     {offers.isError ? <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={offers.isFetching} onRetry={() => void offers.refetch()} /> : null}
     {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
-    {mutation.isError ? <Alert tone="danger" description={translate("genericError")} /> : null}
+    {mutation.isError ? <Alert tone="danger" description={translate("cartUpdateError")} /> : null}
     {evaluation.blockingCount > 0 ? <Alert tone="danger" description={translate("cartBlocked") + evaluation.blockingCount} /> : null}
     {[...groups.entries()].map(([storeId, group]) => <Card key={storeId} style={style.group} contentStyle={style.groupContent}>
       <UiText tone="accentMuted" weight="900" style={style.store}>{group.storeName}</UiText>
