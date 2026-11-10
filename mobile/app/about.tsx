@@ -33,7 +33,7 @@ export default function AboutScreen() {
       </View>
 
       <View style={styles.descriptionBlock}>
-        <Heading level={3}>{translate("settingsAboutTitle")}</Heading>
+        <Heading level={3}>{translate("aboutSectionTitle")}</Heading>
         <UiText style={styles.description}>{translate("aboutDescription")}</UiText>
       </View>
 
