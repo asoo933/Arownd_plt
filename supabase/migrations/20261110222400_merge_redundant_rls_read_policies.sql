@@ -1,8 +1,12 @@
 -- Preserve existing row access while removing overlapping permissive policies.
+-- The DROP statements also make this migration safe after a direct SQL rehearsal.
 
 BEGIN;
 
 DROP POLICY IF EXISTS "Owners manage images" ON public.product_images;
+DROP POLICY IF EXISTS "Owners insert images" ON public.product_images;
+DROP POLICY IF EXISTS "Owners update images" ON public.product_images;
+DROP POLICY IF EXISTS "Owners delete images" ON public.product_images;
 
 CREATE POLICY "Owners insert images"
 ON public.product_images
@@ -25,6 +29,7 @@ USING (public.is_offer_owner(offer_id));
 
 DROP POLICY IF EXISTS "Reviews public read" ON public.reviews;
 DROP POLICY IF EXISTS "Users read own reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Reviews public and own read" ON public.reviews;
 
 CREATE POLICY "Reviews public and own read"
 ON public.reviews
@@ -40,6 +45,7 @@ USING (
 
 DROP POLICY IF EXISTS "Merchants read only their suborder shipments" ON public.shipments;
 DROP POLICY IF EXISTS "العملاء يرون شحنات طلباتهم" ON public.shipments;
+DROP POLICY IF EXISTS "Customers and merchants read shipments" ON public.shipments;
 
 CREATE POLICY "Customers and merchants read shipments"
 ON public.shipments
