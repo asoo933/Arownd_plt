@@ -687,6 +687,13 @@ function MessageScreen({
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
+        <AppHeader
+          title={translate("merchantProductEditTitle")}
+          leading={<Button label={translate("merchantProductEditBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />}
+        />
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantProductEditSubtitle")}
+        </UiText>
         {loading ? (
           <LoadingState label={label} />
         ) : actionLabel && onAction ? (
@@ -759,7 +766,7 @@ function createStyles(theme: AppTheme) {
     cancelText: { fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
     removeConfirmButton: { flex: 1, minHeight: 45, borderRadius: designTokens.radius.sm, alignItems: "center", justifyContent: "center" },
     removeConfirmText: { color: designTokens.brand.white, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
-    message: { flex: 1, alignItems: "center", justifyContent: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg },
+    message: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, lineHeight: 21, textAlign: "center" }
   });
 }
