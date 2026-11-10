@@ -155,7 +155,7 @@ function RootLayoutContent() {
       unsubscribe?.();
       pushTokenSubscription?.remove();
     };
-  }, [queryClient]);
+  }, [queryClient, language]);
 
   useEffect(() => {
     const openNotificationDestination = (response: Notifications.NotificationResponse) => {
