@@ -21,6 +21,17 @@ const SupportMessageSchema = z.object({
   created_at: z.string()
 });
 
+export const supportConversationInputSchema = z.object({
+  subject: z.string().trim().min(3).max(120),
+  message: z.string().trim().min(1).max(4000)
+});
+
+export const supportMessageInputSchema = z.object({
+  message: z.string().trim().min(1).max(4000)
+});
+
+export type SupportConversationInput = z.infer<typeof supportConversationInputSchema>;
+export type SupportMessageInput = z.infer<typeof supportMessageInputSchema>;
 export type SupportConversation = z.infer<typeof SupportConversationSchema>;
 export type SupportMessage = z.infer<typeof SupportMessageSchema>;
 
