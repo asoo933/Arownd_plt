@@ -162,7 +162,6 @@ export default function NotificationsScreen() {
     >
       <AppHeader
         title={translate("notificationsTitle")}
-        leading={unreadCount > 0 ? <StatusBadge label={String(unreadCount)} tone="accent" /> : undefined}
       />
       <Caption>{translate("notificationsSubtitle")}</Caption>
       {actionError ? <Alert tone="danger" description={translate("notificationsMarkError")} /> : null}
