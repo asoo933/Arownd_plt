@@ -74,7 +74,6 @@ export default function MerchantOrderDetailsScreen() {
       : merchantOrder?.status === "shipped"
         ? deliveryType === "desk" ? "ready_for_dispatch" : "out_for_delivery"
         : "confirmed");
-  const isCarrierManaged = deliveryType === "home" && !!detail.data?.shipment?.company_id;
   const refresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["merchant-order-detail", storeId, orderId] }),
@@ -129,11 +128,11 @@ export default function MerchantOrderDetailsScreen() {
   const customerOrder = order.order;
   const total = order.subtotal + order.shipping_fee;
   const canManageFulfillment = canManageMerchantOrderFulfillment(order.status) && customerOrder.status !== "cancelled";
-  const nextStatus = !isCarrierManaged && canManageFulfillment
+  const nextStatus = canManageFulfillment
     ? getNextMerchantTrackingStatus(latestTrackingStatus, deliveryType ?? "")
     : null;
   const nextStatusLabel = nextStatus ? trackingTranslationKeys[nextStatus] : null;
-  const canCollectCod = canCollectMerchantOrderCod(order.status, order.payment_status, deliveryType ?? "", isCarrierManaged);
+  const canCollectCod = canCollectMerchantOrderCod(order.status, order.payment_status, deliveryType ?? "", false);
   const canQuote = customerOrder.status !== "cancelled" && order.status === "pending" && !order.quoted_at;
   const canReject = canQuote;
 
@@ -231,10 +230,6 @@ export default function MerchantOrderDetailsScreen() {
 
         {order.status === "quoted" ? (
           <Alert description={translate("merchantQuoteAwaitingCustomer")} tone="warning" />
-        ) : null}
-
-        {isCarrierManaged ? (
-          <Alert description={translate("merchantTrackingCarrierCompletesDelivery")} tone="warning" />
         ) : null}
 
         <MerchantOrderCard>
