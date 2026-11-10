@@ -1,7 +1,9 @@
 # Repository Redesign Audit — Cross-cutting Review
 
-Branch: `work/next-task`
-Audit date: 2026-11-06
+Historical snapshot — this audit records the repository state reviewed on 2026-11-06.
+Branch at the time of the audit: `work/next-task`.
+
+This document is a historical audit record, not a description of the current branch or current repository state. Re-check the source files before treating any finding as current.
 
 ## Executive result
 
