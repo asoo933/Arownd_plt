@@ -6,6 +6,7 @@ import { Avatar, Icon, PressableSurface, Skeleton, ProductCardSkeleton, Text as 
 import Logo from "@/components/logo";
 import {
   CustomerScreen,
+  CustomerHeading,
   EmptyState,
   ErrorState,
   ProductTile,
@@ -65,6 +66,11 @@ export default function CustomerHomeScreen() {
           </PressableSurface>
         </View>
       </View>
+
+      <CustomerHeading
+        title={translate("homeTitle")}
+        subtitle={translate("homeSubtitle")}
+      />
 
       <View>
         <SectionTitle title={translate("homeFeaturedStores")} />
