@@ -45,7 +45,14 @@ describe("product image storage helpers", () => {
     )).toBe(`${userId}/products/photo.webp`);
   });
 
-  it("extracts signed URLs and ignores their token query string", () => {\n    expect(getProductImageStoragePath(\n      "https://cdn.example.test/storage/v1/object/sign/product-media/" + userId + "/products/photo.webp?token=abc.def.ghi",\n      userId\n    )).toBe(userId + "/products/photo.webp");\n  });\n\n  it("rejects other buckets, other users, malformed URLs, and traversal paths", () => {
+  it("extracts signed URLs and ignores their token query string", () => {
+    expect(getProductImageStoragePath(
+      "https://cdn.example.test/storage/v1/object/sign/product-media/" + userId + "/products/photo.webp?token=abc.def.ghi",
+      userId
+    )).toBe(userId + "/products/photo.webp");
+  });
+
+  it("rejects other buckets, other users, malformed URLs, and traversal paths", () => {
     expect(getProductImageStoragePath(
       `https://cdn.example.test/storage/v1/object/public/avatars/${userId}/products/photo.webp`,
       userId
@@ -58,7 +65,11 @@ describe("product image storage helpers", () => {
       `https://cdn.example.test/storage/v1/object/public/product-media/${userId}/products/../photo.webp`,
       userId
     )).toBeNull();
-    expect(getProductImageStoragePath("not-a-url", userId)).toBeNull();\n    expect(getProductImageStoragePath(\n      "https://cdn.example.test/storage/v1/object/sign/product-media/" + userId + "/products/%252e%252e/photo.webp?token=x",\n      userId\n    )).toBeNull();
+    expect(getProductImageStoragePath("not-a-url", userId)).toBeNull();
+    expect(getProductImageStoragePath(
+      "https://cdn.example.test/storage/v1/object/sign/product-media/" + userId + "/products/%252e%252e/photo.webp?token=x",
+      userId
+    )).toBeNull();
   });
 
   it("selects a replacement only when the removed image was primary", () => {
