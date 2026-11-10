@@ -115,14 +115,14 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           style={[
             styles.textInput,
             label ? styles.textInputWithLabel : null,
-            secureTextEntry ? styles.textInputWithPasswordToggle : null,
             {
               backgroundColor: theme.colors.surface,
               borderColor: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.inputBorder,
               color: theme.colors.foreground,
               fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
             },
-            style
+            style,
+            secureTextEntry ? styles.textInputWithPasswordToggle : null
           ]}
         />
         {secureTextEntry ? (
