@@ -303,8 +303,6 @@ function getErrorMessage(error: unknown): string {
 function translateError(error: string): string {
   if (error.includes("not_authorized")) return translate("merchantErrorNotAuthorized");
   if (error.includes("invalid_tracking_transition")) return translate("merchantTrackingTransitionError");
-  if (error.includes("shipment_not_delivered")) return translate("merchantCodShipmentNotDelivered");
-  if (error.includes("shipment_company_not_assigned")) return translate("merchantCodCarrierMissing");
   if (error.includes("store_pickup_not_completed")) return translate("merchantCodPickupNotCompleted");
   return translate("merchantActionGenericError");
 }
