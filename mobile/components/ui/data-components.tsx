@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { Pressable, ScrollView, View, type StyleProp, type ViewStyle } from "react-native";
+import { Children, useRef, type ReactNode } from "react";
+import { Animated, Pressable, ScrollView, View, type StyleProp, type ViewStyle } from "react-native";
 import { Text as UiText } from "./typography";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -76,8 +76,54 @@ export function ChartCard({ children, style }: { children: ReactNode; style?: St
   return <View style={[{ padding: designTokens.spacing.md, borderRadius: theme.radius.xl, backgroundColor: theme.colors.surfaceSecondary, gap: designTokens.spacing.md }, style]}>{children}</View>;
 }
 
-export function Carousel({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  return <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[{ flexDirection: "row", gap: designTokens.spacing.md }, style]}>{children}</ScrollView>;
+type CarouselProps = {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  itemWidth?: number;
+  snap?: boolean;
+  scale?: boolean;
+};
+
+export function Carousel({ children, style, itemWidth, snap = false, scale = false }: CarouselProps) {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const canAnimateItems = Boolean(itemWidth && itemWidth > 0 && scale);
+  const interval = itemWidth ? itemWidth + designTokens.spacing.md : undefined;
+
+  const content = canAnimateItems
+    ? Children.map(children, (child, index) => {
+        if (child === null || child === undefined || typeof child === "boolean") return null;
+        const inputRange = interval
+          ? [(index - 1) * interval, index * interval, (index + 1) * interval]
+          : [0, 0, 0];
+        const scaleValue = scrollX.interpolate({
+          inputRange,
+          outputRange: [0.94, 1, 0.94],
+          extrapolate: "clamp"
+        });
+
+        return (
+          <Animated.View key={index} style={{ width: itemWidth, transform: [{ scale: scaleValue }] }}>
+            {child}
+          </Animated.View>
+        );
+      })
+    : children;
+
+  return (
+    <Animated.ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      decelerationRate={snap ? "fast" : "normal"}
+      snapToInterval={snap ? interval : undefined}
+      snapToAlignment={snap ? "start" : undefined}
+      disableIntervalMomentum={snap}
+      scrollEventThrottle={16}
+      onScroll={canAnimateItems ? Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true }) : undefined}
+      contentContainerStyle={[{ flexDirection: "row", gap: designTokens.spacing.md }, style]}
+    >
+      {content}
+    </Animated.ScrollView>
+  );
 }
 
 export function HorizontalList({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
