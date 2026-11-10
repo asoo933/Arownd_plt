@@ -130,6 +130,13 @@ function RootLayoutContent() {
 
         if ((event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user) {
           queueMicrotask(() => {
+            if (session.user.user_metadata?.preferred_language !== language) {
+              void getSupabaseClient().auth.updateUser({
+                data: { preferred_language: language }
+              }).then(({ error }) => {
+                if (error) console.warn("[push-notifications] Could not sync the notification language", error);
+              });
+            }
             if (!pushTokenSubscription) {
               pushTokenSubscription = listenForPushTokenChanges();
             }
