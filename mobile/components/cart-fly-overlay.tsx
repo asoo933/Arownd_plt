@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Image, StyleSheet, View } from "react-native";
+import { AccessibilityInfo, Animated, Image, StyleSheet, View } from "react-native";
 
 import { Icon } from "@/components/ui/icon";
 import { useAppTheme } from "@/lib/theme";
@@ -18,6 +18,24 @@ export function CartFlyOverlay() {
   const theme = useAppTheme();
   const progress = useRef(new Animated.Value(0)).current;
   const [flight, setFlight] = useState<Flight | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    void AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (active) setReduceMotion(enabled);
+      })
+      .catch(() => {
+        if (active) setReduceMotion(true);
+      });
+
+    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduceMotion);
+    return () => {
+      active = false;
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     return subscribeCartFly((request) => {
@@ -25,6 +43,11 @@ export function CartFlyOverlay() {
       if (!target) return;
 
       target.measure((destination) => {
+        if (reduceMotion) {
+          target.onArrive();
+          return;
+        }
+
         const sourceCenterX = request.source.x + request.source.width / 2;
         const sourceCenterY = request.source.y + request.source.height / 2;
         const destinationCenterX = destination.x + destination.width / 2;
@@ -40,7 +63,7 @@ export function CartFlyOverlay() {
         });
       });
     });
-  }, []);
+  }, [reduceMotion]);
 
   useEffect(() => {
     if (!flight) return;
