@@ -38,7 +38,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
           styles.textInput,
           {
             backgroundColor: theme.colors.surface,
-            borderColor: error ? theme.colors.danger : theme.mode === "light" && focused ? theme.colors.focus : theme.colors.inputBorder,
+            borderColor: error ? theme.colors.danger : focused ? theme.colors.focus : theme.colors.inputBorder,
             color: theme.colors.foreground,
             fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
           },
