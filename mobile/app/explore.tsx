@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, ProductTile, SectionTitle } from "@/components/customer-ui";
+import { CustomerScreen, CustomerHeading, EmptyState, ErrorState, ProductTile, SectionTitle } from "@/components/customer-ui";
 import { fetchHomeProducts, fetchProductDetails, fetchProductOffers, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -104,6 +104,10 @@ export default function ExploreScreen() {
       onRefresh={hasActiveFilter ? () => { void products.refetch(); } : undefined}
     >
       <View style={styles.topSection}>
+        <CustomerHeading
+          title={translate("exploreTitle")}
+          subtitle={translate("exploreSubtitle")}
+        />
         <View style={styles.header}>
           <View style={styles.search}>
             <SearchField
