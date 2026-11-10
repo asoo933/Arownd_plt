@@ -1,5 +1,7 @@
 import { normalizeCartOptions, type CartItem } from "@/lib/cart-state";
 
+export const MAX_CHECKOUT_ITEMS = 30;
+
 export type CheckoutIdentityInput = {
   items: CartItem[];
   deliveryType: "home" | "desk";
