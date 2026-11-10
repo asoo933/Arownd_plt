@@ -8,6 +8,7 @@ import {
   ActionButton,
   AuthField,
   AuthLayout,
+  PasswordStrengthMeter,
   FormError,
   SuccessPanel
 } from "@/components/auth-ui";
@@ -124,6 +125,11 @@ export default function ResetPasswordScreen() {
                 error={errors.password ? translate("passwordMin") : undefined}
               />
             )}
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value } }) => <PasswordStrengthMeter password={value} />}
           />
 
           <Controller
