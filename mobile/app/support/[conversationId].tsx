@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, TextInput, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, Caption, Icon, PressableSurface, Text as UiText } from "@/components/ui";
-import { fetchSupportConversation, fetchSupportMessages, sendSupportMessage } from "@/lib/support";
+import { fetchSupportConversation, fetchSupportMessages, sendSupportMessage, supportMessageInputSchema, type SupportMessageInput } from "@/lib/support";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -24,8 +26,12 @@ export default function SupportConversationScreen() {
   const { language } = useLanguage();
   const queryClient = useQueryClient();
   const { conversationId } = useLocalSearchParams<{ conversationId: string }>();
-  const [draft, setDraft] = useState("");
   const [sendError, setSendError] = useState(false);
+  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<SupportMessageInput>({
+    resolver: zodResolver(supportMessageInputSchema),
+    defaultValues: { message: "" },
+    mode: "onChange"
+  });
 
   const auth = useQuery({
     queryKey: ["support-auth"],
@@ -64,9 +70,9 @@ export default function SupportConversationScreen() {
   }, [conversationId, auth.data?.id, queryClient]);
 
   const sendMutation = useMutation({
-    mutationFn: () => sendSupportMessage(conversationId, draft),
+    mutationFn: (message: string) => sendSupportMessage(conversationId, message),
     onSuccess: async () => {
-      setDraft("");
+      reset({ message: "" });
       setSendError(false);
       await queryClient.invalidateQueries({ queryKey: ["support-messages", conversationId] });
       await queryClient.invalidateQueries({ queryKey: ["my-support-conversations", auth.data?.id] });
@@ -117,19 +123,27 @@ export default function SupportConversationScreen() {
         <Caption>{translate("supportClosedHint")}</Caption>
       ) : (
         <View style={styles.composer}>
-          <TextInput
-            value={draft}
-            onChangeText={setDraft}
-            placeholder={translate("supportReplyPlaceholder")}
-            placeholderTextColor={theme.colors.subtle}
-            maxLength={4000}
-            multiline
-            textAlignVertical="top"
-            style={styles.input}
-            accessibilityLabel={translate("supportReplyPlaceholder")}
+          <Controller
+            control={control}
+            name="message"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder={translate("supportReplyPlaceholder")}
+                placeholderTextColor={theme.colors.subtle}
+                maxLength={4000}
+                multiline
+                textAlignVertical="top"
+                style={styles.input}
+                accessibilityLabel={translate("supportReplyPlaceholder")}
+              />
+            )}
           />
+          {errors.message ? <UiText tone="danger">{translate("supportMessageInvalid")}</UiText> : null}
           {sendError ? <UiText tone="danger">{translate("supportSendError")}</UiText> : null}
-          <Button label={translate("supportSend")} onPress={() => sendMutation.mutate()} loading={sendMutation.isPending} disabled={!draft.trim()} fullWidth />
+          <Button label={translate("supportSend")} onPress={() => { void handleSubmit(({ message }) => sendMutation.mutate(message))(); }} loading={sendMutation.isPending} disabled={!isValid} fullWidth />
         </View>
       )}
     </CustomerScreen>
