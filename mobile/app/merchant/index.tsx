@@ -269,7 +269,7 @@ export default function MerchantEntryScreen() {
                 index < items.length - 1 && { borderBottomColor: theme.colors.border, borderBottomWidth: StyleSheet.hairlineWidth }
               ]}
             >
-              <View style={[styles.managementIcon, { backgroundColor: theme.colors.surfaceMuted }]}>
+              <View style={[styles.managementIcon, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
                 <Icon name={item.icon as "shopping-bag" | "package" | "layout-grid" | "settings"} color={theme.colors.accentMuted} size={19} accessibilityHidden />
               </View>
               <UiText style={[styles.managementLabel, { color: theme.colors.foreground }]}>{item.label}</UiText>
