@@ -32,6 +32,9 @@ function typeLabel(type: AppNotification["type"]): string {
 }
 
 function localizedNotificationCopy(item: AppNotification): { title: string; body: string | null } {
+  if (item.type === "system" && item.data.kind === "support_reply") {
+    return { title: translate("supportNotificationTitle"), body: item.body };
+  }
   if (item.type !== "order") return { title: item.title, body: item.body };
 
   const status = typeof item.data.status === "string" ? item.data.status : null;
