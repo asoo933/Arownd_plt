@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Logo from "@/components/logo";
+import { CartFlyOverlay } from "@/components/cart-fly-overlay";
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
 import { listenForPushTokenChanges, registerDeviceForPushNotifications } from "@/lib/push-notifications";
@@ -216,6 +217,8 @@ function RootLayoutContent() {
           />
         </LocaleProvider>
       </QueryClientProvider>
+
+      <CartFlyOverlay />
 
       {showSplash ? (
         <View
