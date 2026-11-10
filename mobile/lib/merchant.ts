@@ -11,7 +11,7 @@ import {
   type MerchantAccessStatus
 } from "@/lib/merchant-state";
 
-const AccountTypeSchema = z.enum(["personal", "merchant", "delivery_company"]);
+const AccountTypeSchema = z.enum(["personal", "merchant"]);
 const RoleRowsSchema = z.array(z.object({ role: z.string() }).passthrough());
 const OwnedStoreSchema = z.object({
   id: z.string().uuid(),
@@ -277,7 +277,6 @@ const MerchantOrderItemDetailSchema = z.object({
 const MerchantShipmentSchema = z.object({
   id: z.string().uuid(),
   status: z.string(),
-  company_id: z.string().uuid().nullable(),
   fee: z.coerce.number().nullable().optional(),
   updated_at: z.string().nullable().optional(),
   notes: z.string().nullable().optional()
@@ -341,7 +340,7 @@ export async function fetchMerchantOrderDetails(
       .order("id", { ascending: true }),
     client
       .from("shipments")
-      .select("id, status, company_id, fee, updated_at, notes")
+      .select("id, status, fee, updated_at, notes")
       .eq("merchant_order_id", merchantOrderId)
       .maybeSingle(),
     fetchMerchantOrderTracking(merchantOrderId)
