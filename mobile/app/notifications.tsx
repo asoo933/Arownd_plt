@@ -95,7 +95,7 @@ export default function NotificationsScreen() {
   }
   if (auth.isError || notifications.isError) {
     return (
-      <CustomerScreen>
+      <CustomerScreen refreshing={auth.isFetching || notifications.isFetching} onRefresh={() => { void Promise.all([auth.refetch(), notifications.refetch()]); }}>
         <AppHeader title={translate("notificationsTitle")} />
         <ErrorState
           title={translate("notificationsLoadError")}
@@ -119,7 +119,10 @@ export default function NotificationsScreen() {
   const unreadCount = countUnreadNotifications(rows);
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={auth.isFetching || notifications.isFetching}
+      onRefresh={() => { void Promise.all([auth.refetch(), notifications.refetch()]); }}
+    >
       <AppHeader
         title={translate("notificationsTitle")}
         trailing={unreadCount > 0 ? <StatusBadge label={String(unreadCount)} tone="accent" /> : undefined}
