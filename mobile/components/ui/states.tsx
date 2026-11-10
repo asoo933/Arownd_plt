@@ -15,13 +15,13 @@ export function LoadingState({ label }: { label: string }) {
   );
 }
 
-export function EmptyState({ title, hint, icon = "search" }: { title: string; hint: string; icon?: IconName }) {
+export function EmptyState({ title, hint, icon = "search" }: { title: string; hint?: string; icon?: IconName }) {
   const theme = useAppTheme();
   return (
     <View style={styles.state}>
       <Icon name={icon} size={30} color={theme.colors.accentMuted} accessibilityHidden />
       <UiText style={[styles.stateTitle, { color: theme.colors.foreground }]}>{title}</UiText>
-      <UiText style={[styles.stateText, { color: theme.colors.muted }]}>{hint}</UiText>
+      {hint ? <UiText style={[styles.stateText, { color: theme.colors.muted }]}>{hint}</UiText> : null}
     </View>
   );
 }
