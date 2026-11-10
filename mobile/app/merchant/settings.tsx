@@ -297,6 +297,13 @@ function Message({ theme, label, loading = false, actionLabel, onAction, busy = 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
+        <AppHeader
+          title={translate("merchantStoreSettingsTitle")}
+          leading={<Button label={translate("back")} onPress={() => router.back()} variant="ghost" size="sm" />}
+        />
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantStoreSettingsSubtitle")}
+        </UiText>
         {loading ? (
           <LoadingState label={label} />
         ) : actionLabel && onAction ? (
@@ -340,6 +347,6 @@ function createStyles(theme: AppTheme) {
     dayChipText: { fontSize: designTokens.typography.caption - 1, fontWeight: designTokens.fontWeights.extrabold },
     error: { fontSize: designTokens.typography.caption, textAlign: "auto" },
     success: { fontSize: designTokens.typography.caption, textAlign: "auto", fontWeight: designTokens.fontWeights.extrabold },
-    message: { flex: 1, justifyContent: "center", alignItems: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg }
+    message: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, gap: designTokens.spacing.lg }
   });
 }
