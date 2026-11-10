@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { triggerLightImpactHaptic, triggerSelectionHaptic } from "@/lib/haptics";
 import { Text as UiText } from "./typography";
 import { getButtonPalette, type ButtonVariant } from "./palette";
 
@@ -82,7 +83,7 @@ export function PressableSurface({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       accessibilityState={{ ...accessibilityState, disabled: unavailable }}
-      onPress={onPress}
+      onPress={onPress ? () => { triggerSelectionHaptic(); onPress(); } : undefined}
       testID={testID}
       hitSlop={hitSlop}
       disabled={unavailable}
@@ -142,7 +143,7 @@ export function Button({
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled: unavailable, busy: loading }}
       disabled={unavailable}
-      onPress={onPress}
+      onPress={() => { triggerLightImpactHaptic(); onPress(); }}
       testID={testID}
       style={({ pressed }) => [
         {
@@ -225,7 +226,7 @@ export function IconButton({
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={() => { triggerSelectionHaptic(); onPress(); }}
       hitSlop={8}
       testID={testID}
       style={({ pressed }) => [
