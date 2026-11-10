@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { Animated, I18nManager, PanResponder, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
@@ -170,7 +170,8 @@ export default function AddressesScreen() {
           <Caption align="center">{translate("addressesEmptyHint")}</Caption>
         </Card>
       ) : addresses.data.map((address) => (
-        <Card key={address.id} style={styles.addressCard} contentStyle={styles.addressCardContent}>
+        <SwipeToDelete key={address.id} deleteLabel={translate("addressesDelete")} onDelete={() => setDeleteTarget(address)}>
+        <Card style={styles.addressCard} contentStyle={styles.addressCardContent}>
           <View style={styles.cardHeader}>
             <UiText weight="800">
               {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
@@ -194,6 +195,7 @@ export default function AddressesScreen() {
             <Action label={translate("addressesDelete")} onPress={() => setDeleteTarget(address)} danger />
           </View>
         </Card>
+        </SwipeToDelete>
       ))}
 
       <BottomSheet visible={editor !== null} onRequestClose={() => setEditor(null)} maxHeight="92%">
@@ -273,6 +275,60 @@ export default function AddressesScreen() {
       />
       {deleteMutation.isError ? <UiText tone="danger">{translate("addressesDeleteError")}</UiText> : null}
     </CustomerScreen>
+  );
+}
+
+function SwipeToDelete({
+  children,
+  deleteLabel,
+  onDelete
+}: {
+  children: React.ReactNode;
+  deleteLabel: string;
+  onDelete: () => void;
+}) {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const [revealed, setRevealed] = useState(false);
+  const direction = I18nManager.isRTL ? 1 : -1;
+  const revealDistance = 104;
+
+  const animateTo = (value: number) => {
+    Animated.spring(translateX, {
+      toValue: value,
+      useNativeDriver: true,
+      speed: 22,
+      bounciness: 0
+    }).start();
+  };
+
+  const panResponder = useMemo(() => PanResponder.create({
+    onMoveShouldSetPanResponder: (_, gesture) =>
+      Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2,
+    onPanResponderMove: (_, gesture) => {
+      const next = revealed
+        ? direction * revealDistance + Math.min(0, Math.max(-revealDistance, gesture.dx))
+        : Math.min(0, Math.max(-revealDistance, gesture.dx * direction)) * direction;
+      translateX.setValue(next);
+    },
+    onPanResponderRelease: (_, gesture) => {
+      const shouldReveal = revealed
+        ? direction * gesture.dx > 35
+        : direction * gesture.dx < -55;
+      setRevealed(shouldReveal);
+      animateTo(shouldReveal ? direction * revealDistance : 0);
+    },
+    onPanResponderTerminate: () => animateTo(revealed ? direction * revealDistance : 0)
+  }), [direction, revealed, translateX]);
+
+  return (
+    <View style={{ overflow: "hidden", borderRadius: 20 }}>
+      <View style={{ position: "absolute", top: 0, bottom: 0, [I18nManager.isRTL ? "left" : "right"]: 0, width: revealDistance, alignItems: "center", justifyContent: "center" }}>
+        <Button label={deleteLabel} onPress={onDelete} variant="danger" size="sm" />
+      </View>
+      <Animated.View style={{ transform: [{ translateX }] }} {...panResponder.panHandlers}>
+        {children}
+      </Animated.View>
+    </View>
   );
 }
 
