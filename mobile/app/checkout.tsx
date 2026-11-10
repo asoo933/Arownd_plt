@@ -429,7 +429,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   radioSelected: { borderWidth: 5, borderColor: theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted },
   deliveryOptions: { flexDirection: "row", gap: designTokens.spacing.sm },
   deliveryOption: { flex: 1, minHeight: 92, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border, backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderRadius: designTokens.radius.md, padding: designTokens.spacing.md, gap: designTokens.spacing.sm },
-  deliverySelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.successSurface },
+  deliverySelected: { borderColor: theme.mode === "light" ? theme.colors.accent : theme.colors.accentMuted, backgroundColor: theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceSecondary },
   deliveryTitle: { color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto" },
   deliveryTextSelected: { color: theme.mode === "light" ? theme.colors.accentForeground : theme.colors.accentMuted },
   deliveryHint: { color: theme.colors.muted, fontSize: designTokens.typography.caption - 1, lineHeight: 15, textAlign: "auto" },
