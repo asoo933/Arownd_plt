@@ -299,7 +299,11 @@ These packages provide shared infrastructure; they do not replace Supabase migra
 │   ├── functions/                 # Supabase Edge Functions
 │   ├── migrations/                # Versioned SQL migrations
 │   └── config.toml                # Supabase CLI configuration
+├── package.json                  # Root pnpm workspace scripts/version pin
 ├── pnpm-workspace.yaml
+├── pnpm-lock.yaml                # Backend/shared workspace lockfile
+├── mobile/
+│   └── package-lock.json         # Independent Expo mobile lockfile
 ├── tsconfig.base.json
 └── README.md
 ```
@@ -307,6 +311,10 @@ These packages provide shared infrastructure; they do not replace Supabase migra
 **EN:** The active application is in `mobile/`. The repository also contains backend/shared infrastructure and Supabase resources; their presence does not mean every package is part of the mobile runtime.
 
 **AR:** التطبيق النشط موجود داخل `mobile/`. ويحتوي المستودع أيضاً على بنية خدمات خلفية وحزم مشتركة وموارد Supabase، لكن وجودها لا يعني أن كل حزمة منها تعمل ضمن بيئة تشغيل تطبيق الهاتف.
+
+**Package-manager boundary | فصل مديري الحزم:** Root backend/shared packages use the pinned pnpm workspace (`pnpm@10.34.9`). The Expo application in `mobile/` is intentionally independent and uses npm with its own `package-lock.json`; do not install it through the root pnpm workspace.
+
+**فصل مديري الحزم:** تستخدم حزم الخلفية والمكتبات المشتركة في الجذر pnpm بإصدار مثبت `10.34.9`. أما تطبيق Expo داخل `mobile/` فهو مستقل عمداً ويستخدم npm وملف القفل الخاص به `package-lock.json`، ولا يُثبّت ضمن Workspace الجذري.
 
 ## 🗄️ Data model and Supabase resources | البيانات وموارد Supabase
 
@@ -368,8 +376,17 @@ Use the Supabase **publishable key** in the mobile app. Never put a service-role
 Run from the mobile directory نفّذ من مجلد الهاتف:
 
 ```bash
+corepack enable
+pnpm install --frozen-lockfile
+```
+
+The root workspace install covers `artifacts/*` and `lib/*`; it does not install the independent mobile application. Root workspace scripts include `pnpm run typecheck:libs`, `pnpm run typecheck:api-server`, `pnpm run build:api-server`, and `pnpm run codegen`.
+
+يثبّت أمر الجذر حزم `artifacts/*` و`lib/*` فقط، ولا يثبت تطبيق الهاتف المستقل. تتضمن أوامر Workspace الجذرية فحص المكتبات وAPI Server وبناءه وتوليد عقود API.
+
+```bash
 cd mobile
-npm install --legacy-peer-deps
+npm ci --legacy-peer-deps
 ```
 
 ### 3. Start the app | تشغيل التطبيق
@@ -453,14 +470,18 @@ GitHub Actions workflows live in `.github/workflows/`. توجد مسارات Git
 | Workflow | Purpose / الوظيفة |
 |---|---|
 | `mobile-quality.yml` | TypeScript, ESLint, Vitest, Expo Doctor / فحوصات جودة تطبيق الهاتف |
-| `mobile-android-preview-apk.yml` | Android preview APK after quality succeeds / بناء APK تجريبي بعد نجاح فحوصات الجودة |
-| `android-diagnostic-apk.yml` | Diagnostic Android build / بناء تشخيصي لأندرويد |
+| `android-diagnostic-apk.yml` | Android diagnostic APK on native app configuration changes or manual dispatch / بناء تشخيصي عند تغيير إعدادات التطبيق أو يدوياً |
+| `android-push-test-apk.yml` | Manual Android debug APK / بناء APK تجريبي يدوياً |
 | `android-generate-keystore.yml` | Keystore generation / إنشاء مفتاح توقيع |
-| `android-push-test-apk.yml` | Test APK workflow / مسار APK للاختبار |
-| `android-release-aab.yml` | Release Android App Bundle / بناء AAB للإصدار |
-| `secret-scan.yml` | Repository secret scanning / فحص الأسرار في المستودع |
+| `android-release-aab.yml` | Paused production release workflow / مسار إصدار الإنتاج متوقف حالياً |
+| `repository-cleanup.yml` | Root pnpm and mobile npm lockfile maintenance / تحديث ملفات قفل pnpm وnpm |
+| `secret-scan.yml` | Full-history secret scanning, including `Arownd-native-v2` / فحص تاريخ المستودع للأسرار بما فيه فرع العمل |
 
-The preview workflow expects these GitHub Actions secrets ويتطلب مسار APK التجريبي أسرار GitHub التالية:
+The separate `mobile-android-preview-apk.yml` file is currently present on `Arownd-native-v2` only. Its `workflow_run` trigger requires the workflow file to be present on the repository default branch before GitHub can activate it. It has not been added to `main`.
+
+ملف `mobile-android-preview-apk.yml` موجود حالياً على فرع `Arownd-native-v2` فقط. يتطلب تفعيل مشغّل `workflow_run` وجود الملف في الفرع الافتراضي للمستودع، ولم تتم إضافته إلى `main`.
+
+The active Android diagnostic workflow expects these GitHub Actions secrets ويتطلب مسار البناء التشخيصي أسرار GitHub التالية:
 
 - `EXPO_PUBLIC_SUPABASE_URL`
 - `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
