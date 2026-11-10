@@ -96,7 +96,12 @@ export default function FavoritesScreen() {
     : count;
 
   return (
-    <CustomerScreen>
+    <CustomerScreen
+      refreshing={favorites.isFetching || content.isFetching}
+      onRefresh={() => {
+        void favorites.refetch().then(() => queryClient.invalidateQueries({ queryKey: ["customer-favorites-content"] }));
+      }}
+    >
       <AppHeader
         title={translate("favoritesTitle")}
         leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />}
