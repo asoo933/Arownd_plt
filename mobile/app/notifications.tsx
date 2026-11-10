@@ -31,6 +31,34 @@ function typeLabel(type: AppNotification["type"]): string {
   return labels[type];
 }
 
+function localizedNotificationCopy(item: AppNotification): { title: string; body: string | null } {
+  if (item.type !== "order") return { title: item.title, body: item.body };
+
+  const status = typeof item.data.status === "string" ? item.data.status : null;
+  if (item.data.recipient_role === "merchant" && status === "pending") {
+    return {
+      title: translate("notificationsMerchantNewOrderTitle"),
+      body: translate("notificationsMerchantNewOrderBody")
+    };
+  }
+
+  const statusKeys: Partial<Record<string, TranslationKey>> = {
+    pending: "notificationsOrderPending",
+    quoted: "notificationsOrderQuoted",
+    confirmed: "notificationsOrderConfirmed",
+    shipped: "notificationsOrderShipped",
+    delivered: "notificationsOrderDelivered",
+    cancelled: "notificationsOrderCancelled"
+  };
+  const bodyKey = status ? statusKeys[status] : undefined;
+  if (!bodyKey) return { title: item.title, body: item.body };
+
+  return {
+    title: translate("notificationsOrderUpdateTitle"),
+    body: translate(bodyKey)
+  };
+}
+
 function dateLabel(value: string, language: Language): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -145,9 +173,10 @@ export default function NotificationsScreen() {
         const orderCode = item.type === "order" && orderId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orderId)
           ? formatOrderCode(orderId)
           : null;
-        const body = orderCode && item.body && orderId
-          ? item.body.replace(new RegExp(orderId.slice(0, 8), "i"), orderCode)
-          : item.body;
+        const copy = localizedNotificationCopy(item);
+        const body = orderCode && copy.body && orderId
+          ? copy.body.replace(new RegExp(orderId.slice(0, 8), "i"), orderCode)
+          : copy.body;
         return (
           <NotificationCard
             key={item.id}
@@ -163,7 +192,7 @@ export default function NotificationsScreen() {
               <Caption tone="accentMuted" weight="800">{typeLabel(item.type)}</Caption>
               <Caption>{dateLabel(item.created_at, language)}</Caption>
             </View>
-            <UiText weight="800">{item.title}</UiText>
+            <UiText weight="800">{copy.title}</UiText>
             {orderCode && body === item.body ? <Caption>{translate("ordersCode")}: {orderCode}</Caption> : null}
             {body ? <UiText tone="muted">{body}</UiText> : null}
             {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} /> : null}
