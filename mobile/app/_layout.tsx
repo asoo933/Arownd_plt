@@ -133,7 +133,7 @@ function RootLayoutContent() {
       {showSplash ? (
         <View
           pointerEvents="auto"
-          style={[StyleSheet.absoluteFillObject, styles.splash, { backgroundColor: theme.colors.background }]}
+          style={[StyleSheet.absoluteFill, styles.splash, { backgroundColor: theme.colors.background }]}
         >
           <View style={[styles.logo, { top: insets.top + 32 }]}>
             <Logo color={theme.colors.foreground} width={160} />
