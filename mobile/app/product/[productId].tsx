@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentRef } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -24,7 +24,7 @@ export default function ProductDetailsScreen() {
   const [size, setSize] = useState("");
   const [color, setColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const imageAnchorRef = useRef<View>(null);
+  const imageAnchorRef = useRef<ComponentRef<typeof View>>(null);
   const cartFlyImageRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
   const addMutation = useMutation({
