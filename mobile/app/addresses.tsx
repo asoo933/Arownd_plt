@@ -349,7 +349,7 @@ function createStyles(theme: AppTheme) {
     input: {
       minHeight: designTokens.dimensions.controlHeight.lg,
       borderWidth: 1,
-      borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border,
+      borderColor: theme.colors.inputBorder,
       borderRadius: theme.radius.md,
       paddingHorizontal: designTokens.spacing.md,
       justifyContent: "center",
