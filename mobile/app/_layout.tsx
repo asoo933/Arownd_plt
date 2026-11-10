@@ -16,12 +16,16 @@ import {
   IBMPlexSansArabic_700Bold
 } from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 import { useEffect, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import Logo from "@/components/logo";
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
 import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
+
+const SPLASH_DURATION_MS = 2500;
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -69,15 +73,21 @@ function RootLayoutContent() {
         }
       })
   );
+  const [showSplash, setShowSplash] = useState(true);
   const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
   const { language, isReady: languageReady, restartNoticeVersion } = useLanguage();
   const { isReady: themeReady } = useThemePreference();
+  const appReady = (fontsLoaded || Boolean(fontError)) && themeReady && languageReady;
 
   useEffect(() => {
-    if ((fontsLoaded || fontError) && themeReady && languageReady) {
-      void SplashScreen.hideAsync().catch(() => undefined);
-    }
-  }, [fontError, fontsLoaded, themeReady, languageReady]);
+    if (!appReady) return;
+
+    void SplashScreen.hideAsync().catch(() => undefined);
+    const timeout = setTimeout(() => setShowSplash(false), SPLASH_DURATION_MS);
+
+    return () => clearTimeout(timeout);
+  }, [appReady]);
 
   useEffect(() => {
     if (restartNoticeVersion > 0) {
@@ -103,20 +113,59 @@ function RootLayoutContent() {
     return () => unsubscribe?.();
   }, [queryClient]);
 
-  if ((!fontsLoaded && !fontError) || !themeReady || !languageReady) return null;
+  if (!appReady) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
-      <LocaleProvider direction={language === "ar" ? "rtl" : "ltr"}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: language === "ar" ? "slide_from_left" : "slide_from_right",
-            contentStyle: { backgroundColor: theme.colors.background }
-          }}
-        />
-      </LocaleProvider>
-    </QueryClientProvider>
+    <View style={styles.root}>
+      <QueryClientProvider client={queryClient}>
+        <StatusBar style={theme.mode === "dark" ? "light" : "dark"} />
+        <LocaleProvider direction={language === "ar" ? "rtl" : "ltr"}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: language === "ar" ? "slide_from_left" : "slide_from_right",
+              contentStyle: { backgroundColor: theme.colors.background }
+            }}
+          />
+        </LocaleProvider>
+      </QueryClientProvider>
+
+      {showSplash ? (
+        <View
+          pointerEvents="auto"
+          style={[StyleSheet.absoluteFillObject, styles.splash, { backgroundColor: theme.colors.background }]}
+        >
+          <View style={[styles.logo, { top: insets.top + 32 }]}>
+            <Logo color={theme.colors.foreground} width={160} />
+          </View>
+          <View style={styles.indicator}>
+            <ActivityIndicator size="large" color="#FFF01F" />
+          </View>
+        </View>
+      ) : null}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1
+  },
+  splash: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    zIndex: 10,
+    elevation: 10
+  },
+  logo: {
+    position: "absolute",
+    alignItems: "center"
+  },
+  indicator: {
+    position: "absolute",
+    top: "50%",
+    marginTop: -20,
+    alignItems: "center",
+    justifyContent: "center"
+  }
+});
