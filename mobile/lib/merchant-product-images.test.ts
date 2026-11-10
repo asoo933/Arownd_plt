@@ -67,7 +67,7 @@ describe("product image storage helpers", () => {
     )).toBeNull();
     expect(getProductImageStoragePath("not-a-url", userId)).toBeNull();
     expect(getProductImageStoragePath(
-      "https://cdn.example.test/storage/v1/object/sign/product-media/" + userId + "/products/%252e%252e/photo.webp?token=x",
+      "https://cdn.example.test/storage/v1/object/sign/product-media/" + userId + "/products/%2e%2e/photo.webp?token=x",
       userId
     )).toBeNull();
   });
