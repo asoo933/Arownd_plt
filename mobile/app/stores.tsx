@@ -89,7 +89,7 @@ export default function StoresScreen() {
           {stores.isPending ? <LoadingState label={translate("stateLoading")} /> : stores.isError ? (
             <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={stores.isFetching} onRetry={() => void stores.refetch()} />
           ) : stores.data.length === 0 ? (
-            <EmptyState icon="store" title={translate("storesNoWilayaStores")} hint={translate("homeNoStoresHint")} />
+            <EmptyState icon="store" title={translate("storesNoWilayaStores")} hint={translate("storesNoWilayaStoresHint")} />
           ) : (
             <View style={styles.list}>
               {stores.data.map((store) => (
