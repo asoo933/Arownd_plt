@@ -132,7 +132,6 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
     _phone: input.phone.trim(),
     _payment_method: "cod",
     _receipt_url: null,
-    _delivery_company_id: null,
     _idempotency_key: idempotencyKey
   });
   if (error) throw error;
