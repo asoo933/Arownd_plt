@@ -444,7 +444,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   errorText: { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "auto", lineHeight: 18 },
   successPanel: { borderRadius: designTokens.radius.lg },
   successContent: { padding: designTokens.spacing.xl, gap: designTokens.spacing.lg, alignItems: "center" },
-  successMark: { width: 58, height: 58, overflow: "hidden", borderRadius: 29, backgroundColor: theme.colors.accent, color: theme.colors.foreground, textAlign: "center", textAlignVertical: "center", fontSize: designTokens.typography.display + 1, fontWeight: designTokens.fontWeights.extrabold },
+  successMark: { width: 58, height: 58, overflow: "hidden", borderRadius: 29, backgroundColor: theme.colors.accent, color: theme.colors.accentForeground, textAlign: "center", textAlignVertical: "center", fontSize: designTokens.typography.display + 1, fontWeight: designTokens.fontWeights.extrabold },
   orderLabel: { color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.bold },
   orderId: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold, textAlign: "center" },
   hint: { color: theme.colors.muted, fontSize: designTokens.typography.caption + 1, lineHeight: 19, textAlign: "center" },
