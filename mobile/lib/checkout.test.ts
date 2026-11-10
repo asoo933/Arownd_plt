@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { checkoutRequestIdentity, normalizeCheckoutItems } from "@/lib/checkout-state";
+import { checkoutRequestIdentity, MAX_CHECKOUT_ITEMS, normalizeCheckoutItems } from "@/lib/checkout-state";
 import type { CartItem } from "@/lib/cart-state";
 
 const item = (offerId: string, quantity: number, options: Record<string, string>): CartItem => ({
@@ -10,6 +10,10 @@ const item = (offerId: string, quantity: number, options: Record<string, string>
 });
 
 describe("checkoutRequestIdentity", () => {
+  it("matches the database maximum number of order lines", () => {
+    expect(MAX_CHECKOUT_ITEMS).toBe(30);
+  });
+
   it("normalizes option key order", () => {
     const first = checkoutRequestIdentity({
       items: [item("offer-1", 2, { size: "M", color: "black" })],
