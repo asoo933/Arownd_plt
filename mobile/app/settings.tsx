@@ -27,6 +27,7 @@ import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { fetchMyAddresses } from "@/lib/user-address";
+import { unregisterCurrentPushDevice } from "@/lib/push-notifications";
 
 type SettingsSheet = "delivery" | "addresses" | "password" | "appearance" | "language" | null;
 
@@ -84,6 +85,7 @@ export default function SettingsScreen() {
 
   const signOutMutation = useMutation({
     mutationFn: async () => {
+      await unregisterCurrentPushDevice();
       const { error } = await getSupabaseClient().auth.signOut();
       if (error) throw error;
     },
