@@ -279,7 +279,7 @@ export default function MerchantNewProductScreen() {
                   style={[
                     styles.imageAddItem,
                     {
-                      borderColor: theme.mode === "dark" ? theme.colors.inputBorder : theme.colors.border,
+                      borderColor: theme.colors.inputBorder,
                       backgroundColor: theme.colors.surfaceMuted,
                       opacity: submitting || imagePickerBusy ? 0.55 : 1
                     }
