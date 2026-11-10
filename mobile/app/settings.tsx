@@ -155,7 +155,7 @@ export default function SettingsScreen() {
         <Heading level={3}>{translate("settingsSupportSection")}</Heading>
         <Card contentStyle={styles.sectionContent}>
           <SettingsRow
-            icon="help-circle"
+            icon="info"
             label={translate("settingsSupportTitle")}
             onPress={() => router.push("/support")}
             theme={theme}
