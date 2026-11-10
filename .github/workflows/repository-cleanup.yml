@@ -1,4 +1,4 @@
-name: Arownd repository cleanup
+name: Arownd dependency lockfile maintenance
 
 on:
   workflow_dispatch:
@@ -6,18 +6,24 @@ on:
     branches:
       - Arownd-native-v2
     paths:
+      - package.json
+      - pnpm-workspace.yaml
+      - .npmrc
+      - mobile/package.json
+      - lib/**/package.json
+      - artifacts/**/package.json
       - .github/workflows/repository-cleanup.yml
 
 permissions:
   contents: write
 
 concurrency:
-  group: arownd-repository-cleanup
+  group: arownd-dependency-lockfiles
   cancel-in-progress: false
 
 jobs:
   generate-lockfiles:
-    name: Generate and commit mobile lockfile
+    name: Generate and commit npm and pnpm lockfiles
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -26,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" != "refs/heads/Arownd-native-v2" ]]; then
-            echo "::error::Push-triggered cleanup is allowed only on Arownd-native-v2."
+            echo "::error::Push-triggered lockfile maintenance is allowed only on Arownd-native-v2."
             exit 1
           fi
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$GITHUB_REF" != "refs/heads/main" && "$GITHUB_REF" != "refs/heads/Arownd-native-v2" ]]; then
@@ -44,10 +50,25 @@ jobs:
         with:
           node-version: 22
 
-      - name: Record repository package-manager state
+      - name: Verify workspace manifests and record tool versions
         shell: bash
         run: |
           set -euo pipefail
+          test -s package.json
+          test -s pnpm-workspace.yaml
+          test -s mobile/package.json
+          node <<'NODE'
+          const fs = require("node:fs");
+          const root = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const mobile = JSON.parse(fs.readFileSync("mobile/package.json", "utf8"));
+          if (root.packageManager !== "pnpm@10.34.9") {
+            throw new Error("Root package.json must pin pnpm@10.34.9.");
+          }
+          if (mobile.name !== "@arownd/mobile") {
+            throw new Error("Unexpected mobile package name.");
+          }
+          console.log("Workspace root and independent mobile package manifests are present.");
+          NODE
           {
             echo "Workflow commit: $GITHUB_SHA"
             echo "Trigger: $GITHUB_EVENT_NAME"
@@ -55,88 +76,63 @@ jobs:
             echo "Target commit: $(git rev-parse HEAD)"
             echo "Node: $(node --version)"
             echo "npm: $(npm --version)"
-            echo "Root package.json: $([[ -f package.json ]] && echo present || echo missing)"
-            echo "pnpm workspace: $([[ -f pnpm-workspace.yaml ]] && echo present || echo missing)"
-            echo "Mobile package-lock: $([[ -f mobile/package-lock.json ]] && echo present || echo missing)"
           } | tee cleanup-report.txt
 
       - name: Generate mobile npm lockfile
-        id: npm-lock
         working-directory: mobile
         shell: bash
         run: |
           set -euo pipefail
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund --legacy-peer-deps
+          test -s package-lock.json
 
-      - name: Commit mobile npm lockfile
-        id: commit-lockfile
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s mobile/package-lock.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add mobile/package-lock.json
-          if git diff --cached --quiet; then
-            echo "No mobile lockfile changes to commit."
-            exit 0
-          fi
-          git commit -m "Add mobile npm lockfile"
-          git push origin HEAD:Arownd-native-v2
-
-      - name: Setup pnpm 10
-        id: setup-pnpm
-        continue-on-error: true
+      - name: Activate pinned pnpm version
         shell: bash
         run: |
           set -euo pipefail
           corepack enable
-          corepack prepare pnpm@10 --activate
-          pnpm --version | tee -a cleanup-report.txt
+          corepack prepare pnpm@10.34.9 --activate
+          test "$(pnpm --version)" = "10.34.9"
+          echo "pnpm: $(pnpm --version)" | tee -a cleanup-report.txt
 
-      - name: Generate provisional pnpm workspace lockfile
-        id: pnpm-lock
-        continue-on-error: true
+      - name: Generate pnpm workspace lockfile
         shell: bash
         run: |
           set -euo pipefail
-          temporary_root_manifest=false
-          if [[ ! -f package.json ]]; then
-            printf '{\n  "name": "arownd-workspace-root",\n  "private": true\n}\n' > package.json
-            temporary_root_manifest=true
-            echo "Temporary root package manifest used for pnpm resolution." | tee -a cleanup-report.txt
-          fi
-          cleanup_temporary_manifest() {
-            if [[ "$temporary_root_manifest" == true ]]; then
-              rm -f package.json
-            fi
-          }
-          trap cleanup_temporary_manifest EXIT
           pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
+          test -s pnpm-lock.yaml
+          grep -q "^  '\.'" pnpm-lock.yaml || grep -q '^  .:' pnpm-lock.yaml
 
-      - name: Record generation results
+      - name: Commit lockfiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mobile/package-lock.json pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "Lockfiles are already up to date." | tee -a cleanup-report.txt
+            exit 0
+          fi
+          git commit -m "Update repository dependency lockfiles"
+          git push origin HEAD:Arownd-native-v2
+
+      - name: Record final lockfile state
         if: always()
         shell: bash
         run: |
           {
             echo ""
-            echo "npm lockfile step: ${{ steps.npm-lock.outcome }}"
-            echo "mobile lockfile commit step: ${{ steps.commit-lockfile.outcome }}"
-            echo "pnpm setup step: ${{ steps.setup-pnpm.outcome }}"
-            echo "pnpm lockfile step: ${{ steps.pnpm-lock.outcome }}"
-            echo "Generated mobile/package-lock.json: $([[ -s mobile/package-lock.json ]] && echo yes || echo no)"
-            echo "Generated pnpm-lock.yaml: $([[ -s pnpm-lock.yaml ]] && echo yes || echo no)"
-            echo "NOTE: pnpm-lock.yaml is provisional and is not committed."
+            echo "Mobile npm lockfile: $([[ -s mobile/package-lock.json ]] && echo present || echo missing)"
+            echo "Workspace pnpm lockfile: $([[ -s pnpm-lock.yaml ]] && echo present || echo missing)"
+            echo "Temporary root manifest: not used"
           } >> cleanup-report.txt
 
-      - name: Upload candidate lockfiles and report
+      - name: Upload lockfile report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: arownd-cleanup-candidates-${{ github.run_number }}
-          path: |
-            mobile/package-lock.json
-            pnpm-lock.yaml
-            cleanup-report.txt
+          name: arownd-lockfile-report-${{ github.run_number }}
+          path: cleanup-report.txt
           if-no-files-found: warn
           retention-days: 7
