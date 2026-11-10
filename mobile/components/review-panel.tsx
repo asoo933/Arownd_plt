@@ -56,7 +56,7 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
         }} />
       ) : null}
       {mine.data ? (
-        <View style={[styles.ownReview, { backgroundColor: theme.colors.surfaceMuted }]}>
+        <View style={[styles.ownReview, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
           <UiText style={[styles.ownTitle, { color: theme.colors.foreground }]}>{translate("reviewsAlreadySubmitted")} · {mine.data.rating}/5</UiText>
           {mine.data.comment ? <UiText style={[styles.body, { color: theme.colors.muted }]}>{mine.data.comment}</UiText> : null}
           <UiText style={[styles.caption, { color: theme.colors.muted }]}>{mine.data.status === "approved" ? translate("reviewsApproved") : translate("reviewsPending")}</UiText>
@@ -77,7 +77,7 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
             maxLength={1000}
             placeholder={translate("reviewsCommentPlaceholder")}
             textAlign="auto"
-            style={[styles.input, { color: theme.colors.foreground, borderColor: theme.colors.border }]}
+            style={[styles.input, { color: theme.colors.foreground }]}
           />
           <Button
             label={translate("reviewsSubmit")}
