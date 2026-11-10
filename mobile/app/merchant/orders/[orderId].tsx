@@ -217,7 +217,7 @@ export default function MerchantOrderDetailsScreen() {
                   keyboardType="number-pad"
                   placeholder={translate("merchantQuoteShippingPlaceholder")}
                   placeholderTextColor={theme.colors.placeholder}
-                  style={[styles.input, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.mode === "light" ? theme.colors.inputBorder : theme.colors.border, color: theme.colors.foreground }]}
+                  style={[styles.input, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder, color: theme.colors.foreground }]}
                   textAlign="auto"
                 />
               </>
