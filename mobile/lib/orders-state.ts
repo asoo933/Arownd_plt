@@ -1,3 +1,7 @@
+export function isHideableOrderStatus(status: string): boolean {
+  return status === "delivered" || status === "cancelled" || status === "rejected";
+}
+
 export function canCancelMerchantOrder(status: string, quotedAt: string | null | undefined): boolean {
   return status === "pending" && !quotedAt;
 }
