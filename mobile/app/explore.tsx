@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, StyleSheet, View } from "react-native";
+import { Animated, Easing, PanResponder, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, CustomerHeading, EmptyState, ErrorState, ProductTile, SectionTitle } from "@/components/customer-ui";
 import { fetchHomeProducts, fetchProductDetails, fetchProductOffers, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
@@ -33,6 +33,46 @@ export default function ExploreScreen() {
   const translateX = useRef(new Animated.Value(0)).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const gestureStartX = useRef(0);
+  const categoryMetrics = useRef({ viewportWidth: 0, railWidth: 0, language });
+  categoryMetrics.current = { viewportWidth, railWidth, language };
+  const resumeCategoryAnimation = () => {
+    const { viewportWidth: width, railWidth: contentWidth, language: currentLanguage } = categoryMetrics.current;
+    if (width <= 0 || contentWidth <= width) return;
+    const currentX = translateX.__getValue();
+    const animation = Animated.loop(
+      Animated.timing(translateX, {
+        toValue: currentX - contentWidth,
+        duration: Math.max(28_000, Math.round(contentWidth * 45)),
+        easing: Easing.linear,
+        useNativeDriver: true
+      })
+    );
+    animationRef.current = animation;
+    animation.start();
+  };
+  const categoryPanResponder = useRef(PanResponder.create({
+    onMoveShouldSetPanResponder: (_event, gesture) =>
+      Math.abs(gesture.dx) > 6 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+    onPanResponderGrant: () => {
+      animationRef.current?.stop();
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      gestureStartX.current = translateX.__getValue();
+    },
+    onPanResponderMove: (_event, gesture) => {
+      const { viewportWidth: width, railWidth: contentWidth, language: currentLanguage } = categoryMetrics.current;
+      const rtlStart = -(contentWidth - width);
+      const maxX = currentLanguage === "ar" ? rtlStart : 0;
+      const minX = maxX - contentWidth;
+      translateX.setValue(Math.max(minX, Math.min(maxX, gestureStartX.current + gesture.dx)));
+    },
+    onPanResponderRelease: () => {
+      resumeTimerRef.current = setTimeout(resumeCategoryAnimation, 900);
+    },
+    onPanResponderTerminate: () => {
+      resumeTimerRef.current = setTimeout(resumeCategoryAnimation, 900);
+    }
+  })).current;
   const hasActiveFilter = Boolean(debouncedQuery || category);
 
   useEffect(() => setQuery(initialQuery), [initialQuery]);
