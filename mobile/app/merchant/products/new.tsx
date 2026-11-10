@@ -605,6 +605,13 @@ function MessageScreen({
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <View style={styles.message}>
+        <AppHeader
+          title={translate("merchantProductCreateTitle")}
+          leading={<Button label={translate("merchantProductCreateBack")} onPress={() => router.replace("/merchant/products")} variant="ghost" size="sm" />}
+        />
+        <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>
+          {translate("merchantProductCreateSubtitle")}
+        </UiText>
         {loading ? (
           <LoadingState label={label} />
         ) : actionLabel && onAction ? (
@@ -671,7 +678,7 @@ function createStyles(theme: AppTheme) {
     categoryEmojiSmall: { fontSize: designTokens.typography.subtitle - 1 },
     categoryLabel: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold },
     categorySelected: { fontSize: designTokens.typography.subtitle + 1, fontWeight: designTokens.fontWeights.extrabold },
-    message: { flex: 1, alignItems: "center", justifyContent: "center", padding: designTokens.spacing.xxl, gap: designTokens.spacing.lg },
+    message: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg, gap: designTokens.spacing.lg },
     messageText: { fontSize: designTokens.typography.body - 1, textAlign: "center", lineHeight: 21 },
     retryButton: { minHeight: 45, borderRadius: designTokens.radius.sm, paddingHorizontal: designTokens.spacing.xl, justifyContent: "center" },
     retryText: { fontSize: designTokens.typography.caption + 1, fontWeight: designTokens.fontWeights.extrabold }
