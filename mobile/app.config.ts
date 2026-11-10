@@ -1,16 +1,11 @@
-import type { ExpoConfig } from "expo/config";
+import type { ConfigContext, ExpoConfig } from "expo/config";
 
-import appJson from "./app.json";
-
-const expo = appJson.expo as ExpoConfig;
 const googleServicesFile = process.env.GOOGLE_SERVICES_JSON;
 
-const config: ExpoConfig = {
-  ...expo,
+export default ({ config }: ConfigContext): ExpoConfig => ({
+  ...config,
   android: {
-    ...expo.android,
+    ...config.android,
     ...(googleServicesFile ? { googleServicesFile } : {})
   }
-};
-
-export default config;
+});
