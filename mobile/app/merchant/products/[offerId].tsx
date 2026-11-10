@@ -629,7 +629,7 @@ export default function MerchantEditProductScreen() {
                     }
                   ]}
                 >
-                  <UiText style={[styles.categoryOptionText, { color: theme.colors.foreground }]}>
+                  <UiText style={[styles.categoryOptionText, { color: productCategory === category.id && theme.mode === "dark" ? theme.colors.accentMuted : theme.colors.foreground }]}>
                     {category.emoji} {getLocalizedMerchantCategoryLabel(category.id, category.label, language)}
                   </UiText>
                 </PressableSurface>
