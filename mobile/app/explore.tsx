@@ -188,10 +188,6 @@ export default function ExploreScreen() {
       onRefresh={hasActiveFilter ? () => { void products.refetch(); } : undefined}
     >
       <View style={styles.topSection}>
-        <CustomerHeading
-          title={translate("exploreTitle")}
-          subtitle={translate("exploreSubtitle")}
-        />
         <View style={styles.header}>
           <View style={styles.search}>
             <SearchField
@@ -211,6 +207,10 @@ export default function ExploreScreen() {
             icon={<Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />}
           />
         </View>
+        <CustomerHeading
+          title={translate("exploreTitle")}
+          subtitle={translate("exploreSubtitle")}
+        />
       </View>
 
       <View>
