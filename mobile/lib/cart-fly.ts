@@ -18,7 +18,7 @@ export type CartFlyRequest = {
 type CartFlyListener = (request: CartFlyRequest) => void;
 
 let cartTarget: CartFlyTarget | null = null;
-let pendingRequests: CartFlyRequest[] = [];
+const pendingRequests: CartFlyRequest[] = [];
 const listeners = new Set<CartFlyListener>();
 
 function notifyListeners(request: CartFlyRequest): void {
