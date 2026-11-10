@@ -191,6 +191,6 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
   cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border, paddingTop: designTokens.spacing.md, marginTop: designTokens.spacing.xs },
   openLabel: { color: theme.colors.accentMuted, fontSize: designTokens.typography.caption, fontWeight: designTokens.fontWeights.extrabold },
   primary: { minHeight: 48, borderRadius: designTokens.radius.md, backgroundColor: theme.colors.accent, justifyContent: "center", alignItems: "center" },
-  primaryText: { color: theme.colors.foreground, fontWeight: designTokens.fontWeights.extrabold }
+  primaryText: { color: theme.colors.accentForeground, fontWeight: designTokens.fontWeights.extrabold }
 }); }
 
