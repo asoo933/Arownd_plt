@@ -18,8 +18,8 @@ export type { MetricTrend } from "./merchant";
 export { AppHeader, SegmentedControl } from "./navigation";
 export type { SegmentedOption } from "./navigation";
 
-export { Container, Stack, Row, Column, Spacer, Divider, AspectRatio, ScrollArea } from "./layout";
-export type { ContainerProps, StackProps, RowProps, ColumnProps, ScrollAreaProps } from "./layout";
+export { Container, Stack, Row, Column, Spacer, Divider, AspectRatio, ScrollArea, RefreshableScrollView } from "./layout";
+export type { ContainerProps, StackProps, RowProps, ColumnProps, ScrollAreaProps, RefreshableScrollViewProps } from "./layout";
 
 export { Text, Heading, Label, Caption, PriceText, BadgeText } from "./typography";
 export type { TextComponentProps, HeadingProps } from "./typography";
