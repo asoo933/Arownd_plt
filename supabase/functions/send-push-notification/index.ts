@@ -81,6 +81,98 @@ function toFcmData(record: Record<string, unknown>): Record<string, string> {
   return data;
 }
 
+type NotificationLanguage = "ar" | "en";
+
+async function getPreferredLanguage(
+  userId: string,
+  supabaseUrl: string,
+  serviceRoleKey: string,
+): Promise<NotificationLanguage | null> {
+  try {
+    const response = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users/${encodeURIComponent(userId)}`,
+      {
+        headers: {
+          apikey: serviceRoleKey,
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
+      },
+    );
+    if (!response.ok) return null;
+    const user = (await response.json()) as {
+      user_metadata?: Record<string, unknown>;
+    };
+    const language = user.user_metadata?.preferred_language;
+    return language === "ar" || language === "en" ? language : null;
+  } catch {
+    return null;
+  }
+}
+
+function localizedNotificationCopy(
+  record: Record<string, unknown>,
+  language: NotificationLanguage,
+): { title: string; body: string } | null {
+  if (record.type !== "order") return null;
+  const data =
+    record.data && typeof record.data === "object"
+      ? (record.data as Record<string, unknown>)
+      : {};
+  const status = typeof data.status === "string" ? data.status : "";
+  const url = typeof data.url === "string" ? data.url : "";
+  const isMerchantNewOrder =
+    (data.recipient_role === "merchant" && status === "pending") ||
+    url.startsWith("/studio/orders/");
+
+  const copy = {
+    ar: {
+      updateTitle: "تحديث على طلبك",
+      merchantTitle: "طلب جديد لمتجرك",
+      merchantBody: "وصلك طلب جديد. راجع تفاصيله وحدد رسوم التوصيل لإرسال عرضك للعميل.",
+      pending: "استلم المتجر طلبك، وسيعمل على مراجعته.",
+      quoted: "أرسل المتجر عرض التوصيل. راجع المبلغ الإجمالي واختر قبول العرض أو رفضه.",
+      confirmed: "وافق المتجر على طلبك وبدأ تجهيزه.",
+      shipped: "تم شحن طلبك، وهو في طريقه إليك.",
+      delivered: "تم تسليم طلبك بنجاح.",
+      cancelled: "تم إلغاء طلب المتجر.",
+      accepted: "تم قبول طلب الشحن الخاص بك.",
+      picked_up: "استلم مندوب التوصيل طردك من المتجر.",
+      in_transit: "شُحنت طلبيتك وهي في الطريق إليك.",
+      failed: "تعذّر توصيل الطلب. ستتم متابعة حالة الشحنة.",
+      returned: "تم إرجاع الشحنة.",
+      rejected: "لم يتم قبول طلب الشحن.",
+    },
+    en: {
+      updateTitle: "Your order has been updated",
+      merchantTitle: "A new order for your store",
+      merchantBody: "You received a new order. Review its details and set the delivery fee to send your quote to the customer.",
+      pending: "The store has received your order and will review it.",
+      quoted: "The store sent a delivery quote. Review the total and choose whether to accept or decline it.",
+      confirmed: "The store accepted your order and has started preparing it.",
+      shipped: "Your order has been dispatched and is on its way.",
+      delivered: "Your order has been delivered successfully.",
+      cancelled: "The store order has been cancelled.",
+      accepted: "Your delivery request has been accepted.",
+      picked_up: "The delivery driver has collected your parcel from the store.",
+      in_transit: "Your order has been dispatched and is on its way.",
+      failed: "Delivery could not be completed. The shipment status will be followed up.",
+      returned: "The shipment has been returned.",
+      rejected: "The delivery request was not accepted.",
+    },
+  }[language];
+
+  if (isMerchantNewOrder) {
+    return { title: copy.merchantTitle, body: copy.merchantBody };
+  }
+  const localizedBody = copy[status as keyof typeof copy];
+  const supportedStatuses = [
+    "pending", "quoted", "confirmed", "shipped", "delivered", "cancelled",
+    "accepted", "picked_up", "in_transit", "failed", "returned", "rejected",
+  ];
+  if (!supportedStatuses.includes(status) || typeof localizedBody !== "string") return null;
+  return { title: copy.updateTitle, body: localizedBody };
+}
+
 const MAX_WEBHOOK_BODY_BYTES = 64 * 1024;
 
 function constantTimeEqual(left: string, right: string): boolean {
@@ -193,6 +285,12 @@ Deno.serve(async (req: Request) => {
 
     const accessToken = await getGoogleAccessToken(serviceAccount);
     const data = toFcmData(record);
+    const preferredLanguage = await getPreferredLanguage(userId, supabaseUrl, serviceRoleKey);
+    const localizedCopy = preferredLanguage
+      ? localizedNotificationCopy(record, preferredLanguage)
+      : null;
+    const notificationTitle = localizedCopy?.title ?? String(record.title || "Arownd");
+    const notificationBody = localizedCopy?.body ?? String(record.body || "لديك إشعار جديد.");
     const results = await Promise.all(
       devices.map(async ({ token }) => {
         const response = await fetch(
@@ -207,8 +305,8 @@ Deno.serve(async (req: Request) => {
               message: {
                 token,
                 notification: {
-                  title: String(record.title || "Arownd"),
-                  body: String(record.body || "لديك إشعار جديد."),
+                  title: notificationTitle,
+                  body: notificationBody,
                 },
                 data,
                 android: {
