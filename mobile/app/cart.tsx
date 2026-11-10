@@ -47,8 +47,8 @@ export default function CartScreen() {
   });
 
   if (cart.isPending) return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
-  if (cart.isError) return <CustomerScreen><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching} onRetry={() => void cart.refetch()} /></CustomerScreen>;
-  if (cart.data.length === 0) return <CustomerScreen>
+  if (cart.isError) return <CustomerScreen refreshing={cart.isFetching} onRefresh={() => { void cart.refetch(); }}><ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={cart.isFetching} onRetry={() => void cart.refetch()} /></CustomerScreen>;
+  if (cart.data.length === 0) return <CustomerScreen refreshing={cart.isFetching} onRefresh={() => { void cart.refetch(); }}>
     <AppHeader title={translate("cartTitle")} />
     <Card contentStyle={style.emptyContent}>
       <View style={style.emptyIcon}>
@@ -80,6 +80,8 @@ export default function CartScreen() {
   };
 
   return <CustomerScreen
+    refreshing={cart.isFetching || offers.isFetching}
+    onRefresh={() => { void Promise.all([cart.refetch(), offers.refetch()]); }}
     footer={
       <CartSummary style={style.summaryContent}>
         <View style={style.summaryRow}>
