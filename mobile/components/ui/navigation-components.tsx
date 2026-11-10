@@ -105,7 +105,7 @@ export function BottomNavigation({
                 borderRadius: theme.radius.pill,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: selected && theme.mode === "light" ? theme.colors.accent : "transparent"
+                backgroundColor: "transparent"
               }}
             >
               {item.icon}
