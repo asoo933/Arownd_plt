@@ -937,3 +937,322 @@ This section is a proposed delta checklist only. It is not an executable
 migration and must not be pasted into Supabase SQL Editor.
 ===============================================================================
 */
+
+
+/*
+===============================================================================
+17. PHASE A — FULL TABLE DDL METADATA, RLS, INDEX AND FK AUDIT
+READ-ONLY LIVE CATALOG INSPECTION — 2026-11-11
+===============================================================================
+
+The following metadata was read from pg_catalog / pg_indexes / pg_policies.
+No DDL, data, policies, grants or functions were changed.
+
+A. Table shape and required write columns
+
+profiles:
+- id uuid PK; user_id uuid NOT NULL UNIQUE -> auth.users(id) ON DELETE CASCADE.
+- account_type enum public.account_type NOT NULL DEFAULT 'personal'.
+- country_code text NOT NULL DEFAULT 'DZ'; browsing_country_code text NOT NULL;
+  both reference countries(code), with browsing country separately mutable.
+- wilaya_id integer nullable; region_id bigint nullable;
+  daira_region_id bigint nullable.
+- full_name, phone, commune, avatar_url nullable; is_phone_verified,
+  is_public and timestamps have defaults / NOT NULL.
+- No phone CHECK constraint was found on profiles.
+
+stores:
+- id uuid PK; owner_id uuid nullable -> auth.users(id) ON DELETE CASCADE.
+- name, slug NOT NULL; slug UNIQUE; owner has a partial unique index allowing
+  only one store per non-null owner.
+- wilaya_id integer NOT NULL -> wilayas(id); country_code text NOT NULL
+  -> countries(code); region_id bigint nullable with composite
+  (country_code, region_id) FK -> country_regions(country_code,id).
+- Store metadata includes phone/whatsapp, commune/address, coordinates,
+  opening_hours jsonb NOT NULL with default, category/subcategories,
+  commission_rate, rating, verified state and social URLs.
+- No store phone CHECK constraint was found.
+- create_my_store writes owner/name/slug/contact, wilaya_id, country_code,
+  region_id, location text, coordinates, opening hours and category fields.
+
+user_addresses:
+- id uuid PK; user_id uuid NOT NULL -> auth.users(id) ON DELETE CASCADE.
+- label, recipient_name, phone, wilaya_id, commune, address_line are NOT NULL.
+- wilaya_id integer NOT NULL -> wilayas(id); country_code text NOT NULL
+  -> countries(code); region_id and daira_region_id nullable, each with
+  composite country-region FK.
+- additional_info nullable; is_default and timestamps NOT NULL/defaulted.
+- CHECK constraints enforce label in home/work/other, recipient and commune
+  lengths, address length 5..240, additional_info <=240, and the current
+  Algeria-only phone expression:
+  ^(0[567][0-9]{8}|\\+213[567][0-9]{8}|00213[567][0-9]{8})$
+- Partial unique index permits one default address per user.
+- user_addresses currently has no rows, so there is no existing address
+  population to migrate, but this does not remove the app compatibility risk.
+
+orders:
+- id uuid PK; user_id uuid NOT NULL -> auth.users(id) ON DELETE CASCADE.
+- full_name, phone, commune, delivery_type, payment_method,
+  subtotal/shipping_fee/total are NOT NULL.
+- wilaya_id integer NOT NULL -> wilayas(id); country_code NOT NULL ->
+  countries(code); currency_code NOT NULL and composite FK
+  (country_code,currency_code) -> countries(code,currency_code).
+- region_id and daira_region_id nullable with composite country-region FKs.
+- CHECK: delivery_type home/desk; payment_method cod only; delivery_method
+  store_pickup/delivery; status pending/confirmed/shipped/delivered/cancelled.
+- No phone CHECK constraint on orders.
+- Indexes cover user, created_at, status, shipment, legacy wilaya and
+  country/primary/secondary region lookups.
+
+merchant_orders:
+- id uuid PK; order_id/store_id/customer_id NOT NULL with FKs to orders,
+  stores and auth.users; UNIQUE(order_id,store_id).
+- status NOT NULL DEFAULT pending; subtotal/shipping_fee NOT NULL DEFAULT 0;
+  quoted_at/responded_at nullable; payment_status unpaid default;
+  paid_amount/paid_at nullable; timestamps NOT NULL.
+- CHECK: status pending/quoted/confirmed/shipped/delivered/cancelled;
+  subtotal >=0; shipping_fee >=0; payment fields must be mutually consistent
+  for unpaid vs paid.
+- Indexes cover customer chronology and store/status chronology.
+
+checkout_idempotency:
+- user_id and idempotency_key UUID NOT NULL composite PK;
+  request_hash text NOT NULL; order_id nullable FK -> orders(id) ON DELETE SET NULL;
+  created_at timestamptz NOT NULL DEFAULT now().
+- Indexes on created_at and non-null order_id.
+- RLS is enabled and there are no policies in pg_policies. It is therefore
+  not directly exposed for authenticated table reads/writes; the SECURITY
+  DEFINER checkout wrapper is the intended access path.
+- Preserve this composite key and order deletion semantics.
+
+order_items:
+- id uuid PK; order_id/store_id NOT NULL; offer_id nullable; product_name,
+  unit_price, quantity NOT NULL; options jsonb NOT NULL DEFAULT {};
+  merchant_archived_at and merchant_order_id nullable.
+- FKs: order_id -> orders ON DELETE CASCADE; store_id -> stores ON DELETE
+  CASCADE; offer_id -> store_offers ON DELETE SET NULL;
+  merchant_order_id -> merchant_orders ON DELETE SET NULL.
+- CHECK quantity > 0. Indexes cover order, offer, store, merchant archive,
+  and merchant_order_id.
+- BEFORE INSERT trigger sync_merchant_order_from_item() creates/updates the
+  per-store merchant_orders row and assigns NEW.merchant_order_id.
+
+store_offers:
+- id uuid PK; store_id/product_id NOT NULL; price NOT NULL;
+  old_price nullable; stock_quantity NOT NULL DEFAULT 0;
+  is_available default true; is_merchant_hidden default false;
+  last_confirmed_at, options, created_at have defaults.
+- FKs to stores/products with ON DELETE CASCADE; UNIQUE(store_id,product_id);
+  CHECK price >= 0 and stock_quantity >= 0.
+- BEFORE INSERT/UPDATE OF stock_quantity,is_merchant_hidden,is_available
+  trigger normalizes availability to stock_quantity > 0 and not hidden.
+- AFTER INSERT trigger sends offer notification.
+
+user_roles:
+- id uuid PK; user_id NOT NULL -> auth.users ON DELETE CASCADE;
+  role public.app_role NOT NULL; UNIQUE(user_id,role).
+- RLS enabled; authenticated users can SELECT only their own roles.
+- create_my_store adds merchant role if absent and updates profile account_type.
+
+B. RLS policy inventory (all tables report RLS enabled, not FORCE RLS)
+
+profiles:
+- authenticated SELECT/INSERT/UPDATE are own-user scoped by user_id=auth.uid().
+stores:
+- authenticated SELECT for own store or browsing_country_code match;
+  INSERT requires owner_id=auth.uid(), merchant role and is_verified=true;
+  UPDATE/DELETE are owner scoped.
+user_addresses:
+- authenticated CRUD own rows; INSERT/UPDATE additionally require
+  country_code to equal the caller profile country.
+orders:
+- authenticated SELECT own orders or orders where caller is a merchant;
+  UPDATE policy allows customer cancellation only from pending to cancelled.
+merchant_orders:
+- authenticated SELECT for customer_id=auth.uid() or is_store_owner(store_id).
+order_items:
+- authenticated SELECT only when is_order_owner(order_id) or is_store_owner(store_id).
+store_offers:
+- authenticated SELECT for owner or matching browsing country;
+  INSERT/UPDATE/DELETE are store-owner scoped.
+checkout_idempotency:
+- RLS enabled; no direct policies found.
+user_roles:
+- authenticated SELECT own role rows only.
+
+Preserve the market-isolation predicates. A generic region rollout must not
+weaken country-scoped catalog policies or change checkout ownership.
+
+C. Referential and uniqueness details
+
+- Country-scoped region FKs are composite, not region_id-only. Keep
+  (country_code, region_id) and (country_code, daira_region_id) relationships.
+- Legacy wilaya FKs and NOT NULL constraints on stores/user_addresses/orders
+  remain active and will reject non-DZ generic rows even if region_id is set.
+- stores has one-store-per-owner partial unique index and slug uniqueness.
+- merchant_orders unique per (order_id,store_id) is relied upon by
+  sync_merchant_order_from_item() ON CONFLICT behavior.
+- checkout_idempotency primary key is the concurrency/idempotency boundary.
+- order_items merchant_order_id is assigned by trigger; generic checkout must
+  preserve the insert trigger's ordering and not manually duplicate suborders.
+
+===============================================================================
+18. PHASE A — RPC DEPENDENCY, TRIGGER SIDE-EFFECT AND SECURITY FINDINGS
+READ-ONLY LIVE FUNCTION INSPECTION — 2026-11-11
+===============================================================================
+
+A. Store creation dependency chain
+- create_my_store() updates profiles.account_type, inserts user_roles and
+  inserts stores. The profile update invokes prepare_profile_update,
+  account-country and daira-region guards, and the private public-profile sync.
+- The private sync trigger mirrors public personal-profile fields into
+  private.public_personal_profiles only for public personal accounts and
+  deletes that mirror for non-public or merchant accounts. It currently
+  mirrors legacy wilaya_id/commune, not generic region_id. This dependent
+  denormalized table/trigger must be reviewed before generic location writes.
+- stores AFTER INSERT invokes notify_created_activity(), which sends the
+  store-created notification. Preserve this side effect.
+- Existing create_my_store validates active parent category and active
+  subcategories, locks profile, blocks duplicate store, promotes account type,
+  adds merchant role and derives region from legacy_wilaya_id. Generic
+  implementation must retain all checks, not bypass the profile lock or role
+  transition.
+
+B. Checkout dependency chain
+- create_order_with_delivery() obtains an advisory transaction lock keyed by
+  user + idempotency UUID, checks request_hash, then invokes create_order().
+- create_order() inserts orders, then each order_items INSERT invokes
+  sync_merchant_order_from_item() BEFORE INSERT. That trigger creates or
+  increments merchant_orders by (order_id,store_id), then sets
+  order_items.merchant_order_id.
+- merchant_orders AFTER INSERT/status UPDATE invokes
+  notify_merchant_order_activity(). The INSERT sends the merchant's new-order
+  notification; status updates send customer activity notifications, except
+  the quoted transition which is intentionally skipped because the quote RPC
+  emits a richer notification.
+- orders AFTER INSERT invokes notify_created_activity() and sends the
+  customer order-created notification.
+- store_offers stock updates invoke sync_store_offer_availability(), which
+  recomputes is_available from stock_quantity and is_merchant_hidden.
+- All these triggers are transactional side effects. A generic checkout must
+  preserve atomic rollback of order, suborders, items, stock and notifications.
+  It must not manually create merchant_orders or emit duplicate notifications.
+
+C. Quote / response / cancellation dependencies
+- merchant_submit_order_quote() locks parent order then merchant order,
+  validates owner via is_store_owner(), requires pending and non-cancelled
+  parent, bounds fee 0..1,000,000, and enforces desk pickup fee=0.
+  It updates quote fields, refreshes parent totals and inserts the detailed
+  customer notification. The notification body has three hard-coded DZD labels.
+- customer_respond_to_merchant_order() locks parent then merchant order,
+  verifies customer ownership, requires quoted, then confirms or cancels.
+  On rejection it restores offer stock for that merchant suborder, refreshes
+  parent totals and notifies the store owner.
+- merchant_reject_order() is a separate merchant-side pre-quote rejection
+  path. It verifies store ownership, requires pending and no quote, restores
+  stock, refreshes totals and notifies the customer. Do not conflate it with
+  customer quote response.
+- guard_order_status_transition() protects parent cancellation. It requires
+  auth.uid(), restricts customer transition to pending -> cancelled, prevents
+  cancellation after any suborder leaves pending, rejects pending shipments,
+  cancels merchant suborders and restores all order-item stock.
+- refresh_parent_order_totals() sums subtotal and shipping_fee for non-cancelled
+  merchant_orders and derives parent status:
+  all cancelled -> cancelled; all delivered/cancelled -> delivered;
+  any shipped -> shipped; any confirmed/delivered -> confirmed; otherwise
+  pending. It uses a transaction-local internal aggregate status flag to pass
+  the parent status guard. Preserve this exact mixed-state behavior.
+- Merchant quote and customer response RPCs both currently use SECURITY
+  DEFINER with search_path=public. Their table/function references are
+  schema-qualified, but the eventual hardening should set search_path=''
+  without changing signatures or business rules.
+
+D. Additional security and dependency concerns
+- is_store_owner(), is_order_owner(), is_order_merchant(), merchant quote,
+  customer response, merchant rejection, refresh_parent_order_totals and
+  several trigger functions use SECURITY DEFINER with search_path=public.
+  Their referenced relations are schema-qualified in the inspected bodies;
+  harden search_path to empty in the same controlled security review.
+- has_role(uuid,app_role) is SECURITY INVOKER, search_path='', and explicitly
+  requires _user_id=auth.uid() plus matching user_roles row.
+- Function privilege inspection confirms anon cannot execute the listed
+  business RPCs. Authenticated can execute the expected store creation,
+  current daira checkout, quote, customer response, merchant rejection and
+  ownership helper functions. Direct create_order() execution remains revoked.
+  The old checkout overload without daira remains non-callable by authenticated.
+- Trigger functions are not intended as public RPC endpoints; do not widen
+  their EXECUTE grants. Preserve minimum grants and re-check ACLs after DDL.
+
+E. Country/currency metadata observed
+- countries exposes currency_code, currency_name_ar, currency_name_en,
+  calling_code and is_enabled. No currency-symbol column was found in the
+  inspected country metadata.
+- Live records: DZ/DZD/+213 enabled; MA/MAD/+212, EG/EGP/+20,
+  SA/SAR/+966, AE/AED/+971 disabled.
+- Use currency_code + currency_name_ar (or a reviewed deterministic
+  presentation mapping) for quote text. Do not assume a symbol column exists.
+- region_type inventory:
+  DZ wilaya 69 roots + daira 551 children;
+  MA region 12 roots + province 7 children + prefecture 1 child;
+  EG governorate 27 roots;
+  SA region 13 roots + governorate 136 children;
+  AE emirate 7 roots + municipality 9 children.
+- All listed region rows are enabled in country_regions, but only DZ country
+  is enabled. Keep country enablement separate from region-row enablement.
+
+F. Current live data baseline
+- stores: 3 rows, all DZ, all with non-null region_id.
+- orders: 17 rows, all DZ, all with non-null region_id.
+- user_addresses: 0 rows.
+- This baseline is useful for regression planning only; do not assume zero
+  historical edge cases outside these tables or delete legacy references.
+
+G. Newly confirmed rollout blocker
+- The private public-personal-profile mirror still stores legacy wilaya_id and
+  commune only. A generic region migration that updates profiles but ignores
+  this trigger and mirror will leave public profile location stale or
+  inconsistent. The generic model must decide whether the mirror retains the
+  DZ legacy fields or adds region metadata, and preserve privacy gating.
+- Current stores/user_addresses/orders wilaya_id NOT NULL and legacy FK remain
+  hard blockers for non-DZ writes. Do not relax them until a compatible
+  app/RPC rollout strategy is ready.
+- No application, database, data, RLS, grants, triggers or country flags were
+  changed during this audit.
+
+===============================================================================
+19. PHASE A — AUDIT COMPLETENESS STATUS
+===============================================================================
+
+Completed read-only inspection in this pass:
+- Full columns/defaults/nullability for profiles, stores, user_addresses,
+  orders, merchant_orders, checkout_idempotency, order_items, store_offers,
+  user_roles.
+- Constraints, foreign keys, unique keys, indexes and RLS policies for those
+  tables.
+- Trigger attachments and material trigger-function bodies affecting store
+  creation, checkout, stock, order lifecycle and profile sync.
+- Relevant RPC bodies, helper functions, SECURITY DEFINER/search_path settings
+  and effective anon/authenticated/service_role EXECUTE privileges.
+- Countries currency/calling-code metadata and administrative region-type
+  counts; live row baseline for stores, addresses and orders.
+
+Still required before writing a complete executable migration:
+1. Inspect complete function bodies and ACLs for any remaining helper called
+   transitively by create_my_store/checkout, including notification delivery,
+   role helper dependencies, profile sync table schema/policies, and any
+   private functions that consume legacy wilaya_id.
+2. Inspect the exact profile mirror table DDL, its RLS and grants, and all
+   consumers of private.public_personal_profiles.
+3. Verify every status/stock/totals trigger and any additional order triggers
+   outside the current table set; inspect RPC dependency graph for nested calls.
+4. Inspect data-level consistency of every existing row against country,
+   primary/secondary parent, currency, store and item relationships.
+5. Determine country-aware phone canonicalization and the existing app contract;
+   do not remove the current phone CHECK without a tested replacement.
+6. Reconcile the database region configuration with mobile/lib/country-regions.ts
+   and the actual app screens/services before final DDL design.
+7. Build and review exact forward SQL and a recovery plan only after the above;
+   this document remains a review draft and must not be executed.
+
+END OF ADDITIONAL PHASE A AUDIT.
+*/
