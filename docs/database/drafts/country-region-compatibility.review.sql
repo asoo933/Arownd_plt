@@ -1508,3 +1508,51 @@ Remaining items before executable SQL:
 This source review is documentation only. No application files or live
 database objects were modified.
 */
+
+
+/*
+===============================================================================
+24. PHASE A — MARKET COUNTRY AND CURRENCY CALL-SITE CONFIRMATION
+READ-ONLY MOBILE SOURCE REVIEW — 2026-11-11
+===============================================================================
+
+A. Existing country-service behavior
+- mobile/lib/country-service.ts loads country metadata including currency_code,
+  currency names, flag and enabled state.
+- It reads/writes profiles.browsing_country_code separately from account
+  country_code and caches the selected browsing country.
+- It exposes the browsing market currency through countries.currency_code.
+- Generic public market region selection must use this browsing-country value.
+  The account-only fetchMyAccountRegions() helper must not be used for
+  browsing-market selectors.
+
+B. Current DZD-only formatter call sites confirmed on main
+- mobile/app/cart.tsx
+- mobile/app/checkout.tsx
+- mobile/app/orders/index.tsx
+- mobile/app/orders/[orderId].tsx
+- mobile/app/merchant/index.tsx
+- mobile/app/merchant/orders/index.tsx
+- mobile/app/merchant/orders/[orderId].tsx
+- mobile/app/merchant/analytics.tsx
+
+catalog.ts has formatMarketPrice(amount,currencyCode) and formatDZD(amount).
+The call sites above still use formatDZD. Each must be classified by data
+currency source before changing:
+- market catalog prices -> browsing country currency;
+- checkout/cart amounts -> account country currency and selected offers
+  must be verified to belong to that account market;
+- persisted order amounts -> orders.currency_code snapshot;
+- merchant order amounts -> parent order currency_code;
+- merchant analytics -> store/account currency, with no mixed-currency sum.
+Do not simply replace all formatDZD calls with the browsing currency.
+
+C. Merchant analytics caution
+- Current store creation enforces one store per owner and stores.country_code
+  is account-country-bound. This suggests an individual merchant store's
+  historical order currency should be stable, but the analytics RPC and its
+  underlying joins still need explicit review before relying on that invariant.
+- No analytics RPC change is proposed or made in this audit.
+
+This section is source documentation only; no app files were modified.
+*/
