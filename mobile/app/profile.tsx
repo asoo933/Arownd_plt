@@ -162,6 +162,26 @@ export default function ProfileScreen() {
               avatarSize={64}
               style={styles.identityRow}
             />
+            <Button
+              label={translate("profileAvatarChange")}
+              onPress={() => { void chooseAvatar(); }}
+              loading={uploadAvatar.isPending}
+              disabled={removeAvatar.isPending}
+              fullWidth
+            />
+            {profile.data?.avatar_url ? (
+              <Button
+                label={translate("profileAvatarRemove")}
+                variant="outline"
+                onPress={() => removeAvatar.mutate()}
+                loading={removeAvatar.isPending}
+                disabled={uploadAvatar.isPending}
+                fullWidth
+              />
+            ) : null}
+            {uploadAvatar.isError || removeAvatar.isError ? (
+              <Caption>{translate("profileAvatarError")}</Caption>
+            ) : null}
             {profile.data?.phone ? (
               <View style={[styles.phoneRow, { borderTopColor: theme.colors.border }]}>
                 <Caption>{profile.data.phone}</Caption>
