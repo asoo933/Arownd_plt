@@ -18,7 +18,6 @@ type NoonProduct = {
 
 type JumiaProduct = NoonProduct;
 
-type Market = "ae" | "eg" | "ma";
 
 function isHttpsUrl(value: unknown, allowedHosts: string[]): value is string {
   if (typeof value !== "string") return false;
