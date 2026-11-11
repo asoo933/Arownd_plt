@@ -414,5 +414,122 @@ Phone:
   number regexes without authoritative numbering rules and test fixtures.
 */
 
+
+
+/*
+===============================================================================
+10. ADDITIONAL VERIFIED RPC, MARKET FILTER AND UI CALL-SITE FINDINGS
+===============================================================================
+
+RPC signatures and migration history:
+- Migration 20261111141700_make_store_and_checkout_rpcs_country_aware.sql
+  explicitly documents that the then-current contract still accepts
+  _wilaya_id and supports only regions mapped to legacy wilayas. It does not
+  implement generic multi-country region selection.
+- Migration 20261111171000_add_daira_to_customer_addresses_and_checkout.sql
+  adds the daira-specific checkout overload and explicitly revokes execution
+  of the old overload without _daira_region_id from PUBLIC, anon and
+  authenticated. The live grants confirm the old overload is not callable by
+  authenticated, while the daira overload is callable.
+- The generic migration must retire obsolete overloads deliberately, retain
+  only the exact PostgREST RPC contract used by the updated app, and explicitly
+  revoke PUBLIC/anon before granting authenticated. Avoid overload ambiguity.
+- create_order is not directly executable by authenticated in the live grants;
+  preserve the trusted SECURITY DEFINER wrapper boundary. create_my_store is
+  executable by authenticated and checks auth.uid() and the account profile.
+- The app already calls customer_respond_to_merchant_order from
+  mobile/lib/orders.ts. The customer response function is part of the existing
+  quote workflow, not missing functionality.
+
+Merchant-set shipping fee:
+- The current create_order() still reads wilayas.home_price/desk_price and
+  initially writes that value to orders.shipping_fee/total.
+- This conflicts with the confirmed platform policy: each merchant determines
+  the shipping fee for their own merchant suborder.
+- The generic checkout creator must initialize shipping_fee to zero and
+  total to subtotal (before quote responses), without consulting wilayas
+  tariffs. merchant_submit_order_quote remains the source of each merchant
+  fee; refresh_parent_order_totals remains the parent aggregation authority.
+- Pickup/desk must continue requiring a zero shipping fee in
+  merchant_submit_order_quote.
+- Keep the per-merchant quote lifecycle: merchant submits quote, customer
+  accepts or rejects that merchant order, rejection restores its reserved
+  stock, and parent totals/status are recomputed.
+
+Market browsing call sites:
+- mobile/lib/country-service.ts reads browsing_country_code separately from
+  account country. RLS policies introduced by
+  20261111151040_preserve_merchant_own_catalog_across_browsing_markets.sql
+  are the server-side market boundary for catalog visibility.
+- mobile/lib/catalog.ts fetchHomeProducts(), fetchFeaturedStores(),
+  searchCatalogProducts() and fetchProductOffers() rely on RLS visibility.
+  fetchVerifiedStoresByWilaya(wilayaId) adds a legacy wilaya_id filter and
+  mobile/app/stores.tsx builds its location selector from fetchCheckoutWilayas.
+  This screen must move to browsing-country primary-region IDs; it must not
+  use account-country checkout regions for browsing.
+- fetchCheckoutCommunes() also filters stores by wilaya_id. Replace with
+  country + primary-region filter or derive available locality labels from
+  the selected region's stores without weakening RLS.
+- The catalog's country isolation must remain enforced by RLS, not solely by
+  client filters.
+
+Currency display call sites verified by GitHub search:
+- formatDZD() is used by cart, checkout, customer order list/detail, merchant
+  dashboard/order list/detail, and merchant analytics:
+  mobile/app/cart.tsx
+  mobile/app/checkout.tsx
+  mobile/app/orders/index.tsx
+  mobile/app/orders/[orderId].tsx
+  mobile/app/merchant/index.tsx
+  mobile/app/merchant/orders/index.tsx
+  mobile/app/merchant/orders/[orderId].tsx
+  mobile/app/merchant/analytics.tsx
+- Replace order-specific displays with each order's persisted currency_code.
+  Replace catalog/cart/checkout prices with the active market/account currency
+  according to data ownership: browsing country for market listings, account
+  country for cart/checkout, and order.currency_code for historical orders.
+- Merchant analytics must aggregate one currency at a time or be explicitly
+  grouped by currency; never sum different currencies into one DZD total.
+
+Database trigger migration:
+- Current profiles/stores/user_addresses/orders still use
+  enforce_daira_region_selection(), with orders having a narrow legacy NULL
+  daira exception and a transaction-local checkout_daira_pending bypass.
+- Replace this with a country-aware region guard. Validate primary region:
+  matching account country, enabled country/region, parent_id IS NULL, and
+  expected country-specific region_type. Validate secondary region only where
+  the country's config requires/supports it; when present require matching
+  country, expected type and parent_id = primary.id.
+- DZ: wilaya + required daira. SA: region + required governorate.
+  EG: governorate only. MA: region primary; secondary province/prefecture
+  optional only where the seeded hierarchy actually exists. AE: emirate
+  primary; municipality optional only where mapped data exists.
+- Preserve immutable account country checks. A SECURITY DEFINER RPC must
+  independently validate the caller, account country and selected region
+  because the account-country trigger intentionally returns early when
+  auth.uid() is NULL (trusted database context).
+- The trigger must not force DZ's daira rule onto countries whose config has
+  no required second level. Do not rewrite historical DZ records or erase
+  legacy wilaya_id/daira_region_id values.
+
+Schema and data constraints:
+- Existing wilaya_id columns on stores, user_addresses and orders are NOT NULL
+  and have legacy wilayas foreign keys. Generic region IDs therefore require
+  a compatibility plan before making generic regions authoritative: either
+  preserve legacy columns with a safe DZ-only mapping/nullable transition, or
+  a carefully staged backfill and constraint change. Do not simply drop the
+  NOT NULL/FK constraints while existing app builds may still rely on them.
+- orders.country_code and currency_code are non-null; stores and user_addresses
+  country_code are non-null. Keep both authoritative.
+- Existing profiles may have no location; do not require a region at profile
+  creation. Existing orders may contain legacy region gaps; retain read and
+  status-update compatibility for historical rows.
+- user_addresses.phone currently has a database CHECK limited to DZ formats.
+  The address write path cannot support other countries until this constraint
+  and app Zod schema are reconciled. Use the account country's calling_code
+  and a consistent normalization contract; do not invent unverified national
+  numbering rules.
+*/
+
 END OF REVIEW DRAFT.
 */
