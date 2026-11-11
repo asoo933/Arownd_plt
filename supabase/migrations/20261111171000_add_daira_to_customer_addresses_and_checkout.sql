@@ -33,6 +33,12 @@ grant select (daira_region_id) on public.profiles to authenticated;
 grant insert (daira_region_id) on public.profiles to authenticated;
 grant update (daira_region_id) on public.profiles to authenticated;
 
+-- Preserve existing per-column grants for saved addresses and customer order reads.
+grant select (daira_region_id) on public.user_addresses to authenticated;
+grant insert (daira_region_id) on public.user_addresses to authenticated;
+grant update (daira_region_id) on public.user_addresses to authenticated;
+grant select (daira_region_id) on public.orders to authenticated;
+
 create or replace function public.enforce_daira_region_selection()
 returns trigger
 language plpgsql
