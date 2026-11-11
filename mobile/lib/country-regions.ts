@@ -136,3 +136,20 @@ export async function fetchMyAccountChildRegions(parentRegionId: number): Promis
   if (error) throw error;
   return RegionSchema.array().parse(data as unknown);
 }
+
+/** Normalize a national or international input to E.164 using the account country's calling code. */
+export function normalizePhoneForCallingCode(value: string, callingCode: string): string {
+  if (!/^\\+[1-9]\\d{0,2}$/.test(callingCode)) throw new Error("invalid_calling_code");
+  let digits = value.trim().replace(/[\\s().-]/g, "");
+  if (digits.startsWith("00")) digits = "+" + digits.slice(2);
+  if (!digits.startsWith("+")) {
+    const callingDigits = callingCode.slice(1);
+    if (digits.startsWith(callingDigits)) digits = "+" + digits;
+    else if (digits.startsWith("0")) digits = callingCode + digits.slice(1);
+    else digits = callingCode + digits;
+  }
+  if (!/^\\+[1-9]\\d{7,14}$/.test(digits) || !digits.startsWith(callingCode)) {
+    throw new Error("invalid_phone");
+  }
+  return digits;
+}
