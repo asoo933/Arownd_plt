@@ -9,6 +9,7 @@ import { useAppTheme } from "@/lib/theme";
 
 export default function CountrySelectionScreen() {
   const { language } = useLanguage();
+  const isRTL = language === "ar";
   const theme = useAppTheme();
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
@@ -61,8 +62,8 @@ export default function CountrySelectionScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.heading}>
           <UiText style={[styles.eyebrow, { color: theme.colors.muted }]}>AROWND</UiText>
-          <UiText style={[styles.title, { color: theme.colors.foreground }]}>{translate("countrySelectionTitle")}</UiText>
-          <UiText style={[styles.subtitle, { color: theme.colors.muted }]}>{translate("countrySelectionSubtitle")}</UiText>
+          <UiText style={[styles.title, { color: theme.colors.foreground, textAlign: isRTL ? "right" : "left" }]}>{translate("countrySelectionTitle")}</UiText>
+          <UiText style={[styles.subtitle, { color: theme.colors.muted, textAlign: isRTL ? "right" : "left" }]}>{translate("countrySelectionSubtitle")}</UiText>
         </View>
 
         {loading ? (
@@ -79,7 +80,7 @@ export default function CountrySelectionScreen() {
           </View>
         ) : (
           <>
-            {suggestedCode ? <UiText style={[styles.suggestion, { color: theme.colors.muted }]}>{translate("countrySelectionSuggestion")}</UiText> : null}
+            {suggestedCode ? <UiText style={[styles.suggestion, { color: theme.colors.muted, textAlign: isRTL ? "right" : "left" }]}>{translate("countrySelectionSuggestion")}</UiText> : null}
             <View style={styles.list}>
               {countries.map((country) => {
                 const enabled = country.is_enabled;
@@ -98,14 +99,15 @@ export default function CountrySelectionScreen() {
                       {
                         backgroundColor: selected ? theme.colors.surfaceSecondary : theme.colors.surface,
                         borderColor: selected ? theme.colors.foreground : theme.colors.border,
-                        opacity: enabled ? 1 : 0.55
+                        opacity: enabled ? 1 : 0.55,
+                        flexDirection: isRTL ? "row-reverse" : "row"
                       }
                     ]}
                   >
                     <UiText style={styles.flag}>{country.flag_emoji ?? "🌐"}</UiText>
                     <View style={styles.countryDetails}>
-                      <UiText style={[styles.countryName, { color: theme.colors.foreground }]}>{name}</UiText>
-                      <UiText style={[styles.currency, { color: theme.colors.muted }]}>{translate("countrySelectionCurrency")}: {country.currency_code} · {currencyName}</UiText>
+                      <UiText style={[styles.countryName, { color: theme.colors.foreground, textAlign: isRTL ? "right" : "left" }]}>{name}</UiText>
+                      <UiText style={[styles.currency, { color: theme.colors.muted, textAlign: isRTL ? "right" : "left" }]}>{translate("countrySelectionCurrency")}: {country.currency_code} · {currencyName}</UiText>
                     </View>
                     {!enabled ? (
                       <UiText style={[styles.comingSoon, { color: theme.colors.muted }]}>{translate("countrySelectionComingSoon")}</UiText>
@@ -116,7 +118,7 @@ export default function CountrySelectionScreen() {
                 );
               })}
             </View>
-            <UiText style={[styles.note, { color: theme.colors.muted }]}>{translate("countrySelectionIpNote")}</UiText>
+            <UiText style={[styles.note, { color: theme.colors.muted, textAlign: isRTL ? "right" : "left" }]}>{translate("countrySelectionIpNote")}</UiText>
           </>
         )}
 
