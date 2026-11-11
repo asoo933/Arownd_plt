@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 import { Text as UiText } from "@/components/ui";
-import { detectCountryFromIp, fetchCountries, saveSelectedCountryCode, type Country } from "@/lib/country-service";
+import { detectCountryFromIp, fetchCountries, getSelectedCountryCode, saveSelectedCountryCode, type Country } from "@/lib/country-service";
 import { translate, useLanguage } from "@/lib/i18n";
 import { useAppTheme } from "@/lib/theme";
 
 export default function CountrySelectionScreen() {
+  const params = useLocalSearchParams<{ returnTo?: string }>();
+  const returnToSignup = params.returnTo === "signup-personal" || params.returnTo === "signup-business";
   const { language } = useLanguage();
   const isRTL = language === "ar";
   const theme = useAppTheme();
@@ -29,17 +31,23 @@ export default function CountrySelectionScreen() {
     try {
       const availableCountries = await fetchCountries();
       setCountries(availableCountries);
-      const detectedCode = await detectCountryFromIp();
-      const suggested = availableCountries.find((country) => country.code === detectedCode && country.is_enabled);
-      setSuggestedCode(suggested?.code ?? null);
       const firstEnabled = availableCountries.find((country) => country.is_enabled);
-      setSelectedCode(suggested?.code ?? firstEnabled?.code ?? null);
+      if (returnToSignup) {
+        const storedCode = await getSelectedCountryCode();
+        const storedCountry = availableCountries.find((country) => country.code === storedCode && country.is_enabled);
+        setSelectedCode(storedCountry?.code ?? firstEnabled?.code ?? null);
+      } else {
+        const detectedCode = await detectCountryFromIp();
+        const suggested = availableCountries.find((country) => country.code === detectedCode && country.is_enabled);
+        setSuggestedCode(suggested?.code ?? null);
+        setSelectedCode(suggested?.code ?? firstEnabled?.code ?? null);
+      }
     } catch {
       setError(translate("countrySelectionLoadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [returnToSignup]);
 
   useEffect(() => {
     void loadCountries();
@@ -50,7 +58,8 @@ export default function CountrySelectionScreen() {
     setSaving(true);
     try {
       await saveSelectedCountryCode(selectedCountry.code);
-      router.replace("/login");
+      if (returnToSignup) router.back();
+      else router.replace("/login");
     } catch {
       setError(translate("genericError"));
       setSaving(false);
