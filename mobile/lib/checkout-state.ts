@@ -6,6 +6,7 @@ export type CheckoutIdentityInput = {
   items: CartItem[];
   deliveryType: "home" | "desk";
   wilayaId: number;
+  dairaRegionId: number;
   commune: string;
   addressLine: string;
   fullName: string;
@@ -37,6 +38,7 @@ export function checkoutRequestIdentity(input: CheckoutIdentityInput): string {
     items,
     deliveryType: input.deliveryType,
     wilayaId: input.wilayaId,
+    dairaRegionId: input.dairaRegionId,
     commune: input.commune.trim(),
     addressLine: input.addressLine.trim(),
     fullName: input.fullName.trim(),
