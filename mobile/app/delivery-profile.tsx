@@ -99,6 +99,10 @@ export default function DeliveryProfileScreen() {
 
   const submit = () => {
     setFormError(null);
+    if (regionId === null || (regionOptions.data?.levels[1]?.is_required && secondaryRegionId === null)) {
+      setFormError(translate("deliveryProfileValidationError"));
+      return;
+    }
     const input: DeliveryProfileInput = {
       full_name: fullName.trim(),
       phone: normalizePhoneForCallingCode(phone, regionOptions.data?.callingCode ?? ""),
