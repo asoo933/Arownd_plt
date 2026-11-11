@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -16,6 +17,7 @@ import {
   StatCard
 } from "@/components/ui";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
+import { removeMyProfileAvatar, uploadMyProfileAvatar } from "@/lib/profile-avatar";
 import { getFavorites } from "@/lib/favorites";
 import { translate, useLanguage } from "@/lib/i18n";
 import { fetchMyOrders } from "@/lib/orders";
@@ -26,6 +28,26 @@ import { getSupabaseClient } from "@/lib/supabase";
 export default function ProfileScreen() {
   useLanguage();
   const theme = useAppTheme();
+  const queryClient = useQueryClient();
+  const uploadAvatar = useMutation({
+    mutationFn: uploadMyProfileAvatar,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-delivery-profile"] })
+  });
+  const removeAvatar = useMutation({
+    mutationFn: removeMyProfileAvatar,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-delivery-profile"] })
+  });
+  const chooseAvatar = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.85
+    });
+    if (!result.canceled && result.assets[0]) uploadAvatar.mutate(result.assets[0]);
+  };
   const user = useQuery({
     queryKey: ["current-user"],
     queryFn: async () => {
