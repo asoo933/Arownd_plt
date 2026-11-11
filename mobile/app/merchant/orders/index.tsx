@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { formatDZD, formatNumber } from "@/lib/catalog";
+import { formatMarketPrice, formatNumber } from "@/lib/catalog";
 import {
   fetchMerchantAccess,
   fetchMerchantDashboard,
@@ -194,7 +194,7 @@ function OrderCard({ order, language, theme, onPress }: { order: MerchantDashboa
       <View style={style.orderFooter}>
         <View style={style.priceBlock}>
           <UiText style={[style.metaLabel, { color: theme.colors.subtle }]}>{translate("merchantOrderTotal")}</UiText>
-          <PriceDisplay value={formatDZD(order.subtotal + order.shippingFee)} style={style.orderPrice} />
+          <PriceDisplay value={formatMarketPrice(order.subtotal + order.shippingFee, order.currencyCode)} style={style.orderPrice} />
         </View>
         <View style={style.deliveryBlock}>
           <UiText style={[style.metaLabel, { color: theme.colors.subtle }]}>{translate("merchantOrderDeliveryType")}</UiText>

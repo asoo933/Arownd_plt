@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { formatDZD, formatNumber } from "@/lib/catalog";
+import { formatMarketPrice, formatNumber } from "@/lib/catalog";
 import {
   collectMerchantOrderCod,
   fetchMerchantAccess,
@@ -155,7 +155,7 @@ export default function MerchantOrderDetailsScreen() {
 
         <MerchantOrderCard>
           <View style={styles.summaryRow}>
-            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
+            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatMarketPrice(total, customerOrder.currency_code ?? "DZD")}</UiText>
             <StatusPill status={order.status} deliveryType={deliveryType ?? "home"} />
           </View>
           <View style={styles.sectionHeading}>
@@ -171,20 +171,20 @@ export default function MerchantOrderDetailsScreen() {
                 <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderQuantity")}: {formatNumber(item.quantity)}</UiText>
                 {Object.entries(readCartOptions(item.options)).length > 0 ? <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</UiText> : null}
               </View>
-              <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
+              <PriceDisplay value={formatMarketPrice(item.unit_price * item.quantity, customerOrder.currency_code ?? "DZD")} style={styles.itemPriceDisplay} />
             </View>
           ))}
           <View style={[styles.totalRow, { borderTopColor: theme.colors.border }]}>
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderSubtotal")}</UiText>
-            <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{formatDZD(order.subtotal)}</UiText>
+            <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{formatMarketPrice(order.subtotal, customerOrder.currency_code ?? "DZD")}</UiText>
           </View>
           <View style={styles.totalRow}>
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate("merchantOrderShippingFee")}</UiText>
-            <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{formatDZD(order.shipping_fee)}</UiText>
+            <UiText style={[styles.valueText, { color: theme.colors.foreground }]}>{formatMarketPrice(order.shipping_fee, customerOrder.currency_code ?? "DZD")}</UiText>
           </View>
           <View style={styles.totalRow}>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderTotal")}</UiText>
-            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
+            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatMarketPrice(total, customerOrder.currency_code ?? "DZD")}</UiText>
           </View>
         </MerchantOrderCard>
 
@@ -255,14 +255,14 @@ export default function MerchantOrderDetailsScreen() {
         {canCollectCod ? (
           <MerchantOrderCard>
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantCodTitle")}</UiText>
-            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatDZD(total)}</UiText>
+            <UiText style={[styles.amount, { color: theme.colors.accentMuted }]}>{formatMarketPrice(total, customerOrder.currency_code ?? "DZD")}</UiText>
             <UiText style={[styles.mutedText, { color: theme.colors.muted }]}>{translate(deliveryType === "home" ? "merchantCodDeliveryHint" : "merchantCodPickupHint")}</UiText>
             <Button label={translate("merchantCodCollect")} onPress={() => setConfirmAction("collect")} fullWidth />
           </MerchantOrderCard>
         ) : null}
 
         {order.payment_status === "paid" ? (
-          <Alert description={`${translate("merchantCodPaid")}: ${formatDZD(order.paid_amount ?? 0)}`} tone="success" />
+          <Alert description={`${translate("merchantCodPaid")}: ${formatMarketPrice(order.paid_amount ?? 0, customerOrder.currency_code ?? "DZD")}`} tone="success" />
         ) : null}
 
         {actionError ? (

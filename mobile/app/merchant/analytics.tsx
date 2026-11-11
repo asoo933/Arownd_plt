@@ -3,7 +3,8 @@ import { Redirect, router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { formatDZD, formatNumber } from "@/lib/catalog";
+import { formatMarketPrice, formatNumber } from "@/lib/catalog";
+import { fetchMyAccountCurrencyCode } from "@/lib/country-service";
 import { fetchMerchantAccess } from "@/lib/merchant";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -16,6 +17,7 @@ export default function MerchantAnalyticsScreen() {
   const styles = createStyles(theme);
   const access = useQuery({ queryKey: ["merchant-access"], queryFn: fetchMerchantAccess, retry: false });
   const storeId = access.data?.store?.id ?? null;
+  const accountCurrency = useQuery({ queryKey: ["account-currency"], queryFn: fetchMyAccountCurrencyCode, enabled: access.isSuccess && access.data?.status === "merchant_ready" });
   const ready = access.data?.status === "merchant_ready" && Boolean(storeId);
   const analytics = useQuery({
     queryKey: ["merchant-analytics", storeId],
@@ -76,14 +78,14 @@ export default function MerchantAnalyticsScreen() {
         <View style={styles.revenueMetrics}>
           <MerchantMetricCard
             label={translate("merchantAnalyticsRevenue")}
-            value={formatDZD(data.delivered_revenue)}
+            value={formatMarketPrice(data.delivered_revenue, accountCurrency.data ?? "DZD")}
             valueTone="accent"
             style={styles.revenueMetric}
           />
           <View style={[styles.metricDivider, { backgroundColor: theme.colors.border }]} />
           <MerchantMetricCard
             label={translate("merchantAnalyticsAverage")}
-            value={formatDZD(data.average_delivered_order)}
+            value={formatMarketPrice(data.average_delivered_order, accountCurrency.data ?? "DZD")}
             style={styles.revenueMetric}
           />
         </View>
@@ -98,7 +100,7 @@ export default function MerchantAnalyticsScreen() {
               <View style={[styles.track, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
                 <View style={[styles.bar, { backgroundColor: theme.colors.accent, width: Math.max(item.amount > 0 ? 3 : 0, item.amount / maxDaily * 100) + "%" }]} />
               </View>
-              <UiText numberOfLines={1} adjustsFontSizeToFit style={[styles.amount, { color: theme.colors.foreground }]}>{formatDZD(item.amount)}</UiText>
+              <UiText numberOfLines={1} adjustsFontSizeToFit style={[styles.amount, { color: theme.colors.foreground }]}>{formatMarketPrice(item.amount, accountCurrency.data ?? "DZD")}</UiText>
             </View>
           ))}
         </ChartCard>

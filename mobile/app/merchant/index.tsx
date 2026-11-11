@@ -14,7 +14,7 @@ import {
 } from "@/lib/merchant";
 import { fetchMerchantProducts } from "@/lib/merchant-products";
 import { fetchMerchantAnalytics } from "@/lib/merchant-analytics";
-import { fetchStoreDetails, fetchStoreOffers, formatDZD } from "@/lib/catalog";
+import { fetchStoreDetails, fetchStoreOffers, formatMarketPrice } from "@/lib/catalog";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import type { MerchantDashboardOrder } from "@/lib/merchant-dashboard-state";
@@ -217,7 +217,7 @@ export default function MerchantEntryScreen() {
               <PressableSurface
                 key={order.id}
                 accessibilityRole="button"
-                accessibilityLabel={`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}، ${order.customerName || translate("merchantCustomerUnknown")}، ${formatDZD(order.subtotal + order.shippingFee)}`}
+                accessibilityLabel={`${translate("merchantOrderNumber")} ${order.parentOrderId.slice(0, 8)}، ${order.customerName || translate("merchantCustomerUnknown")}، ${formatMarketPrice(order.subtotal + order.shippingFee, order.currencyCode)}`}
                 onPress={() => {
                   if (storeId) void queryClient.prefetchQuery({ queryKey: ["merchant-order-detail", storeId, order.id], queryFn: () => fetchMerchantOrderDetails(order.id, storeId), staleTime: 15_000 });
                   router.push({ pathname: "/merchant/orders/[orderId]", params: { orderId: order.id } });
