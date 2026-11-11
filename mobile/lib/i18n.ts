@@ -674,7 +674,7 @@ export const messages = {
     merchantOrderShipmentStatus: "حالة الشحنة",
     merchantQuoteTitle: "إرسال عرض السعر",
     merchantQuotePickupHint: "الاستلام من المتجر، لا توجد رسوم توصيل إضافية.",
-    merchantQuoteShippingPlaceholder: "رسوم التوصيل بالدينار",
+    merchantQuoteShippingPlaceholder: "رسوم التوصيل",
     merchantQuoteSend: "إرسال العرض للعميل",
     merchantQuoteInvalidFee: "أدخل رسوم توصيل صحيحة ضمن النطاق المسموح.",
     merchantQuoteAwaitingCustomer: "تم إرسال عرض السعر. ننتظر موافقة العميل.",
