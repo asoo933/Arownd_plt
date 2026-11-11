@@ -25,7 +25,7 @@ import { cartLineKey, evaluateCart, normalizeCartOptions } from "@/lib/cart-stat
 import { getSupabaseClient } from "@/lib/supabase";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { getRegionDisplayName, getRegionLevelDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { fetchMyAccountCurrencyCode } from "@/lib/country-service";
 import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
 import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
@@ -231,7 +231,7 @@ export default function CheckoutScreen() {
   };
 
   const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.inputBorder, color: theme.colors.foreground }];
-  const modalTitle = picker === "region" ? (regionOptions.data?.selectedLevel.label_ar ?? "") : picker === "secondary" ? (secondaryOptions.data?.selectedLevel.label_ar ?? "") : translate("checkoutChooseCommune");
+  const modalTitle = picker === "region" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : picker === "secondary" ? (secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : "") : translate("checkoutChooseCommune");
   const pickerItems = picker === "region"
     ? (regionOptions.data?.regions ?? []).map((item) => ({ id: String(item.id), label: getRegionDisplayName(item, language) }))
     : picker === "secondary"
@@ -324,16 +324,16 @@ export default function CheckoutScreen() {
         </PressableSurface>
       </View>
 
-      <UiText style={styles.fieldLabel}>{regionOptions.data?.selectedLevel.label_ar ?? ""}</UiText>
+      <UiText style={styles.fieldLabel}>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
       <PressableSurface accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"} onPress={() => { setFormEdited(true); setSelectedAddressId(null); setPicker("region"); }} disabled={regionOptions.isPending || regionOptions.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
-        <UiText style={[styles.selectText, !selectedRegion && styles.placeholder]}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.isError ? translate("checkoutWilayaError") : (regionOptions.data?.selectedLevel.label_ar ?? "")}</UiText>
+        <UiText style={[styles.selectText, !selectedRegion && styles.placeholder]}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.isError ? translate("checkoutWilayaError") : (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "")}</UiText>
         {regionOptions.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
 
       {regionOptions.data?.levels[1] ? <>
-        <UiText style={styles.fieldLabel}>{regionOptions.data.levels[1].label_ar}</UiText>
-        <PressableSurface accessibilityLabel={regionOptions.data.levels[1].label_ar} onPress={() => setPicker("secondary")} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
-          <UiText style={[styles.selectText, !selectedSecondaryRegion && styles.placeholder]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+        <UiText style={styles.fieldLabel}>{getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
+        <PressableSurface accessibilityLabel={getRegionLevelDisplayName(regionOptions.data.levels[1], language)} onPress={() => setPicker("secondary")} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
+          <UiText style={[styles.selectText, !selectedSecondaryRegion && styles.placeholder]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
           {secondaryOptions.isPending ? <Spinner size="small" /> : null}
         </PressableSurface>
       </> : null}
