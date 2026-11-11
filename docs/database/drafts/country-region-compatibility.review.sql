@@ -274,10 +274,15 @@ D. Quote lifecycle
 - Its customer notification hard-codes "دج" three times.
 - merchant_reject_order() handles merchant rejection before quote, restores
   reserved stock and refreshes parent totals.
-- The inspected public functions matching quote/accept/reject patterns did
-  not expose a customer quote-acceptance RPC. This is not proof none exists
-  under another name/schema. Search all schemas, policies and app RPC callers
-  before defining/changing the customer response contract.
+- The live database contains public.customer_respond_to_merchant_order(
+  _merchant_order_id uuid, _accept boolean). It verifies auth.uid(), locks the
+  parent and merchant order, verifies mo.customer_id = auth.uid(), requires
+  status = quoted, then confirms or cancels the merchant order. On rejection it
+  restores reserved stock. It refreshes parent totals and notifies the store
+  owner. Preserve this contract; do not create a duplicate response RPC.
+- The response function currently uses SECURITY DEFINER with search_path =
+  public. Include it in the security review and preserve its customer ownership
+  check, row locks, stock restoration, aggregation and notifications.
 - refresh_parent_order_totals() aggregates non-cancelled merchant-order
   subtotals and shipping fees into the parent and derives parent status.
   Preserve this behavior and test mixed multi-store states.
@@ -290,6 +295,84 @@ E. Trigger country guard caveat
 
 These findings came from live function definitions read-only. No database
 objects or rows were changed.
+*/
+
+
+
+/*
+===============================================================================
+8. VERIFIED NATIVE APP CALL-GRAPH AUDIT (main branch)
+===============================================================================
+
+The generic country-region helper exists in mobile/lib/country-regions.ts, but
+GitHub code search for fetchMyAccountRegions and fetchMyAccountChildRegions
+returns only that helper file. The helper is not integrated into the current
+customer or merchant screens.
+
+Customer checkout:
+- mobile/lib/checkout.ts still defines Wilaya/Daira models and profile fields
+  wilaya_id + daira_region_id.
+- fetchCheckoutWilayas() reads public.wilayas.
+- fetchCheckoutDairas() hard-codes country_code = DZ and region_type = daira.
+- CheckoutInput requires wilayaId and dairaRegionId.
+- submitCheckout() requires a positive dairaRegionId and calls the legacy
+  create_order_with_delivery named-argument contract using _wilaya_id and
+  _daira_region_id. It does not send generic region_id or account country.
+- mobile/app/checkout.tsx requires wilaya, daira and commune and renders the
+  Wilaya/Daira pickers. It initializes these values from profile/saved address.
+- Therefore the five-country region helper currently does not power checkout.
+
+Saved addresses:
+- mobile/app/addresses.tsx uses the same Wilaya/Daira pickers and serializes
+  wilaya_id + daira_region_id.
+- mobile/lib/user-address.ts reads/writes wilaya_id and daira_region_id and
+  joins country_regions through the daira FK.
+- mobile/lib/user-address-state.ts validates Algerian phone formats only and
+  requires both wilaya_id and daira_region_id.
+- This means MA/EG/SA/AE cannot currently create or edit addresses using their
+  country-specific region hierarchy.
+
+Delivery profile:
+- mobile/lib/delivery-profile.ts selects/upserts wilaya_id and daira_region_id.
+- mobile/lib/delivery-profile-state.ts uses the Algerian phone regex and
+  requires both legacy location fields.
+- mobile/app/delivery-profile.tsx uses the Algerian location controls and
+  Algerian phone normalization.
+
+Merchant store creation/settings:
+- mobile/lib/merchant.ts calls create_my_store with _wilaya_id.
+- mobile/app/merchant/settings.tsx fetches checkout wilayas and edits
+  wilaya_id; the store settings schema also requires wilaya_id.
+- Existing store creation and settings are therefore Algeria-specific even
+  though stores.country_code and stores.region_id exist.
+
+Order display/data:
+- mobile/lib/orders.ts and merchant order detail queries still select wilaya
+  relations; customer and merchant order screens render wilaya/daira labels.
+- These read paths must be migrated with the write paths so international
+  orders remain readable, but historical DZ records must continue displaying
+  their legacy labels.
+- Catalog store filtering also has a wilaya_id query path; review it separately
+  against browsing_country_code and country-aware market filtering.
+
+Country selection:
+- mobile/lib/country-service.ts handles browsing_country_code separately.
+  Checkout/store creation must continue deriving country from the account,
+  never from browsing_country_code.
+
+Migration ledger:
+- Supabase reports 20261111141624 (country/region foundation),
+  20261111141700 (country-aware RPCs), 20261111141720 (account market
+  isolation), region seeds and 20261111164700 (daira checkout) as applied.
+- Despite its name, 20261111141700_make_store_and_checkout_rpcs_country_aware
+  still requires _wilaya_id and resolves a region through legacy_wilaya_id.
+  It is market-country-aware for the DZ legacy mapping, not a generic
+  multi-country region contract.
+- The later 20261111164700 migration then adds mandatory daira checkout logic.
+  This explains why the live database is still DZ-only in its actual checkout
+  behavior despite the five-country region data being seeded.
+- This audit is based on current main-branch source search and the live
+  Supabase migration ledger. No app or database writes were made.
 */
 
 END OF REVIEW DRAFT.
