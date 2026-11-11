@@ -411,6 +411,7 @@ export default function CheckoutScreen() {
                 setAddressLine("");
               } else if (picker === "daira" && item.daira) {
                 setFormEdited(true);
+                setSelectedAddressId(null);
                 setDairaRegionId(item.daira.id);
               } else if (picker === "commune") {
                 setFormEdited(true);
