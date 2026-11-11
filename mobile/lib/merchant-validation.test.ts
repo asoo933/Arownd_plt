@@ -56,6 +56,8 @@ describe("merchant store helpers", () => {
 
   it("maps known backend errors to translation keys", () => {
     expect(merchantStoreErrorKey(new Error("store_already_exists"))).toBe("merchantErrorStoreExists");
+    expect(merchantStoreErrorKey(new Error("secondary_region_required"))).toBe("merchantValidationSecondaryRegionRequired");
+    expect(merchantStoreErrorKey(new Error("invalid_country_phone"))).toBe("merchantValidationPhone");
     expect(merchantStoreErrorKey(new Error("unexpected"))).toBe("merchantErrorGeneric");
   });
 });
