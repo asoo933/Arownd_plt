@@ -7,6 +7,12 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
+    "updates": {
+      "url": "https://u.expo.dev/a6f00c82-1762-4156-8c7d-6289f496b18f"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "plugins": [
       "expo-router",
       [
@@ -34,6 +40,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0A0A0A"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a6f00c82-1762-4156-8c7d-6289f496b18f"
       }
     }
   }
