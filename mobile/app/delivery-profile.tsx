@@ -168,7 +168,7 @@ export default function DeliveryProfileScreen() {
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
         <View accessibilityViewIsModal style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <UiText weight="800" style={styles.modalTitle}>{picker === "region" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : picker === "secondary" ? (secondaryOptions.data?.selectedLevel.label_ar ?? "") : translate("checkoutChooseCommune")}</UiText>
+          <UiText weight="800" style={styles.modalTitle}>{picker === "region" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : picker === "secondary" ? (secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : "") : translate("checkoutChooseCommune")}</UiText>
           {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
           {picker === "secondary" && secondaryOptions.isPending ? <Spinner size="small" /> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
