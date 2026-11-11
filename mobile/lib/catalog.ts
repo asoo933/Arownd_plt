@@ -243,7 +243,8 @@ export function formatMarketPrice(amount: number, currencyCode: string): string 
   return new Intl.NumberFormat(`${language}-${region}`, {
     style: "currency",
     currency: normalizedCurrency,
-    maximumFractionDigits: 0
+    minimumFractionDigits: 0,
+    maximumFractionDigits: normalizedCurrency === "DZD" ? 0 : 2
   }).format(amount);
 }
 
