@@ -7,6 +7,7 @@ vi.mock("@/lib/i18n", () => ({
 import {
   chooseBestProductOffer,
   formatDZD,
+  formatMarketPrice,
   getPrimaryImage,
   getOfferVariantOptions,
   getCategoryFilterIds,
@@ -54,7 +55,18 @@ describe("catalog presentation helpers", () => {
     expect(getPrimaryImage({ ...product, images: [] })).toBeNull();
   });
 
-  it("formats prices with the Algerian dinar currency", () => {
+  it("formats prices using the selected browsing market currency", () => {
+    for (const currency of ["DZD", "MAD", "EGP", "SAR", "AED"]) {
+      expect(formatMarketPrice(1250, currency)).not.toBe("");
+    }
+    expect(formatMarketPrice(1250, "MAD")).not.toBe(formatDZD(1250));
+  });
+
+  it("keeps unknown currency codes visible instead of silently using DZD", () => {
+    expect(formatMarketPrice(1250, "XYZ")).toContain("XYZ");
+  });
+
+  it("keeps historical and account prices on the DZD formatter", () => {
     expect(formatDZD(1250)).not.toBe("1250");
   });
 });
