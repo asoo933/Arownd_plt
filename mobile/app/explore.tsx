@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, PanResponder, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, CustomerHeading, EmptyState, ErrorState, ProductTile, SectionTitle } from "@/components/customer-ui";
-import { fetchHomeProducts, fetchProductDetails, fetchProductOffers, formatDZD, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
+import { fetchHomeProducts, fetchProductDetails, fetchProductOffers, formatMarketPrice, getPrimaryImage, searchCatalogProducts } from "@/lib/catalog";
+import { fetchBrowsingCurrencyCode } from "@/lib/country-service";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { getLocalizedProductCategoryLabel } from "@/lib/locale-data";
@@ -67,6 +68,7 @@ export default function ExploreScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
+  const browsingCurrency = useQuery({ queryKey: ["browsing-country-currency"], queryFn: fetchBrowsingCurrencyCode, staleTime: 60_000 });
   const params = useLocalSearchParams<{ q?: string; category?: string }>();
   const initialQuery = typeof params.q === "string" ? params.q : "";
   const category = typeof params.category === "string" ? params.category : undefined;
@@ -260,7 +262,7 @@ export default function ExploreScreen() {
         ) : (
           <View style={styles.grid}>
             {products.data.map((item) => (
-              <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={formatDZD(item.price)} imageUrl={getPrimaryImage(item)} onPress={() => {
+              <ProductTile key={item.id} name={item.product.name} store={item.store.name} price={browsingCurrency.data ? formatMarketPrice(item.price, browsingCurrency.data) : "—"} imageUrl={getPrimaryImage(item)} onPress={() => {
                 void queryClient.prefetchQuery({ queryKey: ["customer-product", item.product.id], queryFn: () => fetchProductDetails(item.product.id), staleTime: 60_000 });
                 void queryClient.prefetchQuery({ queryKey: ["customer-product-offers", item.product.id], queryFn: () => fetchProductOffers(item.product.id), staleTime: 30_000 });
                 void queryClient.prefetchQuery({ queryKey: ["approved-reviews", "product", item.product.id], queryFn: () => fetchApprovedReviews("product", item.product.id), staleTime: 60_000 });
