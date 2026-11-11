@@ -12,7 +12,8 @@ import {
   ProductTile,
   SectionTitle
 } from "@/components/customer-ui";
-import { fetchFeaturedStores, fetchHomeProducts, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { fetchFeaturedStores, fetchHomeProducts, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatMarketPrice, getPrimaryImage } from "@/lib/catalog";
+import { fetchBrowsingCurrencyCode } from "@/lib/country-service";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -24,6 +25,7 @@ export default function CustomerHomeScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
+  const browsingCurrency = useQuery({ queryKey: ["browsing-country-currency"], queryFn: fetchBrowsingCurrencyCode, staleTime: 60_000 });
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
 
@@ -124,7 +126,7 @@ export default function CustomerHomeScreen() {
                 key={item.id}
                 name={item.product.name}
                 store={item.store.name}
-                price={formatDZD(item.price)}
+                price={browsingCurrency.data ? formatMarketPrice(item.price, browsingCurrency.data) : "—"}
                 imageUrl={getPrimaryImage(item)}
                 onPress={() => {
                   void queryClient.prefetchQuery({ queryKey: ["customer-product", item.product.id], queryFn: () => fetchProductDetails(item.product.id), staleTime: 60_000 });
