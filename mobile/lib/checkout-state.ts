@@ -5,8 +5,8 @@ export const MAX_CHECKOUT_ITEMS = 30;
 export type CheckoutIdentityInput = {
   items: CartItem[];
   deliveryType: "home" | "desk";
-  regionId: number;
-  secondaryRegionId: number | null;
+  wilayaId: number;
+  dairaRegionId: number;
   commune: string;
   addressLine: string;
   fullName: string;
@@ -37,8 +37,8 @@ export function checkoutRequestIdentity(input: CheckoutIdentityInput): string {
   return JSON.stringify({
     items,
     deliveryType: input.deliveryType,
-    regionId: input.regionId,
-    secondaryRegionId: input.secondaryRegionId,
+    wilayaId: input.wilayaId,
+    dairaRegionId: input.dairaRegionId,
     commune: input.commune.trim(),
     addressLine: input.addressLine.trim(),
     fullName: input.fullName.trim(),

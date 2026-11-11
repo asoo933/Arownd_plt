@@ -3,59 +3,39 @@ import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
 import { checkoutRequestIdentity, MAX_CHECKOUT_ITEMS, normalizeCheckoutItems } from "@/lib/checkout-state";
+import { fetchMyAccountCountryCode, fetchMyAccountRegions, type CountryRegion } from "@/lib/country-regions";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
-
-const WilayaSchema = z.object({ id: z.number(), name_ar: z.string(), name_fr: z.string() });
-export type Wilaya = z.infer<typeof WilayaSchema>;
-
-const DairaSchema = z.object({ id: z.number(), code: z.string(), name_ar: z.string(), name_fr: z.string().nullable() });
-export type Daira = z.infer<typeof DairaSchema>;
+export type { CountryRegion as CheckoutRegion } from "@/lib/country-regions";
 
 const ProfileSchema = z.object({
+  country_code: z.string().length(2),
   full_name: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
-  wilaya_id: z.number().nullable().optional(),
-  daira_region_id: z.number().nullable().optional(),
+  region_id: z.number().int().positive().nullable().optional(),
+  secondary_region_id: z.number().int().positive().nullable().optional(),
   commune: z.string().nullable().optional()
 });
 
 export type CheckoutProfile = z.infer<typeof ProfileSchema>;
 export type CheckoutDeliveryType = "home" | "desk";
 
-export async function fetchCheckoutWilayas(): Promise<Wilaya[]> {
-  const { data, error } = await getSupabaseClient()
-    .from("wilayas")
-    .select("id, name_ar, name_fr")
-    .order("id");
-  if (error) throw error;
-  return WilayaSchema.array().parse(data as unknown);
+export async function fetchCheckoutRegions(parentRegionId?: number | null) {
+  return fetchMyAccountRegions(parentRegionId);
 }
 
-export async function fetchCheckoutDairas(wilayaId: number): Promise<Daira[]> {
-  const client = getSupabaseClient();
-  const { data: parent, error: parentError } = await client.from("country_regions")
-    .select("id").eq("country_code", "DZ").eq("legacy_wilaya_id", wilayaId)
-    .eq("region_type", "wilaya").eq("is_enabled", true).maybeSingle();
-  if (parentError) throw parentError;
-  if (!parent) return [];
-  const { data, error } = await client.from("country_regions")
-    .select("id, code, name_ar, name_fr").eq("country_code", "DZ")
-    .eq("parent_id", parent.id).eq("region_type", "daira")
-    .eq("is_enabled", true).order("code", { ascending: true });
-  if (error) throw error;
-  return DairaSchema.array().parse(data as unknown);
-}
-
-export async function fetchCheckoutCommunes(wilayaId: number): Promise<string[]> {
+export async function fetchCheckoutCommunes(regionId: number): Promise<string[]> {
+  if (!Number.isInteger(regionId) || regionId <= 0) throw new Error("invalid_region");
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("commune")
-    .eq("wilaya_id", wilayaId)
+    .eq("region_id", regionId)
     .not("commune", "is", null);
   if (error) throw error;
-  return [...new Set(data.map((row) => row.commune).filter((value): value is string => typeof value === "string" && value.trim().length > 0))].sort((a, b) => a.localeCompare(b, "ar"));
+  return [...new Set(data.map((row) => row.commune).filter(
+    (value): value is string => typeof value === "string" && value.trim().length > 0
+  ))].sort((a, b) => a.localeCompare(b, "ar"));
 }
 
 export async function fetchCheckoutProfile(): Promise<CheckoutProfile | null> {
@@ -64,7 +44,7 @@ export async function fetchCheckoutProfile(): Promise<CheckoutProfile | null> {
   if (!authData.user) return null;
   const { data, error } = await getSupabaseClient()
     .from("profiles")
-    .select("full_name, phone, wilaya_id, daira_region_id, commune")
+    .select("country_code, full_name, phone, region_id, secondary_region_id, commune")
     .eq("user_id", authData.user.id)
     .maybeSingle();
   if (error) throw error;
@@ -75,8 +55,8 @@ export type CheckoutInput = {
   userId: string;
   items: CartItem[];
   deliveryType: CheckoutDeliveryType;
-  wilayaId: number;
-  dairaRegionId: number;
+  regionId: number;
+  secondaryRegionId: number | null;
   commune: string;
   addressLine: string;
   fullName: string;
@@ -110,8 +90,7 @@ async function getOrCreateIdempotencyKey(userId: string, identity: string): Prom
   const existing = entries[identity];
   if (existing) return existing;
   const idempotencyKey = createUuid();
-  const next = { ...entries, [identity]: idempotencyKey };
-  await AsyncStorage.setItem(storageKey, JSON.stringify(next));
+  await AsyncStorage.setItem(storageKey, JSON.stringify({ ...entries, [identity]: idempotencyKey }));
   return idempotencyKey;
 }
 
@@ -122,8 +101,7 @@ async function removeIdempotencyKey(userId: string, identity: string): Promise<v
   try {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return;
-    const record = parsed as Record<string, unknown>;
-    const entries = Object.fromEntries(Object.entries(record).filter(
+    const entries = Object.fromEntries(Object.entries(parsed as Record<string, unknown>).filter(
       (entry): entry is [string, string] => typeof entry[1] === "string" && entry[0] !== identity
     ));
     if (Object.keys(entries).length === 0) await AsyncStorage.removeItem(storageKey);
@@ -137,30 +115,29 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
   if (!input.userId) throw new Error("not_authenticated");
   if (input.items.length === 0) throw new Error("empty_cart");
   if (input.items.length > MAX_CHECKOUT_ITEMS) throw new Error("too_many_items");
-  if (!Number.isInteger(input.dairaRegionId) || input.dairaRegionId <= 0) throw new Error("invalid_daira");
-  if (input.commune.trim().length < 2 || input.commune.trim().length > 100) {
-    throw new Error("invalid_commune");
+  if (!Number.isInteger(input.regionId) || input.regionId <= 0) throw new Error("invalid_region");
+  if (input.secondaryRegionId !== null && (!Number.isInteger(input.secondaryRegionId) || input.secondaryRegionId <= 0)) {
+    throw new Error("invalid_secondary_region");
   }
-  if (input.addressLine.trim().length === 0 || input.addressLine.trim().length > 300) {
-    throw new Error("invalid_address");
-  }
-  if (input.fullName.trim().length < 2 || input.fullName.trim().length > 120) {
-    throw new Error("invalid_full_name");
-  }
-  if (input.phone.trim().length < 8 || input.phone.trim().length > 30) {
-    throw new Error("invalid_phone");
-  }
+  if (input.commune.trim().length < 2 || input.commune.trim().length > 100) throw new Error("invalid_commune");
+  if (input.addressLine.trim().length === 0 || input.addressLine.trim().length > 300) throw new Error("invalid_address");
+  if (input.fullName.trim().length < 2 || input.fullName.trim().length > 120) throw new Error("invalid_full_name");
+  if (!/^\+[1-9]\d{7,14}$/.test(input.phone.trim())) throw new Error("invalid_phone");
+
+  // Ensure the location belongs to the immutable account country, never the browsing market.
+  await fetchMyAccountCountryCode();
+
   const identity = checkoutRequestIdentity(input);
   const idempotencyKey = await getOrCreateIdempotencyKey(input.userId, identity);
-  const { data, error } = await getSupabaseClient().rpc("create_order_with_delivery", {
+  const { data, error } = await getSupabaseClient().rpc("create_order_with_region", {
     _items: normalizeCheckoutItems(input.items).map((item) => ({
       offer_id: item.offerId,
       quantity: item.quantity,
       options: item.options
     })),
     _delivery_type: input.deliveryType,
-    _wilaya_id: input.wilayaId,
-    _daira_region_id: input.dairaRegionId,
+    _region_id: input.regionId,
+    _secondary_region_id: input.secondaryRegionId,
     _commune: input.commune.trim(),
     _address_line: input.addressLine.trim(),
     _full_name: input.fullName.trim(),
