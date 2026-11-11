@@ -325,7 +325,7 @@ export default function CheckoutScreen() {
       </View>
 
       <UiText style={styles.fieldLabel}>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
-      <PressableSurface accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"} onPress={() => { setFormEdited(true); setSelectedAddressId(null); setPicker("region"); }} disabled={regionOptions.isPending || regionOptions.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
+      <PressableSurface accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"} onPress={() => { setFormEdited(true); setSelectedAddressId(null); setPicker("region"); }} disabled={regionOptions.isPending || regionOptions.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
         <UiText style={[styles.selectText, !selectedRegion && styles.placeholder]}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.isError ? translate("checkoutWilayaError") : (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "")}</UiText>
         {regionOptions.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
