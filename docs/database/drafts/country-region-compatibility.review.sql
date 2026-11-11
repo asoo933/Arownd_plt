@@ -2448,3 +2448,153 @@ $function$;
 -- into a migration. Do not widen execute privileges as part of this change.
 
 ===============================================================================
+
+
+/*
+===============================================================================
+35. REPLACE THE DZ-ONLY DAIRA TRIGGER WITH A GENERIC TWO-LEVEL VALIDATOR
+===============================================================================
+
+This replaces the existing enforce_daira_region_selection() body while keeping
+the existing trigger names/events. Prerequisites from section 33:
+- country_region_levels exists and contains a contiguous level configuration
+  for each country.
+- secondary_region_id and country-scoped FKs exist on profiles, stores,
+  user_addresses and orders.
+- stores/user_addresses/orders.wilaya_id are nullable.
+- Existing DZ secondary selections have been backfilled from daira_region_id.
+
+The function intentionally keeps legacy wilaya_id and daira_region_id as
+compatibility mirrors for DZ. Generic region_id/secondary_region_id are the
+authoritative values for every country. Stores do not have daira_region_id,
+so only their wilaya_id mirror is maintained.
+
+CREATE OR REPLACE FUNCTION public.enforce_daira_region_selection()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $function$
+DECLARE
+  level_one public.country_region_levels;
+  level_two public.country_region_levels;
+  primary_region public.country_regions;
+  secondary_region public.country_regions;
+  country_is_enabled boolean;
+BEGIN
+  SELECT c.is_enabled
+  INTO country_is_enabled
+  FROM public.countries c
+  WHERE c.code = NEW.country_code;
+
+  IF country_is_enabled IS DISTINCT FROM true THEN
+    RAISE EXCEPTION 'country_not_available';
+  END IF;
+
+  SELECT * INTO level_one
+  FROM public.country_region_levels
+  WHERE country_code = NEW.country_code AND level = 1;
+
+  IF NOT FOUND THEN RAISE EXCEPTION 'country_region_levels_not_configured'; END IF;
+
+  SELECT * INTO level_two
+  FROM public.country_region_levels
+  WHERE country_code = NEW.country_code AND level = 2;
+
+  IF NEW.region_id IS NULL THEN
+    -- Profiles may exist before the user has configured a delivery location.
+    IF TG_TABLE_NAME = 'profiles'
+       AND NEW.wilaya_id IS NULL
+       AND NEW.secondary_region_id IS NULL THEN
+      IF TG_TABLE_NAME <> 'stores' THEN NEW.daira_region_id := NULL; END IF;
+      RETURN NEW;
+    END IF;
+    RAISE EXCEPTION 'primary_region_required';
+  END IF;
+
+  SELECT * INTO primary_region
+  FROM public.country_regions r
+  WHERE r.id = NEW.region_id
+    AND r.country_code = NEW.country_code
+    AND r.is_enabled
+    AND r.parent_id IS NULL
+    AND r.region_type = ANY(level_one.region_types);
+
+  IF NOT FOUND THEN RAISE EXCEPTION 'invalid_primary_region'; END IF;
+
+  IF NEW.secondary_region_id IS NOT NULL THEN
+    IF level_two.country_code IS NULL THEN
+      RAISE EXCEPTION 'secondary_region_not_supported';
+    END IF;
+
+    SELECT * INTO secondary_region
+    FROM public.country_regions r
+    WHERE r.id = NEW.secondary_region_id
+      AND r.country_code = NEW.country_code
+      AND r.parent_id = primary_region.id
+      AND r.is_enabled
+      AND r.region_type = ANY(level_two.region_types);
+
+    IF NOT FOUND THEN RAISE EXCEPTION 'invalid_secondary_region'; END IF;
+  ELSIF level_two.country_code IS NOT NULL AND level_two.is_required THEN
+    RAISE EXCEPTION 'secondary_region_required';
+  END IF;
+
+  -- Preserve the legacy integer wilaya link only when this primary region
+  -- explicitly maps to a legacy wilaya (currently Algeria).
+  NEW.wilaya_id := primary_region.legacy_wilaya_id;
+
+  IF TG_TABLE_NAME <> 'stores' THEN
+    IF NEW.secondary_region_id IS NOT NULL
+       AND secondary_region.region_type = 'daira' THEN
+      NEW.daira_region_id := NEW.secondary_region_id;
+    ELSE
+      NEW.daira_region_id := NULL;
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$function$;
+
+-- Existing trigger definitions remain attached to the replaced function.
+-- Confirm trigger coverage after applying the generated migration:
+-- profiles_daira_region_guard
+-- user_addresses_daira_region_guard
+-- orders_daira_region_guard
+-- Add stores_region_guard for INSERT or UPDATE OF
+-- country_code, region_id, secondary_region_id, wilaya_id.
+
+===============================================================================
+36. GENERIC SAVED-ADDRESS PHONE FORMAT
+===============================================================================
+
+The live user_addresses_phone_check only accepts Algerian national/international
+numbers. The mobile address editor now normalizes numbers to E.164 using the
+account country's calling_code. Backfill existing DZ addresses first, then
+replace the constraint. This does not validate the national numbering plan;
+the generic client normalizer only guarantees E.164 shape and country calling
+prefix. A country-specific numbering-plan validator remains a separate future
+data requirement and must not be guessed.
+
+UPDATE public.user_addresses
+SET phone = CASE
+  WHEN phone ~ '^0[567][0-9]{8}$' THEN '+213' || substr(phone, 2)
+  WHEN phone ~ '^00213[567][0-9]{8}$' THEN '+' || substr(phone, 3)
+  WHEN phone ~ '^\\+213[567][0-9]{8}$' THEN phone
+  ELSE phone
+END;
+
+ALTER TABLE public.user_addresses
+  DROP CONSTRAINT user_addresses_phone_check;
+
+ALTER TABLE public.user_addresses
+  ADD CONSTRAINT user_addresses_phone_check
+  CHECK (phone ~ '^\\+[1-9][0-9]{7,14}$');
+
+-- The generic region validator above must additionally verify that phone
+-- starts with public.countries.calling_code for user_addresses and orders.
+-- Keep historical orders unchanged; the new checkout RPC validates E.164 and
+-- calling-code prefix before insert.
+
+===============================================================================
