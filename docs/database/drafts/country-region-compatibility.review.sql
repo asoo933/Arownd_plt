@@ -1556,3 +1556,56 @@ C. Merchant analytics caution
 
 This section is source documentation only; no app files were modified.
 */
+
+
+/*
+===============================================================================
+25. PHASE A — QUOTE CURRENCY AND MERCHANT ANALYTICS RPC REVIEW
+READ-ONLY LIVE FUNCTION / VIEW REVIEW — 2026-11-11
+===============================================================================
+
+A. Public personal profile view
+- public.public_personal_profiles is a view over private.public_personal_profiles.
+- It currently exposes user_id, full_name, avatar_url, wilaya_id and commune.
+- The generic location design must update this view only if product behavior
+  requires a generic region label; retain the existing privacy-gated backing
+  table and avoid exposing private account-country data unintentionally.
+
+B. Merchant shipping quote notification
+- merchant_submit_order_quote(uuid,integer) is SECURITY DEFINER,
+  search_path=public, authenticated EXECUTE only (anon denied).
+- It locks parent order and merchant order, validates merchant ownership,
+  parent/order status, amount range and free desk pickup, updates quote state,
+  invokes refresh_parent_order_totals(), and inserts a customer notification.
+- Its notification body hardcodes the DZD suffix "دج" three times. This is a
+  confirmed multi-currency defect if non-DZ accounts are enabled.
+- Numeric JSON payload fields subtotal, shipping_fee and total are integers;
+  preserve their numeric types and keys. Only localized body presentation
+  should change to derive currency metadata from the parent order's
+  currency_code/country_code. Keep URL and order identifiers unchanged.
+- This RPC currently uses SECURITY DEFINER search_path=public; the final
+  security review should harden it to search_path='' with schema qualification
+  while preserving its signature, validation and ACL.
+
+C. Merchant analytics RPC
+- get_my_store_analytics(uuid) is SECURITY INVOKER, STABLE, search_path='',
+  authenticated EXECUTE only. It verifies auth.uid() owns the requested store.
+- Revenue/average/daily aggregates are computed only from merchant_orders
+  for the supplied store_id and status='delivered'; delivery fee is excluded
+  because delivered_revenue sums subtotal. Preserve this existing metric
+  meaning unless a separate product requirement authorizes changing it.
+- Since store country is account-country-bound and the owner can have only one
+  store, the intended invariant is a single currency per store. Still verify
+  store.country_code and all linked order.currency_code in migration preflight.
+- The current JSON result does not include currency_code. Merchant analytics
+  UI currently formats values as DZD. A coordinated app/RPC update should
+  return the store currency metadata (or have the app fetch the owned store's
+  country currency) and format every analytics amount consistently.
+- Daily series uses merchant_orders.created_at::date, not a delivery timestamp.
+  This is existing metric behavior and should not be silently changed in this
+  country compatibility task.
+
+This review confirms that quote notification currency and merchant analytics
+currency presentation are app/database integration requirements, not merely
+region-column changes. No live objects were modified.
+*/
