@@ -375,5 +375,44 @@ Migration ledger:
   Supabase migration ledger. No app or database writes were made.
 */
 
+
+
+/*
+===============================================================================
+9. VERIFIED CURRENCY AND PHONE CONTRACT GAPS
+===============================================================================
+
+Currency:
+- public.countries currently exposes currency_code, currency_name_ar and
+  currency_name_en, but no dedicated currency symbol column.
+- mobile/lib/catalog.ts already has formatMarketPrice(amount, currencyCode)
+  for DZD, MAD, EGP, SAR and AED, alongside the legacy formatDZD().
+- Multiple cart, checkout, order-history, customer-order-detail and merchant
+  order/analytics screens still call formatDZD(). Historical order displays
+  must instead use each order's stored currency_code; do not use the currently
+  browsed market currency to format an old order.
+- Storefront/catalog price rendering should use the selected browsing market's
+  currency, while checkout and order records must use account country and the
+  currency_code persisted on the order.
+- Quote notification formatting can use currency_code plus locale-aware
+  Intl formatting in the function/client contract. Do not assume a symbol
+  column exists in countries.
+
+Phone:
+- countries currently stores calling_code for all five supported countries.
+- The live user_addresses.phone CHECK is explicitly Algerian:
+  0[567] + 8 digits, +213[567] + 8 digits, or 00213[567] + 8 digits.
+- The mobile address and delivery-profile Zod schemas also hard-code Algerian
+  phone patterns. Merchant store settings have a broader syntax-only pattern,
+  not country-aware validation.
+- There are no matching phone CHECK constraints on profiles, stores or orders
+  in the inspected current schema; do not claim a DB constraint exists there.
+- A country-aware phone contract must be designed once and reused by address,
+  delivery profile, merchant store and checkout. At minimum derive country
+  calling code from the immutable account country, normalize consistently,
+  and validate on the server. Avoid inventing country-specific national
+  number regexes without authoritative numbering rules and test fixtures.
+*/
+
 END OF REVIEW DRAFT.
 */
