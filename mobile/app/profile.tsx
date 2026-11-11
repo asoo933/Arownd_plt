@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -29,6 +30,7 @@ export default function ProfileScreen() {
   useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
+  const [avatarPickerError, setAvatarPickerError] = useState(false);
   const uploadAvatar = useMutation({
     mutationFn: uploadMyProfileAvatar,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-delivery-profile"] })
@@ -38,15 +40,23 @@ export default function ProfileScreen() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-delivery-profile"] })
   });
   const chooseAvatar = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return;
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.85
-    });
-    if (!result.canceled && result.assets[0]) uploadAvatar.mutate(result.assets[0]);
+    setAvatarPickerError(false);
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setAvatarPickerError(true);
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85
+      });
+      if (!result.canceled && result.assets[0]) uploadAvatar.mutate(result.assets[0]);
+    } catch {
+      setAvatarPickerError(true);
+    }
   };
   const user = useQuery({
     queryKey: ["current-user"],
@@ -158,7 +168,7 @@ export default function ProfileScreen() {
             <IdentityRow
               name={displayName}
               {...(user.data.email ? { subtitle: user.data.email } : {})}
-              imageUri={profile.data?.avatar_url ?? undefined}
+              {...(profile.data?.avatar_url ? { imageUri: profile.data.avatar_url } : {})}
               avatarSize={64}
               style={styles.identityRow}
             />
@@ -179,7 +189,7 @@ export default function ProfileScreen() {
                 fullWidth
               />
             ) : null}
-            {uploadAvatar.isError || removeAvatar.isError ? (
+            {avatarPickerError || uploadAvatar.isError || removeAvatar.isError ? (
               <Caption>{translate("profileAvatarError")}</Caption>
             ) : null}
             {profile.data?.phone ? (
