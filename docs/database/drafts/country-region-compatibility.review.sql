@@ -1776,3 +1776,223 @@ country/region/currency contract:
 
 No app or database behavior was modified in this review pass.
 */
+
+
+/*
+===============================================================================
+29. PHASE A — LIVE RPC/TRIGGER/CONSTRAINT CONTRACT FINDINGS
+READ-ONLY SUPABASE CATALOG REVIEW — 2026-11-11
+===============================================================================
+
+A. Store creation
+- Current public.create_my_store(text,text,text,text,integer,text,text,
+  double precision,double precision,jsonb,text,text[]) is SECURITY DEFINER,
+  search_path empty, authenticated EXECUTE.
+- It locks the caller's profile, derives account_type/country_code, validates
+  active parent category and child categories, rejects a second owned store,
+  promotes account_type to merchant, inserts the merchant role, and creates
+  the store. Preserve every one of these behaviors.
+- Its only location input is _wilaya_id. It resolves country_regions through
+  legacy_wilaya_id + region_type='wilaya'; this is DZ-specific.
+- The stores table still has NOT NULL wilaya_id and FK to wilayas. Generic
+  store creation therefore requires a nullable legacy wilaya_id, while
+  retaining it populated from legacy_wilaya_id for DZ during compatibility.
+
+B. Checkout: confirmed fee and overload defect
+- public.create_order(...) reads public.wilayas and sets shipping_fee from
+  home_price/desk_price. It is SECURITY DEFINER with empty search_path and
+  is not executable by authenticated directly.
+- The authenticated create_order_with_delivery overload that accepts
+  _daira_region_id calls this legacy create_order, then attaches the daira.
+  It has idempotency lock/hash and authenticated EXECUTE.
+- Therefore the current callable checkout path still derives delivery cost
+  from wilayas, contradicting the agreed merchant-quoted delivery policy.
+- The generic checkout RPC must NOT call create_order(...). It must create
+  the parent order with shipping_fee=0 and total initially/subsequently equal
+  to product subtotal until merchant quotes are received.
+- Keep COD-only and receipt_url=NULL checks, 1..30 items, per-item quantity
+  bounds, row locks on store_offers, store-country validation, price/name
+  snapshots, stock decrement and availability synchronization.
+- Keep checkout_idempotency unique key (user_id,idempotency_key), transaction
+  advisory lock, request-hash mismatch rejection and existing-order replay.
+  The generic request hash must include primary and secondary region IDs,
+  delivery type, all contact/address values, payment type, receipt and items.
+- Avoid adding an overloaded function with ambiguous PostgREST resolution.
+  Use a distinct RPC name and grant EXECUTE only to authenticated/service_role
+  as appropriate; explicitly revoke PUBLIC and anon.
+
+C. Order item and merchant-order lifecycle
+- BEFORE INSERT order_items_sync_merchant_order calls
+  sync_merchant_order_from_item(). It creates/updates one merchant_orders row
+  per (order_id,store_id), and assigns NEW.merchant_order_id.
+- AFTER INSERT OR UPDATE OF status on merchant_orders invokes
+  notify_merchant_order_activity(). The INSERT path notifies the store owner;
+  quoted status deliberately skips the generic status message because the
+  quote RPC sends the richer notification.
+- merchant_submit_order_quote(uuid,integer) locks parent and child rows,
+  checks store ownership, pending state, fee bounds 0..1,000,000 and requires
+  desk pickup fee=0. It updates quoted state and calls
+  refresh_parent_order_totals(). Preserve these guards and transition.
+- customer_respond_to_merchant_order(uuid,boolean) locks parent/child, checks
+  customer ownership and quoted state, confirms or cancels; rejection restores
+  reserved offer stock, refreshes parent totals and notifies the merchant.
+  Preserve this exact customer response contract; do not create a duplicate.
+- refresh_parent_order_totals() aggregates non-cancelled merchant subtotals
+  and quoted shipping fees. Its status precedence is all-cancelled, all
+  delivered/cancelled, any shipped, any confirmed/delivered, else pending.
+  Preserve and test mixed multi-store states.
+- Existing quote notification hardcodes the Arabic suffix "دج" in its body.
+  The replacement must obtain currency_name_ar/currency_code from the parent
+  order's country metadata; keep numeric data JSON values numeric and retain
+  identifiers and deep-link URL.
+
+D. Region triggers and legacy constraints
+- profiles, user_addresses and orders currently attach
+  enforce_daira_region_selection() to country_code/wilaya_id/region_id/
+  daira_region_id. It hardcodes wilaya+daira hierarchy.
+- stores does not have this trigger; create_my_store itself performs the
+  legacy region resolution.
+- profiles may have no location; addresses and orders currently require
+  daira. New validator must be table-aware:
+    * profile: no location allowed until user supplies it;
+    * store: primary region required; country-specific secondary rule;
+    * address: primary region required; country-specific secondary rule;
+    * order: primary region required; country-specific secondary rule.
+- Existing stores.wilaya_id, user_addresses.wilaya_id and orders.wilaya_id
+  are NOT NULL and reference wilayas(id). These constraints block non-DZ
+  rows and must be relaxed while retaining the FK for DZ legacy values.
+- Generic region_id already has country-scoped composite FKs in these tables.
+  daira_region_id also has country-scoped FKs, but the column name is
+  DZ-specific; a generic secondary_region_id is needed if all countries'
+  second-level regions are to be stored.
+- The address phone CHECK accepts Algeria formats only:
+  0[567]XXXXXXXX, +213[567]XXXXXXXX, or 00213[567]XXXXXXXX.
+  It must not be broadened with guessed country regexes.
+- Orders enforce payment_method='cod' and delivery_type in home/desk;
+  merchant_orders enforce known status values and non-negative subtotal/fee.
+  Preserve all existing state and financial checks.
+
+E. Function permissions confirmed
+- authenticated can execute create_my_store, the current daira checkout overload,
+  merchant_submit_order_quote and customer_respond_to_merchant_order.
+- authenticated cannot execute create_order directly, legacy checkout overload
+  without daira, refresh_parent_order_totals or sync_merchant_order_from_item.
+- anon cannot execute the public checkout/store/quote/customer-response RPCs.
+  Preserve least privilege; internal aggregate/trigger functions must not
+  become client-callable.
+
+===============================================================================
+30. PHASE A — PROPOSED GENERIC DATABASE/API CONTRACTS (NOT SQL)
+===============================================================================
+
+A. One authoritative region validator
+- Introduce a private, schema-qualified validator used by triggers and RPCs.
+  Inputs: country_code, primary_region_id, secondary_region_id, context/table.
+  It verifies country enabled for operations that create new market data,
+  primary region belongs to country, is enabled, parent_id IS NULL, and has
+  the expected region_type. A supplied secondary region must belong to the
+  same country, be enabled, have parent_id=primary.id and an allowed child
+  type. It rejects a secondary region when the country has no secondary level.
+- Country-level rules for the currently modelled catalog:
+    DZ: primary wilaya; secondary daira required.
+    MA: primary region; secondary province/prefecture optional.
+    EG: primary governorate; no secondary.
+    SA: primary region; secondary governorate required.
+    AE: primary emirate; secondary municipality optional.
+- These rules must be centralized server-side (not trusted from the app's
+  TypeScript config). Do not add a new region-config table unless a later
+  audit proves the country rules cannot be safely maintained in one private
+  database function.
+- Profile is the sole context allowed to omit both region IDs. Store/address/
+  order contexts require primary region. Required secondary levels are
+  enforced for those contexts.
+
+B. Generic columns and compatibility
+- Keep country_code + region_id as the authoritative primary location.
+- Add secondary_region_id with same-country composite FK to country_regions.
+  Keep daira_region_id as a DZ compatibility mirror during rollout; populate
+  it only when secondary region_type='daira'. Do not use it as the generic
+  contract.
+- Make legacy wilaya_id nullable on stores, user_addresses and orders; keep
+  its FK. For DZ, populate it from the selected primary region's
+  legacy_wilaya_id. For other countries it remains NULL.
+- Keep region_id and secondary_region_id as the generic source for all new
+  writes. Update all app readers before any non-DZ country activation.
+- Persist primary/secondary Arabic display-name snapshots on orders at
+  creation time so historical order location labels do not silently change
+  when catalog labels are edited. Existing historical rows retain their
+  current values and use legacy fallback display.
+
+C. Distinct RPC contracts
+- New store RPC: public.create_my_store_for_account(..., _region_id bigint,
+  _secondary_region_id bigint, ...). It derives owner and country from auth.uid
+  and profiles; it does not accept a client-supplied account country.
+  Preserve profile lock, merchant promotion/role insertion, category checks,
+  one-store rule and store creation notification. It fills legacy wilaya_id
+  only for DZ. Keep old create_my_store signature during app rollout.
+- New checkout RPC: public.create_checkout_order_for_account(...,
+  _region_id bigint, _secondary_region_id bigint, _idempotency_key uuid).
+  It derives user/country/currency from authenticated profile; it does not
+  accept a client-supplied account country or currency. It creates order and
+  order items transactionally with shipping_fee=0, derives currency_code
+  from countries, snapshots region labels, and fills legacy wilaya_id/
+  daira_region_id only for DZ. It preserves the full idempotency contract and
+  every COD, contact, offer ownership/country, stock and quantity guard.
+  It does not call the legacy create_order function.
+- Existing merchant_submit_order_quote and customer_respond_to_merchant_order
+  signatures remain unchanged. Only notification currency formatting and
+  function hardening are in scope; numeric payload contract stays unchanged.
+- refresh_parent_order_totals and sync_merchant_order_from_item remain internal
+  trigger/RPC implementation details with existing grants and side effects.
+
+D. Phone contract — explicit unresolved release gate
+- Store phone values in a single canonical international representation
+  (E.164) only after country calling-code and national-number validation rules
+  are verified against authoritative numbering metadata for all five countries.
+- Do not treat a generic digit-count regex as proof that a phone number is
+  valid. Until authoritative per-country validation is sourced and tested,
+  keep current DZ-only country activation and do not relax the address CHECK
+  into a permissive international regex. The migration must either include
+  verified metadata-backed validation or leave the phone constraint unchanged
+  and block non-DZ activation.
+
+E. Merchant analytics and currency
+- get_my_store_analytics must remain scoped to the authenticated store owner
+  and preserve the existing delivered-revenue definition (sum of delivered
+  merchant_order subtotals, excluding shipping) and daily-series semantics.
+- The UI must display the store's country currency. If the RPC result is
+  extended with currency_code, inspect/recreate its return type carefully;
+  PostgreSQL cannot change a function's table return type using CREATE OR
+  REPLACE alone. Otherwise load currency_code from the owned store without
+  changing metric aggregation.
+- Never aggregate monetary values across stores/countries into one unlabeled
+  currency total.
+
+===============================================================================
+31. PHASE A — IMPLEMENTATION SAFETY AND RELEASE GATES
+===============================================================================
+
+1. Apply schema changes only after a complete reviewed migration is prepared.
+2. Backfill generic region IDs from existing wilaya/daira relationships and
+   verify zero missing/mismatched mappings before making generic columns
+   authoritative. Preserve historical rows.
+3. Replace region triggers atomically with the shared validator; preserve all
+   other trigger attachments and timing, including status, notifications,
+   profile mirror and stock/availability behavior.
+4. Deploy new RPCs with explicit grants/revokes. Keep old RPC contracts during
+   mobile rollout; remove legacy contracts only after no supported client
+   calls them and compatibility is deliberately retired.
+5. Migrate app call sites together: profile, addresses, delivery profile,
+   merchant settings/create, market store filtering, checkout, cart, customer
+   orders, merchant orders, quote UI, notifications and analytics.
+6. Currency source rules:
+   browsing catalog = browsing country's currency;
+   cart/checkout = immutable account country's currency;
+   historical orders = orders.currency_code;
+   merchant analytics = owned store country currency.
+7. Keep all non-DZ countries disabled until database + app + phone + region
+   catalog + product catalog + quote lifecycle + currency + order history
+   tests pass end-to-end for that country.
+8. No live DDL, data update, country activation, app-code edit or test run was
+   performed by this contract-design pass.
+*/
