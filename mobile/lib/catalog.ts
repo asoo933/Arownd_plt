@@ -120,14 +120,15 @@ export async function fetchFeaturedStores(): Promise<FeaturedStore[]> {
 }
 
 
-export async function fetchVerifiedStoresByWilaya(wilayaId: number): Promise<FeaturedStore[]> {
+export async function fetchVerifiedStoresByRegion(countryCode: string, regionId: number): Promise<FeaturedStore[]> {
+  if (!/^[A-Z]{2}$/.test(countryCode) || !Number.isInteger(regionId) || regionId <= 0) throw new Error("invalid_store_region");
   const { data, error } = await getSupabaseClient()
     .from("stores")
     .select("id, name, description, logo_url, commune, rating, is_verified")
-    .eq("wilaya_id", wilayaId)
+    .eq("country_code", countryCode)
+    .eq("region_id", regionId)
     .eq("is_verified", true)
     .order("rating", { ascending: false });
-
   if (error) throw error;
   return FeaturedStoreSchema.array().parse(data as unknown);
 }

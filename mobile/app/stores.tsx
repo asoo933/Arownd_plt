@@ -5,40 +5,34 @@ import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState, StoreTile } from "@/components/customer-ui";
 import { AppHeader, Icon, IconButton, PressableSurface, Text as UiText } from "@/components/ui";
-import { fetchStoreDetails, fetchStoreOffers, fetchVerifiedStoresByWilaya } from "@/lib/catalog";
-import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
+import { fetchStoreDetails, fetchStoreOffers, fetchVerifiedStoresByRegion } from "@/lib/catalog";
+import { fetchCountryRegions, getRegionDisplayName } from "@/lib/country-regions";
+import { fetchMyBrowsingCountryCode } from "@/lib/country-service";
 import { translate, useLanguage } from "@/lib/i18n";
-import { getLocalizedWilayaLabel } from "@/lib/locale-data";
+
 import { designTokens, useAppTheme } from "@/lib/theme";
 
 export default function StoresScreen() {
   const { language } = useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
-  const [selectedWilayaId, setSelectedWilayaId] = useState<number | null>(null);
-  const wilayas = useQuery({
-    queryKey: ["customer-wilayas"],
-    queryFn: fetchCheckoutWilayas,
-    staleTime: 30 * 60_000
-  });
+  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
+  const browsingCountry = useQuery({ queryKey: ["browsing-country"], queryFn: fetchMyBrowsingCountryCode });
+  const regions = useQuery({ queryKey: ["customer-market-regions", browsingCountry.data], queryFn: () => fetchCountryRegions(browsingCountry.data as string), enabled: Boolean(browsingCountry.data), staleTime: 30 * 60_000 });
   const stores = useQuery({
-    queryKey: ["customer-stores-by-wilaya", selectedWilayaId],
-    queryFn: () => fetchVerifiedStoresByWilaya(selectedWilayaId as number),
-    enabled: selectedWilayaId !== null,
+    queryKey: ["customer-stores-by-region", browsingCountry.data, selectedRegionId],
+    queryFn: () => fetchVerifiedStoresByRegion(browsingCountry.data as string, selectedRegionId as number),
+    enabled: Boolean(browsingCountry.data) && selectedRegionId !== null,
     staleTime: 60_000
   });
 
-  const selectedWilaya = wilayas.data?.find((wilaya) => wilaya.id === selectedWilayaId) ?? null;
-  const selectedWilayaLabel = selectedWilaya
-    ? getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr)
-    : null;
-  const title = selectedWilayaLabel
-    ? `${translate("storesInWilaya")} ${selectedWilayaLabel}`
-    : translate("storesTitle");
+  const selectedRegion = regions.data?.regions.find((region) => region.id === selectedRegionId) ?? null;
+  const selectedRegionLabel = selectedRegion ? getRegionDisplayName(selectedRegion, language) : null;
+  const title = selectedRegionLabel ? `${translate("storesInWilaya")} ${selectedRegionLabel}` : translate("storesTitle");
 
   const handleBack = () => {
-    if (selectedWilayaId !== null) {
-      setSelectedWilayaId(null);
+    if (selectedRegionId !== null) {
+      setSelectedRegionId(null);
       return;
     }
     if (router.canGoBack()) router.back();
@@ -47,35 +41,35 @@ export default function StoresScreen() {
 
   return (
     <CustomerScreen
-      refreshing={selectedWilayaId === null ? wilayas.isFetching : stores.isFetching}
-      onRefresh={() => { void (selectedWilayaId === null ? wilayas.refetch() : stores.refetch()); }}
+      refreshing={selectedRegionId === null ? regions.isFetching || browsingCountry.isFetching : stores.isFetching}
+      onRefresh={() => { void (selectedRegionId === null ? regions.refetch() : stores.refetch()); }}
     >
       <AppHeader
         title={title}
         leading={<IconButton accessibilityLabel={translate("back")} onPress={handleBack} icon={<Icon name="chevron-right" color={theme.colors.foreground} size={20} />} /> }
       />
-      {selectedWilayaId === null ? (
+      {selectedRegionId === null ? (
         <>
           <UiText tone="muted" style={styles.subtitle}>{translate("storesChooseWilayaHint")}</UiText>
-          {wilayas.isPending ? <LoadingState label={translate("stateLoading")} /> : wilayas.isError ? (
-            <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={wilayas.isFetching} onRetry={() => void wilayas.refetch()} />
-          ) : wilayas.data.length === 0 ? (
+          {regions.isPending || browsingCountry.isPending ? <LoadingState label={translate("stateLoading")} /> : regions.isError || browsingCountry.isError ? (
+            <ErrorState title={translate("catalogLoadError")} retryLabel={translate("retry")} busy={regions.isFetching || browsingCountry.isFetching} onRetry={() => { void regions.refetch(); void browsingCountry.refetch(); }} />
+          ) : (regions.data?.regions.length ?? 0) === 0 ? (
             <EmptyState icon="map-pin" title={translate("storesNoWilayas")} />
           ) : (
             <View style={styles.list}>
-              {wilayas.data.map((wilaya: Wilaya) => (
+              {(regions.data?.regions ?? []).map((region) => (
                 <PressableSurface
-                  key={wilaya.id}
+                  key={region.id}
                   accessibilityRole="button"
-                  accessibilityLabel={getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}
-                  onPress={() => setSelectedWilayaId(wilaya.id)}
+                  accessibilityLabel={getRegionDisplayName(region, language)}
+                  onPress={() => setSelectedRegionId(region.id)}
                   style={[styles.wilayaRow, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderColor: theme.colors.border, borderWidth: theme.mode === "light" ? 0 : 1 }]}
                 >
                   <View style={styles.wilayaNumber}>
-                    <UiText weight="700" style={{ color: theme.colors.accentMuted }}>{String(wilaya.id).padStart(2, "0")}</UiText>
+                    <UiText weight="700" style={{ color: theme.colors.accentMuted }}>{region.code}</UiText>
                   </View>
                   <UiText weight="600" style={styles.wilayaName}>
-                    {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}
+                    {getRegionDisplayName(region, language)}
                   </UiText>
                   <Icon name="chevron-left" size={18} color={theme.colors.muted} accessibilityHidden />
                 </PressableSurface>
