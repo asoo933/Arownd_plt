@@ -1,0 +1,74 @@
+name: Bootstrap Expo Updates dependency
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/bootstrap-expo-updates.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arownd-expo-updates-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  install-and-verify:
+    name: Install Expo Updates and verify mobile app
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install current locked dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Install SDK-compatible expo-updates
+        run: npx expo install expo-updates
+
+      - name: Verify generated lockfile
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Vitest
+        run: npm test
+
+      - name: Expo Doctor
+        run: npm run doctor
+
+      - name: Commit package manifest and generated lockfile
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add mobile/package.json mobile/package-lock.json
+          if git diff --cached --quiet; then
+            echo "No dependency or lockfile changes to commit."
+            exit 0
+          fi
+          git commit -m "Add SDK-compatible expo-updates dependency"
+          git push origin HEAD:main
