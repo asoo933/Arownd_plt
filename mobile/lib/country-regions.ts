@@ -77,11 +77,13 @@ export async function fetchMyAccountRegionLevels(): Promise<{
   if (error) throw error;
 
   const levels = CountryRegionLevelSchema.array().parse(data as unknown);
-  if (levels.length === 0 || levels[0].level !== 1) {
+  const firstLevel = levels[0];
+  if (!firstLevel || firstLevel.level !== 1) {
     throw new Error("country_region_levels_not_configured");
   }
   for (let index = 0; index < levels.length; index += 1) {
-    if (levels[index].level !== index + 1) {
+    const currentLevel = levels[index];
+    if (!currentLevel || currentLevel.level !== index + 1) {
       throw new Error("country_region_levels_invalid_sequence");
     }
   }
@@ -91,7 +93,9 @@ export async function fetchMyAccountRegionLevels(): Promise<{
 
 export async function fetchMyAccountRegions(parentRegionId?: number | null): Promise<AccountRegionOptions> {
   const { countryCode, callingCode, levels } = await fetchMyAccountRegionLevels();
-  let selectedLevel = levels[0];
+  const firstLevel = levels[0];
+  if (!firstLevel) throw new Error("country_region_levels_not_configured");
+  let selectedLevel: CountryRegionLevel = firstLevel;
   let parentId: number | null = null;
 
   if (parentRegionId !== undefined && parentRegionId !== null) {
@@ -126,12 +130,15 @@ export async function fetchMyAccountRegions(parentRegionId?: number | null): Pro
         .eq("is_enabled", true)
         .maybeSingle();
       if (grandParentError) throw grandParentError;
-      if (!grandParent || !levels[parentLevelIndex - 1].region_types.includes(grandParent.region_type)) {
+      const previousLevel = levels[parentLevelIndex - 1];
+      if (!grandParent || !previousLevel || !previousLevel.region_types.includes(grandParent.region_type)) {
         throw new Error("invalid_parent_region");
       }
     }
 
-    selectedLevel = levels[parentLevelIndex + 1];
+    const nextLevel = levels[parentLevelIndex + 1];
+    if (!nextLevel) throw new Error("country_region_level_not_found");
+    selectedLevel = nextLevel;
     parentId = parent.id;
   }
 
