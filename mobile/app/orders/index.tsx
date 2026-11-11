@@ -239,7 +239,7 @@ export default function OrdersScreen() {
         </View>
         <View style={styles.cardFooter}>
           <UiText style={styles.openLabel}>{translate("ordersViewDetails")}</UiText>
-          <PriceDisplay value={formatDZD(total)} style={styles.priceDisplay} />
+          <PriceDisplay value={formatMarketPrice(total, row.order.currency_code ?? "DZD")} style={styles.priceDisplay} />
         </View>
       </OrderCard>;
       return isHideableOrderStatus(row.status)

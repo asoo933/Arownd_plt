@@ -243,7 +243,7 @@ export default function MerchantEntryScreen() {
                     {`${order.totalQuantity} ${translate("merchantOrderQuantity")}`}
                   </UiText>
                 </View>
-                <PriceDisplay value={formatDZD(order.subtotal + order.shippingFee)} />
+                <PriceDisplay value={formatMarketPrice(order.subtotal + order.shippingFee, order.currencyCode)} />
                 <UiText style={[styles.textButtonLabel, { color: theme.colors.accentMuted }]}>
                   {translate("merchantOrderDetailTitle")} ←
                 </UiText>
