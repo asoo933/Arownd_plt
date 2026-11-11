@@ -7,7 +7,8 @@ import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/componen
 import { AppHeader, Button, Card, Icon, IconButton, OfferCard, PriceDisplay, ProductImageGallery, ProductQuantitySelector, ProductVariantSelector, RatingStars, StockBadge, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 import { CartButton } from "@/components/cart-button";
 import { FavoriteButton } from "@/components/favorite-button";
-import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatDZD, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
+import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, formatMarketPrice, getOfferVariantOptions, getPrimaryImage } from "@/lib/catalog";
+import { fetchBrowsingCurrencyCode } from "@/lib/country-service";
 import { addToCart, CART_QUERY_KEY } from "@/lib/cart";
 import { emitCartFly } from "@/lib/cart-fly";
 import { fetchApprovedReviews } from "@/lib/reviews";
@@ -27,6 +28,7 @@ export default function ProductDetailsScreen() {
   const imageAnchorRef = useRef<ComponentRef<typeof View>>(null);
   const cartFlyImageRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
+  const browsingCurrency = useQuery({ queryKey: ["browsing-country-currency"], queryFn: fetchBrowsingCurrencyCode, staleTime: 60_000 });
   const addMutation = useMutation({
     mutationFn: addToCart,
     onSuccess: (next) => {
@@ -123,7 +125,7 @@ export default function ProductDetailsScreen() {
       </View>
       <Card contentStyle={styles.infoCard}>
         <UiText weight="700" style={styles.productName}>{productDetails.name}</UiText>
-        {selectedOffer ? <PriceDisplay value={formatDZD(selectedOffer.price)} style={styles.priceDisplay} /> : null}
+        {selectedOffer ? <PriceDisplay value={browsingCurrency.data ? formatMarketPrice(selectedOffer.price, browsingCurrency.data) : "—"} style={styles.priceDisplay} /> : null}
         <View style={styles.ratingRow}>
           <View style={styles.ratingInfo}>
             <RatingStars value={reviewAverage} size={16} showValue />
@@ -163,7 +165,7 @@ export default function ProductDetailsScreen() {
                   tone={available ? offer.stock_quantity <= 3 ? "warning" : "success" : "danger"}
                 />
               </View>
-              <PriceDisplay value={formatDZD(offer.price)} style={styles.offerPriceDisplay} />
+              <PriceDisplay value={browsingCurrency.data ? formatMarketPrice(offer.price, browsingCurrency.data) : "—"} style={styles.offerPriceDisplay} />
             </OfferCard>
           );
         })}
