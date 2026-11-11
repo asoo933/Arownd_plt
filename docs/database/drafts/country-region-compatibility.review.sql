@@ -233,5 +233,64 @@ Release:
 - Apply only through the approved migration workflow, then run verification
   queries and relevant CI.
 
+
+/*
+===============================================================================
+7. ADDITIONAL VERIFIED FUNCTION-BODY FINDINGS (READ-ONLY AUDIT)
+===============================================================================
+
+A. Current daira trigger blocks international records
+- enforce_daira_region_selection() raises daira_required when daira_region_id is
+  NULL, except for a profile with both wilaya_id and daira_region_id NULL, a
+  guarded legacy order insert, and a narrow legacy order update case.
+- user_addresses cannot pass with a NULL daira_region_id.
+- Generic non-DZ profile/address/order rows therefore cannot currently follow
+  a generic primary-region-only model. Redesign this as country-aware region
+  validation, not as a global relaxation.
+- For DZ, preserve daira -> parent wilaya consistency.
+
+B. Existing checkout fee conflicts with merchant quote policy
+- create_order() reads public.wilayas.home_price / desk_price and initializes
+  orders.shipping_fee and total from that tariff.
+- This conflicts with the confirmed policy that each merchant sets delivery
+  cost through the merchant quote flow.
+- Generic checkout must not read public.wilayas pricing. Preserve the pending
+  quote lifecycle and pickup = zero where applicable.
+- Do not rewrite historical order totals.
+
+C. Idempotency overloads
+- Two public.create_order_with_delivery overloads currently exist: one accepts
+  _wilaya_id only; another accepts _wilaya_id and _daira_region_id.
+- The daira overload calls create_order() without daira, then performs a
+  separate UPDATE to attach daira_region_id under a transaction-local setting.
+- Generic checkout should persist validated primary and optional secondary
+  regions atomically and hash all location fields.
+- Inspect PostgREST overload resolution and grants before changing signatures.
+
+D. Quote lifecycle
+- merchant_submit_order_quote() validates merchant ownership, parent/order
+  state, amount range and desk pickup fee = 0, then marks the merchant order
+  quoted and refreshes parent totals.
+- Its customer notification hard-codes "دج" three times.
+- merchant_reject_order() handles merchant rejection before quote, restores
+  reserved stock and refreshes parent totals.
+- The inspected public functions matching quote/accept/reject patterns did
+  not expose a customer quote-acceptance RPC. This is not proof none exists
+  under another name/schema. Search all schemas, policies and app RPC callers
+  before defining/changing the customer response contract.
+- refresh_parent_order_totals() aggregates non-cancelled merchant-order
+  subtotals and shipping fees into the parent and derives parent status.
+  Preserve this behavior and test mixed multi-store states.
+
+E. Trigger country guard caveat
+- enforce_account_country_consistency() returns NEW immediately when auth.uid()
+  is NULL. SECURITY DEFINER RPCs must independently derive and validate
+  account country, ownership and selected region; do not rely on this trigger
+  alone for privileged writes.
+
+These findings came from live function definitions read-only. No database
+objects or rows were changed.
+*/
+
 END OF REVIEW DRAFT.
 */
