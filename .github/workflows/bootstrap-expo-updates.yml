@@ -41,7 +41,7 @@ jobs:
         run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Install SDK-compatible expo-updates
-        run: npx expo install expo-updates
+        run: npm_config_legacy_peer_deps=true npx expo install expo-updates
 
       - name: Verify generated lockfile
         run: npm ci --legacy-peer-deps --no-audit --no-fund
