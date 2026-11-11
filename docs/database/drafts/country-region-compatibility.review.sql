@@ -531,5 +531,74 @@ Schema and data constraints:
   numbering rules.
 */
 
+
+
+/*
+===============================================================================
+11. SAFE IMPLEMENTATION SEQUENCE (PLAN ONLY — NOT EXECUTABLE MIGRATION)
+===============================================================================
+
+Do not deploy a single all-at-once cutover. Use a backward-compatible rollout:
+
+Phase A — additive database compatibility (countries remain disabled):
+1. Keep legacy wilaya_id and daira_region_id columns and foreign keys for
+   existing DZ records and old app builds.
+2. Stage wilaya_id nullable on stores/user_addresses/orders only after checking
+   all current application writes and old-build compatibility. Existing rows
+   remain unchanged. region_id remains the authoritative generic primary key.
+3. Replace the daira-only trigger with a country-aware guard that supports both
+   the legacy DZ write path and the generic primary/secondary region path.
+4. Introduce explicitly named generic RPC entry points for store creation and
+   checkout (avoid PostgreSQL/PostgREST overload ambiguity). Keep existing RPCs
+   as DZ-only compatibility wrappers until old app adoption is understood.
+5. New checkout RPC must derive country/currency from profiles, validate each
+   region and every store country, enforce COD, reserve stock under row locks,
+   preserve idempotency/advisory locks and initialize merchant shipping fees
+   to zero. The client must not choose the account country or currency.
+6. Revoke generic function execution from PUBLIC/anon; grant authenticated
+   only where required. Use SECURITY DEFINER only where existing RLS access
+   requires it, set search_path = '' and schema-qualify all referenced objects.
+   Review existing SECURITY DEFINER quote functions that currently use
+   search_path = public as part of this security pass.
+7. Preserve customer_respond_to_merchant_order and merchant_submit_order_quote
+   lifecycle contracts. Update merchant quote notification text to format the
+   parent's currency_code, without changing numeric payload fields.
+
+Phase B — native app integration:
+1. Integrate country-regions.ts into addresses, delivery profile, checkout,
+   merchant store creation/settings and browsing location selection.
+2. Keep account country for addresses, store creation, cart and checkout.
+   Keep browsing_country_code for catalog visibility and browsing-region filters.
+3. Migrate order read models and UI to generic region labels with legacy DZ
+   fallback. Read historical currency from orders.currency_code.
+4. Migrate all eight verified formatDZD call sites. Merchant analytics must
+   not combine amounts from different currencies.
+5. Replace DZ-only phone schema and database CHECK with a consistent
+   country-aware normalization/validation contract based on countries.calling_code.
+6. Update generated database types only from the actual final schema; do not
+   hand-maintain types that disagree with the database.
+
+Phase C — verification before enabling any additional country:
+- TypeScript, ESLint and focused Vitest suites.
+- Existing DZ regression: profile with no location, address create/edit,
+  merchant create/settings, home and desk checkout, multi-store order,
+  duplicate idempotency retry, quote submit, customer accept/reject,
+  merchant reject, stock restoration and historical order display.
+- Country-specific region validation fixtures: DZ, MA, EG, SA, AE, including
+  MA missing secondary data and AE municipality limitations.
+- Currency checks: market listing, cart, checkout, merchant quote, multi-store
+  totals, historical orders and merchant analytics.
+- RLS and RPC authorization checks: wrong account country, wrong region parent,
+  disabled country/region, foreign store offer, anonymous RPC call, non-owner
+  merchant quote, non-customer quote response, and key reuse with changed
+  region.
+- Run Supabase advisors after the final DDL and verify all function grants.
+- Build and test Android app. Only after all checks pass should an explicit
+  separate decision be made to enable MA/EG/SA/AE.
+
+No live schema change, country enablement, data rewrite, or app code change is
+authorized by this planning section.
+*/
+
 END OF REVIEW DRAFT.
 */
