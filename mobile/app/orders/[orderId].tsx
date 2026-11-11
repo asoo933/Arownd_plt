@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 
 import { CustomerHeading, CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
 import { AppHeader, ConfirmDialog, Icon, IconButton, OrderStatusBadge as UiOrderStatusBadge, PriceDisplay, PressableSurface, Spinner, OrderCardSkeleton, Text as UiText, TrackingTimeline } from "@/components/ui";
-import { formatDZD, formatNumber } from "@/lib/catalog";
+import { formatMarketPrice, formatNumber } from "@/lib/catalog";
 import { cancelMyMerchantOrder, cancelMyOrder, fetchCustomerOrderDetails, getOrderStatusTone, getOrderTrackingSteps, respondToMerchantQuote } from "@/lib/orders";
 import { canCancelLegacyOrder, canCancelMerchantOrder, formatOrderCode } from "@/lib/orders-state";
 import { readCartOptions } from "@/lib/cart-state";
@@ -13,6 +13,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
+import { getRegionDisplayName } from "@/lib/country-regions";
 
 const STEPS = [
   { status: "pending", title: "orderStepPending" as const, hint: "orderStepPendingHint" as const },
@@ -152,6 +153,7 @@ export default function OrderDetailsScreen() {
   const parentCancelled = order.status === "cancelled" || order.status === "rejected";
   const activeStep = getOrderTrackingSteps(order.status);
   const orderCode = formatOrderCode(order.id);
+  const formatOrderMoney = (amount: number) => formatMarketPrice(amount, order.currency_code ?? "DZD");
 
   return <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && query.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void query.refetch(); }); }}>
     <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
@@ -159,7 +161,7 @@ export default function OrderDetailsScreen() {
 
     <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderSummary")}</UiText>
-      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderTotal")}</UiText><PriceDisplay value={formatDZD(order.total)} style={styles.priceDisplay} /></View>
+      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderTotal")}</UiText><PriceDisplay value={formatOrderMoney(order.total)} style={styles.priceDisplay} /></View>
       <UiText style={styles.meta}>{dateLabel(order.created_at, language)}</UiText>
     </View>
 
@@ -184,10 +186,10 @@ export default function OrderDetailsScreen() {
           <UiText style={styles.meta}>{translate("ordersQuantity")}: {formatNumber(item.quantity)}</UiText>
           {Object.entries(readCartOptions(item.options)).length > 0 ? <UiText style={styles.meta}>{Object.entries(readCartOptions(item.options)).map(([key, value]) => (key === "size" ? translate("productSizeOption") : key === "color" ? translate("productColorOption") : key) + ": " + value).join(" · ")}</UiText> : null}
         </View>
-        <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
+        <PriceDisplay value={formatOrderMoney(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} />
       </View>)}
-      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(order.subtotal)}</UiText></View>
-      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(order.shipping_fee)}</UiText></View>
+      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderSubtotal")}</UiText><UiText style={styles.label}>{formatOrderMoney(order.subtotal)}</UiText></View>
+      <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatOrderMoney(order.shipping_fee)}</UiText></View>
     </View> : null}
 
     {merchantOrders.map((merchantOrder) => {
@@ -207,20 +209,20 @@ export default function OrderDetailsScreen() {
               <UiText style={styles.meta}>{translate("ordersQuantity")}: {formatNumber(item.quantity)}</UiText>
               {optionsLabel ? <UiText style={styles.meta}>{optionsLabel}</UiText> : null}
             </View>
-            {!cancelled ? <PriceDisplay value={formatDZD(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} /> : null}
+            {!cancelled ? <PriceDisplay value={formatOrderMoney(item.unit_price * item.quantity)} style={styles.itemPriceDisplay} /> : null}
           </View>;
         })}
         {!cancelled ? <>
-          <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderStoreSubtotal")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.subtotal)}</UiText></View>
-          {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.shipping_fee)}</UiText></View> : null}
-          <View style={styles.totalRow}><UiText style={styles.sectionTitle}>{translate("orderStoreTotal")}</UiText><UiText style={styles.total}>{formatDZD(subTotal)}</UiText></View>
+          <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderStoreSubtotal")}</UiText><UiText style={styles.label}>{formatOrderMoney(merchantOrder.subtotal)}</UiText></View>
+          {merchantOrder.status !== "pending" ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderShipping")}</UiText><UiText style={styles.label}>{formatOrderMoney(merchantOrder.shipping_fee)}</UiText></View> : null}
+          <View style={styles.totalRow}><UiText style={styles.sectionTitle}>{translate("orderStoreTotal")}</UiText><UiText style={styles.total}>{formatOrderMoney(subTotal)}</UiText></View>
         </> : null}
         {(merchantOrder.payment_status === "paid" || (!cancelled && merchantOrder.payment_status === "unpaid")) ? <View style={styles.paymentInfo}>
           <View style={styles.totalRow}>
             <UiText style={styles.label}>{translate("orderPaymentStatus")}</UiText>
             <UiText style={[styles.label, merchantOrder.payment_status === "paid" ? styles.paymentPaid : styles.paymentUnpaid]}>{translate(merchantOrder.payment_status === "paid" ? "orderPaymentPaid" : "orderPaymentUnpaid")}</UiText>
           </View>
-          {merchantOrder.payment_status === "paid" && merchantOrder.paid_amount != null ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderPaidAmount")}</UiText><UiText style={styles.label}>{formatDZD(merchantOrder.paid_amount)}</UiText></View> : null}
+          {merchantOrder.payment_status === "paid" && merchantOrder.paid_amount != null ? <View style={styles.totalRow}><UiText style={styles.label}>{translate("orderPaidAmount")}</UiText><UiText style={styles.label}>{formatOrderMoney(merchantOrder.paid_amount)}</UiText></View> : null}
           {merchantOrder.payment_status === "paid" && merchantOrder.paid_at ? <UiText style={styles.meta}>{translate("orderPaidAt")}: {dateLabel(merchantOrder.paid_at, language)}</UiText> : null}
         </View> : null}
         {canCancelMerchantOrder(merchantOrder.status, merchantOrder.quoted_at) ? <PressableSurface
@@ -267,7 +269,7 @@ export default function OrderDetailsScreen() {
     <View style={[styles.panel, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface }]}>
       <UiText style={styles.sectionTitle}>{translate("orderRecipientTitle")}</UiText>
       <UiText style={[styles.recipient, { color: theme.colors.foreground }]}>{order.full_name ?? ""}</UiText>
-      <UiText style={styles.meta}>{getLocalizedWilayaLabel(order.wilaya_id ?? 0, order.wilaya?.name_ar ?? "", language, order.wilaya?.name_fr)}{order.daira?.name_ar ? " · " + (language === "ar" ? order.daira.name_ar : order.daira.name_fr ?? order.daira.name_ar) : ""} · {order.commune ?? ""}</UiText>
+      <UiText style={styles.meta}>{order.region ? getRegionDisplayName(order.region, language) : getLocalizedWilayaLabel(order.wilaya_id ?? 0, order.wilaya?.name_ar ?? "", language, order.wilaya?.name_fr)}{order.secondary_region ? " · " + getRegionDisplayName(order.secondary_region, language) : order.daira?.name_ar ? " · " + (language === "ar" ? order.daira.name_ar : order.daira.name_fr ?? order.daira.name_ar) : ""} · {order.commune ?? ""}</UiText>
       {order.delivery_type === "home" && order.address_line ? <UiText style={styles.meta}>{order.address_line}</UiText> : null}
       <UiText style={styles.meta}>{order.phone ?? ""}</UiText>
       <UiText style={styles.meta}>{order.delivery_type === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")}</UiText>
