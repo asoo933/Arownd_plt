@@ -1,18 +1,23 @@
 import { describe, expect, it } from "vitest";
 
-import { COUNTRY_REGION_CONFIG, getCountryRegionConfig } from "@/lib/country-regions";
+import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 
-describe("country region configuration", () => {
-  it("maps each supported country to its real administrative hierarchy", () => {
-    expect(COUNTRY_REGION_CONFIG.DZ).toMatchObject({ primaryType: "wilaya", secondaryTypes: ["daira"], secondaryRequired: true });
-    expect(COUNTRY_REGION_CONFIG.MA).toMatchObject({ primaryType: "region", secondaryTypes: ["province", "prefecture"], secondaryRequired: false });
-    expect(COUNTRY_REGION_CONFIG.EG).toMatchObject({ primaryType: "governorate", secondaryTypes: [], secondaryRequired: false });
-    expect(COUNTRY_REGION_CONFIG.SA).toMatchObject({ primaryType: "region", secondaryTypes: ["governorate"], secondaryRequired: true });
-    expect(COUNTRY_REGION_CONFIG.AE).toMatchObject({ primaryType: "emirate", secondaryTypes: ["municipality"], secondaryRequired: false });
+describe("country region and phone helpers", () => {
+  it("uses the best available localized region name", () => {
+    const region = { name_ar: "الجزائر", name_fr: "Alger", name_en: null };
+    expect(getRegionDisplayName(region, "ar")).toBe("الجزائر");
+    expect(getRegionDisplayName(region, "fr")).toBe("Alger");
+    expect(getRegionDisplayName(region, "en")).toBe("Alger");
   });
 
-  it("rejects countries outside the supported Arownd markets", () => {
-    expect(() => getCountryRegionConfig("US")).toThrow("unsupported_country");
-    expect(() => getCountryRegionConfig("dz")).not.toThrow();
+  it("normalizes national and international phone formats using the account calling code", () => {
+    expect(normalizePhoneForCallingCode("0550 123 456", "+213")).toBe("+213550123456");
+    expect(normalizePhoneForCallingCode("06 12 34 56 78", "+212")).toBe("+212612345678");
+    expect(normalizePhoneForCallingCode("+966 50 123 4567", "+966")).toBe("+966501234567");
+  });
+
+  it("rejects a number from another country or an invalid E.164 length", () => {
+    expect(() => normalizePhoneForCallingCode("+212612345678", "+213")).toThrow("invalid_phone");
+    expect(() => normalizePhoneForCallingCode("123", "+213")).toThrow("invalid_phone");
   });
 });
