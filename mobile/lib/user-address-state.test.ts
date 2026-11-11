@@ -7,6 +7,7 @@ const validAddress = {
   recipient_name: "أحمد علي",
   phone: "0550123456",
   wilaya_id: 9,
+  daira_region_id: 1,
   commune: "البليدة",
   address_line: "حي 1200 مسكن، العمارة 5",
   additional_info: ""
