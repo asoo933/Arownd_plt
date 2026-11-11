@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 
@@ -13,17 +13,29 @@ import {
   InlineLink,
   SuccessPanel
 } from "@/components/auth-ui";
-import { Text as UiText } from "@/components/ui";
+import { PressableSurface, Text as UiText } from "@/components/ui";
 import { signUpBusiness } from "@/lib/auth-service";
 import { businessSignupSchema, type BusinessSignupInput } from "@/lib/auth-validation";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens } from "@/lib/theme";
+import { fetchCountries, getSelectedCountryCode, type Country } from "@/lib/country-service";
 
 export default function BusinessSignupScreen() {
-  useLanguage();
+  const { language } = useLanguage();
   const [serverError, setServerError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const [hasSession, setHasSession] = useState(false);
+  const [accountCountry, setAccountCountry] = useState<Country | null>(null);
+
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    void Promise.all([getSelectedCountryCode(), fetchCountries()]).then(([code, countries]) => {
+      if (active) setAccountCountry(countries.find((country) => country.code === code && country.is_enabled) ?? null);
+    }).catch(() => {
+      if (active) setAccountCountry(null);
+    });
+    return () => { active = false; };
+  }, []));
 
   const {
     control,
@@ -77,6 +89,10 @@ export default function BusinessSignupScreen() {
         </View>
       ) : (
         <View style={styles.form}>
+          <PressableSurface accessibilityRole="button" onPress={() => router.push({ pathname: "/country-selection", params: { returnTo: "signup-business" } })} style={styles.countrySelector}>
+            <UiText tone="muted">{translate("signupAccountCountry")}</UiText>
+            <UiText weight="700">{accountCountry ? accountCountry.flag_emoji + " " + (language === "ar" ? accountCountry.name_ar : accountCountry.name_en ?? accountCountry.name_ar) : translate("countryRequired")}</UiText>
+          </PressableSurface>
           <Controller
             control={control}
             name="fullName"
@@ -194,6 +210,7 @@ export default function BusinessSignupScreen() {
 }
 
 const styles = StyleSheet.create({
+  countrySelector: { minHeight: 54, justifyContent: "center", gap: 4, paddingHorizontal: designTokens.spacing.md, borderWidth: StyleSheet.hairlineWidth, borderColor: "#A0A0A0", borderRadius: designTokens.radius.md },
   form: {
     gap: designTokens.spacing.lg
   },
