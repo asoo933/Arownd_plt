@@ -154,6 +154,11 @@ export default function MerchantStoreSettingsScreen() {
   };
   const submit = () => {
     if (imageBusy || mutation.isPending) return;
+    if (regionOptions.data?.levels[1]?.is_required && form.secondary_region_id === null) {
+      setFieldErrors({ secondary_region_id: true });
+      setFormError(true);
+      return;
+    }
     const parsed = MerchantStoreSettingsSchema.safeParse(form);
     if (!parsed.success) {
       const nextFieldErrors = parsed.error.issues.reduce<Record<string, boolean>>((errors, issue) => {
