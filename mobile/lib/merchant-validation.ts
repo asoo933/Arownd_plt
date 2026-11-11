@@ -54,6 +54,7 @@ export function merchantStoreErrorKey(error: unknown): string {
     ["invalid_store_subcategory", "merchantErrorInvalidCategory"],
     ["secondary_region_required", "merchantValidationSecondaryRegionRequired"],
     ["invalid_country_phone", "merchantValidationPhone"],
+    ["invalid_country_whatsapp", "merchantValidationWhatsApp"],
     ["invalid_phone", "merchantValidationPhone"],
     ["PGRST202", "merchantErrorUnavailable"],
     ["Could not find the function", "merchantErrorUnavailable"],
