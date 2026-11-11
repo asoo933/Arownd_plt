@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - ".github/workflows/bootstrap-expo-updates.yml"
+      - ".github/workflows/bootstrap-expo-updates.trigger"
   workflow_dispatch:
 
 permissions:
