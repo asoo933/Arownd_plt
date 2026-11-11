@@ -55,7 +55,7 @@ export async function createMyAddress(input: UserAddressInput): Promise<UserAddr
       ...parsed,
       country_code: countryCode,
       additional_info: parsed.additional_info || null,
-      phone: parsed.phone.replace(/[\s()-]/g, ""),
+      phone,
       user_id: userId,
       is_default: false
     })
@@ -81,7 +81,7 @@ export async function updateMyAddress(addressId: string, input: UserAddressInput
       ...parsed,
       country_code: countryCode,
       additional_info: parsed.additional_info || null,
-      phone: parsed.phone.replace(/[\s()-]/g, ""),
+      phone,
       updated_at: new Date().toISOString()
     })
     .eq("id", addressId)
