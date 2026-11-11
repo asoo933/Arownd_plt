@@ -460,10 +460,14 @@ function SettingsRow({
       style={[styles.linkRow, last ? undefined : { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border }]}
     >
       <View style={styles.linkLabel}>
-        <Icon name={icon} size={19} color={theme.colors.foregroundSecondary} />
+        <View style={styles.iconBadge}>
+          <Icon name={icon} size={19} color={theme.colors.accent} />
+        </View>
         <UiText weight="700">{label}</UiText>
       </View>
-      <Icon name="chevron-left" size={19} color={theme.colors.subtle} />
+      <View style={styles.rowTrailing}>
+        <Icon name="chevron-left" size={18} color={theme.colors.subtle} />
+      </View>
     </PressableSurface>
   );
 }
@@ -494,23 +498,27 @@ function createStyles(theme: AppTheme) {
       alignItems: "center",
       justifyContent: "center",
       alignSelf: "flex-start",
-      borderRadius: designTokens.radius.md
+      marginBottom: designTokens.spacing.xs,
+      borderRadius: designTokens.radius.lg,
+      backgroundColor: theme.colors.surfaceSecondary
     },
     section: {
-      gap: designTokens.spacing.md
+      gap: designTokens.spacing.sm,
+      marginTop: designTokens.spacing.lg
     },
     sectionContent: {
       gap: 0,
-      paddingHorizontal: designTokens.spacing.lg,
-      paddingVertical: designTokens.spacing.xs
+      paddingHorizontal: designTokens.spacing.md,
+      paddingVertical: designTokens.spacing.xs,
+      borderRadius: designTokens.radius.xl
     },
     input: {
       minHeight: designTokens.dimensions.controlHeight.lg,
       textAlign: "auto"
     },
     linkRow: {
-      minHeight: 58,
-      paddingVertical: designTokens.spacing.md,
+      minHeight: 68,
+      paddingVertical: designTokens.spacing.sm,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
@@ -522,6 +530,22 @@ function createStyles(theme: AppTheme) {
       flexDirection: "row",
       alignItems: "center",
       gap: designTokens.spacing.md
+    },
+    iconBadge: {
+      width: 38,
+      height: 38,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: designTokens.radius.md,
+      backgroundColor: theme.colors.surfaceSecondary
+    },
+    rowTrailing: {
+      width: 30,
+      height: 30,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: designTokens.radius.full,
+      backgroundColor: theme.colors.surfaceMuted
     },
     sheetContent: {
       gap: designTokens.spacing.md
@@ -547,7 +571,8 @@ function createStyles(theme: AppTheme) {
       backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted
     },
     signOutButton: {
-      marginTop: designTokens.spacing.sm
+      marginTop: designTokens.spacing.xl,
+      marginBottom: designTokens.spacing.lg
     }
   });
 }
