@@ -28,6 +28,11 @@ create index if not exists user_addresses_daira_region_idx
 create index if not exists orders_daira_region_idx
   on public.orders(country_code, daira_region_id);
 
+-- Preserve the existing profile column allowlist while permitting the new field.
+grant select (daira_region_id) on public.profiles to authenticated;
+grant insert (daira_region_id) on public.profiles to authenticated;
+grant update (daira_region_id) on public.profiles to authenticated;
+
 create or replace function public.enforce_daira_region_selection()
 returns trigger
 language plpgsql
