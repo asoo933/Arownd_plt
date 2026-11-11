@@ -272,26 +272,37 @@ function SwipeToHide({
     }).start();
   }, [translateX]);
 
-  const panResponder = useMemo(() => PanResponder.create({
-    onMoveShouldSetPanResponder: (_, gesture) =>
-      Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2,
-    onPanResponderMove: (_, gesture) => {
-      const minOffset = direction === 1 ? 0 : -revealDistance;
-      const maxOffset = direction === 1 ? revealDistance : 0;
-      const next = revealed
-        ? Math.min(maxOffset, Math.max(minOffset, direction * revealDistance + gesture.dx))
-        : direction * Math.min(revealDistance, Math.max(0, gesture.dx * direction));
-      translateX.setValue(next);
-    },
-    onPanResponderRelease: (_, gesture) => {
-      const shouldReveal = revealed
-        ? direction * gesture.dx < -35
-        : direction * gesture.dx > 55;
-      setRevealed(shouldReveal);
-      animateTo(shouldReveal ? direction * revealDistance : 0);
-    },
-    onPanResponderTerminate: () => animateTo(revealed ? direction * revealDistance : 0)
-  }), [animateTo, direction, revealed, translateX]);
+  const panResponder = useMemo(() => {
+    const shouldCaptureHorizontalSwipe = (_: unknown, gesture: { dx: number; dy: number }) =>
+      Math.abs(gesture.dx) > 12 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.2;
+
+    return PanResponder.create({
+      // Capture horizontal movement before the nested order-card Pressable.
+      // Vertical movement remains available to the parent ScrollView.
+      onMoveShouldSetPanResponder: shouldCaptureHorizontalSwipe,
+      onMoveShouldSetPanResponderCapture: shouldCaptureHorizontalSwipe,
+      onPanResponderGrant: () => {
+        translateX.stopAnimation();
+      },
+      onPanResponderMove: (_, gesture) => {
+        const minOffset = direction === 1 ? 0 : -revealDistance;
+        const maxOffset = direction === 1 ? revealDistance : 0;
+        const next = revealed
+          ? Math.min(maxOffset, Math.max(minOffset, direction * revealDistance + gesture.dx))
+          : direction * Math.min(revealDistance, Math.max(0, gesture.dx * direction));
+        translateX.setValue(next);
+      },
+      onPanResponderRelease: (_, gesture) => {
+        const shouldReveal = revealed
+          ? direction * gesture.dx < -35
+          : direction * gesture.dx > 55;
+        setRevealed(shouldReveal);
+        animateTo(shouldReveal ? direction * revealDistance : 0);
+      },
+      onPanResponderTerminate: () => animateTo(revealed ? direction * revealDistance : 0),
+      onPanResponderTerminationRequest: () => false
+    });
+  }, [animateTo, direction, revealed, translateX]);
 
   return (
     <View style={{ overflow: "hidden", borderRadius: 20 }}>
