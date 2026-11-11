@@ -12,7 +12,7 @@ import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsse
 import { fetchMyMerchantStoreSettings, updateMyMerchantStoreSettings } from "@/lib/merchant-store-settings";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 import { translate, useLanguage } from "@/lib/i18n";
-import { getRegionDisplayName } from "@/lib/country-regions";
+import { getRegionDisplayName, getRegionLevelDisplayName } from "@/lib/country-regions";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 export default function MerchantStoreSettingsScreen() {
@@ -220,16 +220,16 @@ export default function MerchantStoreSettingsScreen() {
         <Card contentStyle={styles.sectionCard}>
           <Heading level={3}>{translate("merchantStoreLocationTitle")}</Heading>
           <View style={styles.field}>
-            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{regionOptions.data?.selectedLevel.label_ar ?? translate("merchantStoreWilayaLabel")}</UiText>
-            <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"} onPress={() => { setRegionPickerLevel("primary"); setRegionPickerOpen(true); }} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
-              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data?.selectedLevel.label_ar ?? ""}</UiText>
+            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : translate("merchantStoreWilayaLabel")}</UiText>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"} onPress={() => { setRegionPickerLevel("primary"); setRegionPickerOpen(true); }} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
+              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
             </PressableSurface>
             {fieldErrors.region_id ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           </View>
           {regionOptions.data?.levels[1] ? <View style={styles.field}>
-            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{regionOptions.data.levels[1].label_ar}</UiText>
-            <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data.levels[1].label_ar} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={mutation.isPending || !form.region_id || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
-              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={getRegionLevelDisplayName(regionOptions.data.levels[1], language)} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={mutation.isPending || !form.region_id || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
+              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
             </PressableSurface>
             {fieldErrors.secondary_region_id ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           </View> : null}
