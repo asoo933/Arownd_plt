@@ -10,7 +10,8 @@ const validStore = {
   storeName: "متجر النخبة",
   phone: "0550123456",
   whatsapp: "",
-  wilayaId: 16,
+  regionId: 16,
+  secondaryRegionId: null,
   commune: "باب الزوار",
   addressLine: "شارع الاستقلال، الجزائر",
   open: "09:00",
@@ -24,10 +25,10 @@ describe("merchantStoreSchema", () => {
     expect(merchantStoreSchema.safeParse(validStore).success).toBe(true);
   });
 
-  it("requires a wilaya and a main category", () => {
+  it("requires a primary region and a main category", () => {
     expect(merchantStoreSchema.safeParse({
       ...validStore,
-      wilayaId: null,
+      regionId: null,
       category: ""
     }).success).toBe(false);
   });

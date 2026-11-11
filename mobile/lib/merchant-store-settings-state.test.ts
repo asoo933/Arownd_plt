@@ -3,7 +3,8 @@ import { MerchantStoreSettingsSchema } from "@/lib/merchant-store-settings-state
 
 const valid = {
   name: "متجر الاختبار",
-  wilaya_id: 9,
+  region_id: 9,
+  secondary_region_id: null,
   logo_url: "",
   cover_url: "",
   description: "",
@@ -21,9 +22,9 @@ describe("MerchantStoreSettingsSchema", () => {
     expect(MerchantStoreSettingsSchema.safeParse(valid).success).toBe(true);
   });
 
-  it("requires a valid wilaya identifier", () => {
-    expect(MerchantStoreSettingsSchema.safeParse({ ...valid, wilaya_id: 0 }).success).toBe(false);
-    expect(MerchantStoreSettingsSchema.safeParse({ ...valid, wilaya_id: 9 }).success).toBe(true);
+  it("requires a valid primary region identifier", () => {
+    expect(MerchantStoreSettingsSchema.safeParse({ ...valid, region_id: 0 }).success).toBe(false);
+    expect(MerchantStoreSettingsSchema.safeParse({ ...valid, region_id: 9 }).success).toBe(true);
   });
 
   it("rejects unsafe social URLs, invalid opening times and duplicate closing days", () => {
