@@ -29,12 +29,19 @@ $draft_guard$;
 ===============================================================================
 
 - profiles.region_id, stores.region_id, user_addresses.region_id and
-  orders.region_id exist but are nullable.
-- stores.wilaya_id, user_addresses.wilaya_id and orders.wilaya_id are NOT NULL.
-  Their legacy foreign keys still reference public.wilayas(id).
-- profiles.wilaya_id is nullable.
-- profiles/user_addresses/orders have daira_region_id. The current checkout
-  wrapper has a daira-specific path for Algeria.
+  orders.region_id exist but are nullable and have country-scoped composite
+  foreign keys to country_regions(country_code, id).
+- profiles.country_code, stores.country_code, user_addresses.country_code and
+  orders.country_code exist and are NOT NULL.
+- stores.wilaya_id, user_addresses.wilaya_id and orders.wilaya_id are NOT NULL;
+  their legacy foreign keys still reference public.wilayas(id). profiles.wilaya_id
+  is nullable. The legacy NOT NULL columns block generic-country inserts.
+- profiles, user_addresses and orders have daira_region_id (nullable). There is
+  NO secondary_region_id column in the live schema. The app's generic
+  secondary_region_id contract therefore requires a reviewed migration.
+- orders.currency_code exists and is NOT NULL with a composite country/currency
+  foreign key. Store currency is derived from stores.country_code.
+- user_addresses.phone has a DZ-only CHECK constraint.
 - orders.country_code and orders.currency_code are NOT NULL.
 - country_regions has (id, country_code, parent_id, region_type, is_enabled,
   legacy_wilaya_id); region_type is free text, so country-level validation
