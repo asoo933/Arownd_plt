@@ -26,17 +26,17 @@ export default function MerchantAnalyticsScreen() {
     retry: false
   });
 
-  if (access.isPending || (ready && analytics.isPending)) {
+  if (access.isPending || (ready && (analytics.isPending || accountCurrency.isPending))) {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
   }
   if (access.isError) {
     return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} busy={access.isFetching} onAction={() => void access.refetch()} />;
   }
-  if (analytics.isError) {
-    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} busy={analytics.isFetching} onAction={() => void analytics.refetch()} />;
+  if (analytics.isError || (ready && accountCurrency.isError)) {
+    return <Message theme={theme} label={translate("merchantDashboardError")} actionLabel={translate("merchantRetry")} busy={analytics.isFetching || accountCurrency.isFetching} onAction={() => { void analytics.refetch(); void accountCurrency.refetch(); }} />;
   }
   if (!access.data) return <Redirect href="/login" />;
-  if (!ready || !analytics.data) return <Redirect href="/merchant" />;
+  if (!ready || !analytics.data || !accountCurrency.data) return <Redirect href="/merchant" />;
 
   const data = analytics.data;
   const maxDaily = Math.max(1, ...data.daily_delivered.map((item) => item.amount));
@@ -78,14 +78,14 @@ export default function MerchantAnalyticsScreen() {
         <View style={styles.revenueMetrics}>
           <MerchantMetricCard
             label={translate("merchantAnalyticsRevenue")}
-            value={formatMarketPrice(data.delivered_revenue, accountCurrency.data ?? "DZD")}
+            value={formatMarketPrice(data.delivered_revenue, accountCurrency.data)}
             valueTone="accent"
             style={styles.revenueMetric}
           />
           <View style={[styles.metricDivider, { backgroundColor: theme.colors.border }]} />
           <MerchantMetricCard
             label={translate("merchantAnalyticsAverage")}
-            value={formatMarketPrice(data.average_delivered_order, accountCurrency.data ?? "DZD")}
+            value={formatMarketPrice(data.average_delivered_order, accountCurrency.data)}
             style={styles.revenueMetric}
           />
         </View>
@@ -100,7 +100,7 @@ export default function MerchantAnalyticsScreen() {
               <View style={[styles.track, { backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted }]}>
                 <View style={[styles.bar, { backgroundColor: theme.colors.accent, width: Math.max(item.amount > 0 ? 3 : 0, item.amount / maxDaily * 100) + "%" }]} />
               </View>
-              <UiText numberOfLines={1} adjustsFontSizeToFit style={[styles.amount, { color: theme.colors.foreground }]}>{formatMarketPrice(item.amount, accountCurrency.data ?? "DZD")}</UiText>
+              <UiText numberOfLines={1} adjustsFontSizeToFit style={[styles.amount, { color: theme.colors.foreground }]}>{formatMarketPrice(item.amount, accountCurrency.data)}</UiText>
             </View>
           ))}
         </ChartCard>
