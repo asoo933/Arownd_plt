@@ -244,6 +244,7 @@ export default function AddressesScreen() {
               <PressableSurface onPress={() => setDairaPickerOpen(true)} style={styles.input} disabled={wilayaId === null || dairas.isPending || dairas.isError}>
                 <UiText>{selectedDaira ? (language === "ar" ? selectedDaira.name_ar : selectedDaira.name_fr ?? selectedDaira.name_ar) : translate("checkoutChooseDaira")}</UiText>
               </PressableSurface>
+              {dairas.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
               <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
               <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
               <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
