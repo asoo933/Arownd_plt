@@ -38,23 +38,26 @@ create table public.country_regions (
   parent_id bigint,
   code text not null,
   name_ar text not null,
-  name_en text not null,
+  name_fr text,
+  name_en text,
   region_type text not null,
   legacy_wilaya_id integer unique references public.wilayas(id) on delete restrict,
   is_enabled boolean not null default true,
   created_at timestamptz not null default now(),
   constraint country_regions_parent_fkey
-    foreign key (parent_id) references public.country_regions(id) on delete restrict,
+    foreign key (country_code, parent_id)
+    references public.country_regions(country_code, id)
+    on delete restrict,
   constraint country_regions_code_nonempty check (length(btrim(code)) > 0),
   constraint country_regions_type_nonempty check (length(btrim(region_type)) > 0),
   constraint country_regions_country_code_key unique (country_code, code),
   constraint country_regions_country_id_key unique (country_code, id)
 );
 
--- Reuse the existing authoritative 58-wilaya dataset. No names or IDs are
--- recreated, translated, renumbered, or detached from the legacy wilayas table.
+-- Reuse the existing authoritative 58-wilaya dataset. Preserve French source
+-- names as French; English translations remain NULL until verified translations exist.
 insert into public.country_regions (
-  country_code, code, name_ar, name_en, region_type, legacy_wilaya_id
+  country_code, code, name_ar, name_fr, region_type, legacy_wilaya_id
 )
 select
   'DZ',
@@ -189,7 +192,7 @@ create policy "Enabled country regions read"
 comment on table public.countries is
   'Supported Arownd markets. A country is selectable only when is_enabled is true.';
 comment on table public.country_regions is
-  'Country-scoped administrative regions; Algeria rows retain a link to legacy wilayas.';
+  'Country-scoped administrative regions; Arabic and French names are stored in their matching columns. Algeria rows retain a link to legacy wilayas.';
 comment on column public.orders.currency_code is
   'Currency snapshot for the order. Existing orders are retained as DZD; no conversion is performed.';
 comment on column public.profiles.country_code is
