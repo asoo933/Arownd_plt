@@ -2481,6 +2481,7 @@ DECLARE
   primary_region public.country_regions;
   secondary_region public.country_regions;
   country_is_enabled boolean;
+  country_calling_code text;
 BEGIN
   SELECT c.is_enabled
   INTO country_is_enabled
@@ -2553,9 +2554,67 @@ BEGIN
     END IF;
   END IF;
 
+  IF TG_TABLE_NAME IN ('user_addresses', 'orders') THEN
+    SELECT c.calling_code INTO country_calling_code
+    FROM public.countries c WHERE c.code = NEW.country_code;
+    IF country_calling_code IS NULL
+       OR NEW.phone IS NULL
+       OR NEW.phone !~ '^\\+[1-9][0-9]{7,14}
+-- Confirm trigger coverage after applying the generated migration:
+-- profiles_daira_region_guard
+-- user_addresses_daira_region_guard
+-- orders_daira_region_guard
+-- Add stores_region_guard for INSERT or UPDATE OF
+-- country_code, region_id, secondary_region_id, wilaya_id.
+
+===============================================================================
+36. GENERIC SAVED-ADDRESS PHONE FORMAT
+===============================================================================
+
+The live user_addresses_phone_check only accepts Algerian national/international
+numbers. The mobile address editor now normalizes numbers to E.164 using the
+account country's calling_code. Backfill existing DZ addresses first, then
+replace the constraint. This does not validate the national numbering plan;
+the generic client normalizer only guarantees E.164 shape and country calling
+prefix. A country-specific numbering-plan validator remains a separate future
+data requirement and must not be guessed.
+
+UPDATE public.user_addresses
+SET phone = CASE
+  WHEN phone ~ '^0[567][0-9]{8}$' THEN '+213' || substr(phone, 2)
+  WHEN phone ~ '^00213[567][0-9]{8}$' THEN '+' || substr(phone, 3)
+  WHEN phone ~ '^\\+213[567][0-9]{8}$' THEN phone
+  ELSE phone
+END;
+
+ALTER TABLE public.user_addresses
+  DROP CONSTRAINT user_addresses_phone_check;
+
+ALTER TABLE public.user_addresses
+  ADD CONSTRAINT user_addresses_phone_check
+  CHECK (phone ~ '^\\+[1-9][0-9]{7,14}$');
+
+-- The generic region validator above must additionally verify that phone
+-- starts with public.countries.calling_code for user_addresses and orders.
+-- Keep historical orders unchanged; the new checkout RPC validates E.164 and
+-- calling-code prefix before insert.
+
+===============================================================================
+
+       OR left(NEW.phone, length(country_calling_code)) <> country_calling_code THEN
+      RAISE EXCEPTION 'phone_country_mismatch';
+    END IF;
+  END IF;
+
   RETURN NEW;
 END;
 $function$;
+
+DROP TRIGGER IF EXISTS stores_region_guard ON public.stores;
+CREATE TRIGGER stores_region_guard
+BEFORE INSERT OR UPDATE OF country_code, region_id, secondary_region_id, wilaya_id
+ON public.stores
+FOR EACH ROW EXECUTE FUNCTION public.enforce_daira_region_selection();
 
 -- Existing trigger definitions remain attached to the replaced function.
 -- Confirm trigger coverage after applying the generated migration:
