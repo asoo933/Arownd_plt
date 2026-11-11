@@ -69,8 +69,8 @@ export async function updateMyAddress(addressId: string, input: UserAddressInput
   const parsed = UserAddressSchema.parse(input);
   const client = getSupabaseClient();
   const userId = await getCurrentUserId();
-  const countryCode = await fetchMyAccountCountryCode();
   const regionContext = await fetchMyAccountRegionLevels();
+  const countryCode = regionContext.countryCode;
   if (regionContext.levels[1]?.is_required && parsed.secondary_region_id === null) {
     throw new Error("secondary_region_required");
   }
