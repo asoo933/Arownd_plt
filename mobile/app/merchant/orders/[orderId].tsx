@@ -192,8 +192,8 @@ export default function MerchantOrderDetailsScreen() {
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</UiText>
           <InfoRow label={translate("merchantCustomerUnknown")} value={customerOrder.full_name || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderPhone")} value={customerOrder.phone || "—"} theme={theme} />
-          <InfoRow label={language === "ar" ? "المنطقة" : language === "fr" ? "Région" : "Region"} value={customerOrder.region ? getRegionDisplayName(customerOrder.region, language) : "—"} theme={theme} />
-          {customerOrder.secondary_region || customerOrder.daira ? <InfoRow label={language === "ar" ? "المنطقة الفرعية" : language === "fr" ? "Région secondaire" : "Secondary region"} value={customerOrder.secondary_region ? getRegionDisplayName(customerOrder.secondary_region, language) : customerOrder.daira ? (language === "ar" ? customerOrder.daira.name_ar : customerOrder.daira.name_fr ?? customerOrder.daira.name_ar) : "—"} theme={theme} /> : null}
+          <InfoRow label={language === "ar" ? "المنطقة" : "Region"} value={customerOrder.region ? getRegionDisplayName(customerOrder.region, language) : "—"} theme={theme} />
+          {customerOrder.secondary_region || customerOrder.daira ? <InfoRow label={language === "ar" ? "المنطقة الفرعية" : "Secondary region"} value={customerOrder.secondary_region ? getRegionDisplayName(customerOrder.secondary_region, language) : customerOrder.daira ? (language === "ar" ? customerOrder.daira.name_ar : customerOrder.daira.name_fr ?? customerOrder.daira.name_ar) : "—"} theme={theme} /> : null}
           <InfoRow label={translate("merchantStoreCommuneLabel")} value={customerOrder.commune || "—"} theme={theme} />
           <InfoRow label={translate("merchantStoreAddressLabel")} value={customerOrder.address_line || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderDeliveryType")} value={deliveryType === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")} theme={theme} />
