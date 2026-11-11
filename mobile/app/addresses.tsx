@@ -282,7 +282,7 @@ export default function AddressesScreen() {
       </BottomSheet>
 
       <BottomSheet visible={secondaryPickerOpen} onRequestClose={() => setSecondaryPickerOpen(false)} maxHeight="78%">
-        <Heading level={3}>{secondaryOptions.data?.selectedLevel.label_ar ?? ""}</Heading>
+        <Heading level={3}>{secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : ""}</Heading>
         {secondaryOptions.isPending ? <LoadingState label={translate("stateLoading")} /> : null}
         {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
         <ScrollView>
