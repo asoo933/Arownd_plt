@@ -224,7 +224,7 @@ export default function OrdersScreen() {
       const orderCard = <OrderCard key={rowKey} onPress={() => {
         void queryClient.prefetchQuery({ queryKey: ["customer-order-details", row.order.id], queryFn: () => fetchCustomerOrderDetails(row.order.id), staleTime: 15_000 });
         router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } });
-      }} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatMarketPrice(total, row.order.currency_code ?? "DZD")}`} style={styles.card} contentStyle={styles.cardContent}>
+      }} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatMarketPrice(total, row.order.currency_code)}`} style={styles.card} contentStyle={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <UiText style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</UiText>
@@ -239,7 +239,7 @@ export default function OrdersScreen() {
         </View>
         <View style={styles.cardFooter}>
           <UiText style={styles.openLabel}>{translate("ordersViewDetails")}</UiText>
-          <PriceDisplay value={formatMarketPrice(total, row.order.currency_code ?? "DZD")} style={styles.priceDisplay} />
+          <PriceDisplay value={formatMarketPrice(total, row.order.currency_code)} style={styles.priceDisplay} />
         </View>
       </OrderCard>;
       return isHideableOrderStatus(row.status)
