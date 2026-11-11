@@ -202,7 +202,7 @@ export default function AddressesScreen() {
           <Heading level={3}>{address.recipient_name}</Heading>
           <UiText tone="muted">{address.phone}</UiText>
           <Caption>
-            {address.region ? getRegionDisplayName(address.region, language) : ""}{address.secondary_region?.name_ar ? "، " + (language === "ar" ? address.secondary_region.name_ar : address.secondary_region.name_fr ?? address.secondary_region.name_en ?? address.secondary_region.name_ar) : ""}، {address.commune}
+            {address.region ? getRegionDisplayName(address.region, language) : ""}{address.secondary_region ? "، " + getRegionDisplayName(address.secondary_region, language) : ""}، {address.commune}
           </Caption>
           <Caption>{address.address_line}</Caption>
           {address.additional_info ? <Caption>{address.additional_info}</Caption> : null}
