@@ -94,7 +94,7 @@ export async function createMerchantStore(
   input: MerchantStoreFormValues
 ): Promise<string> {
   const values = merchantStoreSchema.parse(input);
-  if (values.regionId === null) throw new Error("merchantValidationWilaya");
+  if (values.regionId === null) throw new Error("merchantValidationPrimaryRegion");
   const regionContext = await fetchMyAccountRegionLevels();
   if (regionContext.levels[1]?.is_required && values.secondaryRegionId === null) {
     throw new Error("secondary_region_required");
