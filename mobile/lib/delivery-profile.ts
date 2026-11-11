@@ -36,19 +36,17 @@ export async function saveMyDeliveryProfile(input: DeliveryProfileInput): Promis
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
   const regionContext = await fetchMyAccountRegionLevels();
-  const countryCode = regionContext.countryCode;
   if (regionContext.levels[1]?.is_required && parsed.secondary_region_id === null) {
     throw new Error("secondary_region_required");
   }
   const phone = normalizePhoneForCallingCode(parsed.phone, regionContext.callingCode);
-  const { error } = await client.from("profiles").upsert({
-    user_id: auth.user.id,
-    country_code: countryCode,
+  const { data, error } = await client.from("profiles").update({
     full_name: parsed.full_name,
     phone,
     region_id: parsed.region_id,
     secondary_region_id: parsed.secondary_region_id,
     commune: parsed.commune
-  }, { onConflict: "user_id" });
+  }).eq("user_id", auth.user.id).select("user_id").maybeSingle();
   if (error) throw error;
+  if (!data) throw new Error("profile_not_found");
 }
