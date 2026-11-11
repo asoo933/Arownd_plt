@@ -25,7 +25,7 @@ import { cartLineKey, evaluateCart, normalizeCartOptions } from "@/lib/cart-stat
 import { getSupabaseClient } from "@/lib/supabase";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getRegionDisplayName } from "@/lib/country-regions";
+import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
 import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
 import { formatOrderCode } from "@/lib/orders-state";
@@ -190,7 +190,14 @@ export default function CheckoutScreen() {
       setFormError(translate("checkoutNameInvalid"));
       return;
     }
-    if (!isValidAddressPhone(phone)) {
+    let normalizedPhone: string;
+    try {
+      normalizedPhone = normalizePhoneForCallingCode(phone, regionOptions.data?.callingCode ?? "");
+    } catch {
+      setFormError(translate("checkoutPhoneInvalid"));
+      return;
+    }
+    if (!isValidAddressPhone(normalizedPhone)) {
       setFormError(translate("checkoutPhoneInvalid"));
       return;
     }
@@ -215,7 +222,7 @@ export default function CheckoutScreen() {
       commune: commune.trim(),
       addressLine: addressLine.trim(),
       fullName: fullName.trim(),
-      phone: normalizeAddressPhone(phone)
+      phone: normalizedPhone
     };
     mutation.mutate(input);
   };

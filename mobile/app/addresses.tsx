@@ -33,7 +33,7 @@ import {
 } from "@/lib/user-address";
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getRegionDisplayName } from "@/lib/country-regions";
+import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { triggerSuccessHaptic } from "@/lib/haptics";
 
 type EditorState = { address: UserAddress | null } | null;
@@ -113,10 +113,18 @@ export default function AddressesScreen() {
   };
 
   const submit = () => {
+    if (!regionOptions.data) return;
+    let normalizedPhone: string;
+    try {
+      normalizedPhone = normalizePhoneForCallingCode(phone, regionOptions.data.callingCode);
+    } catch {
+      setFormError(translate("addressesValidation"));
+      return;
+    }
     const candidate = {
       label,
       recipient_name: recipientName.trim(),
-      phone: phone.trim(),
+      phone: normalizedPhone,
       region_id: regionId ?? 0,
       secondary_region_id: secondaryRegionId,
       commune: commune.trim(),
