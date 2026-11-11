@@ -14,11 +14,13 @@ import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
 import {
   completeCheckout,
   fetchCheckoutCommunes,
+  fetchCheckoutDairas,
   fetchCheckoutProfile,
   fetchCheckoutWilayas,
   submitCheckout,
   type CheckoutDeliveryType,
   type CheckoutInput,
+  type Daira,
   type Wilaya
 } from "@/lib/checkout";
 import { CART_QUERY_KEY, clearCart, getCart } from "@/lib/cart";
@@ -32,7 +34,7 @@ import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-s
 import { formatOrderCode } from "@/lib/orders-state";
 import { MAX_CHECKOUT_ITEMS } from "@/lib/checkout-state";
 
-type Picker = "wilaya" | "commune" | null;
+type Picker = "wilaya" | "daira" | "commune" | null;
 
 export default function CheckoutScreen() {
   const { language } = useLanguage();
@@ -43,6 +45,7 @@ export default function CheckoutScreen() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [wilayaId, setWilayaId] = useState<number | null>(null);
+  const [dairaRegionId, setDairaRegionId] = useState<number | null>(null);
   const [commune, setCommune] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [picker, setPicker] = useState<Picker>(null);
@@ -73,6 +76,7 @@ export default function CheckoutScreen() {
     queryFn: fetchCheckoutWilayas,
     staleTime: Infinity
   });
+  const dairas = useQuery({ queryKey: ["checkout-dairas", wilayaId], queryFn: () => fetchCheckoutDairas(wilayaId as number), enabled: wilayaId !== null, staleTime: Infinity });
   const communes = useQuery({
     queryKey: ["checkout-communes", wilayaId],
     queryFn: () => fetchCheckoutCommunes(wilayaId as number),
@@ -100,6 +104,7 @@ export default function CheckoutScreen() {
       setFullName(profile.data?.full_name ?? auth.data?.user_metadata?.["full_name"] ?? "");
       setPhone(profile.data?.phone ?? auth.data?.phone ?? "");
       setWilayaId(profile.data?.wilaya_id ?? null);
+      setDairaRegionId(profile.data?.daira_region_id ?? null);
       setCommune(profile.data?.commune ?? "");
     }
     setProfileApplied(true);
@@ -112,6 +117,7 @@ export default function CheckoutScreen() {
     setFullName(address.recipient_name);
     setPhone(address.phone);
     setWilayaId(address.wilaya_id);
+    setDairaRegionId(address.daira_region_id);
     setCommune(address.commune);
     setAddressLine(address.address_line);
   };
@@ -127,6 +133,7 @@ export default function CheckoutScreen() {
     () => wilayas.data?.find((item) => item.id === wilayaId) ?? null,
     [wilayas.data, wilayaId]
   );
+  const selectedDaira = useMemo(() => dairas.data?.find((item) => item.id === dairaRegionId) ?? null, [dairas.data, dairaRegionId]);
   const evaluation = evaluateCart(cart.data ?? [], offers.data);
   const offerById = new Map((offers.data ?? []).map((offer) => [offer.id, offer]));
   const hasBlockingItems = evaluation.blockingCount > 0;
@@ -197,7 +204,7 @@ export default function CheckoutScreen() {
       setFormError(translate("checkoutPhoneInvalid"));
       return;
     }
-    if (wilayaId === null || !commune.trim()) {
+    if (wilayaId === null || dairaRegionId === null || !commune.trim()) {
       setFormError(translate("checkoutAreaRequired"));
       return;
     }
@@ -214,6 +221,7 @@ export default function CheckoutScreen() {
       items: cart.data,
       deliveryType,
       wilayaId,
+      dairaRegionId,
       commune: commune.trim(),
       addressLine: addressLine.trim(),
       fullName: fullName.trim(),
@@ -223,10 +231,12 @@ export default function CheckoutScreen() {
   };
 
   const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.inputBorder, color: theme.colors.foreground }];
-  const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune");
-  const pickerItems: { id: string; label: string; wilaya?: Wilaya }[] = picker === "wilaya"
+  const modalTitle = picker === "wilaya" ? translate("checkoutChooseWilaya") : picker === "daira" ? translate("checkoutChooseDaira") : translate("checkoutChooseCommune");
+  const pickerItems: { id: string; label: string; wilaya?: Wilaya; daira?: Daira }[] = picker === "wilaya"
     ? (wilayas.data ?? []).map((item) => ({ id: String(item.id), label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr), wilaya: item }))
-    : (communes.data ?? []).map((item) => ({ id: item, label: item }));
+    : picker === "daira"
+      ? (dairas.data ?? []).map((item) => ({ id: String(item.id), label: item.code.replace("DZ-DAIRA-", "") + " - " + (language === "ar" ? item.name_ar : item.name_fr ?? item.name_ar), daira: item }))
+      : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
   return <CustomerScreen
     footer={
@@ -282,7 +292,7 @@ export default function CheckoutScreen() {
                 <View style={[styles.radio, selectedAddressId === address.id && styles.radioSelected]} />
               </View>
               <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{address.phone}</UiText>
-              <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_fr)}، {address.commune}</UiText>
+              <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data?.find((item) => item.id === address.wilaya_id)?.name_fr)}{address.daira?.name_ar ? "، " + (language === "ar" ? address.daira.name_ar : address.daira.name_fr ?? address.daira.name_ar) : ""}، {address.commune}</UiText>
               <UiText style={[styles.fieldHint, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{address.address_line}</UiText>
               {address.is_default ? <UiText style={[styles.savedDefault, selectedAddressId === address.id && theme.mode === "light" && { color: theme.colors.accentForeground }]}>{translate("addressesDefault")}</UiText> : null}
             </PressableSurface>
@@ -321,6 +331,12 @@ export default function CheckoutScreen() {
       </PressableSurface>
       {wilayas.isError ? <PressableSurface accessibilityLabel={translate("retry")} onPress={() => void wilayas.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
 
+      <UiText style={styles.fieldLabel}>{translate("checkoutDaira")}</UiText>
+      <PressableSurface accessibilityLabel={translate("checkoutDaira")} onPress={() => setPicker("daira")} disabled={wilayaId === null || dairas.isPending || dairas.isError} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]}>
+        <UiText style={[styles.selectText, !selectedDaira && styles.placeholder]}>{selectedDaira ? (language === "ar" ? selectedDaira.name_ar : selectedDaira.name_fr ?? selectedDaira.name_ar) : translate("checkoutChooseDaira")}</UiText>
+        {dairas.isPending ? <Spinner size="small" /> : null}
+      </PressableSurface>
+      {dairas.isError ? <UiText style={styles.fieldHint}>{translate("checkoutDairaLoadError")}</UiText> : null}
       <UiText style={styles.fieldLabel}>{translate("checkoutCommune")}</UiText>
       {communes.data && communes.data.length > 0 ? (
         <PressableSurface accessibilityLabel={translate("checkoutCommune")} onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]} disabled={!wilayaId}>
@@ -384,14 +400,18 @@ export default function CheckoutScreen() {
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{modalTitle}</UiText>
             <PressableSurface accessibilityLabel={translate("back")} onPress={() => setPicker(null)} hitSlop={10}><UiText style={styles.back}>{translate("back")}</UiText></PressableSurface>
           </View>
-          {((picker === "wilaya" && wilayas.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
+          {((picker === "wilaya" && wilayas.isPending) || (picker === "daira" && dairas.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
           <ScrollView keyboardShouldPersistTaps="handled">
             {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {
                 setFormEdited(true);
                 setWilayaId(item.wilaya.id);
+                setDairaRegionId(null);
                 setCommune("");
                 setAddressLine("");
+              } else if (picker === "daira" && item.daira) {
+                setFormEdited(true);
+                setDairaRegionId(item.daira.id);
               } else if (picker === "commune") {
                 setFormEdited(true);
                 setCommune(item.label);

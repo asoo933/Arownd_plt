@@ -21,7 +21,7 @@ import {
   Text as UiText,
   TextField
 } from "@/components/ui";
-import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
+import { fetchCheckoutDairas, fetchCheckoutWilayas, type Daira, type Wilaya } from "@/lib/checkout";
 import {  translate, useLanguage } from "@/lib/i18n";
 import {
   createMyAddress,
@@ -47,10 +47,12 @@ export default function AddressesScreen() {
   const [editor, setEditor] = useState<EditorState>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserAddress | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [dairaPickerOpen, setDairaPickerOpen] = useState(false);
   const [label, setLabel] = useState<AddressLabel>("home");
   const [recipientName, setRecipientName] = useState("");
   const [phone, setPhone] = useState("");
   const [wilayaId, setWilayaId] = useState<number | null>(null);
+  const [dairaRegionId, setDairaRegionId] = useState<number | null>(null);
   const [commune, setCommune] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
@@ -58,7 +60,9 @@ export default function AddressesScreen() {
 
   const addresses = useQuery({ queryKey: ["my-addresses"], queryFn: fetchMyAddresses });
   const wilayas = useQuery({ queryKey: ["checkout-wilayas"], queryFn: fetchCheckoutWilayas, staleTime: Infinity });
+  const dairas = useQuery({ queryKey: ["checkout-dairas", wilayaId], queryFn: () => fetchCheckoutDairas(wilayaId as number), enabled: wilayaId !== null, staleTime: Infinity });
   const selectedWilaya = useMemo(() => wilayas.data?.find((item) => item.id === wilayaId) ?? null, [wilayas.data, wilayaId]);
+  const selectedDaira = useMemo(() => dairas.data?.find((item) => item.id === dairaRegionId) ?? null, [dairas.data, dairaRegionId]);
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["my-addresses"] });
@@ -100,6 +104,7 @@ export default function AddressesScreen() {
     setRecipientName(address?.recipient_name ?? "");
     setPhone(address?.phone ?? "");
     setWilayaId(address?.wilaya_id ?? null);
+    setDairaRegionId(address?.daira_region_id ?? null);
     setCommune(address?.commune ?? "");
     setAddressLine(address?.address_line ?? "");
     setAdditionalInfo(address?.additional_info ?? "");
@@ -113,6 +118,7 @@ export default function AddressesScreen() {
       recipient_name: recipientName.trim(),
       phone: phone.trim(),
       wilaya_id: wilayaId ?? 0,
+      daira_region_id: dairaRegionId ?? 0,
       commune: commune.trim(),
       address_line: addressLine.trim(),
       additional_info: additionalInfo.trim()
@@ -188,7 +194,7 @@ export default function AddressesScreen() {
           <Heading level={3}>{address.recipient_name}</Heading>
           <UiText tone="muted">{address.phone}</UiText>
           <Caption>
-            {String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_fr)}، {address.commune}
+            {String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_fr)}{address.daira?.name_ar ? "، " + (language === "ar" ? address.daira.name_ar : address.daira.name_fr ?? address.daira.name_ar) : ""}، {address.commune}
           </Caption>
           <Caption>{address.address_line}</Caption>
           {address.additional_info ? <Caption>{address.additional_info}</Caption> : null}
@@ -234,6 +240,10 @@ export default function AddressesScreen() {
                 <UiText>{selectedWilaya ? getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr) : translate("checkoutChooseWilaya")}</UiText>
               </PressableSurface>
 
+              <FormLabel>{translate("checkoutDaira")}</FormLabel>
+              <PressableSurface onPress={() => setDairaPickerOpen(true)} style={styles.input} disabled={wilayaId === null || dairas.isPending || dairas.isError}>
+                <UiText>{selectedDaira ? (language === "ar" ? selectedDaira.name_ar : selectedDaira.name_fr ?? selectedDaira.name_ar) : translate("checkoutChooseDaira")}</UiText>
+              </PressableSurface>
               <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
               <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
               <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
@@ -254,6 +264,7 @@ export default function AddressesScreen() {
                   accessibilityLabel={String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr)}
                   onPress={() => {
                     setWilayaId(item.id);
+                    setDairaRegionId(null);
                     setCommune("");
                     setPickerOpen(false);
                   }}
@@ -264,6 +275,18 @@ export default function AddressesScreen() {
               ))}
             </ScrollView>
             <Button label={translate("back")} onPress={() => setPickerOpen(false)} variant="ghost" fullWidth />
+      </BottomSheet>
+
+      <BottomSheet visible={dairaPickerOpen} onRequestClose={() => setDairaPickerOpen(false)} maxHeight="78%">
+        <Heading level={3}>{translate("checkoutChooseDaira")}</Heading>
+        {dairas.isPending ? <LoadingState label={translate("stateLoading")} /> : null}
+        {dairas.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
+        <ScrollView>
+          {(dairas.data ?? []).map((item: Daira) => <PressableSurface key={item.id} onPress={() => { setDairaRegionId(item.id); setDairaPickerOpen(false); }} style={styles.pickerOption}>
+            <UiText>{item.code.replace("DZ-DAIRA-", "")} - {language === "ar" ? item.name_ar : item.name_fr ?? item.name_ar}</UiText>
+          </PressableSurface>)}
+        </ScrollView>
+        <Button label={translate("back")} onPress={() => setDairaPickerOpen(false)} variant="ghost" fullWidth />
       </BottomSheet>
 
       <ConfirmDialog

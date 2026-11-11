@@ -5,14 +5,14 @@ import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton, PressableSurface, Spinner, Text as UiText, TextField } from "@/components/ui";
-import { fetchCheckoutCommunes, fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
+import { fetchCheckoutCommunes, fetchCheckoutDairas, fetchCheckoutWilayas, type Daira, type Wilaya } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, normalizeAlgerianPhone, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getLocalizedWilayaLabel } from "@/lib/locale-data";
 
-type Picker = "wilaya" | "commune" | null;
+type Picker = "wilaya" | "commune" | "daira" | null;
 
 export default function DeliveryProfileScreen() {
   const { language } = useLanguage();
@@ -22,6 +22,7 @@ export default function DeliveryProfileScreen() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [wilayaId, setWilayaId] = useState<number | null>(null);
+  const [dairaRegionId, setDairaRegionId] = useState<number | null>(null);
   const [commune, setCommune] = useState("");
   const [picker, setPicker] = useState<Picker>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export default function DeliveryProfileScreen() {
     queryFn: fetchCheckoutWilayas,
     staleTime: Infinity
   });
+  const dairas = useQuery({ queryKey: ["checkout-dairas", wilayaId], queryFn: () => fetchCheckoutDairas(wilayaId as number), enabled: wilayaId !== null, staleTime: Infinity });
   const communes = useQuery({
     queryKey: ["checkout-communes", wilayaId],
     queryFn: () => fetchCheckoutCommunes(wilayaId as number),
@@ -61,6 +63,7 @@ export default function DeliveryProfileScreen() {
     setFullName(profile.data?.full_name ?? "");
     setPhone(profile.data?.phone ?? "");
     setWilayaId(profile.data?.wilaya_id ?? null);
+    setDairaRegionId(profile.data?.daira_region_id ?? null);
     setCommune(profile.data?.commune ?? "");
     setInitialized(true);
   }, [profile.data, profile.isSuccess, initialized]);
@@ -95,7 +98,9 @@ export default function DeliveryProfileScreen() {
         label: String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr),
         wilaya: item
       }))
-    : (communes.data ?? []).map((item) => ({ id: item, label: item }));
+    : picker === "daira"
+      ? (dairas.data ?? []).map((item: Daira) => ({ id: String(item.id), label: language === "ar" ? item.name_ar : item.name_fr ?? item.name_ar }))
+      : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
   const clearSaveFeedback = () => {
     setFormError(null);
@@ -108,6 +113,7 @@ export default function DeliveryProfileScreen() {
       full_name: fullName.trim(),
       phone: normalizeAlgerianPhone(phone),
       wilaya_id: wilayaId ?? 0,
+      daira_region_id: dairaRegionId ?? 0,
       commune: commune.trim()
     };
     const parsed = DeliveryProfileSchema.safeParse(input);
@@ -131,6 +137,11 @@ export default function DeliveryProfileScreen() {
       <PressableSurface accessibilityLabel={translate("checkoutWilaya")} onPress={() => setPicker("wilaya")} style={pickerStyle}>
         <UiText tone={selectedWilaya ? "foreground" : "muted"}>{selectedWilaya ? getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr) : translate("checkoutChooseWilaya")}</UiText>
       </PressableSurface>
+      <FormLabel>{translate("checkoutDaira")}</FormLabel>
+      <PressableSurface accessibilityLabel={translate("checkoutDaira")} onPress={() => setPicker("daira")} style={pickerStyle} disabled={wilayaId === null || dairas.isPending || dairas.isError}>
+        <UiText tone={dairaRegionId ? "foreground" : "muted"}>{dairas.data?.find((item) => item.id === dairaRegionId) ? (language === "ar" ? dairas.data.find((item) => item.id === dairaRegionId)?.name_ar : dairas.data.find((item) => item.id === dairaRegionId)?.name_fr ?? dairas.data.find((item) => item.id === dairaRegionId)?.name_ar) : translate("checkoutChooseDaira")}</UiText>
+      </PressableSurface>
+      {dairas.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
       <FormLabel>{translate("checkoutCommune")}</FormLabel>
       <TextField
         accessibilityLabel={translate("checkoutCommune")}
@@ -154,14 +165,19 @@ export default function DeliveryProfileScreen() {
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
         <View accessibilityViewIsModal style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <UiText weight="800" style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : translate("checkoutChooseCommune")}</UiText>
+          <UiText weight="800" style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : picker === "daira" ? translate("checkoutChooseDaira") : translate("checkoutChooseCommune")}</UiText>
           {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
+          {picker === "daira" && dairas.isPending ? <Spinner size="small" /> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
           <ScrollView style={styles.options}>
             {pickerItems.map((item) => <PressableSurface key={item.id} accessibilityLabel={item.label} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {
                 setWilayaId(item.wilaya.id);
+                setDairaRegionId(null);
                 setCommune("");
+                clearSaveFeedback();
+              } else if (picker === "daira") {
+                setDairaRegionId(Number(item.id));
                 clearSaveFeedback();
               } else if (picker === "commune") {
                 setCommune(item.label);
