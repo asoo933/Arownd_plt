@@ -1667,3 +1667,112 @@ D. Design consequence
   different region rules across triggers and RPCs.
 - No catalog rows, policies, grants or database objects were changed.
 */
+
+
+/*
+===============================================================================
+27. PHASE A — BROWSING MARKET CONTRACT AND RLS PRESERVATION
+READ-ONLY MAIN SOURCE REVIEW — 2026-11-11
+===============================================================================
+
+A. Country preference flow
+- settings.tsx loads countries through fetchCountries(), then filters
+  is_enabled=true before presenting browsing-country choices.
+- It reads profiles.browsing_country_code and updates only that field.
+  The database trigger validate_profile_browsing_country() rejects a changed
+  browsing country unless countries.is_enabled=true. Account country_code
+  remains immutable and separate.
+- On success the settings mutation invalidates the TanStack Query cache and
+  reloads the browsing-country value. Preserve this refresh behavior.
+- country-service.ts stores account and browsing selections under separate
+  AsyncStorage keys. The authoritative value remains profiles; local storage
+  is a cache, not authorization.
+
+B. Existing RLS market boundary
+- Stores SELECT permits the caller's own store regardless of browsing market,
+  or stores matching profiles.browsing_country_code.
+- store_offers, products and product_images apply the equivalent market
+  boundary through the related store, while preserving owner access.
+- Reviews allow the user's own reviews and approved reviews in the browsing
+  market, with owner access to the owner's store/product review data.
+- Home/catalog queries that do not explicitly filter country rely on these RLS
+  policies. Do not remove that protection or assume client-side filters are
+  sufficient.
+- Generic region filtering is an additional location selector within the
+  selected browsing market; it must never change the RLS market boundary.
+
+C. Remaining UI inconsistency
+- stores.tsx still loads legacy wilayas and filters stores by wilaya_id.
+  This conflicts with generic country browsing and will not work for non-DZ
+  browsing markets.
+- fetchVerifiedStoresByWilaya() filters only wilaya_id; its generic successor
+  should accept a validated country-scoped primary region ID and filter
+  stores.region_id, while relying on RLS for browsing-country isolation.
+- The current country-regions helper is explicitly account-country-only.
+  It cannot directly serve stores.tsx when browsing_country_code differs from
+  country_code. A browsing-country-aware helper is needed, while server-side
+  country matching and RLS remain authoritative.
+- fetchMyAccountRegions() filters primary roots by parent_id IS NULL.
+  fetchMyAccountChildRegions() validates the selected parent belongs to the
+  account country and expected primary type before reading configured child
+  types. Reuse these validation semantics without changing its meaning.
+
+D. Country enablement boundary
+- Settings hides disabled countries and the database trigger rejects selecting
+  a disabled browsing country. Keep both checks.
+- Region rows being enabled does not mean their country is enabled.
+  Live country availability remains DZ only.
+- Do not enable MA/EG/SA/AE as part of schema compatibility work. Country
+  activation is a separate release gate after app, data, catalog, shipping,
+  phone and currency integration tests.
+
+===============================================================================
+28. PHASE A — INTEGRATION CONTRACT MATRIX
+===============================================================================
+
+The coordinated implementation must map the following flows to one
+country/region/currency contract:
+
+1. Account and delivery profile:
+   immutable profiles.country_code; primary region_id; optional/required
+   secondary region according to country config; country-aware phone
+   normalization; locality text retained only where current behavior needs it.
+2. Saved addresses:
+   country_code equals account country; primary/secondary region FKs are
+   country-consistent; preserve default-address uniqueness and all existing
+   recipient/address length checks; replace Algeria-only phone CHECK only
+   after a safe canonical format is specified.
+3. Merchant store creation/settings:
+   account-country region validation; generic create_my_store contract;
+   owner lock, merchant role, category checks, one-store rule, notifications
+   and owner RLS remain intact.
+4. Market browsing:
+   browsing_country_code selects market; region_id filters within that market;
+   owner can still see/manage own store across markets; catalog RLS remains
+   the authoritative isolation boundary.
+5. Checkout:
+   account country only; generic primary/secondary validation; preserve
+   idempotency key/request hash; COD only; offer locks/stock decrement;
+   order_items trigger creates merchant_orders; shipping fee starts at zero
+   until merchants submit quotes; parent totals/status remain consistent.
+6. Merchant quote/customer response:
+   merchant-supplied fee remains the delivery price; pickup fee stays zero;
+   quote bounds and ownership checks remain; customer response continues
+   through customer_respond_to_merchant_order; rejection stock restoration
+   and notifications remain transactional; currency label comes from order.
+7. Customer/merchant order history:
+   persist country_code, currency_code and generic region snapshot; historical
+   amounts render from orders.currency_code, never current browsing market.
+8. Merchant analytics:
+   store currency explicit in result or loaded from owned store; all monetary
+   fields use that currency; never combine currencies in one unlabeled total;
+   preserve current metric semantics.
+9. Public personal profile:
+   preserve opt-in privacy gating; define non-DZ public region labels without
+   exposing private account location fields.
+10. Notifications:
+    preserve DB notification insertion, push dispatcher, numeric payload
+    fields, deep-link URLs and delivery semantics.
+
+No app or database behavior was modified in this review pass.
+*/
