@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const SELECTED_COUNTRY_STORAGE_KEY = "arownd:account-country";
+const BROWSING_COUNTRY_STORAGE_KEY = "arownd:browsing-country";
 
 const CountrySchema = z.object({
   code: z.string().length(2),
@@ -38,6 +39,36 @@ export async function saveSelectedCountryCode(countryCode: string): Promise<void
   await AsyncStorage.setItem(SELECTED_COUNTRY_STORAGE_KEY, countryCode);
 }
 
+export async function getSelectedBrowsingCountryCode(): Promise<string | null> {
+  const value = await AsyncStorage.getItem(BROWSING_COUNTRY_STORAGE_KEY);
+  return value && /^[A-Z]{2}$/.test(value) ? value : null;
+}
+
+export async function saveBrowsingCountryCode(countryCode: string): Promise<void> {
+  if (!/^[A-Z]{2}$/.test(countryCode)) throw new Error("INVALID_COUNTRY_CODE");
+  await AsyncStorage.setItem(BROWSING_COUNTRY_STORAGE_KEY, countryCode);
+}
+
+export async function fetchMyBrowsingCountryCode(): Promise<string> {
+  const { data: authData, error: authError } = await getSupabaseClient().auth.getUser();
+  if (authError || !authData.user) throw new Error("NOT_AUTHENTICATED");
+  const { data, error } = await getSupabaseClient().from("profiles").select("browsing_country_code").eq("user_id", authData.user.id).single();
+  if (error) throw error;
+  if (typeof data.browsing_country_code !== "string" || !/^[A-Z]{2}$/.test(data.browsing_country_code)) throw new Error("INVALID_BROWSING_COUNTRY");
+  await saveBrowsingCountryCode(data.browsing_country_code);
+  return data.browsing_country_code;
+}
+
+export async function updateBrowsingCountryCode(countryCode: string): Promise<void> {
+  if (!/^[A-Z]{2}$/.test(countryCode)) throw new Error("INVALID_COUNTRY_CODE");
+  const { data: authData, error: authError } = await getSupabaseClient().auth.getUser();
+  if (authError || !authData.user) throw new Error("NOT_AUTHENTICATED");
+  const { data, error } = await getSupabaseClient().from("profiles").update({ browsing_country_code: countryCode }).eq("user_id", authData.user.id).select("browsing_country_code").single();
+  if (error) throw error;
+  if (data.browsing_country_code !== countryCode) throw new Error("BROWSING_COUNTRY_UPDATE_FAILED");
+  await saveBrowsingCountryCode(countryCode);
+}
+
 export async function detectCountryFromIp(): Promise<string | null> {
   try {
     const response = await fetch("https://ipwho.is/");
@@ -58,7 +89,7 @@ export async function syncSelectedCountryCodeFromProfile(userId: string): Promis
   try {
     const { data, error } = await getSupabaseClient()
       .from("profiles")
-      .select("country_code")
+      .select("country_code, browsing_country_code")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -66,6 +97,8 @@ export async function syncSelectedCountryCodeFromProfile(userId: string): Promis
     if (!/^[A-Z]{2}$/.test(data.country_code)) return false;
 
     await saveSelectedCountryCode(data.country_code);
+    const browsingCode = typeof data.browsing_country_code === "string" ? data.browsing_country_code : data.country_code;
+    await saveBrowsingCountryCode(browsingCode);
     return true;
   } catch {
     return false;
