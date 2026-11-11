@@ -507,7 +507,7 @@ export default function MerchantOnboardingScreen() {
       <BottomSheet visible={regionPickerOpen} onRequestClose={() => setRegionPickerOpen(false)} maxHeight="85%">
             <View style={styles.modalHeader}>
               <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>
-                {regionPickerLevel === "primary" ? regionOptions.data?.selectedLevel.label_ar : secondaryOptions.data?.selectedLevel.label_ar}
+                {regionPickerLevel === "primary" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : (secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : "")}
               </UiText>
               <PressableSurface
                 accessibilityRole="button"
