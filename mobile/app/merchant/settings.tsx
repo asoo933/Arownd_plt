@@ -7,12 +7,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheet, AppHeader, Button, Card, ErrorState, Heading, Icon, IconButton, Image as UiImage, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 import { fetchMerchantAccess } from "@/lib/merchant";
-import { fetchCheckoutWilayas, type Wilaya } from "@/lib/checkout";
+import { fetchCheckoutRegions } from "@/lib/checkout";
 import { STORE_IMAGE_MAX_BYTES, uploadMerchantStoreImage, validateStoreImageAsset } from "@/lib/merchant-store-images";
 import { fetchMyMerchantStoreSettings, updateMyMerchantStoreSettings } from "@/lib/merchant-store-settings";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 import { translate, useLanguage } from "@/lib/i18n";
-import { getLocalizedWilayaLabel } from "@/lib/locale-data";
+import { getRegionDisplayName } from "@/lib/country-regions";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 
 export default function MerchantStoreSettingsScreen() {
@@ -23,7 +23,8 @@ export default function MerchantStoreSettingsScreen() {
   const access = useQuery({ queryKey: ["merchant-access"], queryFn: fetchMerchantAccess, retry: false });
   const storeId = access.data?.store?.id ?? null;
   const ready = access.data?.status === "merchant_ready" && Boolean(storeId);
-  const wilayas = useQuery({ queryKey: ["merchant-wilayas"], queryFn: fetchCheckoutWilayas, staleTime: Infinity });
+  const regionOptions = useQuery({ queryKey: ["merchant-regions"], queryFn: () => fetchCheckoutRegions(), staleTime: Infinity });
+  const secondaryOptions = useQuery({ queryKey: ["merchant-regions", form?.region_id], queryFn: () => fetchCheckoutRegions(form?.region_id ?? null), enabled: form?.region_id !== undefined && form?.region_id !== null, staleTime: Infinity });
   const settings = useQuery({
     queryKey: ["merchant-store-settings", storeId],
     queryFn: () => fetchMyMerchantStoreSettings(storeId ?? ""),
@@ -34,7 +35,8 @@ export default function MerchantStoreSettingsScreen() {
   const [formDirty, setFormDirty] = useState(false);
   const [formError, setFormError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
-  const [wilayaPickerOpen, setWilayaPickerOpen] = useState(false);
+  const [regionPickerOpen, setRegionPickerOpen] = useState(false);
+  const [regionPickerLevel, setRegionPickerLevel] = useState<"primary" | "secondary">("primary");
   const [imageBusy, setImageBusy] = useState<"logo" | null>(null);
   const [imageError, setImageError] = useState(false);
   const [imageSaved, setImageSaved] = useState(false);
@@ -56,21 +58,31 @@ export default function MerchantStoreSettingsScreen() {
     if (settings.data && !formDirty) setForm(settings.data);
   }, [settings.data, formDirty]);
 
-  if (access.isPending || wilayas.isPending || (ready && settings.isPending)) {
+  if (access.isPending || regionOptions.isPending || (ready && settings.isPending)) {
     return <Message theme={theme} label={translate("merchantLoading")} loading />;
   }
-  if (access.isError || wilayas.isError || settings.isError) {
-    return <Message theme={theme} label={translate("merchantStoreSettingsSaveError")} actionLabel={translate("merchantRetry")} busy={access.isFetching || wilayas.isFetching || settings.isFetching} onAction={() => { void access.refetch(); void wilayas.refetch(); void settings.refetch(); }} />;
+  if (access.isError || regionOptions.isError || settings.isError) {
+    return <Message theme={theme} label={translate("merchantStoreSettingsSaveError")} actionLabel={translate("merchantRetry")} busy={access.isFetching || regionOptions.isFetching || settings.isFetching} onAction={() => { void access.refetch(); void regionOptions.refetch(); void settings.refetch(); }} />;
   }
   if (!access.data) return <Redirect href="/login" />;
   if (!ready || !form) return <Redirect href="/merchant" />;
 
-  const selectedWilaya = wilayas.data?.find((item) => item.id === form.wilaya_id);
-  const selectWilaya = (wilaya: Wilaya) => {
+  const selectedRegion = regionOptions.data?.regions.find((item) => item.id === form.region_id);
+  const selectedSecondaryRegion = secondaryOptions.data?.regions.find((item) => item.id === form.secondary_region_id);
+  const selectRegion = (regionId: number) => {
     if (mutation.isPending) return;
-    setForm((current) => current ? { ...current, wilaya_id: wilaya.id, commune: "" } : current);
+    setForm((current) => current ? { ...current, region_id: regionId, secondary_region_id: null, commune: "" } : current);
     setFormDirty(true);
-    setWilayaPickerOpen(false);
+    setRegionPickerOpen(false);
+    setFormError(false);
+    setFieldErrors({});
+    mutation.reset();
+  };
+  const selectSecondaryRegion = (regionId: number) => {
+    if (mutation.isPending) return;
+    setForm((current) => current ? { ...current, secondary_region_id: regionId } : current);
+    setFormDirty(true);
+    setRegionPickerOpen(false);
     setFormError(false);
     setFieldErrors({});
     mutation.reset();
@@ -203,12 +215,19 @@ export default function MerchantStoreSettingsScreen() {
         <Card contentStyle={styles.sectionCard}>
           <Heading level={3}>{translate("merchantStoreLocationTitle")}</Heading>
           <View style={styles.field}>
-            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
-            <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantStoreWilayaLabel")} onPress={() => setWilayaPickerOpen(true)} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
-              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedWilaya ? `${String(selectedWilaya.id).padStart(2, "0")} - ${getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr)}` : translate("merchantStoreChooseWilaya")}</UiText>
+            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{regionOptions.data?.selectedLevel.label_ar ?? translate("merchantStoreWilayaLabel")}</UiText>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"} onPress={() => { setRegionPickerLevel("primary"); setRegionPickerOpen(true); }} disabled={mutation.isPending} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
+              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data?.selectedLevel.label_ar ?? ""}</UiText>
             </PressableSurface>
-            {fieldErrors.wilaya_id ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
+            {fieldErrors.region_id ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
           </View>
+          {regionOptions.data?.levels[1] ? <View style={styles.field}>
+            <UiText style={[styles.label, { color: theme.colors.foreground }]}>{regionOptions.data.levels[1].label_ar}</UiText>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data.levels[1].label_ar} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={mutation.isPending || !form.region_id || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.input, styles.select, { backgroundColor: theme.colors.background, borderColor: theme.colors.inputBorder }]}>
+              <UiText style={{ color: theme.colors.foreground, fontSize: designTokens.typography.body - 1, textAlign: "auto" }}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+            </PressableSurface>
+            {fieldErrors.secondary_region_id ? <UiText style={[styles.error, { color: theme.mode === "light" ? theme.colors.dangerText : theme.colors.danger }]}>{translate("merchantStoreSettingsValidation")}</UiText> : null}
+          </View> : null}
           <Field label={translate("merchantStoreSettingsCommune")} value={form.commune} onChangeText={(value) => update("commune", value)} theme={theme} disabled={mutation.isPending} error={fieldErrors.commune} />
           <Field label={translate("merchantStoreSettingsAddress")} value={form.address_line} onChangeText={(value) => update("address_line", value)} theme={theme} hint={translate("merchantStoreSettingsAddressHint")} disabled={mutation.isPending} error={fieldErrors.address_line} />
         </Card>
@@ -254,17 +273,17 @@ export default function MerchantStoreSettingsScreen() {
         <Button label={translate("merchantStoreSettingsSave")} onPress={submit} loading={mutation.isPending} disabled={imageBusy !== null || mutation.isPending} fullWidth />
       </View>
 
-      <BottomSheet visible={wilayaPickerOpen} onRequestClose={() => setWilayaPickerOpen(false)} maxHeight="85%">
+      <BottomSheet visible={regionPickerOpen} onRequestClose={() => setRegionPickerOpen(false)} maxHeight="85%">
         <View style={styles.modalHeader}>
-          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantStoreWilayaLabel")}</UiText>
-          <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setWilayaPickerOpen(false)} hitSlop={10}>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{regionPickerLevel === "primary" ? regionOptions.data?.selectedLevel.label_ar : secondaryOptions.data?.selectedLevel.label_ar}</UiText>
+          <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setRegionPickerOpen(false)} hitSlop={10}>
             <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</UiText>
           </PressableSurface>
         </View>
         <ScrollView style={styles.wilayaList} keyboardShouldPersistTaps="handled">
-          {(wilayas.data ?? []).map((wilaya) => (
-            <PressableSurface key={wilaya.id} accessibilityRole="button" accessibilityLabel={String(wilaya.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)} accessibilityState={{ selected: wilaya.id === form.wilaya_id }} onPress={() => selectWilaya(wilaya)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: wilaya.id === form.wilaya_id ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted) : "transparent" }]}>
-              <UiText style={[styles.wilayaText, { color: wilaya.id === form.wilaya_id && theme.mode === "dark" ? theme.colors.accentMuted : theme.colors.foreground }]}>{String(wilaya.id).padStart(2, "0")} - {getLocalizedWilayaLabel(wilaya.id, wilaya.name_ar, language, wilaya.name_fr)}</UiText>
+          {(regionPickerLevel === "primary" ? (regionOptions.data?.regions ?? []) : (secondaryOptions.data?.regions ?? [])).map((region) => (
+            <PressableSurface key={region.id} accessibilityRole="button" accessibilityLabel={getRegionDisplayName(region, language)} accessibilityState={{ selected: regionPickerLevel === "primary" ? region.id === form.region_id : region.id === form.secondary_region_id }} onPress={() => regionPickerLevel === "primary" ? selectRegion(region.id) : selectSecondaryRegion(region.id)} style={[styles.wilayaOption, { borderBottomColor: theme.colors.border, backgroundColor: (regionPickerLevel === "primary" ? region.id === form.region_id : region.id === form.secondary_region_id) ? (theme.mode === "light" ? theme.colors.accent : theme.colors.surfaceMuted) : "transparent" }]}>
+              <UiText style={[styles.wilayaText, { color: theme.colors.foreground }]}>{getRegionDisplayName(region, language)}</UiText>
             </PressableSurface>
           ))}
         </ScrollView>
