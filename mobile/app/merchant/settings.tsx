@@ -280,7 +280,7 @@ export default function MerchantStoreSettingsScreen() {
 
       <BottomSheet visible={regionPickerOpen} onRequestClose={() => setRegionPickerOpen(false)} maxHeight="85%">
         <View style={styles.modalHeader}>
-          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{regionPickerLevel === "primary" ? regionOptions.data?.selectedLevel.label_ar : secondaryOptions.data?.selectedLevel.label_ar}</UiText>
+          <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{regionPickerLevel === "primary" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : (secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : "")}</UiText>
           <PressableSurface accessibilityRole="button" accessibilityLabel={translate("merchantProductCategoryClose")} onPress={() => setRegionPickerOpen(false)} hitSlop={10}>
             <UiText style={[styles.backText, { color: theme.colors.accentMuted }]}>{translate("merchantProductCategoryClose")}</UiText>
           </PressableSurface>
