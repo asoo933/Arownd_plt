@@ -263,7 +263,8 @@ const MerchantOrderDetailSchema = z.object({
     delivery_type: z.string(),
     payment_method: z.string().nullable(),
     created_at: z.string(),
-    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable()
+    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable(),
+    daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional()
   })
 }).passthrough();
 
