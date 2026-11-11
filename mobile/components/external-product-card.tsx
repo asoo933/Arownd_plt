@@ -68,7 +68,7 @@ function ExternalProductCard({ product }: { product: ExternalProduct }) {
           disabled={!canOpen}
           size="sm"
           fullWidth
-          endIcon={<Icon name="external-link" size={15} color={theme.colors.onAccent} accessibilityHidden />}
+          endIcon={<Icon name="arrow-right" size={15} color={theme.colors.accentForeground} accessibilityHidden />}
         />
       </View>
     </View>
@@ -81,7 +81,7 @@ export function ExternalProductsSection({ products }: { products: ExternalProduc
       <SectionTitle title={translate("homeExternalProducts")} subtitle={translate("homeExternalProductsSubtitle")} />
       {products.length === 0 ? (
         <EmptyState
-          icon="globe"
+          icon="store"
           title={translate("homeExternalProductsEmpty")}
           hint={translate("homeExternalProductsEmptyHint")}
         />
