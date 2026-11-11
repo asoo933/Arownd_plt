@@ -161,7 +161,8 @@ const MerchantDashboardOrderRowSchema = z.object({
     commune: z.string().nullable(),
     delivery_type: z.string(),
     created_at: z.string(),
-    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable()
+    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable(),
+    daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional()
   }),
   items: z.array(MerchantDashboardOrderItemSchema)
 }).passthrough();
@@ -321,7 +322,7 @@ export async function fetchMerchantOrderDetails(
 
   const { data: merchantOrderData, error: merchantOrderError } = await client
     .from("merchant_orders")
-    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, wilaya_id, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(id, name_ar, name_fr))")
+    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, wilaya_id, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(id, name_ar, name_fr), daira:country_regions!orders_daira_region_fkey(name_ar, name_fr))")
     .eq("id", merchantOrderId)
     .eq("store_id", storeId)
     .maybeSingle();
