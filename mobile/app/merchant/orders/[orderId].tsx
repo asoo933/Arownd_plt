@@ -22,7 +22,7 @@ import { canCollectMerchantOrderCod, canManageMerchantOrderFulfillment, getNextM
 import { readCartOptions } from "@/lib/cart-state";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getLocalizedWilayaLabel } from "@/lib/locale-data";
+import { getRegionDisplayName } from "@/lib/country-regions";
 import { Alert, AppHeader, Button, ConfirmDialog, ErrorState, MerchantOrderCard, MerchantStatusBadge, PriceDisplay, OrderCardSkeleton, Text as UiText, TextField, TrackingTimeline } from "@/components/ui";
 
 type ConfirmAction = "reject" | "collect" | null;
@@ -192,8 +192,8 @@ export default function MerchantOrderDetailsScreen() {
           <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{translate("merchantOrderCustomerTitle")}</UiText>
           <InfoRow label={translate("merchantCustomerUnknown")} value={customerOrder.full_name || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderPhone")} value={customerOrder.phone || "—"} theme={theme} />
-          <InfoRow label={translate("merchantStoreWilayaLabel")} value={getLocalizedWilayaLabel(customerOrder.wilaya_id ?? 0, customerOrder.wilaya?.name_ar ?? "—", language, customerOrder.wilaya?.name_fr)} theme={theme} />
-          <InfoRow label={translate("checkoutDaira")} value={customerOrder.daira ? (language === "ar" ? customerOrder.daira.name_ar : customerOrder.daira.name_fr ?? customerOrder.daira.name_ar) : "—"} theme={theme} />
+          <InfoRow label={language === "ar" ? "المنطقة" : language === "fr" ? "Région" : "Region"} value={customerOrder.region ? getRegionDisplayName(customerOrder.region, language) : "—"} theme={theme} />
+          {customerOrder.secondary_region || customerOrder.daira ? <InfoRow label={language === "ar" ? "المنطقة الفرعية" : language === "fr" ? "Région secondaire" : "Secondary region"} value={customerOrder.secondary_region ? getRegionDisplayName(customerOrder.secondary_region, language) : customerOrder.daira ? (language === "ar" ? customerOrder.daira.name_ar : customerOrder.daira.name_fr ?? customerOrder.daira.name_ar) : "—"} theme={theme} /> : null}
           <InfoRow label={translate("merchantStoreCommuneLabel")} value={customerOrder.commune || "—"} theme={theme} />
           <InfoRow label={translate("merchantStoreAddressLabel")} value={customerOrder.address_line || "—"} theme={theme} />
           <InfoRow label={translate("merchantOrderDeliveryType")} value={deliveryType === "desk" ? translate("checkoutStorePickup") : translate("checkoutHomeDelivery")} theme={theme} />
