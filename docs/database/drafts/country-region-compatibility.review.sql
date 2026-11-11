@@ -789,3 +789,151 @@ The metadata query returned the constraints and trigger attachments only;
 it did not execute DDL or modify rows. The complete migration still requires
 the remaining dependency and ACL inspection listed in section 13.
 */
+
+
+/*
+===============================================================================
+15. PHASE A — RPC ACL AND SECURITY DEFINER AUDIT (READ-ONLY)
+===============================================================================
+
+Verified live ACL/security contracts:
+
+- public.create_my_store(text,text,text,text,integer,text,text,double precision,
+  double precision,jsonb,text,text[]) is SECURITY DEFINER with search_path=''.
+  EXECUTE is granted to authenticated and service_role, not anon.
+  It requires _wilaya_id, resolves only a DZ-style legacy wilaya, locks the
+  caller profile, validates active category/subcategories, prevents duplicate
+  stores, promotes account_type and merchant role, then inserts the store.
+  A generic store RPC must preserve every one of these checks and the role
+  transition. It must accept a validated primary region id and derive legacy
+  wilaya_id only for DZ compatibility.
+
+- public.create_order(...) is SECURITY DEFINER with search_path=''.
+  EXECUTE is not granted to authenticated or anon; service_role and postgres
+  have EXECUTE. It is invoked from the authenticated checkout wrapper.
+  Do not grant authenticated direct execution as a shortcut.
+
+- public.create_order_with_delivery has two existing overloads:
+  * legacy overload without daira: authenticated EXECUTE is revoked;
+  * daira overload: authenticated EXECUTE is granted.
+  New generic checkout must use a distinct function name to avoid PostgREST
+  overload ambiguity. Grant EXECUTE only to authenticated/service_role as
+  justified by the caller contract; revoke PUBLIC/anon explicitly.
+
+- public.merchant_submit_order_quote(uuid,integer) and
+  public.customer_respond_to_merchant_order(uuid,boolean) are SECURITY DEFINER,
+  search_path='public', and executable by authenticated.
+  The former verifies store ownership through public.is_store_owner().
+  The latter verifies mo.customer_id=auth.uid(). Preserve these checks.
+  Both should be hardened to search_path='' with all object references
+  schema-qualified before altering behavior. Re-test authenticated access.
+
+- public.is_store_owner(uuid) is SECURITY DEFINER, search_path='public',
+  authenticated EXECUTE. Its query is schema-qualified. If retained as a
+  SECURITY DEFINER helper, harden its search_path to '' as part of the same
+  security review.
+
+- public.refresh_parent_order_totals(uuid) is SECURITY DEFINER, search_path
+  'public', and has no anon/authenticated EXECUTE grant. It is an internal
+  helper invoked by trusted RPCs. Keep it unexposed and preserve its
+  aggregate/status semantics.
+
+- enforce_daira_region_selection() is a trigger function with PUBLIC/anon/
+  authenticated EXECUTE ACL in the current catalog. Trigger functions cannot
+  be invoked as ordinary scalar functions; nevertheless, the replacement
+  should revoke unnecessary PUBLIC/anon/authenticated EXECUTE and grant only
+  what is required for trigger execution (trigger invocation itself is
+  governed by table write permissions). Do not grant broad EXECUTE by default.
+
+Security hardening rule for new/modified SECURITY DEFINER functions:
+SET search_path = ''; schema-qualify every relation, type, sequence and helper
+function reference; derive identity from auth.uid(); perform explicit
+authorization checks inside each RPC; do not rely on triggers when auth.uid()
+may be NULL in privileged execution.
+
+Important confirmed defects to include in Phase A:
+1. merchant_submit_order_quote() notification body hardcodes the DZD label
+   three times. Format using orders.currency_code and countries metadata,
+   while keeping numeric notification JSON fields unchanged.
+2. customer_respond_to_merchant_order() and is_store_owner() use
+   search_path='public'; harden without changing their external signatures.
+3. Existing create_order() initializes shipping_fee from wilayas.home_price /
+   desk_price. Generic flow must initialize shipping_fee=0 and total=subtotal.
+4. Existing generic country configuration is currently implemented in
+   mobile/lib/country-regions.ts only; SQL needs a single authoritative
+   country/region-type rule source, or an explicit safe derivation from
+   existing countries + country_regions metadata. Do not assume the client
+   helper is a server-side security boundary.
+
+No ACL, function body, grant, row or schema was changed during this audit.
+===============================================================================
+16. PHASE A — IMPLEMENTATION DELTA (PROPOSED, NOT EXECUTABLE SQL)
+===============================================================================
+
+Database changes expected in the eventual reviewed migration:
+
+A1. Additive compatibility only:
+- Keep existing legacy RPC signatures and columns for currently deployed
+  clients.
+- Introduce distinct generic RPC names for store creation and checkout.
+- Keep the old checkout entry point DZ-only and preserve its idempotency
+  behavior until the app rollout is complete.
+- Do not drop wilaya_id FKs or NOT NULL constraints until all write paths and
+  supported app versions have been migrated and verified.
+
+A2. Country-aware region validation:
+- Replace the daira-only trigger function body while retaining the existing
+  trigger attachments and timings.
+- Validate the selected primary region against country_code, enabled country,
+  enabled region, parent_id IS NULL and the configured primary region_type.
+- Validate optional/required secondary region against same country, enabled
+  status, configured secondary region_type and parent_id=primary.id.
+- For DZ, preserve wilaya -> daira and legacy wilaya_id mapping.
+- For EG, allow governorate as the primary level with no secondary level.
+- For SA, require region -> governorate.
+- For MA, support region -> province/prefecture only where the parent-child
+  dataset is actually present; do not require a missing child record.
+- For AE, support emirate primary and municipality only as optional because
+  the current second-level data is not a uniform administrative hierarchy.
+- Reject unsupported region_type combinations. Country activation remains
+  outside this migration and disabled countries remain disabled.
+
+A3. Store and checkout RPCs:
+- New generic store RPC validates auth/profile, merchant eligibility, category,
+  subcategories, duplicate store, primary region, country match and role
+  transition, preserving the current create_my_store safeguards.
+- New generic checkout RPC validates COD, payload bounds, contact fields,
+  country/account ownership, delivery type, region hierarchy, store country,
+  item availability, stock, and idempotency.
+- It must reserve stock under the same FOR UPDATE locks and write region fields
+  atomically with the order. No temporary daira bypass setting in generic flow.
+- Initial shipping_fee=0; total=subtotal. Merchant quote remains authoritative.
+- Preserve existing order/merchant_order snapshots and notification lifecycle.
+
+A4. Legacy compatibility:
+- Keep legacy RPCs callable under their existing ACLs.
+- Legacy DZ checkout wrapper remains mapped to generic internal logic only if
+  all legacy validation and response contracts remain identical.
+- Do not widen old RPC grants. Do not remove legacy fields in Phase A.
+
+A5. Currency and quote:
+- Derive display currency from the parent order currency_code and country
+  metadata; do not assume a symbol column.
+- Numeric JSON data payload remains numeric and backward-compatible.
+- Desk pickup shipping fee remains exactly zero.
+- Preserve quote acceptance/rejection and stock restoration semantics.
+
+A6. Required migration preconditions:
+- The full DDL/constraints for checkout_idempotency and all affected tables
+  must be rechecked immediately before generating executable SQL.
+- Confirm phone validation strategy before relaxing the Algeria-specific
+  CHECK. This is a separate compatibility change and must not be loosened
+  without a tested server-side replacement.
+- Review every trigger function dependency and function ACL after replacement.
+- Test existing DZ app RPC calls and all idempotency/quote regressions.
+- Do not enable any additional country in this phase.
+
+This section is a proposed delta checklist only. It is not an executable
+migration and must not be pasted into Supabase SQL Editor.
+===============================================================================
+*/
