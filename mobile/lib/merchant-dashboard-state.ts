@@ -16,7 +16,11 @@ export type MerchantOrderRow = {
     commune: string | null;
     delivery_type: string;
     created_at: string;
-    wilaya: { id: number; name_ar: string | null; name_fr: string | null } | null;
+    country_code: string;
+    currency_code: string;
+    region: { name_ar: string; name_fr: string | null; name_en: string | null } | null;
+    secondary_region: { name_ar: string; name_fr: string | null; name_en: string | null } | null;
+    wilaya?: { id: number; name_ar: string | null; name_fr: string | null } | null;
   } | null;
 };
 
@@ -33,6 +37,7 @@ export type MerchantDashboardOrder = {
   wilayaName: string;
   wilayaId: number | null;
   wilayaNameFr: string;
+  currencyCode: string;
   deliveryType: string;
   itemCount: number;
   totalQuantity: number;
@@ -75,9 +80,10 @@ export function groupMerchantOrderRows(rows: MerchantOrderRow[]): MerchantOrderS
       createdAt: parentOrder.created_at,
       customerName: parentOrder.full_name?.trim() ?? "",
       commune: parentOrder.commune?.trim() ?? "",
-      wilayaName: parentOrder.wilaya?.name_ar?.trim() ?? "",
+      wilayaName: [parentOrder.region?.name_ar ?? parentOrder.wilaya?.name_ar ?? "", parentOrder.secondary_region?.name_ar ?? ""].filter(Boolean).join("، "),
       wilayaId: parentOrder.wilaya?.id ?? null,
-      wilayaNameFr: parentOrder.wilaya?.name_fr?.trim() ?? "",
+      wilayaNameFr: [parentOrder.region?.name_fr ?? parentOrder.region?.name_en ?? parentOrder.wilaya?.name_fr ?? "", parentOrder.secondary_region?.name_fr ?? parentOrder.secondary_region?.name_en ?? ""].filter(Boolean).join(", "),
+      currencyCode: parentOrder.currency_code,
       deliveryType: parentOrder.delivery_type,
       itemCount: 1,
       totalQuantity: row.quantity,
