@@ -10,7 +10,7 @@ import {
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSurface, PriceDisplay, Spinner, Text as UiText, TextField } from "@/components/ui";
-import { fetchOffersByIds, formatDZD } from "@/lib/catalog";
+import { fetchOffersByIds, formatMarketPrice } from "@/lib/catalog";
 import {
   completeCheckout,
   fetchCheckoutCommunes,
@@ -26,6 +26,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { fetchMyAccountCurrencyCode } from "@/lib/country-service";
 import { fetchMyAddresses, type UserAddress } from "@/lib/user-address";
 import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-state";
 import { formatOrderCode } from "@/lib/orders-state";
@@ -68,6 +69,8 @@ export default function CheckoutScreen() {
     queryFn: () => fetchOffersByIds(offerIds),
     enabled: cart.isSuccess && offerIds.length > 0
   });
+  const accountCurrency = useQuery({ queryKey: ["account-currency"], queryFn: fetchMyAccountCurrencyCode });
+  const formatAccountAmount = (amount: number) => accountCurrency.data ? formatMarketPrice(amount, accountCurrency.data) : "—";
   const regionOptions = useQuery({ queryKey: ["checkout-regions"], queryFn: () => fetchCheckoutRegions(), staleTime: Infinity });
   const secondaryOptions = useQuery({ queryKey: ["checkout-regions", regionId], queryFn: () => fetchCheckoutRegions(regionId), enabled: regionId !== null, staleTime: Infinity });
   const communes = useQuery({
@@ -360,7 +363,7 @@ export default function CheckoutScreen() {
             <UiText style={styles.fieldHint}>{translate("checkoutQuantity")}: {item.quantity}</UiText>
             {optionSummary ? <UiText style={styles.fieldHint}>{optionSummary}</UiText> : null}
           </View>
-          <UiText style={styles.summaryPrice}>{offer ? formatDZD(offer.price * item.quantity) : "—"}</UiText>
+          <UiText style={styles.summaryPrice}>{offer ? formatAccountAmount(offer.price * item.quantity) : "—"}</UiText>
         </View>;
       })}
       {offers.isPending ? <LoadingState label={translate("cartVerifying")} /> : null}
@@ -368,7 +371,7 @@ export default function CheckoutScreen() {
       {hasBlockingItems ? <UiText style={styles.errorText}>{translate("checkoutFixCart")}</UiText> : null}
       <View style={styles.totalRow}>
         <UiText style={styles.totalLabel}>{translate("checkoutProductsTotal")}</UiText>
-        <PriceDisplay value={offers.data ? formatDZD(evaluation.subtotal) : "—"} style={styles.totalDisplay} />
+        <PriceDisplay value={offers.data ? formatAccountAmount(evaluation.subtotal) : "—"} style={styles.totalDisplay} />
       </View>
       <View style={styles.shippingRow}>
         <UiText style={styles.fieldHint}>{translate("checkoutShippingFee")}</UiText>

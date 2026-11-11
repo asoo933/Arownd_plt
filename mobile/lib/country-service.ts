@@ -59,6 +59,20 @@ export async function fetchMyBrowsingCountryCode(): Promise<string> {
   return data.browsing_country_code;
 }
 
+export async function fetchMyAccountCurrencyCode(): Promise<string> {
+  const { data: authData, error: authError } = await getSupabaseClient().auth.getUser();
+  if (authError || !authData.user) throw new Error("NOT_AUTHENTICATED");
+  const { data: profile, error: profileError } = await getSupabaseClient()
+    .from("profiles").select("country_code").eq("user_id", authData.user.id).single();
+  if (profileError) throw profileError;
+  if (typeof profile.country_code !== "string" || !/^[A-Z]{2}$/.test(profile.country_code)) throw new Error("INVALID_ACCOUNT_COUNTRY");
+  const { data: country, error: countryError } = await getSupabaseClient()
+    .from("countries").select("currency_code").eq("code", profile.country_code).single();
+  if (countryError) throw countryError;
+  if (typeof country.currency_code !== "string" || !/^[A-Z]{3}$/.test(country.currency_code)) throw new Error("INVALID_ACCOUNT_CURRENCY");
+  return country.currency_code;
+}
+
 export async function fetchBrowsingCurrencyCode(): Promise<string> {
   const { data: authData, error: authError } = await getSupabaseClient().auth.getUser();
   if (authError || !authData.user) throw new Error("NOT_AUTHENTICATED");

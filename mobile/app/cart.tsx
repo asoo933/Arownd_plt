@@ -19,7 +19,8 @@ import {
   QuantityStepper,
   Text as UiText
 } from "@/components/ui";
-import { fetchOffersByIds, formatDZD, formatNumber, getPrimaryImage } from "@/lib/catalog";
+import { fetchOffersByIds, formatMarketPrice, formatNumber, getPrimaryImage } from "@/lib/catalog";
+import { fetchBrowsingCurrencyCode } from "@/lib/country-service";
 import { CART_QUERY_KEY, getCart, removeFromCart, updateCartQuantity } from "@/lib/cart";
 import { cartLineKey, evaluateCart, normalizeCartOptions, type CartItem as CartLine } from "@/lib/cart-state";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -32,6 +33,8 @@ export default function CartScreen() {
   const queryClient = useQueryClient();
   const cart = useQuery({ queryKey: CART_QUERY_KEY, queryFn: getCart });
   const ids = cart.data?.map((item) => item.offerId) ?? [];
+  const marketCurrency = useQuery({ queryKey: ["browsing-currency"], queryFn: fetchBrowsingCurrencyCode });
+  const formatMarketAmount = (amount: number) => marketCurrency.data ? formatMarketPrice(amount, marketCurrency.data) : "—";
   const offers = useQuery({
     queryKey: ["customer-cart-offers", ids],
     queryFn: () => fetchOffersByIds(ids),
@@ -86,13 +89,13 @@ export default function CartScreen() {
       <CartSummary style={style.summaryContent}>
         <View style={style.summaryRow}>
           <UiText tone="muted" style={style.summaryLabel}>{translate("cartSubtotal")}</UiText>
-          <PriceText numberOfLines={1} adjustsFontSizeToFit value={offers.isPending || offers.isError ? "—" : formatDZD(evaluation.subtotal)} tone="accentMuted" style={style.total} />
+          <PriceText numberOfLines={1} adjustsFontSizeToFit value={offers.isPending || offers.isError ? "—" : formatMarketAmount(evaluation.subtotal)} tone="accentMuted" style={style.total} />
         </View>
         <Caption style={style.note}>{translate("cartDeliveryNote")}</Caption>
         <Button
           label={translate("cartCheckout")}
           onPress={() => router.push("/checkout")}
-          disabled={offers.isPending || offers.isError || mutation.isPending || evaluation.blockingCount > 0}
+          disabled={offers.isPending || offers.isError || !marketCurrency.data || marketCurrency.isError || mutation.isPending || evaluation.blockingCount > 0}
           fullWidth
         />
       </CartSummary>
@@ -132,12 +135,12 @@ export default function CartScreen() {
                 <PriceText
                   numberOfLines={1}
                   adjustsFontSizeToFit
-                  value={formatDZD(currentPrice * item.quantity)}
-                  previousValue={line?.issues.includes("priceChanged") && item.price != null ? formatDZD(item.price * item.quantity) : undefined}
+                  value={formatMarketAmount(currentPrice * item.quantity)}
+                  previousValue={line?.issues.includes("priceChanged") && item.price != null ? formatMarketAmount(item.price * item.quantity) : undefined}
                   tone="accentMuted"
                   style={style.price}
                 />
-                {item.quantity > 1 ? <Caption numberOfLines={1} style={style.options}>{formatDZD(currentPrice)} × {item.quantity}</Caption> : null}
+                {item.quantity > 1 ? <Caption numberOfLines={1} style={style.options}>{formatMarketAmount(currentPrice)} × {item.quantity}</Caption> : null}
               </View>
             </PressableSurface>
             <View style={style.controls}>

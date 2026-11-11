@@ -6,7 +6,7 @@ import { Animated, I18nManager, PanResponder, StyleSheet, View } from "react-nat
 
 import { CustomerScreen, EmptyState, ErrorState } from "@/components/customer-ui";
 import { AppHeader, Button, Icon, IconButton, OrderCard, OrderCardSkeleton, OrderStatusBadge, PriceDisplay, PressableSurface, SegmentedControl, Text as UiText } from "@/components/ui";
-import { formatDZD, formatNumber } from "@/lib/catalog";
+import { formatMarketPrice, formatNumber } from "@/lib/catalog";
 import { fetchCustomerOrderDetails, fetchMyOrders, getOrderStatusTone, type CustomerOrder } from "@/lib/orders";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, type Language, useLanguage } from "@/lib/i18n";
@@ -224,7 +224,7 @@ export default function OrdersScreen() {
       const orderCard = <OrderCard key={rowKey} onPress={() => {
         void queryClient.prefetchQuery({ queryKey: ["customer-order-details", row.order.id], queryFn: () => fetchCustomerOrderDetails(row.order.id), staleTime: 15_000 });
         router.push({ pathname: "/orders/[orderId]", params: { orderId: row.order.id } });
-      }} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatDZD(total)}`} style={styles.card} contentStyle={styles.cardContent}>
+      }} accessibilityLabel={`${translate("ordersCode")} ${orderCode}، ${statusLabel(row.status)}، ${formatMarketPrice(total, row.order.currency_code ?? "DZD")}`} style={styles.card} contentStyle={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <UiText style={[styles.orderCode, { color: theme.colors.foreground }]}>{translate("ordersCode")}: {orderCode}</UiText>
