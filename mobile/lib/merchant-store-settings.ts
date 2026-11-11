@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { fetchMyAccountCallingCode, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/merchant-store-settings-state";
 
 const StoreSettingsRecordSchema = z.object({
@@ -63,6 +64,9 @@ export async function updateMyMerchantStoreSettings(
   input: MerchantStoreSettings
 ): Promise<void> {
   const values = MerchantStoreSettingsSchema.parse(input);
+  const callingCode = await fetchMyAccountCallingCode();
+  const phone = normalizePhoneForCallingCode(values.phone, callingCode);
+  const whatsapp = values.whatsapp ? normalizePhoneForCallingCode(values.whatsapp, callingCode) : "";
   const client = getSupabaseClient();
   const { data: auth, error: authError } = await client.auth.getUser();
   if (authError) throw authError;
@@ -70,10 +74,11 @@ export async function updateMyMerchantStoreSettings(
 
   const { data, error } = await client.from("stores").update({
     ...values,
+    phone,
+    whatsapp: whatsapp || null,
     description: values.description || null,
     logo_url: values.logo_url || null,
     cover_url: values.cover_url || null,
-    whatsapp: values.whatsapp || null,
     instagram_url: values.instagram_url || null,
     facebook_url: values.facebook_url || null
   }).eq("id", storeId).eq("owner_id", auth.user.id).select("id").maybeSingle();
