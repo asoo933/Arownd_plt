@@ -52,12 +52,12 @@ export async function fetchMyAccountCountryCode(): Promise<SupportedCountryCode>
 }
 
 /** Country-specific region levels are data, not application conditionals. */
-export async function fetchMyAccountRegionLevels(): Promise<{
+export async function fetchCountryRegionLevels(countryCodeInput: string): Promise<{
   countryCode: SupportedCountryCode;
   callingCode: string;
   levels: CountryRegionLevel[];
 }> {
-  const countryCode = await fetchMyAccountCountryCode();
+  const countryCode = CountryCodeSchema.parse(countryCodeInput);
   const client = getSupabaseClient();
 
   const { data: country, error: countryError } = await client.from("countries")
@@ -65,9 +65,9 @@ export async function fetchMyAccountRegionLevels(): Promise<{
     .eq("code", countryCode)
     .single();
   if (countryError) throw countryError;
-  if (!country.is_enabled) throw new Error("account_country_disabled");
+  if (!country.is_enabled) throw new Error("country_disabled");
   if (typeof country.calling_code !== "string" || !/^\+[1-9]\d{0,2}$/.test(country.calling_code)) {
-    throw new Error("account_country_calling_code_invalid");
+    throw new Error("country_calling_code_invalid");
   }
 
   const { data, error } = await client.from("country_region_levels")
@@ -91,8 +91,13 @@ export async function fetchMyAccountRegionLevels(): Promise<{
   return { countryCode, callingCode: country.calling_code, levels };
 }
 
-export async function fetchMyAccountRegions(parentRegionId?: number | null): Promise<AccountRegionOptions> {
-  const { countryCode, callingCode, levels } = await fetchMyAccountRegionLevels();
+
+export async function fetchMyAccountRegionLevels() {
+  return fetchCountryRegionLevels(await fetchMyAccountCountryCode());
+}
+
+export async function fetchCountryRegions(countryCodeInput: string, parentRegionId?: number | null): Promise<AccountRegionOptions> {
+  const { countryCode, callingCode, levels } = await fetchCountryRegionLevels(countryCodeInput);
   const firstLevel = levels[0];
   if (!firstLevel) throw new Error("country_region_levels_not_configured");
   let selectedLevel: CountryRegionLevel = firstLevel;
@@ -162,6 +167,11 @@ export async function fetchMyAccountRegions(parentRegionId?: number | null): Pro
     selectedLevel,
     regions: RegionSchema.array().parse(data as unknown)
   };
+
+}
+
+export async function fetchMyAccountRegions(parentRegionId?: number | null): Promise<AccountRegionOptions> {
+  return fetchCountryRegions(await fetchMyAccountCountryCode(), parentRegionId);
 }
 
 export async function fetchMyAccountChildRegions(parentRegionId: number): Promise<CountryRegion[]> {
