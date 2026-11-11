@@ -1366,3 +1366,145 @@ Still open before final executable SQL:
 This remains documentation only. No live database or application changes
 were made by this inspection.
 */
+
+
+/*
+===============================================================================
+22. PHASE A — MOBILE SOURCE CONTRACT AUDIT
+GITHUB MAIN SOURCE REVIEW — 2026-11-11
+===============================================================================
+
+Reviewed current source files (read-only):
+mobile/lib/checkout.ts
+mobile/lib/user-address.ts
+mobile/lib/user-address-state.ts
+mobile/lib/delivery-profile.ts
+mobile/lib/delivery-profile-state.ts
+mobile/lib/country-regions.ts
+mobile/lib/merchant.ts
+mobile/lib/merchant-validation.ts
+mobile/lib/catalog.ts
+mobile/lib/orders.ts
+mobile/app/checkout.tsx
+mobile/app/addresses.tsx
+mobile/app/delivery-profile.tsx
+mobile/app/merchant/settings.tsx
+mobile/app/stores.tsx
+mobile/app/orders/[orderId].tsx
+mobile/app/merchant/orders/[orderId].tsx
+
+A. Checkout
+- fetchCheckoutWilayas() reads public.wilayas, not country_regions.
+- fetchCheckoutDairas() hardcodes country_code='DZ', region_type='daira',
+  and resolves parent through legacy_wilaya_id.
+- CheckoutProfile selects full_name, phone, wilaya_id, daira_region_id, commune;
+  it does not select country_code or generic region_id.
+- CheckoutInput requires wilayaId and dairaRegionId; submitCheckout rejects
+  missing/invalid daira and invokes create_order_with_delivery using
+  _wilaya_id and _daira_region_id. It sends no generic primary/secondary
+  region contract and no country_code.
+- checkout.tsx uses wilaya/daira pickers, requires both IDs and commune, and
+  formats product subtotal using formatDZD().
+- Address selection in checkout copies the same legacy wilaya/daira values.
+- Therefore generic checkout requires coordinated updates to types, Zod
+  validation, data loaders, screen state/pickers, selected-address mapping,
+  request identity/idempotency hash and RPC arguments.
+
+B. Saved addresses and delivery profile
+- UserAddressSchema requires wilaya_id, daira_region_id and an Algeria-only
+  phone regex. It has no country_code or generic region_id.
+- user-address.ts selects the daira relation through the legacy
+  user_addresses_daira_region_fkey and writes the legacy fields only.
+- Database user_addresses.phone CHECK duplicates the Algeria-only assumption.
+- DeliveryProfileSchema and delivery-profile.ts similarly require and persist
+  wilaya_id + daira_region_id and validate Algeria-only phone formats.
+- addresses.tsx and delivery-profile.tsx both use the legacy Wilaya/Daira
+  pickers. The generic country-regions helper is not wired into either flow.
+- The new generic rollout must preserve existing DZ address/profile behavior
+  while supporting countries without a secondary region and countries where
+  the secondary region is optional. Do not make all countries require daira.
+
+C. Merchant store creation and settings
+- merchant-validation.ts requires wilayaId.
+- createMerchantStore() rejects null wilayaId and calls create_my_store()
+  with _wilaya_id; it does not submit country_code or region_id.
+- Database create_my_store() also requires _wilaya_id and derives generic
+  region_id from legacy_wilaya_id.
+- merchant/settings.tsx loads public.wilayas and only edits wilaya_id.
+- Merchant order detail/dashboard queries continue joining wilayas and
+  display wilaya/daira, so they need generic region labels for international
+  accounts without losing legacy DZ rendering.
+
+D. Market browsing
+- catalog.fetchVerifiedStoresByWilaya(wilayaId) filters stores by wilaya_id.
+- stores.tsx loads wilayas and requires a wilaya selection before displaying
+  stores. It does not use browsing_country_code + country_regions primary
+  region as the browsing selector.
+- Generic market browsing must use browsing_country_code and region_id while
+  preserving existing RLS isolation. Do not use the immutable account country
+  as the browsing market selector.
+
+E. Orders and currency presentation
+- orders.ts OrderSchema and ORDER_SELECT retain wilaya_id and wilaya/daira
+  relations; no generic region selection is requested in the current query.
+- Customer order detail and merchant order detail screens use formatDZD()
+  for order totals, item prices, shipping fees and paid amounts.
+- checkout.tsx uses formatDZD() for cart/order preview values.
+- catalog.ts already contains formatMarketPrice(amount,currencyCode) for
+  DZD/MAD/EGP/SAR/AED and formatDZD() as a DZ-only helper.
+- The reviewed order screens still call formatDZD() rather than using the
+  immutable historical orders.currency_code. This would render non-DZ
+  historical orders with DZD formatting if such rows existed.
+- Merchant product/settings and quote UI also contain DZD-labelled copy
+  (for example delivery fee and product price labels). These are app contract
+  updates required before any additional country is enabled.
+- Preserve the distinction: browsing market prices use browsing-country
+  currency; cart/checkout use account-country currency; historical orders use
+  orders.currency_code snapshot; merchant analytics must not aggregate mixed
+  currencies into one unlabelled total.
+
+F. Generic helper readiness
+- mobile/lib/country-regions.ts defines country primary/secondary region
+  configuration and account-country fetch functions for DZ/MA/EG/SA/AE.
+- fetchMyAccountRegions() reads only the current account country and root
+  region type; fetchMyAccountChildRegions() validates the primary region and
+  returns configured child types.
+- This helper is not yet integrated into the address, delivery-profile,
+  checkout, merchant store creation/settings, store discovery or order detail
+  flows reviewed above.
+- It also models account-country regions, not browsing-country regions; a
+  separate existing country-service contract must be followed for public
+  market discovery rather than reusing account-country fetch functions.
+
+G. Mobile rollout gate
+- The app currently implements a DZ-specific vertical slice across checkout,
+  addresses, profile, merchant store creation, market browsing and order UI.
+- The generic helper alone does not make the app multi-country compatible.
+- No mobile files were changed in this pass. Before writing final DDL, map each
+  existing service/UI call to the proposed RPC and columns, then update app
+  and database as a coordinated release. Add tests for DZ legacy parity and
+  each configured country shape (single-level, optional secondary, required
+  secondary), and verify COD quote acceptance/rejection and currency snapshots.
+
+===============================================================================
+23. PHASE A — AUDIT STATUS AFTER MOBILE SOURCE REVIEW
+===============================================================================
+
+The database schema and app source now confirm a coordinated compatibility
+release is mandatory. The database-only migration path is rejected.
+
+Remaining items before executable SQL:
+1. Inspect country-service.ts and the complete store/catalog/merchant screens
+   to define account-country vs browsing-country query behavior.
+2. Inspect all currency formatting call sites and quote-notification body
+   across customer and merchant views, including analytics aggregation.
+3. Inspect all references to legacy wilaya_id/daira_region_id and public
+   profile mirror consumers before choosing compatibility/retirement timing.
+4. Specify the exact generic RPC signatures and request payload, including
+   idempotency hash inputs, location validation, COD, item stock locking,
+   merchant-order trigger behavior and quote lifecycle.
+5. Prepare a test matrix and rollback plan before final DDL review.
+
+This source review is documentation only. No application files or live
+database objects were modified.
+*/
