@@ -2,20 +2,63 @@ import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
 
-const CountryCodeSchema = z.string().trim().length(2).transform((value) => value.toUpperCase());
+export const COUNTRY_REGION_CONFIG = {
+  DZ: {
+    primaryType: "wilaya",
+    secondaryTypes: ["daira"],
+    secondaryRequired: true,
+    primaryLabelAr: "الولاية",
+    primaryLabelEn: "Wilaya",
+    secondaryLabelAr: "الدائرة",
+    secondaryLabelEn: "Daira"
+  },
+  MA: {
+    primaryType: "region",
+    secondaryTypes: ["province", "prefecture"],
+    secondaryRequired: false,
+    primaryLabelAr: "الجهة",
+    primaryLabelEn: "Region",
+    secondaryLabelAr: "الإقليم أو العمالة",
+    secondaryLabelEn: "Province or prefecture"
+  },
+  EG: {
+    primaryType: "governorate",
+    secondaryTypes: [],
+    secondaryRequired: false,
+    primaryLabelAr: "المحافظة",
+    primaryLabelEn: "Governorate",
+    secondaryLabelAr: "المدينة",
+    secondaryLabelEn: "City"
+  },
+  SA: {
+    primaryType: "region",
+    secondaryTypes: ["governorate"],
+    secondaryRequired: true,
+    primaryLabelAr: "المنطقة",
+    primaryLabelEn: "Region",
+    secondaryLabelAr: "المحافظة",
+    secondaryLabelEn: "Governorate"
+  },
+  AE: {
+    primaryType: "emirate",
+    secondaryTypes: ["municipality"],
+    secondaryRequired: false,
+    primaryLabelAr: "الإمارة",
+    primaryLabelEn: "Emirate",
+    secondaryLabelAr: "البلدية أو المنطقة الخدمية",
+    secondaryLabelEn: "Municipality or service area"
+  }
+} as const;
 
-const CountryRegionLevelSchema = z.object({
-  country_code: CountryCodeSchema,
-  level: z.number().int().positive(),
-  region_types: z.array(z.string().trim().min(1)).min(1),
-  label_ar: z.string().trim().min(1),
-  label_en: z.string().trim().min(1),
-  is_required: z.boolean()
-});
+export type SupportedCountryCode = keyof typeof COUNTRY_REGION_CONFIG;
+export type CountryRegionConfig = (typeof COUNTRY_REGION_CONFIG)[SupportedCountryCode];
+
+const CountryCodeSchema = z.string().length(2).transform((value) => value.toUpperCase())
+  .refine((value): value is SupportedCountryCode => value in COUNTRY_REGION_CONFIG, "unsupported_country");
 
 const RegionSchema = z.object({
   id: z.number().int().positive(),
-  country_code: CountryCodeSchema,
+  country_code: z.string().length(2),
   parent_id: z.number().int().positive().nullable(),
   code: z.string(),
   name_ar: z.string(),
@@ -25,14 +68,11 @@ const RegionSchema = z.object({
   is_enabled: z.boolean()
 });
 
-export type SupportedCountryCode = string;
-export type CountryRegionLevel = z.infer<typeof CountryRegionLevelSchema>;
 export type CountryRegion = z.infer<typeof RegionSchema>;
 
 export type AccountRegionOptions = {
   countryCode: SupportedCountryCode;
-  levels: CountryRegionLevel[];
-  selectedLevel: CountryRegionLevel;
+  config: CountryRegionConfig;
   regions: CountryRegion[];
 };
 
@@ -50,109 +90,49 @@ export async function fetchMyAccountCountryCode(): Promise<SupportedCountryCode>
   return CountryCodeSchema.parse(data.country_code);
 }
 
-/**
- * Administrative hierarchy is configured in the database, not in a
- * country-code switch. Adding a market only requires country and level data.
- */
-export async function fetchMyAccountRegionLevels(): Promise<{
-  countryCode: SupportedCountryCode;
-  levels: CountryRegionLevel[];
-}> {
-  const countryCode = await fetchMyAccountCountryCode();
-  const client = getSupabaseClient();
-
-  const { data: country, error: countryError } = await client.from("countries")
-    .select("code, is_enabled")
-    .eq("code", countryCode)
-    .single();
-  if (countryError) throw countryError;
-  if (!country.is_enabled) throw new Error("account_country_disabled");
-
-  const { data, error } = await client.from("country_region_levels")
-    .select("country_code, level, region_types, label_ar, label_en, is_required")
-    .eq("country_code", countryCode)
-    .order("level", { ascending: true });
-  if (error) throw error;
-
-  const levels = CountryRegionLevelSchema.array().parse(data as unknown);
-  if (levels.length === 0 || levels[0].level !== 1) {
-    throw new Error("country_region_levels_not_configured");
-  }
-  for (let index = 0; index < levels.length; index += 1) {
-    if (levels[index].level !== index + 1) {
-      throw new Error("country_region_levels_invalid_sequence");
-    }
-  }
-
-  return { countryCode, levels };
+export function getCountryRegionConfig(countryCode: string): CountryRegionConfig {
+  return COUNTRY_REGION_CONFIG[CountryCodeSchema.parse(countryCode)];
 }
 
-export async function fetchMyAccountRegions(parentRegionId?: number | null): Promise<AccountRegionOptions> {
-  const { countryCode, levels } = await fetchMyAccountRegionLevels();
-  let selectedLevel = levels[0];
-  let parentId: number | null = null;
-
-  if (parentRegionId !== undefined && parentRegionId !== null) {
-    if (!Number.isInteger(parentRegionId) || parentRegionId <= 0) {
-      throw new Error("invalid_parent_region");
-    }
-
-    const { data: parent, error: parentError } = await getSupabaseClient().from("country_regions")
-      .select("id, country_code, parent_id, region_type, is_enabled")
-      .eq("id", parentRegionId)
-      .eq("country_code", countryCode)
-      .eq("is_enabled", true)
-      .maybeSingle();
-    if (parentError) throw parentError;
-    if (!parent) throw new Error("invalid_parent_region");
-
-    const parentLevelIndex = levels.findIndex((level) => level.region_types.includes(parent.region_type));
-    if (parentLevelIndex < 0 || parentLevelIndex + 1 >= levels.length) {
-      throw new Error("country_region_level_not_found");
-    }
-
-    const expectedParentLevel = levels[parentLevelIndex];
-    const { data: parentParent, error: parentParentError } = parent.parent_id === null
-      ? { data: null, error: null }
-      : await getSupabaseClient().from("country_regions")
-          .select("id, region_type, country_code")
-          .eq("id", parent.parent_id)
-          .eq("country_code", countryCode)
-          .maybeSingle();
-    if (parentParentError) throw parentParentError;
-    if (parent.parent_id === null && expectedParentLevel.level !== 1) {
-      throw new Error("invalid_parent_region");
-    }
-    if (parent.parent_id !== null && !parentParent) {
-      throw new Error("invalid_parent_region");
-    }
-
-    selectedLevel = levels[parentLevelIndex + 1];
-    parentId = parent.id;
-  }
-
+export async function fetchMyAccountRegions(): Promise<AccountRegionOptions> {
+  const countryCode = await fetchMyAccountCountryCode();
+  const config = getCountryRegionConfig(countryCode);
   const { data, error } = await getSupabaseClient().from("country_regions")
     .select("id, country_code, parent_id, code, name_ar, name_fr, name_en, region_type, is_enabled")
     .eq("country_code", countryCode)
-    .in("region_type", selectedLevel.region_types)
+    .eq("region_type", config.primaryType)
+    .is("parent_id", null)
     .eq("is_enabled", true)
     .order("code", { ascending: true });
-
   if (error) throw error;
-
-  const regions = RegionSchema.array().parse(data as unknown)
-    .filter((region) => region.parent_id === parentId);
-
-  return { countryCode, levels, selectedLevel, regions };
+  return { countryCode, config, regions: RegionSchema.array().parse(data as unknown) };
 }
 
 export async function fetchMyAccountChildRegions(parentRegionId: number): Promise<CountryRegion[]> {
-  const result = await fetchMyAccountRegions(parentRegionId);
-  return result.regions;
-}
+  if (!Number.isInteger(parentRegionId) || parentRegionId <= 0) throw new Error("invalid_parent_region");
+  const countryCode = await fetchMyAccountCountryCode();
+  const config = getCountryRegionConfig(countryCode);
+  if (config.secondaryTypes.length === 0) return [];
 
-export function getRegionDisplayName(region: CountryRegion, language: string): string {
-  if (language === "fr") return region.name_fr ?? region.name_en ?? region.name_ar;
-  if (language === "en") return region.name_en ?? region.name_fr ?? region.name_ar;
-  return region.name_ar;
+  const client = getSupabaseClient();
+  const { data: parent, error: parentError } = await client.from("country_regions")
+    .select("id, parent_id, region_type, country_code, is_enabled")
+    .eq("id", parentRegionId)
+    .eq("country_code", countryCode)
+    .eq("region_type", config.primaryType)
+    .is("parent_id", null)
+    .eq("is_enabled", true)
+    .maybeSingle();
+  if (parentError) throw parentError;
+  if (!parent) throw new Error("invalid_parent_region");
+
+  const { data, error } = await client.from("country_regions")
+    .select("id, country_code, parent_id, code, name_ar, name_fr, name_en, region_type, is_enabled")
+    .eq("country_code", countryCode)
+    .eq("parent_id", parent.id)
+    .in("region_type", [...config.secondaryTypes])
+    .eq("is_enabled", true)
+    .order("code", { ascending: true });
+  if (error) throw error;
+  return RegionSchema.array().parse(data as unknown);
 }
