@@ -1,14 +1,16 @@
 import { z } from "zod";
 
 import { DeliveryProfileSchema, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
+import { fetchMyAccountCountryCode } from "@/lib/country-regions";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const ProfileSchema = z.object({
+  country_code: z.string().length(2),
   full_name: z.string().nullable().optional(),
   avatar_url: z.string().url().nullable().optional(),
   phone: z.string().nullable().optional(),
-  wilaya_id: z.number().nullable().optional(),
-  daira_region_id: z.number().nullable().optional(),
+  region_id: z.number().nullable().optional(),
+  secondary_region_id: z.number().nullable().optional(),
   commune: z.string().nullable().optional()
 });
 
@@ -20,7 +22,7 @@ export async function fetchMyDeliveryProfile(): Promise<DeliveryProfile | null> 
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
   const { data, error } = await client.from("profiles")
-    .select("full_name, avatar_url, phone, wilaya_id, daira_region_id, commune")
+    .select("country_code, full_name, avatar_url, phone, region_id, secondary_region_id, commune")
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (error) throw error;
@@ -33,12 +35,14 @@ export async function saveMyDeliveryProfile(input: DeliveryProfileInput): Promis
   const { data: auth, error: authError } = await client.auth.getUser();
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
+  const countryCode = await fetchMyAccountCountryCode();
   const { error } = await client.from("profiles").upsert({
     user_id: auth.user.id,
+    country_code: countryCode,
     full_name: parsed.full_name,
     phone: parsed.phone,
-    wilaya_id: parsed.wilaya_id,
-    daira_region_id: parsed.daira_region_id,
+    region_id: parsed.region_id,
+    secondary_region_id: parsed.secondary_region_id,
     commune: parsed.commune
   }, { onConflict: "user_id" });
   if (error) throw error;
