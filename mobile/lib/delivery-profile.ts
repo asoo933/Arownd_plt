@@ -7,6 +7,7 @@ const ProfileSchema = z.object({
   full_name: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
   wilaya_id: z.number().nullable().optional(),
+  daira_region_id: z.number().nullable().optional(),
   commune: z.string().nullable().optional()
 });
 
@@ -18,7 +19,7 @@ export async function fetchMyDeliveryProfile(): Promise<DeliveryProfile | null> 
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
   const { data, error } = await client.from("profiles")
-    .select("full_name, phone, wilaya_id, commune")
+    .select("full_name, phone, wilaya_id, daira_region_id, commune")
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (error) throw error;
@@ -36,6 +37,7 @@ export async function saveMyDeliveryProfile(input: DeliveryProfileInput): Promis
     full_name: parsed.full_name,
     phone: parsed.phone,
     wilaya_id: parsed.wilaya_id,
+    daira_region_id: parsed.daira_region_id,
     commune: parsed.commune
   }, { onConflict: "user_id" });
   if (error) throw error;

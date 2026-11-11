@@ -10,10 +10,14 @@ export { checkoutRequestIdentity } from "@/lib/checkout-state";
 const WilayaSchema = z.object({ id: z.number(), name_ar: z.string(), name_fr: z.string() });
 export type Wilaya = z.infer<typeof WilayaSchema>;
 
+const DairaSchema = z.object({ id: z.number(), code: z.string(), name_ar: z.string(), name_fr: z.string().nullable() });
+export type Daira = z.infer<typeof DairaSchema>;
+
 const ProfileSchema = z.object({
   full_name: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
   wilaya_id: z.number().nullable().optional(),
+  daira_region_id: z.number().nullable().optional(),
   commune: z.string().nullable().optional()
 });
 
@@ -27,6 +31,21 @@ export async function fetchCheckoutWilayas(): Promise<Wilaya[]> {
     .order("id");
   if (error) throw error;
   return WilayaSchema.array().parse(data as unknown);
+}
+
+export async function fetchCheckoutDairas(wilayaId: number): Promise<Daira[]> {
+  const client = getSupabaseClient();
+  const { data: parent, error: parentError } = await client.from("country_regions")
+    .select("id").eq("country_code", "DZ").eq("legacy_wilaya_id", wilayaId)
+    .eq("region_type", "wilaya").eq("is_enabled", true).maybeSingle();
+  if (parentError) throw parentError;
+  if (!parent) return [];
+  const { data, error } = await client.from("country_regions")
+    .select("id, code, name_ar, name_fr").eq("country_code", "DZ")
+    .eq("parent_id", parent.id).eq("region_type", "daira")
+    .eq("is_enabled", true).order("code", { ascending: true });
+  if (error) throw error;
+  return DairaSchema.array().parse(data as unknown);
 }
 
 export async function fetchCheckoutCommunes(wilayaId: number): Promise<string[]> {
@@ -45,7 +64,7 @@ export async function fetchCheckoutProfile(): Promise<CheckoutProfile | null> {
   if (!authData.user) return null;
   const { data, error } = await getSupabaseClient()
     .from("profiles")
-    .select("full_name, phone, wilaya_id, commune")
+    .select("full_name, phone, wilaya_id, daira_region_id, commune")
     .eq("user_id", authData.user.id)
     .maybeSingle();
   if (error) throw error;
@@ -57,6 +76,7 @@ export type CheckoutInput = {
   items: CartItem[];
   deliveryType: CheckoutDeliveryType;
   wilayaId: number;
+  dairaRegionId: number;
   commune: string;
   addressLine: string;
   fullName: string;
@@ -117,6 +137,7 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
   if (!input.userId) throw new Error("not_authenticated");
   if (input.items.length === 0) throw new Error("empty_cart");
   if (input.items.length > MAX_CHECKOUT_ITEMS) throw new Error("too_many_items");
+  if (!Number.isInteger(input.dairaRegionId) || input.dairaRegionId <= 0) throw new Error("invalid_daira");
   if (input.commune.trim().length < 2 || input.commune.trim().length > 100) {
     throw new Error("invalid_commune");
   }
@@ -139,6 +160,7 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
     })),
     _delivery_type: input.deliveryType,
     _wilaya_id: input.wilayaId,
+    _daira_region_id: input.dairaRegionId,
     _commune: input.commune.trim(),
     _address_line: input.addressLine.trim(),
     _full_name: input.fullName.trim(),

@@ -4,6 +4,8 @@ import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-sta
 import { getSupabaseClient } from "@/lib/supabase";
 
 const UserAddressRecordSchema = UserAddressSchema.extend({
+  daira_region_id: z.number().int().positive().nullable(),
+  daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional(),
   id: z.string().uuid(),
   user_id: z.string().uuid(),
   is_default: z.boolean(),
@@ -26,7 +28,7 @@ export async function fetchMyAddresses(): Promise<UserAddress[]> {
   const userId = await getCurrentUserId();
   const { data, error } = await client
     .from("user_addresses")
-    .select("id, user_id, label, recipient_name, phone, wilaya_id, commune, address_line, additional_info, is_default, created_at, updated_at")
+    .select("id, user_id, label, recipient_name, phone, wilaya_id, daira_region_id, daira:country_regions!user_addresses_daira_region_fkey(name_ar, name_fr), commune, address_line, additional_info, is_default, created_at, updated_at")
     .eq("user_id", userId)
     .order("is_default", { ascending: false })
     .order("created_at", { ascending: false });
@@ -47,7 +49,7 @@ export async function createMyAddress(input: UserAddressInput): Promise<UserAddr
       user_id: userId,
       is_default: false
     })
-    .select("id, user_id, label, recipient_name, phone, wilaya_id, commune, address_line, additional_info, is_default, created_at, updated_at")
+    .select("id, user_id, label, recipient_name, phone, wilaya_id, daira_region_id, daira:country_regions!user_addresses_daira_region_fkey(name_ar, name_fr), commune, address_line, additional_info, is_default, created_at, updated_at")
     .single();
   if (error) throw error;
   return UserAddressRecordSchema.parse(data);
@@ -67,7 +69,7 @@ export async function updateMyAddress(addressId: string, input: UserAddressInput
     })
     .eq("id", addressId)
     .eq("user_id", userId)
-    .select("id, user_id, label, recipient_name, phone, wilaya_id, commune, address_line, additional_info, is_default, created_at, updated_at")
+    .select("id, user_id, label, recipient_name, phone, wilaya_id, daira_region_id, daira:country_regions!user_addresses_daira_region_fkey(name_ar, name_fr), commune, address_line, additional_info, is_default, created_at, updated_at")
     .single();
   if (error) throw error;
   return UserAddressRecordSchema.parse(data);
