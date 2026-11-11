@@ -92,6 +92,19 @@ export async function fetchCountryRegionLevels(countryCodeInput: string): Promis
 }
 
 
+export async function fetchMyAccountCallingCode(): Promise<string> {
+  const countryCode = await fetchMyAccountCountryCode();
+  const { data, error } = await getSupabaseClient().from("countries")
+    .select("calling_code")
+    .eq("code", countryCode)
+    .single();
+  if (error) throw error;
+  if (typeof data.calling_code !== "string" || !/^\\+[1-9]\\d{0,2}$/.test(data.calling_code)) {
+    throw new Error("country_calling_code_invalid");
+  }
+  return data.calling_code;
+}
+
 export async function fetchMyAccountRegionLevels() {
   return fetchCountryRegionLevels(await fetchMyAccountCountryCode());
 }
