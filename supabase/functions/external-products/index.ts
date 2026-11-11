@@ -21,7 +21,7 @@ function isHttpsUrl(value: unknown, allowedHost: string): value is string {
   try {
     const url = new URL(value);
     return url.protocol === "https:" &&
-      (url.hostname === allowedHost || url.hostname.endsWith(`. ${allowedHost}`.replace(" ", "")));
+      (url.hostname === allowedHost || url.hostname.endsWith(`.${allowedHost}`));
   } catch {
     return false;
   }
