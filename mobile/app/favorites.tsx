@@ -26,7 +26,8 @@ import {
   EmptyState,
   ErrorState,
 } from "@/components/customer-ui";
-import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatDZD, getPrimaryImage } from "@/lib/catalog";
+import { chooseBestProductOffer, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatMarketPrice, getPrimaryImage } from "@/lib/catalog";
+import { fetchBrowsingCurrencyCode } from "@/lib/country-service";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { getFavorites } from "@/lib/favorites";
 import type { FavoriteKind } from "@/lib/favorites-state";
@@ -38,6 +39,7 @@ export default function FavoritesScreen() {
   useLanguage();
   const theme = useAppTheme();
   const queryClient = useQueryClient();
+  const browsingCurrency = useQuery({ queryKey: ["browsing-country-currency"], queryFn: fetchBrowsingCurrencyCode, staleTime: 60_000 });
   const styles = createStyles(theme);
   const [tab, setTab] = useState<FavoriteTab>("products");
   const favorites = useQuery({ queryKey: FAVORITES_QUERY_KEY, queryFn: getFavorites });
@@ -162,7 +164,7 @@ export default function FavoritesScreen() {
               >
                 <Heading level={3} numberOfLines={2}>{offer.product.name}</Heading>
                 <Caption numberOfLines={1}>{offer.store.name}</Caption>
-                <PriceText value={formatDZD(offer.price)} tone="accentMuted" />
+                <PriceText value={browsingCurrency.data ? formatMarketPrice(offer.price, browsingCurrency.data) : "—"} tone="accentMuted" />
               </ProductCard>
             </View>
           ))}
