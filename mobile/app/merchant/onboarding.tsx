@@ -29,7 +29,7 @@ import {
 } from "@/lib/merchant-validation";
 import { translate, type TranslationKey, useLanguage } from "@/lib/i18n";
 import { getLocalizedMerchantCategoryLabel } from "@/lib/locale-data";
-import { getRegionDisplayName } from "@/lib/country-regions";
+import { getRegionDisplayName, getRegionLevelDisplayName } from "@/lib/country-regions";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { BottomSheet, AppHeader, Button, Card, ErrorState, LoadingState, PressableSurface, Text as UiText, TextField } from "@/components/ui";
 
@@ -260,7 +260,7 @@ export default function MerchantOnboardingScreen() {
               render={({ fieldState }) => (
                 <FormField
                   theme={theme}
-                  label={regionOptions.data?.selectedLevel.label_ar ?? translate("merchantStoreWilayaLabel")}
+                  label={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : translate("merchantStoreWilayaLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
                   <PressableSurface
@@ -270,7 +270,7 @@ export default function MerchantOnboardingScreen() {
                     style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}
                   >
                     <UiText style={[styles.selectText, { color: selectedRegion ? theme.colors.foreground : theme.colors.placeholder }]}>
-                      {selectedRegion ? getRegionDisplayName(selectedRegion, language) : (regionOptions.data?.selectedLevel.label_ar ?? translate("merchantStoreChooseWilaya"))}
+                      {selectedRegion ? getRegionDisplayName(selectedRegion, language) : (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : translate("merchantStoreChooseWilaya"))}
                     </UiText>
                     <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
                   </PressableSurface>
@@ -281,9 +281,9 @@ export default function MerchantOnboardingScreen() {
               control={control}
               name="secondaryRegionId"
               render={() => (
-                <FormField theme={theme} label={regionOptions.data?.levels[1]?.label_ar ?? ""}>
-                  <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data?.levels[1]?.label_ar ?? ""} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={!regionId || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}>
-                    <UiText style={[styles.selectText, { color: selectedSecondaryRegion ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data?.levels[1]?.label_ar ?? ""}</UiText>
+                <FormField theme={theme} label={regionOptions.data?.levels[1] ? getRegionLevelDisplayName(regionOptions.data.levels[1], language) : ""}>
+                  <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data?.levels[1] ? getRegionLevelDisplayName(regionOptions.data.levels[1], language) : ""} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={!regionId || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}>
+                    <UiText style={[styles.selectText, { color: selectedSecondaryRegion ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data?.levels[1] ? getRegionLevelDisplayName(regionOptions.data.levels[1], language) : ""}</UiText>
                     <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
                   </PressableSurface>
                 </FormField>
