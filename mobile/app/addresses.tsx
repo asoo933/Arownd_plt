@@ -21,7 +21,7 @@ import {
   Text as UiText,
   TextField
 } from "@/components/ui";
-import { fetchCheckoutDairas, fetchCheckoutWilayas, type Daira, type Wilaya } from "@/lib/checkout";
+import { fetchCheckoutRegions } from "@/lib/checkout";
 import {  translate, useLanguage } from "@/lib/i18n";
 import {
   createMyAddress,
@@ -33,7 +33,7 @@ import {
 } from "@/lib/user-address";
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getLocalizedWilayaLabel } from "@/lib/locale-data";
+import { getRegionDisplayName } from "@/lib/country-regions";
 import { triggerSuccessHaptic } from "@/lib/haptics";
 
 type EditorState = { address: UserAddress | null } | null;
@@ -46,23 +46,23 @@ export default function AddressesScreen() {
   const queryClient = useQueryClient();
   const [editor, setEditor] = useState<EditorState>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserAddress | null>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [dairaPickerOpen, setDairaPickerOpen] = useState(false);
+  const [regionPickerOpen, setRegionPickerOpen] = useState(false);
+  const [secondaryPickerOpen, setSecondaryPickerOpen] = useState(false);
   const [label, setLabel] = useState<AddressLabel>("home");
   const [recipientName, setRecipientName] = useState("");
   const [phone, setPhone] = useState("");
-  const [wilayaId, setWilayaId] = useState<number | null>(null);
-  const [dairaRegionId, setDairaRegionId] = useState<number | null>(null);
+  const [regionId, setRegionId] = useState<number | null>(null);
+  const [secondaryRegionId, setSecondaryRegionId] = useState<number | null>(null);
   const [commune, setCommune] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   const addresses = useQuery({ queryKey: ["my-addresses"], queryFn: fetchMyAddresses });
-  const wilayas = useQuery({ queryKey: ["checkout-wilayas"], queryFn: fetchCheckoutWilayas, staleTime: Infinity });
-  const dairas = useQuery({ queryKey: ["checkout-dairas", wilayaId], queryFn: () => fetchCheckoutDairas(wilayaId as number), enabled: wilayaId !== null, staleTime: Infinity });
-  const selectedWilaya = useMemo(() => wilayas.data?.find((item) => item.id === wilayaId) ?? null, [wilayas.data, wilayaId]);
-  const selectedDaira = useMemo(() => dairas.data?.find((item) => item.id === dairaRegionId) ?? null, [dairas.data, dairaRegionId]);
+  const regionOptions = useQuery({ queryKey: ["checkout-regions"], queryFn: () => fetchCheckoutRegions(), staleTime: Infinity });
+  const secondaryOptions = useQuery({ queryKey: ["checkout-regions", regionId], queryFn: () => fetchCheckoutRegions(regionId), enabled: regionId !== null, staleTime: Infinity });
+  const selectedRegion = useMemo(() => regionOptions.data?.regions.find((item) => item.id === regionId) ?? null, [regionOptions.data, regionId]);
+  const selectedSecondaryRegion = useMemo(() => secondaryOptions.data?.regions.find((item) => item.id === secondaryRegionId) ?? null, [secondaryOptions.data, secondaryRegionId]);
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["my-addresses"] });
@@ -103,8 +103,8 @@ export default function AddressesScreen() {
     setLabel(address?.label ?? "home");
     setRecipientName(address?.recipient_name ?? "");
     setPhone(address?.phone ?? "");
-    setWilayaId(address?.wilaya_id ?? null);
-    setDairaRegionId(address?.daira_region_id ?? null);
+    setRegionId(address?.region_id ?? null);
+    setSecondaryRegionId(address?.secondary_region_id ?? null);
     setCommune(address?.commune ?? "");
     setAddressLine(address?.address_line ?? "");
     setAdditionalInfo(address?.additional_info ?? "");
@@ -117,8 +117,8 @@ export default function AddressesScreen() {
       label,
       recipient_name: recipientName.trim(),
       phone: phone.trim(),
-      wilaya_id: wilayaId ?? 0,
-      daira_region_id: dairaRegionId ?? 0,
+      region_id: regionId ?? 0,
+      secondary_region_id: secondaryRegionId,
       commune: commune.trim(),
       address_line: addressLine.trim(),
       additional_info: additionalInfo.trim()
@@ -134,11 +134,11 @@ export default function AddressesScreen() {
     saveMutation.mutate(parsed.data);
   };
 
-  if (addresses.isPending || wilayas.isPending) {
+  if (addresses.isPending || regionOptions.isPending) {
     return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
   }
 
-  if (addresses.isError || wilayas.isError) {
+  if (addresses.isError || regionOptions.isError) {
     return (
       <CustomerScreen>
         <AppHeader
@@ -148,8 +148,8 @@ export default function AddressesScreen() {
         <ErrorState
           title={translate("addressesLoadError")}
           retryLabel={translate("retry")}
-          busy={addresses.isFetching || wilayas.isFetching}
-          onRetry={() => { void addresses.refetch(); void wilayas.refetch(); }}
+          busy={addresses.isFetching || regionOptions.isFetching}
+          onRetry={() => { void addresses.refetch(); void regionOptions.refetch(); }}
         />
       </CustomerScreen>
     );
@@ -194,7 +194,7 @@ export default function AddressesScreen() {
           <Heading level={3}>{address.recipient_name}</Heading>
           <UiText tone="muted">{address.phone}</UiText>
           <Caption>
-            {String(address.wilaya_id).padStart(2, "0")} - {getLocalizedWilayaLabel(address.wilaya_id, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_ar ?? "", language, wilayas.data.find((item) => item.id === address.wilaya_id)?.name_fr)}{address.daira?.name_ar ? "، " + (language === "ar" ? address.daira.name_ar : address.daira.name_fr ?? address.daira.name_ar) : ""}، {address.commune}
+            {address.region ? getRegionDisplayName({ ...address.region, id: address.region_id, country_code: address.country_code, parent_id: null, code: "", region_type: "", is_enabled: true }, language) : ""}{address.secondary_region?.name_ar ? "، " + (language === "ar" ? address.secondary_region.name_ar : address.secondary_region.name_fr ?? address.secondary_region.name_en ?? address.secondary_region.name_ar) : ""}، {address.commune}
           </Caption>
           <Caption>{address.address_line}</Caption>
           {address.additional_info ? <Caption>{address.additional_info}</Caption> : null}
@@ -231,20 +231,18 @@ export default function AddressesScreen() {
               <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
               <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
 
-              <FormLabel>{translate("checkoutWilaya")}</FormLabel>
-              <PressableSurface
-                onPress={() => setPickerOpen(true)}
-                style={styles.input}
-                accessibilityLabel={translate("checkoutChooseWilaya")}
-              >
-                <UiText>{selectedWilaya ? getLocalizedWilayaLabel(selectedWilaya.id, selectedWilaya.name_ar, language, selectedWilaya.name_fr) : translate("checkoutChooseWilaya")}</UiText>
+              <FormLabel>{regionOptions.data?.selectedLevel.label_ar ?? ""}</FormLabel>
+              <PressableSurface onPress={() => setRegionPickerOpen(true)} style={styles.input} accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"}>
+                <UiText>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data?.selectedLevel.label_ar ?? ""}</UiText>
               </PressableSurface>
 
-              <FormLabel>{translate("checkoutDaira")}</FormLabel>
-              <PressableSurface onPress={() => setDairaPickerOpen(true)} style={styles.input} disabled={wilayaId === null || dairas.isPending || dairas.isError}>
-                <UiText>{selectedDaira ? (language === "ar" ? selectedDaira.name_ar : selectedDaira.name_fr ?? selectedDaira.name_ar) : translate("checkoutChooseDaira")}</UiText>
-              </PressableSurface>
-              {dairas.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
+              {regionOptions.data?.levels[1] ? <>
+                <FormLabel>{regionOptions.data.levels[1].label_ar}</FormLabel>
+                <PressableSurface onPress={() => setSecondaryPickerOpen(true)} style={styles.input} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
+                  <UiText>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+                </PressableSurface>
+                {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
+              </> : null}
               <Field label={translate("checkoutCommune")} value={commune} onChangeText={setCommune} styles={styles} />
               <Field label={translate("addressesStreet")} value={addressLine} onChangeText={setAddressLine} styles={styles} />
               <Field label={translate("addressesAdditional")} value={additionalInfo} onChangeText={setAdditionalInfo} styles={styles} />
@@ -256,39 +254,31 @@ export default function AddressesScreen() {
             </ScrollView>
       </BottomSheet>
 
-      <BottomSheet visible={pickerOpen} onRequestClose={() => setPickerOpen(false)} maxHeight="78%">
-            <Heading level={3}>{translate("checkoutChooseWilaya")}</Heading>
-            <ScrollView>
-              {wilayas.data.map((item: Wilaya) => (
-                <PressableSurface
-                  key={item.id}
-                  accessibilityLabel={String(item.id).padStart(2, "0") + " - " + getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr)}
-                  onPress={() => {
-                    setWilayaId(item.id);
-                    setDairaRegionId(null);
-                    setCommune("");
-                    setPickerOpen(false);
-                  }}
-                  style={[styles.pickerOption, wilayaId === item.id && styles.pickerOptionSelected]}
-                >
-                  <UiText>{String(item.id).padStart(2, "0")} - {getLocalizedWilayaLabel(item.id, item.name_ar, language, item.name_fr)}</UiText>
-                </PressableSurface>
-              ))}
-            </ScrollView>
-            <Button label={translate("back")} onPress={() => setPickerOpen(false)} variant="ghost" fullWidth />
-      </BottomSheet>
-
-      <BottomSheet visible={dairaPickerOpen} onRequestClose={() => setDairaPickerOpen(false)} maxHeight="78%">
-        <Heading level={3}>{translate("checkoutChooseDaira")}</Heading>
-        {dairas.isPending ? <LoadingState label={translate("stateLoading")} /> : null}
-        {dairas.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
-        {dairas.isSuccess && dairas.data.length === 0 ? <UiText tone="muted">{translate("checkoutDairasEmpty")}</UiText> : null}
+      <BottomSheet visible={regionPickerOpen} onRequestClose={() => setRegionPickerOpen(false)} maxHeight="78%">
+        <Heading level={3}>{regionOptions.data?.selectedLevel.label_ar ?? ""}</Heading>
         <ScrollView>
-          {(dairas.data ?? []).map((item: Daira) => <PressableSurface key={item.id} onPress={() => { setDairaRegionId(item.id); setDairaPickerOpen(false); }} style={styles.pickerOption}>
-            <UiText>{item.code.replace("DZ-DAIRA-", "")} - {language === "ar" ? item.name_ar : item.name_fr ?? item.name_ar}</UiText>
+          {(regionOptions.data?.regions ?? []).map((item) => <PressableSurface key={item.id} onPress={() => {
+            setRegionId(item.id);
+            setSecondaryRegionId(null);
+            setCommune("");
+            setRegionPickerOpen(false);
+          }} style={[styles.pickerOption, regionId === item.id && styles.pickerOptionSelected]}>
+            <UiText>{getRegionDisplayName(item, language)}</UiText>
           </PressableSurface>)}
         </ScrollView>
-        <Button label={translate("back")} onPress={() => setDairaPickerOpen(false)} variant="ghost" fullWidth />
+        <Button label={translate("back")} onPress={() => setRegionPickerOpen(false)} variant="ghost" fullWidth />
+      </BottomSheet>
+
+      <BottomSheet visible={secondaryPickerOpen} onRequestClose={() => setSecondaryPickerOpen(false)} maxHeight="78%">
+        <Heading level={3}>{secondaryOptions.data?.selectedLevel.label_ar ?? ""}</Heading>
+        {secondaryOptions.isPending ? <LoadingState label={translate("stateLoading")} /> : null}
+        {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
+        <ScrollView>
+          {(secondaryOptions.data?.regions ?? []).map((item) => <PressableSurface key={item.id} onPress={() => { setSecondaryRegionId(item.id); setSecondaryPickerOpen(false); }} style={styles.pickerOption}>
+            <UiText>{getRegionDisplayName(item, language)}</UiText>
+          </PressableSurface>)}
+        </ScrollView>
+        <Button label={translate("back")} onPress={() => setSecondaryPickerOpen(false)} variant="ghost" fullWidth />
       </BottomSheet>
 
       <ConfirmDialog
