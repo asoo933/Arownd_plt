@@ -85,7 +85,7 @@ const ORDER_SELECT = [
   "items:order_items(*),",
   "merchant_orders(id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, store:stores(name, address_line, commune), items:order_items(*)),",
   "region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en),",
-  "secondary_region:country_regions!orders_secondary_region_fkey(name_ar, name_fr, name_en),",
+  "secondary_region:country_regions!orders_country_secondary_region_fkey(name_ar, name_fr, name_en),",
   "wilaya:wilayas(name_ar, name_fr),",
   "daira:country_regions!orders_daira_region_fkey(name_ar, name_fr)"
 ].join(" ");
