@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
 
 import { getSupabaseClient } from "@/lib/supabase";
-import { getSelectedCountryCode } from "@/lib/country-service";
+import { getSelectedCountryCode, syncSelectedCountryCodeFromProfile } from "@/lib/country-service";
 import { LoadingState } from "@/components/ui";
 import { translate, useLanguage } from "@/lib/i18n";
 
@@ -21,7 +21,8 @@ export default function IndexRoute() {
         const { data, error } = await getSupabaseClient().auth.getSession();
         if (active) {
           if (!error && data.session) {
-            setDestination("/home");
+            await syncSelectedCountryCodeFromProfile(data.session.user.id);
+            if (active) setDestination("/home");
             return;
           }
           const selectedCountryCode = await getSelectedCountryCode();

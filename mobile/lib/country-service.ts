@@ -52,3 +52,22 @@ export async function detectCountryFromIp(): Promise<string | null> {
     return null;
   }
 }
+
+/** Refresh the local market label from the authoritative immutable profile value. */
+export async function syncSelectedCountryCodeFromProfile(userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await getSupabaseClient()
+      .from("profiles")
+      .select("country_code")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error || !data || typeof data.country_code !== "string") return false;
+    if (!/^[A-Z]{2}$/.test(data.country_code)) return false;
+
+    await saveSelectedCountryCode(data.country_code);
+    return true;
+  } catch {
+    return false;
+  }
+}

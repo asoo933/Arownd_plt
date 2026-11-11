@@ -1,6 +1,6 @@
 import * as Linking from "expo-linking";
 
-import { getSelectedCountryCode } from "@/lib/country-service";
+import { getSelectedCountryCode, syncSelectedCountryCodeFromProfile } from "@/lib/country-service";
 
 import { getSupabaseClient } from "@/lib/supabase";
 import type {
@@ -17,6 +17,9 @@ export async function signIn(input: LoginInput): Promise<void> {
   });
 
   if (error) throw error;
+  if (data.user) {
+    await syncSelectedCountryCodeFromProfile(data.user.id);
+  }
 }
 
 export async function signUpPersonal(input: PersonalSignupInput): Promise<boolean> {
