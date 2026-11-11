@@ -197,6 +197,10 @@ export function getRegionDisplayName(region: Pick<CountryRegion, "name_ar" | "na
   return region.name_ar;
 }
 
+export function getRegionLevelDisplayName(level: CountryRegionLevel, language: string): string {
+  return language === "ar" ? level.label_ar : level.label_en;
+}
+
 export function normalizePhoneForCallingCode(value: string, callingCode: string): string {
   if (!/^\+[1-9]\d{0,2}$/.test(callingCode)) throw new Error("invalid_calling_code");
   let normalized = value.trim().replace(/[\s().-]/g, "");
