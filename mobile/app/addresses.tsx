@@ -282,6 +282,7 @@ export default function AddressesScreen() {
         <Heading level={3}>{translate("checkoutChooseDaira")}</Heading>
         {dairas.isPending ? <LoadingState label={translate("stateLoading")} /> : null}
         {dairas.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
+        {dairas.isSuccess && dairas.data.length === 0 ? <UiText tone="muted">{translate("checkoutDairasEmpty")}</UiText> : null}
         <ScrollView>
           {(dairas.data ?? []).map((item: Daira) => <PressableSurface key={item.id} onPress={() => { setDairaRegionId(item.id); setDairaPickerOpen(false); }} style={styles.pickerOption}>
             <UiText>{item.code.replace("DZ-DAIRA-", "")} - {language === "ar" ? item.name_ar : item.name_fr ?? item.name_ar}</UiText>

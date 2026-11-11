@@ -401,6 +401,7 @@ export default function CheckoutScreen() {
             <PressableSurface accessibilityLabel={translate("back")} onPress={() => setPicker(null)} hitSlop={10}><UiText style={styles.back}>{translate("back")}</UiText></PressableSurface>
           </View>
           {((picker === "wilaya" && wilayas.isPending) || (picker === "daira" && dairas.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
+          {picker === "daira" && dairas.isSuccess && dairas.data.length === 0 ? <UiText style={styles.fieldHint}>{translate("checkoutDairasEmpty")}</UiText> : null}
           <ScrollView keyboardShouldPersistTaps="handled">
             {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
               if (picker === "wilaya" && item.wilaya) {

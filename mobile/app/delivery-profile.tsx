@@ -168,6 +168,7 @@ export default function DeliveryProfileScreen() {
           <UiText weight="800" style={styles.modalTitle}>{picker === "wilaya" ? translate("checkoutChooseWilaya") : picker === "daira" ? translate("checkoutChooseDaira") : translate("checkoutChooseCommune")}</UiText>
           {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
           {picker === "daira" && dairas.isPending ? <Spinner size="small" /> : null}
+          {picker === "daira" && dairas.isSuccess && dairas.data.length === 0 ? <UiText tone="muted">{translate("checkoutDairasEmpty")}</UiText> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
           <ScrollView style={styles.options}>
             {pickerItems.map((item) => <PressableSurface key={item.id} accessibilityLabel={item.label} onPress={() => {
