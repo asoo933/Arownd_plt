@@ -33,7 +33,7 @@ import {
 } from "@/lib/user-address";
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { getRegionDisplayName, getRegionLevelDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { triggerSuccessHaptic } from "@/lib/haptics";
 
 type EditorState = { address: UserAddress | null } | null;
@@ -243,15 +243,15 @@ export default function AddressesScreen() {
               <Field label={translate("addressesRecipient")} value={recipientName} onChangeText={setRecipientName} styles={styles} />
               <Field label={translate("addressesPhone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" styles={styles} />
 
-              <FormLabel>{regionOptions.data?.selectedLevel.label_ar ?? ""}</FormLabel>
-              <PressableSurface onPress={() => setRegionPickerOpen(true)} style={styles.input} accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"}>
-                <UiText>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data?.selectedLevel.label_ar ?? ""}</UiText>
+              <FormLabel>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</FormLabel>
+              <PressableSurface onPress={() => setRegionPickerOpen(true)} style={styles.input} accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"}>
+                <UiText>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
               </PressableSurface>
 
               {regionOptions.data?.levels[1] ? <>
-                <FormLabel>{regionOptions.data.levels[1].label_ar}</FormLabel>
+                <FormLabel>{getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</FormLabel>
                 <PressableSurface onPress={() => setSecondaryPickerOpen(true)} style={styles.input} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
-                  <UiText>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+                  <UiText>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
                 </PressableSurface>
                 {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
               </> : null}
@@ -267,7 +267,7 @@ export default function AddressesScreen() {
       </BottomSheet>
 
       <BottomSheet visible={regionPickerOpen} onRequestClose={() => setRegionPickerOpen(false)} maxHeight="78%">
-        <Heading level={3}>{regionOptions.data?.selectedLevel.label_ar ?? ""}</Heading>
+        <Heading level={3}>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</Heading>
         <ScrollView>
           {(regionOptions.data?.regions ?? []).map((item) => <PressableSurface key={item.id} onPress={() => {
             setRegionId(item.id);
