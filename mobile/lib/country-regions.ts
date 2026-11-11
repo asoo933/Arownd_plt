@@ -99,7 +99,7 @@ export async function fetchMyAccountCallingCode(): Promise<string> {
     .eq("code", countryCode)
     .single();
   if (error) throw error;
-  if (typeof data.calling_code !== "string" || !/^\\+[1-9]\\d{0,2}$/.test(data.calling_code)) {
+  if (typeof data.calling_code !== "string" || !/^\+[1-9]\d{0,2}$/.test(data.calling_code)) {
     throw new Error("country_calling_code_invalid");
   }
   return data.calling_code;
