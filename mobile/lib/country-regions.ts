@@ -148,7 +148,7 @@ export async function fetchCountryRegions(countryCodeInput: string, parentRegion
   }
 
   const client = getSupabaseClient();
-  let query = client.from("country_regions")
+  const query = client.from("country_regions")
     .select("id, country_code, parent_id, code, name_ar, name_fr, name_en, region_type, is_enabled")
     .eq("country_code", countryCode)
     .in("region_type", selectedLevel.region_types)

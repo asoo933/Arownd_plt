@@ -68,6 +68,49 @@ Known administrative data caveats:
   administrative hierarchy. Do not require municipality.
 - Do not assume all countries share the same number or meaning of levels.
 
+/*
+Required country_region_levels metadata table (currently absent from live DB):
+
+CREATE TABLE public.country_region_levels (
+  country_code text NOT NULL REFERENCES public.countries(code) ON DELETE RESTRICT,
+  level smallint NOT NULL CHECK (level > 0),
+  region_types text[] NOT NULL CHECK (cardinality(region_types) > 0),
+  label_ar text NOT NULL CHECK (length(btrim(label_ar)) > 0),
+  label_en text NOT NULL CHECK (length(btrim(label_en)) > 0),
+  is_required boolean NOT NULL DEFAULT true,
+  PRIMARY KEY (country_code, level)
+);
+ALTER TABLE public.country_region_levels ENABLE ROW LEVEL SECURITY;
+CREATE POLICY country_region_levels_read_enabled
+  ON public.country_region_levels FOR SELECT TO anon, authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.countries c
+    WHERE c.code = country_region_levels.country_code AND c.is_enabled
+  ));
+GRANT SELECT ON public.country_region_levels TO anon, authenticated;
+GRANT ALL ON public.country_region_levels TO service_role;
+
+Seed metadata (review against region_type values before applying):
+INSERT INTO public.country_region_levels
+  (country_code, level, region_types, label_ar, label_en, is_required)
+VALUES
+  ('DZ', 1, ARRAY['wilaya'], 'الولاية', 'Wilaya', true),
+  ('DZ', 2, ARRAY['daira'], 'الدائرة', 'Daira', true),
+  ('MA', 1, ARRAY['region'], 'الجهة', 'Region', true),
+  ('MA', 2, ARRAY['province','prefecture'], 'الإقليم أو العمالة', 'Province or Prefecture', false),
+  ('EG', 1, ARRAY['governorate'], 'المحافظة', 'Governorate', true),
+  ('SA', 1, ARRAY['region'], 'المنطقة', 'Region', true),
+  ('SA', 2, ARRAY['governorate'], 'المحافظة', 'Governorate', true),
+  ('AE', 1, ARRAY['emirate'], 'الإمارة', 'Emirate', true),
+  ('AE', 2, ARRAY['municipality'], 'البلدية', 'Municipality', false);
+
+IMPORTANT:
+- This metadata does not enable countries. countries.is_enabled remains unchanged.
+- MA and AE level 2 are optional because source coverage/administrative
+  semantics are incomplete. EG has one verified level only.
+- Future countries add rows here; do not add country-specific UI branches.
+
+*/
 ===============================================================================
 2. REQUIRED SCHEMA TRANSITION (PROPOSED; NOT EXECUTABLE IN THIS DRAFT)
 ===============================================================================
