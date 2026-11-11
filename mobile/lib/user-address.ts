@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { UserAddressSchema, type UserAddressInput } from "@/lib/user-address-state";
 import { getSupabaseClient } from "@/lib/supabase";
-import { fetchMyAccountCountryCode, fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
 
 const RegionNameSchema = z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() });
 const UserAddressRecordSchema = UserAddressSchema.extend({
@@ -43,8 +43,8 @@ export async function createMyAddress(input: UserAddressInput): Promise<UserAddr
   const parsed = UserAddressSchema.parse(input);
   const client = getSupabaseClient();
   const userId = await getCurrentUserId();
-  const countryCode = await fetchMyAccountCountryCode();
   const regionContext = await fetchMyAccountRegionLevels();
+  const countryCode = regionContext.countryCode;
   if (regionContext.levels[1]?.is_required && parsed.secondary_region_id === null) {
     throw new Error("secondary_region_required");
   }
