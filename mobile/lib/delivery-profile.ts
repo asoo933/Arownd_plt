@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { DeliveryProfileSchema, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
-import { fetchMyAccountCountryCode } from "@/lib/country-regions";
+import { fetchMyAccountCountryCode, fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const ProfileSchema = z.object({
@@ -36,11 +36,16 @@ export async function saveMyDeliveryProfile(input: DeliveryProfileInput): Promis
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
   const countryCode = await fetchMyAccountCountryCode();
+  const regionContext = await fetchMyAccountRegionLevels();
+  if (regionContext.levels[1]?.is_required && parsed.secondary_region_id === null) {
+    throw new Error("secondary_region_required");
+  }
+  const phone = normalizePhoneForCallingCode(parsed.phone, regionContext.callingCode);
   const { error } = await client.from("profiles").upsert({
     user_id: auth.user.id,
     country_code: countryCode,
     full_name: parsed.full_name,
-    phone: parsed.phone,
+    phone,
     region_id: parsed.region_id,
     secondary_region_id: parsed.secondary_region_id,
     commune: parsed.commune
