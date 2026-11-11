@@ -1,0 +1,20 @@
+name: Android production release (paused pending Expo signing setup)
+
+# The previous release workflow targeted the legacy root Capacitor project.
+# Production release builds stay disabled until the Expo app is linked to EAS
+# and its Android upload credentials are configured for the native mobile app.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-paused:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain release prerequisite
+        run: |
+          echo "::notice::Production AAB/APK release is intentionally paused."
+          echo "The native app is mobile/ (Expo + React Native), not the legacy root android/ Capacitor project."
+          echo "Link mobile/ to its EAS project and configure Android signing before enabling production releases."

@@ -1,0 +1,241 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+
+import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import {
+  Alert,
+  AppHeader,
+  Button,
+  Caption,
+  NotificationCard,
+  StatusBadge,
+  Text as UiText
+} from "@/components/ui";
+import { countUnreadNotifications, fetchMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from "@/lib/notifications";
+import { getNotificationDestination } from "@/lib/notifications-state";
+import { formatOrderCode } from "@/lib/orders-state";
+import { getSupabaseClient } from "@/lib/supabase";
+import { translate, type Language, type TranslationKey, useLanguage } from "@/lib/i18n";
+import { designTokens, useAppTheme } from "@/lib/theme";
+
+function typeLabel(type: AppNotification["type"]): string {
+  const labels: Record<AppNotification["type"], string> = {
+    order: translate("notificationsOrder"),
+    offer: translate("notificationsOffer"),
+    reservation: translate("notificationsReservation"),
+    system: translate("notificationsSystem"),
+    info: translate("notificationsInfo")
+  };
+  return labels[type];
+}
+
+function localizedNotificationCopy(item: AppNotification): { title: string; body: string | null } {
+  if (item.type === "system" && item.data.kind === "support_reply") {
+    return { title: translate("supportNotificationTitle"), body: item.body };
+  }
+  if (item.type !== "order") return { title: item.title, body: item.body };
+
+  const status = typeof item.data.status === "string" ? item.data.status : null;
+  const notificationUrl = typeof item.data.url === "string" ? item.data.url : "";
+  const isMerchantNewOrder = (item.data.recipient_role === "merchant" && status === "pending")
+    || notificationUrl.startsWith("/studio/orders/");
+  if (isMerchantNewOrder) {
+    return {
+      title: translate("notificationsMerchantNewOrderTitle"),
+      body: translate("notificationsMerchantNewOrderBody")
+    };
+  }
+
+  const statusKeys: Partial<Record<string, TranslationKey>> = {
+    pending: "notificationsOrderPending",
+    quoted: "notificationsOrderQuoted",
+    confirmed: "notificationsOrderConfirmed",
+    shipped: "notificationsOrderShipped",
+    delivered: "notificationsOrderDelivered",
+    cancelled: "notificationsOrderCancelled",
+    accepted: "notificationsShipmentAccepted",
+    picked_up: "notificationsShipmentPickedUp",
+    in_transit: "notificationsShipmentInTransit",
+    failed: "notificationsShipmentFailed",
+    returned: "notificationsShipmentReturned",
+    rejected: "notificationsShipmentRejected"
+  };
+  const bodyKey = status ? statusKeys[status] : undefined;
+  if (!bodyKey) return { title: item.title, body: item.body };
+
+  return {
+    title: translate("notificationsOrderUpdateTitle"),
+    body: translate(bodyKey)
+  };
+}
+
+function dateLabel(value: string, language: Language): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(date);
+}
+
+export default function NotificationsScreen() {
+  const { language } = useLanguage();
+  const theme = useAppTheme();
+  const queryClient = useQueryClient();
+  const [actionError, setActionError] = useState(false);
+  const auth = useQuery({
+    queryKey: ["notifications-auth"],
+    queryFn: async () => {
+      const { data, error } = await getSupabaseClient().auth.getUser();
+      if (error) throw error;
+      return data.user;
+    },
+    retry: false
+  });
+  const notifications = useQuery({
+    queryKey: ["my-notifications", auth.data?.id],
+    queryFn: fetchMyNotifications,
+    enabled: auth.isSuccess && Boolean(auth.data)
+  });
+
+  useEffect(() => {
+    const userId = auth.data?.id;
+    if (!userId) return;
+    const client = getSupabaseClient();
+    const channel = client.channel("native-notifications-" + userId).on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "notifications",
+      filter: "user_id=eq." + userId
+    }, () => {
+      void queryClient.invalidateQueries({ queryKey: ["my-notifications", userId] });
+    }).subscribe();
+
+    return () => { void client.removeChannel(channel); };
+  }, [auth.data?.id, queryClient]);
+
+  const markOne = useMutation({
+    mutationFn: markNotificationRead,
+    onSuccess: () => {
+      setActionError(false);
+      return queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] });
+    },
+    onError: () => setActionError(true)
+  });
+  const markAll = useMutation({
+    mutationFn: markAllNotificationsRead,
+    onSuccess: () => {
+      setActionError(false);
+      return queryClient.invalidateQueries({ queryKey: ["my-notifications", auth.data?.id] });
+    },
+    onError: () => setActionError(true)
+  });
+
+  if (auth.isPending || (auth.data && notifications.isPending)) {
+    return <CustomerScreen><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+  }
+  if (auth.isError || notifications.isError) {
+    return (
+      <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && notifications.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void notifications.refetch(); }); }}>
+        <AppHeader title={translate("notificationsTitle")} />
+        <ErrorState
+          title={translate("notificationsLoadError")}
+          retryLabel={translate("retry")}
+          busy={auth.isFetching || notifications.isFetching}
+          onRetry={() => { void auth.refetch(); void notifications.refetch(); }}
+        />
+      </CustomerScreen>
+    );
+  }
+  if (!auth.data) {
+    return (
+      <CustomerScreen>
+        <AppHeader title={translate("notificationsTitle")} trailing={<Caption>{translate("profileLoginHint")}</Caption>} />
+        <Button label={translate("login")} onPress={() => router.push("/login")} fullWidth />
+      </CustomerScreen>
+    );
+  }
+
+  const rows = notifications.data ?? [];
+  const unreadCount = countUnreadNotifications(rows);
+
+  return (
+    <CustomerScreen
+      refreshing={auth.isFetching || (Boolean(auth.data) && notifications.isFetching)}
+      onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void notifications.refetch(); }); }}
+    >
+      <AppHeader
+        title={translate("notificationsTitle")}
+      />
+      <Caption>{translate("notificationsSubtitle")}</Caption>
+      {actionError ? <Alert tone="danger" description={translate("notificationsMarkError")} /> : null}
+      {unreadCount > 0 ? (
+        <Button
+          label={translate("notificationsMarkAll") + " · " + unreadCount}
+          onPress={() => markAll.mutate()}
+          loading={markAll.isPending}
+          fullWidth
+        />
+      ) : null}
+      {rows.length === 0 ? (
+        <EmptyState icon="bell" title={translate("notificationsEmpty")} hint={translate("notificationsEmptyHint")} />
+      ) : rows.map((item) => {
+        const destination = getNotificationDestination(item);
+        const orderId = typeof item.data.order_id === "string" ? item.data.order_id : null;
+        const orderCode = item.type === "order" && orderId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orderId)
+          ? formatOrderCode(orderId)
+          : null;
+        const copy = localizedNotificationCopy(item);
+        const body = orderCode && copy.body && orderId
+          ? copy.body.replace(new RegExp(orderId.slice(0, 8), "i"), orderCode)
+          : copy.body;
+        return (
+          <NotificationCard
+            key={item.id}
+            style={styles.card}
+            contentStyle={styles.cardContent}
+            onPress={() => {
+              if (!item.read) markOne.mutate(item.id);
+              if (destination) router.push(destination as never);
+            }}
+            accessibilityLabel={item.title}
+          >
+            <View style={styles.cardHeader}>
+              <Caption tone="accentMuted" weight="800">{typeLabel(item.type)}</Caption>
+              <Caption>{dateLabel(item.created_at, language)}</Caption>
+            </View>
+            <UiText weight="800">{copy.title}</UiText>
+            {orderCode ? <Caption>{translate("ordersCode")}: {orderCode}</Caption> : null}
+            {body ? <UiText tone="muted">{body}</UiText> : null}
+            {!item.read ? <View style={[styles.unreadDot, { backgroundColor: theme.colors.accentMuted }]} /> : null}
+          </NotificationCard>
+        );
+      })}
+    </CustomerScreen>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    position: "relative",
+    borderRadius: designTokens.radius.lg
+  },
+  cardContent: {
+    gap: designTokens.spacing.md,
+    padding: designTokens.spacing.lg
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: designTokens.spacing.sm,
+    paddingBottom: designTokens.spacing.xs
+  },
+  unreadDot: {
+    position: "absolute",
+    top: designTokens.spacing.lg,
+    start: designTokens.spacing.lg,
+    width: 8,
+    height: 8,
+    borderRadius: designTokens.radius.pill
+  }
+});

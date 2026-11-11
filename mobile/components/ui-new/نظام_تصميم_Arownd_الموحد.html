@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>نظام تصميم Arownd الموحد</title>
+<style>:root{--bg:#F5F5F5;--card:#FFFFFF;--ink:#0A0A0A;--mute:#525252;--line:#E5E5E5;--lime:#C6F135;--lg:#A8D522;--pink:#E5F8A8;--teal:#16A34A;--red:#DC2626;--onred:#FFFFFF;--mint:#EEEEEE;--dk:#0A0A0A;--info:#2563EB;--am:#D97706;--mx:#0A0A0A;--sh:0 1px 2px rgba(10,10,10,.05),0 8px 24px rgba(10,10,10,.05);--ring:#0A0A0A;--mp1:#E5E5E5;--mp2:#FFFFFF;--mp3:#DBEAFE;--black:#0A0A0A;--white:#FFFFFF;--lime-d:#A8D522;--lime-l:#E5F8A8;--n300:#D4D4D4;--n500:#737373;--n600:#525252;--n700:#333333;--n800:#262626;--bdc:#8C8C8C;--is:20px;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A0A0A;--card:#171717;--ink:#F5F5F5;--mute:#A3A3A3;--line:#333333;--lg:#C6F135;--pink:#C6F135;--mint:#262626;--mx:#F5F5F5;--sh:0 0 0 1px #262626;--ring:#C6F135;--mp1:#262626;--mp2:#333333;--mp3:color-mix(in srgb,#2563EB 30%,#171717);--bdc:#737373;color-scheme:dark}}
+:root[data-theme="dark"]{color-scheme:dark;--bdc:#737373;--bg:#0A0A0A;--card:#171717;--ink:#F5F5F5;--mute:#A3A3A3;--line:#333333;--lg:#C6F135;--pink:#C6F135;--mint:#262626;--mx:#F5F5F5;--sh:0 0 0 1px #262626;--ring:#C6F135;--mp1:#262626;--mp2:#333333;--mp3:color-mix(in srgb,#2563EB 30%,#171717)}
+html[data-theme="light"]{color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--ring);outline-offset:3px}
+.i,.lucide{width:var(--is,20px);height:var(--is,20px);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
+x-i{display:inline-grid;place-items:center;flex:none}
+x-i[hidden]{display:none}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+header,main{max-width:1100px;margin:auto;padding-inline:20px}
+header{padding-top:32px}
+.brand{display:flex;gap:14px;align-items:center}
+.logo{width:52px;height:52px;border-radius:50%;background:var(--dk);color:var(--lime);display:grid;place-items:center;font-weight:700;font-size:24px;flex:none}
+h1{font-size:26px;line-height:1.3;margin:0;font-weight:700}
+header p{margin:2px 0 0;color:var(--mute);font-size:14px}
+main{padding-bottom:96px}
+h2{font-size:18px;font-weight:600;margin:40px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.c{background:var(--card);border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;min-height:160px;box-shadow:var(--sh);position:relative}
+.c>small{align-self:flex-start;color:var(--mute);font-size:12px;margin-top:auto}
+.c.w{grid-column:span 2}
+@media(max-width:600px){.c.w{grid-column:span 1}}
+.mt{color:var(--mute);font-size:12.5px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;width:100%}
+/* buttons */
+.btn{min-height:48px;padding:0 28px;border-radius:99px;background:var(--lime);color:var(--dk);font-weight:600;font-size:15px;display:inline-flex;gap:8px;align-items:center;justify-content:center;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(.94)}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn .spin{display:none}
+.btn[aria-busy="true"] .spin{display:inline-block}
+.btn[aria-busy="true"]{pointer-events:none}
+.btn.o{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--lg);min-height:44px;padding:0 16px;font-weight:500;font-size:14px}
+.btn.o:hover{background:color-mix(in srgb,var(--lime) 25%,transparent);filter:none}
+.btn.n{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);padding:0 22px}
+.btn.n:hover{background:var(--bg);filter:none}
+.btn.sm{min-height:36px;padding:0 16px;font-size:13px}
+.ic{width:44px;height:44px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line);background:var(--card);display:grid;place-items:center;flex:none;position:relative;transition:background .15s,transform .1s}
+.ic:hover{background:var(--bg)}
+.ic:active{transform:scale(.93)}
+.ic.l{background:var(--lime);color:var(--dk);box-shadow:none}
+.ic.l:hover{filter:brightness(.94)}
+.fav[aria-pressed="true"]{background:var(--pink);color:var(--dk);box-shadow:none}
+.fav[aria-pressed="true"] .i{fill:currentColor}
+.badge{position:absolute;top:-3px;inset-inline-end:-3px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:var(--onred);font-size:11px;font-weight:600;display:grid;place-items:center;padding:0 5px;box-shadow:0 0 0 2px var(--card)}
+
+.cover{width:100%;height:132px;border-radius:24px;background:linear-gradient(135deg,var(--lime-l),var(--lime));position:relative;overflow:hidden}
+.cover div{position:absolute;inset:auto 12px 12px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cover b{background:var(--card);border-radius:99px;padding:4px 12px;font-size:13px}
+/* pager + steps */
+.pager{display:flex;gap:4px;align-items:center}
+.pager .pg{min-width:40px;height:40px;border-radius:50%;font-size:14px;color:var(--mute);display:grid;place-items:center}
+.pager .pg:hover{background:var(--bg)}
+.pager .pg[aria-current]{background:var(--pink);color:var(--dk);font-weight:600}
+/* inputs */
+.pick{display:flex;align-items:center;gap:12px;cursor:pointer}
+.pick{position:relative;width:100%;min-height:48px;border-radius:99px;padding:0 16px;box-shadow:inset 0 0 0 1px var(--line);font-size:14.5px;transition:background .15s}
+.pick:hover{background:var(--bg)}
+.pick input{position:absolute;opacity:0;pointer-events:none}
+.k{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--mute);display:grid;place-items:center;flex:none;color:transparent}
+.pick:has(input:checked){background:var(--pink);box-shadow:none;color:var(--dk)}
+.pick:has(input:checked) .k{background:var(--dk);box-shadow:none;color:var(--white)}
+.k .i{width:12px;height:12px;stroke-width:3}
+.pick:has(input:focus-visible){outline:2px solid var(--ring);outline-offset:3px}
+.chips{display:flex;gap:8px;overflow-x:auto;width:100%;padding:6px;margin-block:-4px;scrollbar-width:none}
+.chip{flex:none;min-height:40px;padding:0 18px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);font-size:14px}
+.chip:hover{background:var(--bg)}
+.chip[aria-pressed="true"]{background:var(--pink);color:var(--dk);box-shadow:none;font-weight:500}
+.field{width:100%;display:flex;gap:10px;align-items:center;min-height:48px;box-shadow:inset 0 0 0 1px var(--bdc);border-radius:99px;padding:0 16px;color:var(--mute);transition:box-shadow .15s}
+.field:focus-within{box-shadow:inset 0 0 0 2px var(--ring);color:var(--ink)}
+.field input{all:unset;flex:1;min-width:0;font-size:15px;color:var(--ink)}
+.field input::placeholder{color:var(--mute)}
+.field input:focus-visible{outline:0}
+.field .x{width:28px;height:28px;border-radius:50%;background:var(--line);display:grid;place-items:center}
+.field .x .i{width:14px;height:14px}
+/* product */
+.im{height:150px;border-radius:24px;position:relative;width:100%}
+.im .fav{position:absolute;inset-block-start:8px;inset-inline-end:8px;width:40px;height:40px;background:var(--card)}
+.dis{position:absolute;inset-block-start:10px;inset-inline-start:10px;background:var(--red);color:var(--onred);border-radius:99px;font-size:12px;font-weight:600;padding:2px 10px}
+.g1{background:linear-gradient(160deg,var(--lime),var(--lime-d))}
+.g2{background:linear-gradient(160deg,var(--black),var(--n800))}
+.g3{background:linear-gradient(160deg,var(--lime-l),var(--lime))}
+.g4{background:linear-gradient(160deg,var(--n600),var(--black))}
+.c .g1,.c .g3{color:var(--dk)}
+.c .g2,.c .g4{color:var(--white)}
+.pc{width:100%;display:flex;flex-direction:column;gap:6px}
+.pc h3{margin:6px 0 0;font-size:15px;font-weight:600}
+.rt{display:flex;gap:4px;align-items:center;color:var(--mute);font-size:12.5px}
+.rt .i{width:14px;height:14px;fill:var(--am);stroke:none}
+.circ{border-radius:50%;flex:none;display:grid;place-items:center;font-weight:600;color:var(--white);font-size:15px}
+.blob{border-radius:48% 52% 42% 58%/55% 45% 55% 45%}
+.sm2{width:52px;height:52px}
+.item small,.who small{display:block;color:var(--mute);font-size:12px}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--lime-d));display:grid;place-items:center;color:var(--black);font-weight:600;font-size:14px;flex:none;position:relative}
+.av.c2{background:linear-gradient(135deg,var(--n700),var(--black));color:var(--white)}
+.av.c3{background:linear-gradient(135deg,var(--lime-l),var(--lime))}
+.av.b{width:84px;height:84px;font-size:32px;box-shadow:0 0 0 3px var(--card),0 0 0 6px var(--pink)}
+.stack{display:flex}
+.stack .av{box-shadow:0 0 0 3px var(--card);margin-inline-end:-10px}
+.who{display:flex;gap:12px;align-items:center;font-size:14px;width:100%}
+.who .rt{margin-inline-start:auto}
+.tag{display:inline-flex;align-items:center;gap:6px;border-radius:99px;font-size:12px;font-weight:600;padding:3px 12px;background:var(--red);color:var(--onred)}
+.tag:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;animation:pu 1.6s infinite}
+@keyframes pu{50%{opacity:.25}}
+.tag.s{background:var(--pink);color:var(--dk)}
+.tag.s:before{display:none}
+/* order */
+.item{display:flex;gap:12px;align-items:center;width:100%;font-size:14.5px}
+.item>span:nth-child(2){flex:1}
+.qty{display:inline-flex;align-items:center;gap:2px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);margin-top:6px}
+.qty button{width:36px;height:36px;border-radius:50%;display:grid;place-items:center}
+.qty button:hover{background:var(--bg)}
+.qty .i{width:16px;height:16px}
+.qty output{min-width:22px;text-align:center;font-weight:600}
+.kv{width:100%;font-size:14.5px;margin:0}
+.kv div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.kv div:last-child{border:0;font-size:16px;font-weight:700}
+.kv dt{color:var(--mute);font-weight:400}
+.kv dd{margin:0}
+.t2{stroke:var(--lg)}
+.bar{width:100%;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:var(--lg)}
+.lg{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--mute)}
+.lg span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-inline-end:6px}
+.peak{display:flex;gap:4px;align-items:flex-end;height:80px;width:100%}
+.peak i{flex:1;border-radius:6px 6px 2px 2px;background:var(--line);display:block}
+.peak i.m{background:var(--lg)}
+/* app */
+.nav{display:flex;justify-content:space-around;width:100%;color:var(--mute);font-size:11.5px}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;min-height:48px}
+.nav .pill{width:48px;height:28px;border-radius:99px;display:grid;place-items:center}
+.nav [aria-current] .pill{background:var(--lime);color:var(--dk)}
+.nav [aria-current]{color:var(--ink);font-weight:500}
+.head{display:flex;flex-direction:column;gap:12px;width:100%}
+.head>div{display:flex;justify-content:space-between;align-items:center}
+.head h3{margin:0;font-size:24px;font-weight:700}
+.feed{width:100%;font-size:14px;display:flex;flex-direction:column;gap:16px;padding:0;margin:0;list-style:none}
+.feed li{display:flex;gap:12px;position:relative}
+.feed li:not(:last-child):before{content:"";position:absolute;inset-inline-start:17px;top:38px;bottom:-14px;width:2px;background:var(--line)}
+.feed .ic{width:36px;height:36px;background:var(--mint);box-shadow:none}
+.feed .ic .i{width:16px;height:16px}
+.toast{box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 0 1px var(--n700);position:fixed;inset-inline:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:calc(100% - 32px);background:var(--dk);color:var(--white);border-radius:99px;padding:10px 20px;font-size:14px;opacity:0;transform:translateY(12px);pointer-events:none;transition:.25s;z-index:40;display:flex;gap:8px;align-items:center}
+.toast.on{opacity:1;transform:none}
+.toast .i{color:var(--lime)}
+.theme{position:fixed;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:var(--sh),inset 0 0 0 1px var(--line);z-index:4}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.c{align-items:stretch}
+.c>small{align-self:flex-start}
+.c.f{grid-column:1/-1}
+@media(max-width:600px){.c.f{grid-column:span 1}}
+.c .row{justify-content:flex-start}
+.sf{padding:12px 16px;border-radius:16px;font-size:13px}
+.s0{background:var(--bg)}
+.s1{box-shadow:inset 0 0 0 1px var(--line)}
+.s2{background:var(--mint)}
+.bx{flex:1;height:30px;border-radius:8px;background:var(--pink);display:grid;place-items:center;font-size:11px;color:var(--dk)}
+.spc{flex:2;border:1.5px dashed var(--mute);border-radius:8px;height:30px}
+.rw{display:flex;gap:8px}
+.cl{display:flex;flex-direction:column;gap:6px}
+hr{border:0;height:1px;background:var(--line);width:100%;margin:0}
+.ar{aspect-ratio:16/9;border-radius:16px;display:grid;place-items:center;font-size:12px;color:var(--white)}
+.scr{height:72px;overflow:auto;border-radius:12px;box-shadow:inset 0 0 0 1px var(--line);padding:8px 12px;font-size:13px}
+.btn.gh{background:transparent;box-shadow:none}
+.btn.gh:hover{background:var(--bg)}
+.btn.dg{background:var(--red);color:var(--onred)}
+.btn.lg2{min-height:56px;padding:0 36px;font-size:16px}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-top-color:transparent;animation:rot .8s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
+.fab{width:56px;height:56px;border-radius:50%;background:var(--lime);color:var(--dk);display:grid;place-items:center;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.lk{color:var(--ink);font-weight:600;display:inline-flex;gap:4px;align-items:center;text-decoration:underline;text-underline-offset:4px}
+.prs{padding:14px 16px;border-radius:20px;box-shadow:inset 0 0 0 1px var(--line);transition:transform .1s,background .15s;text-align:start;width:100%}
+.prs:active{transform:scale(.98);background:var(--bg)}
+.grp{display:inline-flex;box-shadow:inset 0 0 0 1px var(--line);border-radius:99px;overflow:hidden}
+.grp button{min-height:44px;padding:0 16px;font-size:14px;display:grid;place-items:center}
+.grp button:focus-visible{outline-offset:-3px}
+.grp button+button{border-inline-start:1px solid var(--line)}
+.grp [aria-pressed=true]{background:var(--pink);color:var(--dk)}
+.ty{display:grid;gap:10px}
+.ty>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ty small{color:var(--mute);font-size:11.5px;flex:none}
+.ff{display:grid;gap:6px}
+.ff label{font-size:13px;font-weight:600}
+.ff small{font-size:12px;color:var(--mute)}
+.ff.er .field{box-shadow:inset 0 0 0 2px var(--red)}
+.ff.er small{color:var(--red);display:flex;gap:4px;align-items:center}
+.tx{width:100%;border:0;color:var(--ink);box-shadow:inset 0 0 0 1px var(--bdc);border-radius:20px;padding:12px 16px;background:transparent;resize:none;font-size:15px}
+.tx:focus{outline:0;box-shadow:inset 0 0 0 2px var(--ring)}
+.field select{all:unset;flex:1;font-size:15px;color:var(--ink)}
+.field select option{color:var(--ink);background:var(--card)}
+.cbx{display:flex;gap:10px;align-items:center;min-height:40px;font-size:14.5px;cursor:pointer}
+.cbx input{appearance:none;width:22px;height:22px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--mute);display:grid;place-items:center;margin:0;flex:none;cursor:pointer}
+.cbx input[type=radio]{border-radius:50%}
+.cbx input:checked{background:var(--lime);box-shadow:none}
+.cbx input:checked:after{content:"";width:6px;height:11px;border:solid var(--black);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.cbx input[type=radio]:checked:after{width:8px;height:8px;border-radius:50%;background:var(--black);border:0;transform:none}
+.cbx .sw2{margin-inline-start:auto}
+.sw2{appearance:none;width:48px;height:28px;border-radius:99px;background:var(--n500);position:relative;margin:0;cursor:pointer;transition:background .2s;flex:none}
+.sw2:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:inset-inline-start .2s}
+.sw2:checked{background:var(--teal)}
+.sw2:checked:after{inset-inline-start:23px}
+.otp{display:flex;gap:8px;direction:ltr}
+.otp input{flex:1;min-width:0;height:56px;border-radius:16px;border:0;box-shadow:inset 0 0 0 1px var(--bdc);background:transparent;text-align:center;font-size:22px;font-weight:600}
+.otp input:focus{box-shadow:inset 0 0 0 2px var(--ring);outline:0}
+.dpk{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:13px}
+.dpk em{font-style:normal;color:var(--mute);font-size:12px}
+.dpk button{aspect-ratio:1;border-radius:50%}
+.dpk button:hover{background:var(--bg)}
+.dpk [aria-pressed=true]{background:var(--lime);color:var(--dk);font-weight:600}
+.dpk .td{box-shadow:inset 0 0 0 1.5px var(--lg)}
+.al{display:flex;gap:10px;padding:12px 14px;border-radius:18px;background:color-mix(in srgb,var(--c) 12%,var(--card));font-size:13.5px;line-height:1.5}
+.al .i{color:var(--c);margin-top:2px}
+.al b{display:block;font-size:14px}
+.bn{display:flex;gap:10px;align-items:center;background:var(--lime);color:var(--dk);border-radius:18px;padding:10px 14px;font-size:14px;font-weight:500}
+.bn span{flex:1}
+.bn .btn{background:var(--dk);color:var(--white)}
+.dlg{border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.18),inset 0 0 0 1px var(--line);padding:20px;display:grid;gap:12px;text-align:center}
+.dlg h4{margin:0;font-size:17px}
+.dlg p{margin:0;color:var(--mute);font-size:14px}
+.dlg .row{flex-wrap:nowrap}
+.dlg .btn{flex:1;padding:0 12px}
+.sheet{border-radius:28px 28px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.14),inset 0 0 0 1px var(--line);padding:10px 20px 20px;display:grid;gap:10px}
+.sheet:before{content:"";width:40px;height:4px;border-radius:9px;background:var(--line);margin:auto}
+.sk{background:linear-gradient(90deg,var(--line) 25%,var(--bg) 50%,var(--line) 75%);background-size:200% 100%;animation:sh 1.4s infinite;border-radius:10px;display:block}
+@keyframes sh{to{background-position:-200% 0}}
+.stt{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;text-align:center;font-size:13.5px;font-weight:600}
+.stt>div{display:grid;gap:6px;justify-items:center}
+.stt p{margin:0;color:var(--mute);font-size:12px;font-weight:400}
+.stt .ic{width:52px;height:52px;box-shadow:none;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+.bar2{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bar2 b{font-size:17px}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;min-height:44px;color:var(--mute);font-size:14px;position:relative}
+.tabs [aria-selected=true]{color:var(--ink);font-weight:600}
+.tabs [aria-selected=true]:after{content:"";position:absolute;inset:auto 20% -1px;height:3px;border-radius:3px;background:var(--lg)}
+.seg{display:flex;background:var(--bg);border-radius:99px;padding:4px}
+.seg button{flex:1;min-height:40px;border-radius:99px;font-size:14px;color:var(--mute)}
+.seg [aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.bc{display:flex;gap:4px;align-items:center;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.bc b{color:var(--ink);font-weight:500}
+.bc .i{width:14px;height:14px}
+.dr{display:grid;gap:2px;font-size:14.5px}
+.dr button{display:flex;gap:12px;align-items:center;min-height:46px;padding:0 12px;border-radius:14px;text-align:start}
+.dr .on{background:var(--pink);color:var(--dk)}
+.cd2{border-radius:24px;box-shadow:inset 0 0 0 1px var(--line);padding:14px;display:grid;gap:10px;font-size:14px}
+.cd2 .h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cd2 small,.pick small{color:var(--mute);font-size:12px;display:block}
+.pick small{color:inherit;opacity:.75}
+.off{border-radius:24px;background:var(--dk);color:var(--white);padding:18px;display:grid;gap:6px}
+.off b{font-size:32px;color:var(--lime);line-height:1}
+.off code{background:rgba(255,255,255,.14);border-radius:8px;padding:2px 10px;justify-self:start}
+.cat{height:96px;border-radius:22px;padding:12px;display:flex;align-items:flex-end;color:var(--white);font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;font-size:12.5px}
+.tiles div{display:grid;gap:6px;justify-items:center;padding:12px 4px;border-radius:20px;background:var(--bg)}
+.sbd{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:600;background:color-mix(in srgb,var(--c) 15%,transparent);color:color-mix(in srgb,var(--c) 70%,var(--mx))}
+.sbd:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.dot{width:36px;height:36px;border-radius:50%}
+.dot[aria-pressed=true]{box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--ink)}
+.th{display:flex;gap:8px}
+.th button,.th i{flex:1;aspect-ratio:1;border-radius:14px;display:block}
+.th [aria-pressed=true]{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--ink)}
+.rs button{width:40px;height:40px;display:grid;place-items:center;color:var(--mute)}
+.rs [aria-pressed=true]{color:var(--am)}
+.rs [aria-pressed=true] .i{fill:currentColor}
+.ds{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;align-items:center;font-size:12px}
+.ds .bar{grid-column:span 4}
+.map{height:180px;border-radius:22px;position:relative;overflow:hidden;background-color:var(--mp1);background-image:linear-gradient(35deg,transparent 46%,var(--mp2) 46% 49%,transparent 49%),linear-gradient(120deg,transparent 60%,var(--mp2) 60% 62.5%,transparent 62.5%),linear-gradient(0deg,transparent 72%,var(--mp3) 72%)}
+.mk{position:absolute;width:34px;height:34px;margin:-34px 0 0 -17px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--lime);color:var(--dk);display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.mk .i{transform:rotate(45deg);width:16px;height:16px}
+.mk.t{background:var(--black);color:var(--lime)}
+.me{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--lime);border:3px solid var(--black);box-shadow:0 0 0 7px rgba(198,241,53,.35)}
+.map .ic{position:absolute;inset-block-start:10px;inset-inline-end:10px;width:40px;height:40px}
+.upl{border:1.5px dashed var(--mute);border-radius:22px;padding:18px;display:grid;gap:6px;justify-items:center;text-align:center;font-size:13.5px;color:var(--mute)}
+.viewer{height:180px;border-radius:22px;background:linear-gradient(150deg,var(--n700),var(--black));color:var(--white);padding:12px;display:flex;flex-direction:column;justify-content:space-between}
+.viewer>div{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.viewer .ic{background:rgba(255,255,255,.14);color:var(--white);box-shadow:none}
+.ls button{display:flex;gap:12px;align-items:center;min-height:56px;width:100%;text-align:start;border-bottom:1px solid var(--line)}
+.ls button:last-child{border:0}
+.ls span{flex:1}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{color:var(--mute);font-weight:500;text-align:start;padding:8px 6px;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 6px;border-bottom:1px solid var(--line)}
+.car{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.car>div{flex:0 0 84%;height:110px;border-radius:22px;scroll-snap-align:center;color:var(--white);font-weight:600;padding:14px;display:flex;align-items:flex-end}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:7px;height:7px;border-radius:9px;background:var(--line)}
+.dots i:first-child{width:20px;background:var(--lg)}
+.ph{border-radius:32px;box-shadow:inset 0 0 0 1px var(--line);background:var(--bg);display:flex;flex-direction:column;gap:10px;padding:12px;height:420px;max-width:300px;margin:auto;width:100%}
+.ph .z{height:20px;border-radius:8px;background:repeating-linear-gradient(135deg,transparent 0 4px,var(--line) 4px 5px);font-size:10px;color:var(--mute);text-align:center;line-height:20px;flex:none}
+.ph .bd{flex:1;display:grid;gap:10px;align-content:start;overflow:hidden}
+.ph .b{background:var(--card);border-radius:16px;padding:10px 12px;font-size:12.5px}
+.tk{height:52px;border-radius:14px;padding:6px 8px;font-size:11px;display:flex;align-items:flex-end;box-shadow:inset 0 0 0 1px var(--line)}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;font-size:11px;color:var(--mute);text-align:center}
+.ig div{display:grid;gap:6px;justify-items:center;padding:12px 4px;border-radius:16px;background:var(--bg)}
+.ig .i{color:var(--ink)}
+.cc{background:var(--bg);border-radius:6px;padding:2px 8px;font-size:12px;direction:ltr;display:inline-block}
+.ball{width:36px;height:36px;border-radius:50%;background:var(--lime);transition:transform var(--d,.3s) cubic-bezier(.2,.8,.2,1)}
+
+.btn.sm,.qty button,.chip,.pager .pg,.dot,.rs button,.im .fav{position:relative}
+.im .fav{position:absolute}
+.btn.sm::after,.qty button::after,.chip::after,.pager .pg::after,.dot::after,.rs button::after,.im .fav::after{content:"";position:absolute;left:50%;top:50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}
+.ball{display:block}
+.qty button[disabled]{opacity:.4;cursor:not-allowed}
+.trk{container-type:inline-size;direction:ltr;background:var(--mint);border-radius:99px;padding:4px;overflow:hidden}
+.trk .ball.go{transform:translateX(calc(100cqw - 36px))}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo" aria-hidden="true">A</span><div><h1>نظام تصميم Arownd الموحد</h1><p>مكونات التطبيق في 18 قسمًا، بالمسميات نفسها المستخدمة في الكود. جرّب العناصر لترى حالاتها.</p></div></div>
+</header>
+<main id="m"></main>
+<div class="toast" id="ts" role="status"><x-i n="check"></x-i><span></span></div>
+<button class="ic theme" id="t" aria-label="الوضع الداكن" aria-pressed="false"><x-i n="moon" class="mi"></x-i><x-i n="sun" class="si" hidden></x-i></button>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+const $=s=>[...document.querySelectorAll(s)],I=(n)=>'<x-i n="'+n+'"></x-i>';
+const B='var(--info)',T='var(--teal)',R='var(--red)',A='var(--am)',M='var(--mute)';
+const bd=(t,c)=>'<span class="sbd" style="--c:'+c+'">'+t+'</span>';
+const av=(t,c,s)=>'<span class="av '+(c||'')+'" style="'+(s||'')+'">'+t+'</span>';
+const qty='<span class="qty"><button data-d="-1" aria-label="تقليل" disabled>'+I('minus')+'</button><output>1</output><button data-d="1" aria-label="زيادة">'+I('plus')+'</button></span>';
+const stars=n=>'<span class="rt" role="img" aria-label="'+n+' من 5">'+I('star').repeat(5)+'</span>';
+const pk=(nm,ic,t,s,c)=>'<label class="pick">'+'<input type="radio" name="'+nm+'"'+(c?' checked':'')+'>'+'<span class="k">'+I('check')+'</span>'+(ic?I(ic):'')+'<span style="flex:1">'+t+(s?'<small>'+s+'</small>':'')+'</span></label>';
+const dp='<div class="bar2"><button class="ic" aria-label="الشهر السابق">'+I('chevron-right')+'</button><b style="font-size:15px">نوفمبر 2026</b><button class="ic" aria-label="الشهر التالي">'+I('chevron-left')+'</button></div><div class="dpk" data-g>'+['ح','ن','ث','ر','خ','ج','س'].map(d=>'<em>'+d+'</em>').join('')+Array.from({length:30},(_,i)=>'<button class="'+(i===7?'td':'')+'"'+(i===7?' aria-current="date"':'')+' aria-pressed="'+(i===11)+'">'+(i+1)+'</button>').join('')+'</div>';
+const wil={'الجزائر':['الجزائر الوسطى','باب الزوار','بئر مراد رايس'],'وهران':['وهران','بئر الجير','عين الترك'],'قسنطينة':['قسنطينة','الخروب','حامة بوزيان']};
+const E=[
+['1. الأساسيات',[
+['Surface · Container','<div class="sf s0">Surface 0 · الخلفية</div><div class="sf s1">Surface 1 · البطاقة</div><div class="sf s2">Surface 2 · مميّز</div>'],
+['Stack · Row · Column · Spacer','<div class="rw"><b class="bx">Row</b><b class="spc"></b><b class="bx">Row</b></div><div class="cl"><b class="bx">Column</b><b class="bx">Column</b></div>'],
+['Divider · AspectRatio · ScrollArea','<hr><div class="ar g2">16:9</div><div class="scr" tabindex="0" role="region" aria-label="منطقة تمرير">سطر أول<br>سطر ثانٍ<br>سطر ثالث<br>سطر رابع<br>سطر خامس</div>']]],
+['2. الأزرار',[
+['Button — الأنواع والأحجام والحالات','<div class="row"><button class="btn">رئيسي</button><button class="btn o">ثانوي</button><button class="btn n">محايد</button><button class="btn gh">نصّي</button><button class="btn dg">حذف</button></div><div class="row"><button class="btn sm">صغير</button><button class="btn lg2">كبير</button><button class="btn" disabled>معطّل</button><button class="btn" data-ld><span class="spin"></span><span>إرسال</span></button></div>','w'],
+['IconButton · ButtonGroup','<div class="row"><button class="ic" aria-label="بحث">'+I('search')+'</button><button class="ic l" aria-label="إضافة">'+I('plus')+'</button><button class="ic fav" aria-pressed="false" aria-label="المفضلة">'+I('heart')+'</button></div><div class="grp" data-g><button aria-pressed="true">يومي</button><button aria-pressed="false">أسبوعي</button><button aria-pressed="false">شهري</button></div>'],
+['FloatingActionButton · LinkButton · PressableSurface','<div class="row" style="justify-content:space-between"><button class="fab" aria-label="طلب جديد">'+I('plus')+'</button><a class="lk" href="#">تصفح المتاجر'+I('chevron-left')+'</a></div><button class="prs">'+'بطاقة قابلة للضغط<br><span class="mt">اضغط لترى حالة الضغط</span></button>']]],
+['3. الطباعة',[
+['Text · Heading · Label · Caption · PriceText · BadgeText','<div class="ty"><div><b style="font-size:26px">متجر النور</b><small>Heading 1 · 26 / 700</small></div><div><b style="font-size:20px;font-weight:600">منتجات مختارة لك</b><small>Heading 2 · 20 / 600</small></div><div><span>وصل الطلب خلال يومين والتغليف ممتاز.</span><small>Text · 15 / 400</small></div><div><b style="font-size:13px;font-weight:600">الاسم الكامل</b><small>Label · 13 / 600</small></div><div><span class="mt">آخر تحديث منذ ساعة</span><small>Caption · 12.5 / 400</small></div><div><span><b style="font-size:20px">18,900 د.ج</b> <s class="mt">25,200</s></span><small>PriceText · 20 / 700</small></div><div><span class="tag s">جديد</span><small>BadgeText · 12 / 600</small></div></div>','f']]],
+['4. النماذج',[
+['TextField · FormField · FormLabel · FormError','<div class="ff"><label for="a1">الاسم الكامل</label><div class="field"><input id="a1" aria-describedby="a1h" placeholder="مثال: سارة محمد"></div><small id="a1h">يظهر للتاجر على الطلب</small></div><div class="ff er"><label for="a2">رقم الجوال</label><div class="field"><input id="a2" value="055" inputmode="tel" aria-invalid="true" aria-describedby="a2e"></div><small id="a2e">'+I('info')+'أدخل 10 أرقام</small></div>'],
+['TextArea · NumberField · SearchField','<textarea class="tx" rows="3" aria-label="ملاحظات للتاجر" placeholder="ملاحظات للتاجر"></textarea><label class="field">'+I('search')+'<input type="search" aria-label="بحث" placeholder="ابحث في المتجر"></label><label class="field"><input type="number" aria-label="الكمية" value="2" min="1"><span class="mt">قطعة</span></label>'],
+['Checkbox · Radio · RadioGroup · SwitchControl','<label class="cbx"><input type="checkbox" checked>أوافق على الشروط</label><div role="radiogroup" aria-label="التوصيل"><label class="cbx"><input type="radio" name="dl" checked>توصيل للمنزل</label><label class="cbx"><input type="radio" name="dl">استلام من المتجر</label></div><label class="cbx">إشعارات الطلبات<input class="sw2" type="checkbox" role="switch" checked></label>'],
+['Select · MultiSelect','<label class="field">'+I('map-pin')+'<select aria-label="المدينة"><option>الجزائر</option><option>وهران</option></select>'+I('chevron-down')+'</label><div class="chips" data-m><button class="chip" aria-pressed="true">أزياء '+I('x')+'</button><button class="chip" aria-pressed="true">منزل</button><button class="chip" aria-pressed="false">جمال</button></div>'],
+['DatePicker',dp],
+['QuantityStepper · InputOTP','<div class="row">'+qty+'</div><div class="otp" role="group" aria-label="رمز التحقق">'+Array.from({length:4},(_,i)=>'<input inputmode="numeric" autocomplete="'+(i?'off':'one-time-code')+'" maxlength="1" aria-label="الرقم '+(i+1)+'">').join('')+'</div>']]],
+['5. التغذية الراجعة',[
+['Alert','<div class="al" style="--c:'+B+'">'+I('info')+'<span><b>معلومة</b>يصل طلبك خلال يومين.</span></div><div class="al" style="--c:'+T+'">'+I('circle-check')+'<span><b>تم الدفع</b>أرسلنا الإيصال إلى بريدك.</span></div><div class="al" style="--c:'+A+'">'+I('triangle-alert')+'<span><b>مخزون محدود</b>بقيت 3 قطع فقط.</span></div><div class="al" style="--c:'+R+'">'+I('circle-x')+'<span><b>تعذّر الدفع</b>تحقق من بيانات البطاقة وأعد المحاولة.</span></div>'],
+['Toast · Banner · ProgressBar · Spinner','<div class="row"><button class="btn sm" data-t="تم حفظ التغييرات">أظهر Toast</button><span class="spin" aria-label="جارٍ التحميل" role="status"></span></div><div class="bn">'+I('flame')+'<span>عرض خاطف ينتهي اليوم</span><button class="btn sm">تسوّق</button></div><div class="bar" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"><i style="width:65%"></i></div>'],
+['ConfirmDialog · Dialog','<div class="dlg"><h4>إلغاء الطلب؟</h4><p>لا يمكن التراجع بعد الإلغاء.</p><div class="row"><button class="btn n">تراجع</button><button class="btn dg">إلغاء الطلب</button></div></div>'],
+['BottomSheet','<div class="sheet"><b>ترتيب حسب</b>'+pk('so',null,'الأقرب إليك',null,1)+pk('so',null,'الأعلى تقييمًا')+'<button class="btn">تطبيق</button></div>'],
+['LoadingState · EmptyState · ErrorState · SuccessState','<div class="stt"><div style="--c:'+M+'"><span class="ic">'+'<span class="spin"></span></span>جارٍ التحميل<p>لحظات من فضلك</p></div><div style="--c:'+M+'"><span class="ic">'+I('shopping-bag')+'</span>السلة فارغة<p>أضف منتجًا للبدء</p><button class="btn sm">تصفح المنتجات</button></div><div style="--c:'+R+'"><span class="ic">'+I('circle-x')+'</span>تعذّر التحميل<p>تحقق من الاتصال</p><button class="btn n sm">أعد المحاولة</button></div><div style="--c:'+T+'"><span class="ic">'+I('circle-check')+'</span>تم الطلب<p>رقم الطلب 4821</p></div></div>','f'],
+['Skeleton','<span class="sk" style="height:110px;border-radius:22px"></span><span class="sk" style="height:14px;width:70%"></span><span class="sk" style="height:14px;width:40%"></span>']]],
+['6. التنقل',[
+['AppHeader · PageHeader · BackButton','<div class="bar2"><button class="ic" aria-label="رجوع">'+I('arrow-right')+'</button><b>السلة</b><button class="ic" aria-label="المزيد">'+I('ellipsis')+'</button></div><div><h3 style="margin:0;font-size:26px">طلباتي</h3><span class="mt">12 طلبًا هذا الشهر</span></div>'],
+['BottomNavigation','<nav class="nav" data-n aria-label="التنقل الرئيسي"><button aria-current="page"><span class="pill">'+I('house')+'</span>الرئيسية</button><button><span class="pill">'+I('store')+'</span>المتاجر</button><button><span class="pill">'+I('shopping-cart')+'<span class="badge">3</span></span>السلة</button><button><span class="pill">'+I('user')+'</span>حسابي</button></nav>'],
+['TabBar · SegmentedControl','<div class="tabs" role="tablist" data-g><button role="tab" aria-selected="true">المنتجات</button><button role="tab" aria-selected="false">التقييمات</button><button role="tab" aria-selected="false">عن المتجر</button></div><div class="seg" data-g><button aria-pressed="true">قائمة</button><button aria-pressed="false">شبكة</button></div>'],
+['Breadcrumb · NavigationMenu','<nav class="bc" aria-label="مسار التنقل">الرئيسية'+I('chevron-left')+'أزياء'+I('chevron-left')+'<b>حقائب</b></nav><div class="chips" data-g><button class="chip" aria-pressed="true">الكل</button><button class="chip" aria-pressed="false">العروض</button><button class="chip" aria-pressed="false">الأحدث</button></div>'],
+['Drawer','<div class="dr" data-g><div class="item" style="padding:6px 12px">'+av('س')+'<span>سارة محمد<small>sara@mail.com</small></span></div><button class="on" aria-pressed="true">'+I('shopping-bag')+'طلباتي</button><button>'+I('heart')+'المفضلة</button><button>'+I('settings')+'الإعدادات</button></div>']]],
+['7. البطاقات',[
+['Card','<div class="cd2"><div class="h"><b>عنوان البطاقة</b>'+I('ellipsis')+'</div><span class="mt">محتوى البطاقة، تتسع لأي مكوّن داخلها.</span><button class="btn sm" style="justify-self:start">إجراء</button></div>'],
+['ProductListCard · ProductCard','<div class="cd2"><div class="item"><span class="circ sm2 blob g4"></span><span>حقيبة جلد يدوية<small>متجر النور · ★ 4.8</small></span><b>18,900 د.ج</b></div></div><div class="pc"><div class="im g3" style="height:110px"><span class="dis">−25%</span><button class="ic fav" aria-pressed="false" aria-label="المفضلة">'+I('heart')+'</button></div><b>سماعة لاسلكية</b></div>'],
+['StoreCard · StoreMiniCard','<div class="cd2"><div class="cover" style="height:80px"></div><div class="h"><span class="item">'+av('ن','c2','width:44px;height:44px')+'<span>متجر النور<small>★ 4.9 · 1.2 ألف متابع</small></span></span><button class="btn sm">متابعة</button></div></div><div class="row">'+['ن','ب','أ'].map((x,i)=>'<span style="text-align:center;font-size:12px">'+av(x,['','c2','c3'][i],'width:52px;height:52px;margin:auto')+'متجر</span>').join('')+'</div>'],
+['OfferCard','<div class="off"><span>خصم على أول طلب</span><b>−30%</b><code>AROWND30</code><span class="mt" style="color:var(--n300)">ينتهي بعد 3 ساعات</span></div>'],
+['CategoryCard · CategoryTile','<div class="cat g1">أزياء</div><div class="tiles"><div>'+I('shirt')+'أزياء</div><div>'+I('smartphone')+'إلكترونيات</div><div>'+I('sofa')+'منزل</div></div>'],
+['MerchantCard · DeliveryCard','<div class="cd2"><div class="h"><span class="item">'+av('ب','c3')+'<span>بيت القهوة<small>48 طلبًا اليوم</small></span></span>'+bd('مفتوح',T)+'</div></div><div class="cd2"><div class="h"><b>توصيل سريع</b><span class="mt">25 دقيقة</span></div><span class="mt">'+I('truck')+' يصل قبل 6 مساءً</span></div>'],
+['OrderCard · AddressCard · NotificationCard','<div class="cd2"><div class="h"><b>طلب #4821</b>'+bd('قيد الشحن',B)+'</div><small>3 منتجات · 20,400 د.ج</small></div><div class="cd2"><div class="item">'+I('map-pin')+'<span>المنزل<small>حي الأمل، شارع 12</small></span></div></div><div class="cd2"><div class="item"><span class="ic" style="background:var(--mint);box-shadow:none">'+I('bell')+'</span><span>تم شحن طلبك<small>منذ 5 دقائق</small></span></div></div>','w'],
+['MetricCard','<div class="cd2"><span class="mt">مبيعات اليوم</span><b style="font-size:28px"><span class="num">128,000</span> د.ج</b>'+bd('+12% عن أمس',T)+'</div>']]],
+['8. التجارة',[
+['PriceDisplay · DiscountBadge · StockBadge','<div class="row" style="justify-content:space-between"><span><b style="font-size:22px">18,900 د.ج</b> <s class="mt">25,200</s></span><span class="dis" style="position:static">−25%</span></div><div class="row">'+bd('متوفر',T)+bd('بقي 3',A)+bd('نفد',R)+'</div>'],
+['FavoriteButton · CartButton','<div class="row"><button class="ic fav" aria-pressed="false" aria-label="المفضلة">'+I('heart')+'</button><button class="ic" aria-label="السلة">'+I('shopping-cart')+'<span class="badge">3</span></button></div>'],
+['CartItem · ProductQuantitySelector','<div class="item"><span class="circ sm2 blob g3"></span><span>سماعة لاسلكية<small>متجر الأفق · 5,900 د.ج</small>'+qty+'</span><button class="ic" aria-label="حذف">'+I('trash-2')+'</button></div>'],
+['CartSummary · CheckoutSummary · CouponInput','<div class="field"><input aria-label="كود الخصم" placeholder="كود الخصم"><button class="btn sm">تطبيق</button></div><dl class="kv"><div><dt>المجموع الفرعي</dt><dd>18,900 د.ج</dd></div><div><dt>الخصم</dt><dd style="color:color-mix(in srgb,var(--teal) 70%,var(--mx))">−2,000 د.ج</dd></div><div><dt>الإجمالي</dt><dd>16,900 د.ج</dd></div></dl><button class="btn">إتمام الشراء</button>'],
+['ProductVariantSelector','<span class="mt">اللون</span><div class="row" data-g><button class="dot g1" aria-pressed="true" aria-label="ليموني"></button><button class="dot g2" aria-pressed="false" aria-label="أسود"></button><button class="dot g4" aria-pressed="false" aria-label="رمادي"></button></div><span class="mt">المقاس</span><div class="row" data-g><button class="chip" aria-pressed="false">S</button><button class="chip" aria-pressed="true">M</button><button class="chip" aria-pressed="false">L</button></div>'],
+['ProductImageGallery','<div class="im g4" style="height:130px"></div><div class="th" data-g><button class="g4" aria-pressed="true" aria-label="صورة 1"></button><button class="g1" aria-pressed="false" aria-label="صورة 2"></button><button class="g2" aria-pressed="false" aria-label="صورة 3"></button><button class="g3" aria-pressed="false" aria-label="صورة 4"></button></div>'],
+['OfferSelector · PaymentMethodCard','<div style="display:grid;gap:8px"><label class="pick"><input type="radio" name="of" checked><span class="k">'+I('check')+'</span><span style="flex:1">قطعتان<small>وفّر 15%</small></span><b>32,000 د.ج</b></label>'+pk('pm','credit-card','Visa ••4242','تنتهي 08/28',1)+pk('pm','wallet','رصيد المحفظة','12,000 د.ج')+'</div>'],
+['OrderStatusBadge','<div class="row">'+bd('جديد',M)+bd('قيد التجهيز',A)+bd('تم الشحن',T)+bd('ملغي',R)+'</div>']]],
+['9. الهوية',[
+['Avatar · AvatarGroup · VerifiedBadge','<div class="row" style="align-items:flex-end">'+av('س','','width:32px;height:32px;font-size:12px')+av('م','c2')+av('ع','c3','width:56px;height:56px;font-size:20px')+av('ن','c2 b blob','width:72px;height:72px;font-size:26px')+'</div><div class="row"><div class="stack">'+av('س')+av('م','c2')+av('ع','c3')+av('+8','','background:var(--ink);color:var(--card)')+'</div><span class="sbd" style="--c:'+T+'">'+I('check')+'موثّق</span></div>'],
+['IdentityRow · UserProfileCard','<div class="item">'+av('س','','width:48px;height:48px')+'<span>سارة محمد<small>مشترية موثّقة</small></span><button class="btn sm n">عرض</button></div><div class="cd2" style="text-align:center"><span style="margin:auto">'+av('س','c3','width:64px;height:64px;font-size:22px')+'</span><b>سارة محمد</b><div class="tiles"><div><b>12</b>طلبًا</div><div><b>8</b>مفضلة</div><div><b>3</b>كوبونات</div></div></div>'],
+['RatingStars · RatingSelector','<div class="row">'+stars(5)+'<span class="num">4.8</span></div><div class="rs row" data-r role="group" aria-label="قيّم المتجر">'+Array.from({length:5},(_,i)=>'<button aria-pressed="false" aria-label="'+(i+1)+' من 5">'+I('star')+'</button>').join('')+'</div>'],
+['ReviewCard · ReviewList','<div class="cd2"><b>تغليف ممتاز</b><span class="mt">وصلني الطلب بعد يومين وسأطلب مرة أخرى.</span><div class="who">'+av('س','c3')+'<span>سارة م.<small>مشترية موثّقة</small></span>'+stars(5)+'</div></div><div class="ds">'+[[5,80],[4,12],[3,5],[2,2],[1,1]].map(([n,p])=>'<span>'+n+' ★</span><div class="bar"><i style="width:'+p+'%"></i></div>').join('')+'</div>']]],
+['10. التاجر',[
+['MerchantMetricCard · SalesSummary','<div class="tiles"><div><b class="num">48</b>طلبًا</div><div><b class="num">1.2K</b>زيارة</div><div><b class="num">23%</b>تحويل</div></div><div class="cd2"><span class="mt">إجمالي المبيعات</span><b style="font-size:26px"><span class="num">345,000</span> د.ج</b><div class="peak" style="height:48px">'+[4,6,5,8,7,10,9].map((h,i)=>'<i class="'+(i===6?'m':'')+'" style="height:'+h*4.5+'px"></i>').join('')+'</div></div>'],
+['MerchantProfileCard · MerchantStoreCard · MerchantStatusBadge','<div class="cd2"><div class="item">'+av('ن','c2','width:52px;height:52px')+'<span>متجر النور<small>arownd.app/s/alnoor</small></span>'+bd('مفتوح',T)+'</div><div class="row">'+bd('قيد المراجعة',A)+bd('مغلق',M)+bd('موقوف',R)+'</div></div>'],
+['MerchantOrderCard','<div class="cd2"><div class="h"><b>طلب #4822</b>'+bd('جديد',M)+'</div><span class="mt">سارة م. · 2 منتجات · 20,400 د.ج</span><div class="row"><button class="btn sm">قبول</button><button class="btn sm n">رفض</button></div></div>'],
+['MerchantProductRow','<div class="item"><span class="circ sm2 blob g4"></span><span>حقيبة جلد يدوية<small>18,900 د.ج · المخزون 14</small></span><input class="sw2" type="checkbox" role="switch" aria-label="متاح للبيع" checked></div>'],
+['MerchantOnboardingStep','<ul class="feed"><li class="dn"><span class="ic" style="background:var(--teal);color:#fff">'+I('check')+'</span><span>بيانات المتجر<small class="mt" style="display:block">مكتملة</small></span></li><li class="cur"><span class="ic" style="background:var(--pink);color:var(--dk)">'+I('camera')+'</span><span>أضف شعار المتجر<small class="mt" style="display:block">الخطوة الحالية</small></span></li><li><span class="ic">'+I('package')+'</span><span>أضف أول منتج</span></li></ul>'],
+['BusinessHours','<table class="tbl"><tr><td>السبت – الخميس</td><td class="num">09:00 – 22:00</td></tr><tr><td>الجمعة</td><td class="num">16:00 – 22:00</td></tr></table>'+bd('مفتوح الآن',T)]]],
+['11. التوصيل',[
+['DeliveryOrderCard · DeliveryStatusBadge · DeliveryMetricCard','<div class="cd2"><div class="h"><b>طلب #4821</b>'+bd('في الطريق',B)+'</div><div class="tiles"><div><b class="num">3.2</b>كم</div><div><b class="num">12</b>دقيقة</div><div><b class="num">250</b>د.ج</div></div></div>'],
+['DeliveryPartnerCard','<div class="cd2"><div class="item">'+av('ي','c2','width:48px;height:48px')+'<span>يوسف المدني<small>★ 4.9 · دراجة نارية</small></span><button class="ic l" aria-label="اتصال">'+I('phone')+'</button></div></div>'],
+['TrackingTimeline · TrackingStep','<ul class="feed"><li class="dn"><span class="ic" style="background:var(--teal);color:#fff">'+I('check')+'</span><span>تم تأكيد الطلب<small class="mt" style="display:block">10:02</small></span></li><li class="dn"><span class="ic" style="background:var(--teal);color:#fff">'+I('package')+'</span><span>جارٍ التجهيز<small class="mt" style="display:block">10:20</small></span></li><li class="cur"><span class="ic" style="background:var(--pink);color:var(--dk)">'+I('truck')+'</span><span>في الطريق إليك<small class="mt" style="display:block">يصل خلال 12 دقيقة</small></span></li><li><span class="ic">'+I('house')+'</span><span>تم التسليم</span></li></ul>'],
+['DeliveryAddressCard · DeliveryRouteCard','<div class="cd2"><div class="item">'+I('store')+'<span>من: متجر الأفق<small>حي النخيل</small></span></div><div class="bar" style="width:2px;height:16px;margin-inline-start:9px"></div><div class="item">'+I('map-pin')+'<span>إلى: المنزل<small>حي الأمل، شارع 12</small></span></div></div>']]],
+['12. الخرائط والموقع',[
+['MapView · MapMarker','<div class="map"><span class="mk" style="left:30%;top:45%">'+I('store')+'</span><span class="mk t" style="left:68%;top:62%">'+I('house')+'</span><span class="me" style="left:48%;top:70%"></span><button class="ic" aria-label="موقعي">'+I('locate-fixed')+'</button></div>'],
+['LocationPicker · DirectionsButton','<div class="map" style="height:130px"><span class="mk" style="left:50%;top:58%">'+I('map-pin')+'</span></div><div class="cd2"><span>حي الأمل، شارع 12</span><div class="row"><button class="btn sm">تأكيد الموقع</button><button class="btn sm o">'+I('navigation')+'الاتجاهات</button></div></div>'],
+['LocationSearch · AddressPicker','<label class="field">'+I('search')+'<input aria-label="بحث عن عنوان" placeholder="ابحث عن عنوان"></label>'+pk('ad','house','المنزل','حي الأمل، شارع 12',1)+pk('ad','map-pin','العمل','المنطقة الصناعية')],
+['WilayaSelect · CommuneSelect','<label class="field">'+I('map-pin')+'<select id="wl" aria-label="الولاية">'+Object.keys(wil).map(w=>'<option>'+w+'</option>').join('')+'</select></label><label class="field">'+I('map-pin')+'<select id="cm" aria-label="البلدية"></select></label>'],
+['LocationPermissionPrompt','<div class="dlg">'+'<span class="ic l" style="margin:auto">'+I('map-pin')+'</span><h4>السماح بالوصول إلى موقعك؟</h4><p>نستخدمه لإظهار أقرب المتاجر.</p><div class="row"><button class="btn n">ليس الآن</button><button class="btn">السماح</button></div></div>']]],
+['13. الوسائط',[
+['Image · ImageGallery · ImagePreview','<div class="im g2" style="height:110px"></div><div class="th"><i class="g1"></i><i class="g3"></i><i class="g4"></i><i class="sk"></i></div>'],
+['ImageUploader · CameraButton','<div class="upl">'+I('upload')+'اسحب الصور أو اضغط للرفع<button class="btn sm o">'+I('camera')+'التقاط صورة</button></div><div class="th"><i class="g1"></i><i class="g4"></i></div>'],
+['FileUploader','<div class="cd2"><div class="item">'+I('file-text')+'<span>السجل التجاري.pdf<small>1.2 MB · 70%</small></span><button class="ic" aria-label="إلغاء">'+I('x')+'</button></div><div class="bar" role="progressbar" aria-label="رفع الملف" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"><i style="width:70%"></i></div></div>'],
+['ImageSearch · MediaViewer','<label class="field">'+I('image')+'<input aria-label="بحث عن صورة" placeholder="ابحث عن صورة"></label><div class="viewer"><div><button class="ic" aria-label="إغلاق">'+I('x')+'</button><span class="num">2 / 5</span></div><div><button class="ic" aria-label="السابق">'+I('chevron-right')+'</button><button class="ic" aria-label="التالي">'+I('chevron-left')+'</button></div></div>']]],
+['14. القوائم والبيانات',[
+['List · ListItem','<div class="ls"><button><span class="ic" style="background:var(--mint);box-shadow:none">'+I('user')+'</span><span>الملف الشخصي</span>'+I('chevron-left')+'</button><button><span class="ic" style="background:var(--mint);box-shadow:none">'+I('bell')+'</span><span>الإشعارات</span>'+I('chevron-left')+'</button></div>'],
+['DataTable','<div style="overflow-x:auto"><table class="tbl"><thead><tr><th scope="col">الطلب</th><th scope="col">العميل</th><th scope="col">المبلغ (د.ج)</th><th scope="col">الحالة</th></tr></thead><tr><td class="num">#4822</td><td>سارة</td><td class="num">20,400</td><td>'+bd('جديد',M)+'</td></tr><tr><td class="num">#4821</td><td>ماجد</td><td class="num">8,900</td><td>'+bd('شُحن',T)+'</td></tr></table></div>'],
+['StatCard · ChartCard','<div class="cd2"><span class="mt">زيارات المتجر</span><b class="num" style="font-size:24px">1,240</b><div class="peak" style="height:60px">'+[3,5,4,7,6,9,8,10,7,11].map((h,i)=>'<i class="'+(i===9?'m':'')+'" style="height:'+h*5+'px"></i>').join('')+'</div></div>'],
+['Carousel · HorizontalList','<div class="car" tabindex="0" role="region" aria-label="العروض"><div class="g1">عروض الخريف</div><div class="g2">وصل حديثًا</div><div class="g4">الأكثر مبيعًا</div></div><div class="dots"><i></i><i></i><i></i></div>'],
+['FilterChip · FilterBar · SortSelector · ViewToggle','<div class="chips" data-g><button class="chip" aria-pressed="true">'+I('list-filter')+' تصفية 2</button><button class="chip" aria-pressed="false">متوفر</button><button class="chip" aria-pressed="false">خصم</button></div><div class="row" style="justify-content:space-between"><label class="field" style="width:auto;min-height:44px">'+I('arrow-up-down')+'<select aria-label="الترتيب"><option>الأحدث</option><option>الأقل سعرًا</option></select></label><div class="grp" data-g><button aria-pressed="true" aria-label="شبكة">'+I('layout-grid')+'</button><button aria-pressed="false" aria-label="قائمة">'+I('list')+'</button></div></div>'],
+['Pagination','<nav class="pager" aria-label="الصفحات"><button class="ic" aria-label="السابقة">'+I('chevron-right')+'</button><button class="pg">1</button><button class="pg" aria-current="page">2</button><button class="pg">3</button><button class="ic l" aria-label="التالية">'+I('chevron-left')+'</button></nav>']]],
+['15. التخطيط والتطبيق',[
+['AppShell · Screen · Section · SectionHeader · StickyActionBar · SafeAreaContainer','<div class="ph"><div class="z">SafeArea · أعلى</div><div class="bar2"><button class="ic" aria-label="رجوع">'+I('arrow-right')+'</button><b>المتاجر</b><span></span></div><div class="bd"><div class="bar2"><b style="font-size:15px">مميّزة</b><a class="lk" href="#" style="font-size:13px">عرض الكل</a></div><div class="b">StoreCard</div><div class="b">StoreCard</div></div><button class="btn">StickyActionBar · متابعة</button><div class="z">SafeArea · أسفل</div></div>'],
+['KeyboardAvoidingContainer · RefreshContainer','<div class="stt"><div style="--c:'+T+'"><span class="ic">'+I('refresh-cw')+'</span>اسحب للتحديث<p>RefreshContainer</p></div><div style="--c:'+M+'"><span class="ic">'+I('lock')+'</span>يرتفع المحتوى مع لوحة المفاتيح<p>KeyboardAvoidingContainer</p></div></div>']]]
+];
+const wrap=(t,cs)=>'<h2>'+t+'</h2><div class="grid">'+cs.map(([cap,h,w])=>'<div class="c'+(w?' '+w:'')+'">'+h+'<small>'+cap+'</small></div>').join('')+'</div>';
+const lin=v=>v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);
+const lum=h=>{h=h.replace('#','');const [r,g,b]=[0,2,4].map(k=>lin(parseInt(h.substr(k,2),16)/255));return .2126*r+.7152*g+.0722*b};
+const fg=h=>{const L=lum(h);return (L+.05)/.05304>=1.05/(L+.05)?'var(--black)':'var(--white)'};
+const pal=[['Brand — الهوية',[['Lime Signal','#C6F135'],['Lime Dark','#A8D522'],['Lime Light','#E5F8A8'],['Black','#0A0A0A'],['White','#FFFFFF']]],
+['Light Theme',[['background','#F5F5F5'],['surface','#FFFFFF'],['surface-secondary','#EEEEEE'],['surface-tertiary','#E5E5E5'],['foreground','#0A0A0A'],['fg-secondary','#525252'],['fg-muted','#737373'],['border-input','#8C8C8C']]],
+['Dark Theme',[['background','#0A0A0A'],['surface','#171717'],['surface-secondary','#262626'],['surface-tertiary','#333333'],['foreground','#F5F5F5'],['fg-secondary','#A3A3A3'],['fg-muted','#737373'],['border-input','#737373']]],
+['Semantic — الحالات',[['success','#16A34A'],['success-light','#DCFCE7'],['warning','#D97706'],['warning-light','#FEF3C7'],['danger','#DC2626'],['danger-light','#FEE2E2'],['info','#2563EB'],['info-light','#DBEAFE']]],
+['Commerce — التجارة',[['price','#0A0A0A'],['discount','#DC2626'],['offer','#C6F135'],['stock-available','#16A34A'],['stock-low','#D97706'],['stock-out','#DC2626']]],
+['Map & Delivery',[['map-primary','#C6F135'],['map-route','#2563EB'],['delivery-pending','#D97706'],['delivery-progress','#2563EB'],['delivery-completed','#16A34A'],['delivery-cancelled','#DC2626']]]];
+const cols=[['lime','Primary'],['pink','Selected'],['teal','Success'],['red','Danger'],['mint','Surface 2'],['ink','Ink'],['mute','Muted'],['line','Line'],['bg','Background'],['card','Card']];
+const ico=['house','store','shopping-cart','shopping-bag','heart','star','user','bell','search','map-pin','truck','package','credit-card','wallet','ticket','camera','image','phone','message-circle','calendar','clock','settings','share','trash-2','eye','lock','navigation','percent','gift','refresh-cw'];
+const tok=[
+['Colors · الألوان الرسمية','<div style="display:grid;gap:16px">'+pal.map(([g,a])=>'<div><b style="font-size:13.5px">'+g+'</b><div class="tg" style="margin-top:8px">'+a.map(([n,h])=>'<div class="tk" style="background:'+h+';color:'+fg(h)+';flex-direction:column;align-items:flex-start;justify-content:flex-end;height:68px;line-height:1.35"><span>'+n+'</span><span class="num" style="font-family:ui-monospace,monospace">'+h+'</span></div>').join('')+'</div></div>').join('')+'<div><b style="font-size:13.5px">Gradients</b><div class="tg" style="margin-top:8px"><div class="tk g1" style="height:68px;color:var(--black);align-items:flex-end">brand-gradient</div><div class="tk g2" style="height:68px;color:var(--white);align-items:flex-end">dark-gradient</div><div class="tk" style="height:68px;background:linear-gradient(160deg,#FFFFFF,#F5F5F5);color:var(--black);align-items:flex-end">light-gradient</div></div></div></div>','f'],
+['قواعد استخدام الألوان','<ul style="margin:0;padding-inline-start:18px;display:grid;gap:8px;font-size:14px"><li>Lime Signal للأزرار الأساسية والعناصر المهمة، والنص فوقه دائمًا Black.</li><li>لا يُستخدم الليموني كنص صغير على الأبيض.</li><li>البطاقات بيضاء في الفاتح و#171717 في الداكن.</li><li>ألوان الحالات لا تتغير بين الوضعين، ولا تُستخدم كنص صغير على الأبيض (استخدم الشارة أو لونًا أغمق).</li><li>النص الثانوي = fg-secondary. أما fg-muted فللأيقونات والعناصر غير النصية فقط.</li><li>حدود الحقول بلون border-input (تباين 3:1 على الأقل).</li><li>كل الألوان عبر Design Tokens ولا يتكرر HEX داخل المكونات.</li></ul>'],
+['Typography · Spacing','<div class="ty">'+[['Display',32,700],['Heading 1',26,700],['Heading 2',20,600],['Text',15,400],['Label',13,600],['Caption',12.5,400],['Badge',12,600]].map(([n,s,w])=>'<div><span style="font-size:'+s+'px;font-weight:'+w+'">'+n+'</span><small>'+s+' / '+w+'</small></div>').join('')+'</div><div class="row">'+[4,8,12,16,24,32].map(s=>'<span style="width:'+s+'px;height:'+s+'px;background:var(--pink);display:block;border-radius:2px" title="'+s+'"></span>').join('')+'<span class="mt">4 · 8 · 12 · 16 · 24 · 32</span></div>'],
+['BorderRadius · Shadows','<div class="row">'+[8,12,16,24,28,99].map(r=>'<span style="width:44px;height:44px;background:var(--mint);border-radius:'+r+'px;display:grid;place-items:center;font-size:11px">'+(r>50?'full':r)+'</span>').join('')+'</div><div class="row" style="gap:14px">'+['0 1px 2px rgba(0,0,0,.12)','0 8px 24px rgba(0,0,0,.12)','0 12px 40px rgba(0,0,0,.2)'].map((s,i)=>'<span style="width:64px;height:44px;border-radius:14px;background:var(--card);box-shadow:'+s+',inset 0 0 0 1px var(--line);display:grid;place-items:center;font-size:11px">'+['sm','md','lg'][i]+'</span>').join('')+'</div>'],
+['Dimensions · Opacity · ZIndex','<div class="ty"><div><span>حد اللمس الأدنى</span><small>44px</small></div><div><span>الحقل والزر الرئيسي</span><small>48px</small></div><div><span>الترويسة / الشريط السفلي</span><small>56 / 64px</small></div><div><span>معطّل · تراكب · ضغط</span><small>.5 · .4 · .12</small></div><div><span>sticky · drawer · modal · toast</span><small>10 · 20 · 30 · 40</small></div></div>'],
+['IconSizes','<div class="row" style="gap:16px;align-items:flex-end">'+[14,16,20,24,32].map(s=>'<span style="text-align:center;font-size:11px;color:var(--mute)"><x-i n="shopping-cart" style="--is:'+s+'px"></x-i><br>'+s+'</span>').join('')+'</div>'],
+['Animation','<div class="trk"><span class="ball" id="ball"></span></div><div class="row" data-an><button class="btn sm n" data-s=".1s">سريع 100ms</button><button class="btn sm n" data-s=".2s">عادي 200ms</button><button class="btn sm n" data-s=".4s">بطيء 400ms</button></div>'],
+['LightTheme · DarkTheme','<span class="mt">يتبدّل النظام بالكامل عبر متغيّرات الألوان.</span><button class="btn o" id="t2">'+I('moon')+'بدّل الوضع</button>']];
+const util=[['Icon','غلاف موحد لأيقونات Lucide بأحجام النظام','<Icon name="heart" size={20}/>'],['Portal','يعرض Dialog وToast فوق الشاشة','<Portal>…</Portal>'],['Pressable','يوفّر حالة الضغط ومساحة لمس 44px','<Pressable onPress/>'],['Haptics','اهتزاز خفيف عند التأكيد والخطأ','Haptics.success()'],['ResponsiveValue','قيمة تتغيّر حسب عرض الشاشة','rv({base:1,md:2})'],['Accessibility','أدوار وتسميات وترتيب التركيز','accessibilityLabel'],['ThemeProvider','يوفّر LightTheme وDarkTheme','<ThemeProvider mode/>'],['DirectionProvider','يضبط RTL/LTR لكل المكونات','<DirectionProvider rtl/>']];
+document.getElementById('m').innerHTML=E.map(([t,c])=>wrap(t,c)).join('')+wrap('16. رموز التصميم',tok)+wrap('17. الأدوات والمزوّدات',[['Utilities & Providers','<div style="overflow-x:auto"><table class="tbl"><thead><tr><th scope="col">المكوّن</th><th scope="col">الغرض</th><th scope="col">مثال</th></tr></thead>'+util.map(r=>'<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td><span class="cc">'+r[2].replace(/</g,'&lt;')+'</span></td></tr>').join('')+'</table></div>','f']])+wrap('18. مكتبة الأيقونات',[['Lucide Icons','<div class="ig">'+ico.map(n=>'<div>'+I(n)+n+'</div>').join('')+'</div><div class="row"><span class="cc">npm i lucide-react</span><span class="cc">npm i lucide-react-native</span></div><span class="mt">الويب: lucide-react · الموبايل: lucide-react-native</span>','f']]);
+$('x-i').forEach(e=>e.innerHTML='<i data-lucide="'+e.getAttribute('n')+'"></i>');
+const ic=()=>{if(!window.lucide)return;lucide.createIcons({attrs:{'aria-hidden':'true'}});$('svg.lucide').forEach(v=>v.classList.add('i'))};ic();
+let tm;const toast=m=>{const t=document.getElementById('ts');t.querySelector('span').textContent=m;t.classList.add('on');clearTimeout(tm);tm=setTimeout(()=>t.classList.remove('on'),1800)};
+document.addEventListener('click',e=>{
+if(e.target.closest('a[href="#"]')){e.preventDefault();return}
+const b=e.target.closest('button');if(!b)return;
+const g=b.closest('[data-g]');
+if(g&&!g.hasAttribute('data-m')){const a=b.hasAttribute('aria-selected')?'aria-selected':'aria-pressed';[...g.querySelectorAll(':scope>button')].forEach(x=>x.setAttribute(a,x===b))}
+if(b.closest('[data-m]'))b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true');
+if(b.classList.contains('fav'))b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true');
+if(b.dataset.d){const o=b.parentElement.querySelector('output');o.textContent=Math.max(1,Math.min(9,+o.textContent+ +b.dataset.d));const q=b.parentElement;q.querySelector('[data-d="-1"]').disabled=+o.textContent<=1;q.querySelector('[data-d="1"]').disabled=+o.textContent>=9}
+if(b.dataset.t)toast(b.dataset.t);
+if(b.hasAttribute('data-ld')){b.setAttribute('aria-busy','true');setTimeout(()=>b.removeAttribute('aria-busy'),1500)}
+const r=b.closest('[data-r]');if(r){const bs=[...r.querySelectorAll('button')],i=bs.indexOf(b);bs.forEach((x,j)=>x.setAttribute('aria-pressed',j<=i))}
+const n=b.closest('[data-n]');if(n)[...n.querySelectorAll('button')].forEach(x=>x===b?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current'));
+if(b.dataset.s){const l=document.getElementById('ball');l.style.setProperty('--d',b.dataset.s);l.classList.toggle('go')}
+if(b.id==='t2')document.getElementById('t').click();
+});
+document.querySelectorAll('.otp input').forEach((x,i,a)=>{x.oninput=()=>{x.value=x.value.replace(/\D/g,'').slice(-1);if(x.value&&a[i+1])a[i+1].focus()};x.onkeydown=e=>{if(e.key==='Backspace'&&!x.value&&a[i-1]){a[i-1].focus();a[i-1].value=''}};x.onpaste=e=>{const d=(e.clipboardData.getData('text')||'').replace(/\D/g,'');if(!d)return;e.preventDefault();[...d.slice(0,a.length-i)].forEach((c,k)=>a[i+k].value=c);a[Math.min(i+d.length,a.length-1)].focus()}});
+const wl=document.getElementById('wl'),cm=document.getElementById('cm'),fill=()=>cm.innerHTML=wil[wl.value].map(c=>'<option>'+c+'</option>').join('');wl.onchange=fill;fill();
+const tb=document.getElementById('t'),root=document.documentElement;
+const setTheme=th=>{root.setAttribute('data-theme',th);tb.setAttribute('aria-pressed',th==='dark');tb.querySelector('.mi').hidden=th==='dark';tb.querySelector('.si').hidden=th!=='dark'};
+setTheme(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+tb.onclick=()=>setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+</script>
+</body>
+</html>
