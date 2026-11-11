@@ -226,6 +226,27 @@ export function formatNumber(value: number): string {
   }).format(value);
 }
 
+const CURRENCY_REGIONS: Record<string, string> = {
+  DZD: "DZ",
+  MAD: "MA",
+  EGP: "EG",
+  SAR: "SA",
+  AED: "AE"
+};
+
+export function formatMarketPrice(amount: number, currencyCode: string): string {
+  const normalizedCurrency = currencyCode.toUpperCase();
+  const region = CURRENCY_REGIONS[normalizedCurrency];
+  if (!region) return `${formatNumber(amount)} ${normalizedCurrency}`;
+
+  const language = getCurrentLanguage() === "ar" ? "ar" : "en";
+  return new Intl.NumberFormat(`${language}-${region}`, {
+    style: "currency",
+    currency: normalizedCurrency,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
 export function formatDZD(amount: number): string {
   return new Intl.NumberFormat(getCurrentLanguage() === "ar" ? "ar-DZ" : "en-DZ", {
     style: "currency",
