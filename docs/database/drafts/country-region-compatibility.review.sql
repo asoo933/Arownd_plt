@@ -2358,3 +2358,93 @@ C. Remaining release blockers
 No live database statements were executed while recording these findings.
 ===============================================================================
 */
+
+
+/*
+===============================================================================
+34. MERCHANT QUOTE CURRENCY — LIVE RPC GAP
+===============================================================================
+
+The inspected live public.merchant_submit_order_quote() hardcodes the text
+"دج" in the customer notification even though orders.currency_code is already
+stored per order. This breaks currency correctness for every non-DZ order.
+
+The following replacement preserves the existing authorization, quote state,
+desk-delivery validation, totals refresh, notification payload and return type.
+Only the currency rendering in the notification body changes. ISO currency
+code is intentionally used instead of inventing a symbol/name mapping.
+
+CREATE OR REPLACE FUNCTION public.merchant_submit_order_quote(
+  _merchant_order_id uuid,
+  _shipping_fee integer
+)
+RETURNS public.merchant_orders
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'public'
+AS $function$
+DECLARE
+  mo public.merchant_orders;
+  parent public.orders;
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'not_authenticated'; END IF;
+  IF _shipping_fee IS NULL OR _shipping_fee < 0 OR _shipping_fee > 1000000 THEN
+    RAISE EXCEPTION 'invalid_shipping_fee';
+  END IF;
+
+  SELECT o.* INTO parent
+  FROM public.orders o
+  JOIN public.merchant_orders x ON x.order_id = o.id
+  WHERE x.id = _merchant_order_id
+  FOR UPDATE OF o;
+  IF NOT FOUND THEN RAISE EXCEPTION 'merchant_order_not_found'; END IF;
+
+  SELECT * INTO mo
+  FROM public.merchant_orders
+  WHERE id = _merchant_order_id
+  FOR UPDATE;
+
+  IF NOT public.is_store_owner(mo.store_id) THEN RAISE EXCEPTION 'not_authorized'; END IF;
+  IF parent.status = 'cancelled' OR mo.status <> 'pending' THEN
+    RAISE EXCEPTION 'quote_not_available';
+  END IF;
+  IF parent.delivery_type = 'desk' AND _shipping_fee <> 0 THEN
+    RAISE EXCEPTION 'pickup_shipping_must_be_free';
+  END IF;
+
+  UPDATE public.merchant_orders
+  SET shipping_fee = _shipping_fee, status = 'quoted',
+      quoted_at = now(), updated_at = now()
+  WHERE id = _merchant_order_id
+  RETURNING * INTO mo;
+
+  PERFORM public.refresh_parent_order_totals(mo.order_id);
+
+  INSERT INTO public.notifications (user_id, type, title, body, data)
+  VALUES (
+    mo.customer_id,
+    'order',
+    'عرض المتجر جاهز للموافقة',
+    'قيمة المنتجات: ' || mo.subtotal::text || ' ' || parent.currency_code ||
+    '، التوصيل: ' || mo.shipping_fee::text || ' ' || parent.currency_code ||
+    '، الإجمالي: ' || (mo.subtotal + mo.shipping_fee)::text || ' ' ||
+    parent.currency_code || '. راجع العرض ووافق أو ارفض هذا الطلب.',
+    jsonb_build_object(
+      'order_id', mo.order_id,
+      'merchant_order_id', mo.id,
+      'subtotal', mo.subtotal,
+      'shipping_fee', mo.shipping_fee,
+      'total', mo.subtotal + mo.shipping_fee,
+      'currency_code', parent.currency_code,
+      'url', '/orders/' || mo.order_id::text
+    )
+  );
+
+  RETURN mo;
+END;
+$function$;
+
+-- Reconfirm ACL from the existing live function before converting this draft
+-- into a migration. Do not widen execute privileges as part of this change.
+
+===============================================================================
