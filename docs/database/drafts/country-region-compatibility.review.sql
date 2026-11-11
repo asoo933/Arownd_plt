@@ -3004,3 +3004,37 @@ Review before conversion:
 - This is review SQL only. No statements have been applied to the live database.
 
 ===============================================================================
+
+
+/*
+===============================================================================
+38. INCLUDE secondary_region_id IN ALL GENERIC REGION TRIGGER EVENTS
+===============================================================================
+
+The live trigger event lists predate secondary_region_id. Recreate them so
+changing a secondary selection alone cannot bypass parent-child validation.
+
+DROP TRIGGER IF EXISTS profiles_daira_region_guard ON public.profiles;
+CREATE TRIGGER profiles_daira_region_guard
+BEFORE INSERT OR UPDATE OF country_code, wilaya_id, region_id,
+  daira_region_id, secondary_region_id
+ON public.profiles
+FOR EACH ROW EXECUTE FUNCTION public.enforce_daira_region_selection();
+
+DROP TRIGGER IF EXISTS user_addresses_daira_region_guard ON public.user_addresses;
+CREATE TRIGGER user_addresses_daira_region_guard
+BEFORE INSERT OR UPDATE OF country_code, wilaya_id, region_id,
+  daira_region_id, secondary_region_id
+ON public.user_addresses
+FOR EACH ROW EXECUTE FUNCTION public.enforce_daira_region_selection();
+
+DROP TRIGGER IF EXISTS orders_daira_region_guard ON public.orders;
+CREATE TRIGGER orders_daira_region_guard
+BEFORE INSERT OR UPDATE OF country_code, wilaya_id, region_id,
+  daira_region_id, secondary_region_id
+ON public.orders
+FOR EACH ROW EXECUTE FUNCTION public.enforce_daira_region_selection();
+
+The stores_region_guard definition is included in section 35.
+
+===============================================================================
