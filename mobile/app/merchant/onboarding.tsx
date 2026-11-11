@@ -53,9 +53,6 @@ export default function MerchantOnboardingScreen() {
     access.data?.status === "merchant_setup_required";
 
   const regionOptions = useQuery({ queryKey: ["merchant-regions"], queryFn: () => fetchCheckoutRegions(), enabled: canStartOnboarding, staleTime: Infinity });
-  const regionIdValue = watch("regionId");
-  const secondaryOptions = useQuery({ queryKey: ["merchant-regions", regionIdValue], queryFn: () => fetchCheckoutRegions(regionIdValue), enabled: canStartOnboarding && regionIdValue !== null, staleTime: Infinity });
-
   const categories = useQuery({
     queryKey: ["merchant-categories"],
     queryFn: fetchMerchantCategories,
@@ -87,6 +84,7 @@ export default function MerchantOnboardingScreen() {
   });
 
   const regionId = watch("regionId");
+  const secondaryOptions = useQuery({ queryKey: ["merchant-regions", regionId], queryFn: () => fetchCheckoutRegions(regionId), enabled: canStartOnboarding && regionId !== null, staleTime: Infinity });
   const categoryId = watch("category");
   const selectedSubcategories = watch("subcategories");
   const selectedRegion = regionOptions.data?.regions.find((item) => item.id === regionId);
