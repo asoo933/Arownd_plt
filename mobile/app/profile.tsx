@@ -136,6 +136,7 @@ export default function ProfileScreen() {
             <IdentityRow
               name={displayName}
               {...(user.data.email ? { subtitle: user.data.email } : {})}
+              imageUri={profile.data?.avatar_url ?? undefined}
               avatarSize={64}
               style={styles.identityRow}
             />
