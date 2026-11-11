@@ -2657,3 +2657,350 @@ ALTER TABLE public.user_addresses
 -- calling-code prefix before insert.
 
 ===============================================================================
+
+/*
+===============================================================================
+37. GENERIC STORE-CREATION AND CHECKOUT RPC CONTRACTS
+===============================================================================
+
+The current mobile app calls these exact RPC names and argument names.
+Both derive account country and currency from profiles.country_code; browsing
+country is never accepted as an order/store authority. They do not call the
+legacy wilaya tariff functions.
+
+Prerequisites:
+- country_region_levels and secondary_region_id are installed and seeded.
+- Generic region validation and stores_region_guard are installed.
+- wilaya_id is nullable on stores, user_addresses and orders.
+- The existing order_items_sync_merchant_order trigger remains active and is
+  the sole creator of merchant_orders during checkout.
+- Existing RLS, account-country, notification, and stock protections remain.
+
+A. Generic store creation
+
+CREATE OR REPLACE FUNCTION public.create_my_store_for_account(
+  _store_name text, _slug text, _phone text, _whatsapp text,
+  _region_id bigint, _secondary_region_id bigint,
+  _commune text, _address_line text,
+  _latitude double precision, _longitude double precision,
+  _opening_hours jsonb, _category text DEFAULT NULL,
+  _subcategories text[] DEFAULT '{}'::text[]
+)
+RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''
+AS $function$
+DECLARE
+  current_country_code text;
+  primary_region public.country_regions;
+  secondary_region public.country_regions;
+  level_two public.country_region_levels;
+  created_store_id uuid;
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'not_authenticated'; END IF;
+  IF nullif(btrim(_store_name), '') IS NULL OR char_length(btrim(_store_name)) > 120
+     OR nullif(btrim(_slug), '') IS NULL OR char_length(btrim(_slug)) > 160
+     OR _region_id IS NULL OR _region_id <= 0
+     OR (_secondary_region_id IS NOT NULL AND _secondary_region_id <= 0)
+     OR _opening_hours IS NULL OR jsonb_typeof(_opening_hours) <> 'object'
+     OR nullif(_opening_hours ->> 'open', '') IS NULL
+     OR nullif(_opening_hours ->> 'close', '') IS NULL THEN
+    RAISE EXCEPTION 'invalid_store_input';
+  END IF;
+
+  IF _category IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM public.categories c
+    WHERE c.id = _category AND c.parent_id IS NULL AND c.is_active
+  ) THEN RAISE EXCEPTION 'invalid_store_category'; END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM unnest(coalesce(_subcategories, '{}'::text[])) selected(id)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM public.categories c
+      WHERE c.id = selected.id AND c.parent_id = _category AND c.is_active
+    )
+  ) THEN RAISE EXCEPTION 'invalid_store_subcategory'; END IF;
+
+  SELECT p.country_code INTO current_country_code
+  FROM public.profiles p WHERE p.user_id = auth.uid() FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'profile_not_found'; END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM public.countries c
+    WHERE c.code = current_country_code AND c.is_enabled
+  ) THEN RAISE EXCEPTION 'account_country_not_available'; END IF;
+
+  SELECT r.* INTO primary_region
+  FROM public.country_regions r
+  JOIN public.country_region_levels l
+    ON l.country_code = r.country_code AND l.level = 1
+   AND r.region_type = ANY(l.region_types)
+  WHERE r.id = _region_id AND r.country_code = current_country_code
+    AND r.parent_id IS NULL AND r.is_enabled;
+  IF NOT FOUND THEN RAISE EXCEPTION 'invalid_primary_region'; END IF;
+
+  SELECT * INTO level_two FROM public.country_region_levels
+  WHERE country_code = current_country_code AND level = 2;
+
+  IF _secondary_region_id IS NOT NULL THEN
+    IF level_two.country_code IS NULL THEN RAISE EXCEPTION 'secondary_region_not_supported'; END IF;
+    SELECT r.* INTO secondary_region
+    FROM public.country_regions r
+    WHERE r.id = _secondary_region_id AND r.country_code = current_country_code
+      AND r.parent_id = primary_region.id
+      AND r.region_type = ANY(level_two.region_types) AND r.is_enabled;
+    IF NOT FOUND THEN RAISE EXCEPTION 'invalid_secondary_region'; END IF;
+  ELSIF level_two.country_code IS NOT NULL AND level_two.is_required THEN
+    RAISE EXCEPTION 'secondary_region_required';
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM public.stores s WHERE s.owner_id = auth.uid()) THEN
+    RAISE EXCEPTION 'store_already_exists';
+  END IF;
+
+  UPDATE public.profiles SET account_type = 'merchant'::public.account_type
+  WHERE user_id = auth.uid();
+
+  INSERT INTO public.user_roles (user_id, role)
+  SELECT auth.uid(), 'merchant'::public.app_role
+  WHERE NOT EXISTS (
+    SELECT 1 FROM public.user_roles ur
+    WHERE ur.user_id = auth.uid() AND ur.role = 'merchant'::public.app_role
+  );
+
+  INSERT INTO public.stores (
+    owner_id, name, slug, phone, whatsapp, wilaya_id,
+    country_code, region_id, secondary_region_id, commune, address_line,
+    latitude, longitude, opening_hours, category, subcategories
+  ) VALUES (
+    auth.uid(), btrim(_store_name), btrim(_slug),
+    nullif(btrim(_phone), ''), nullif(btrim(_whatsapp), ''),
+    primary_region.legacy_wilaya_id, current_country_code,
+    primary_region.id, _secondary_region_id,
+    nullif(btrim(_commune), ''), nullif(btrim(_address_line), ''),
+    _latitude, _longitude, _opening_hours,
+    nullif(btrim(_category), ''), coalesce(_subcategories, '{}'::text[])
+  ) RETURNING id INTO created_store_id;
+
+  RETURN created_store_id;
+END;
+$function$;
+
+REVOKE ALL ON FUNCTION public.create_my_store_for_account(
+  text,text,text,text,bigint,bigint,text,text,double precision,double precision,jsonb,text,text[]
+) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.create_my_store_for_account(
+  text,text,text,text,bigint,bigint,text,text,double precision,double precision,jsonb,text,text[]
+) TO authenticated;
+
+B. Generic account-country checkout
+
+CREATE OR REPLACE FUNCTION public.create_checkout_order_for_account(
+  _items jsonb, _delivery_type text,
+  _region_id bigint, _secondary_region_id bigint,
+  _commune text, _address_line text, _full_name text, _phone text,
+  _payment_method text, _receipt_url text DEFAULT NULL,
+  _idempotency_key uuid DEFAULT NULL
+)
+RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''
+AS $function$
+DECLARE
+  current_user_id uuid := auth.uid();
+  current_country_code text;
+  current_currency_code text;
+  current_calling_code text;
+  primary_region public.country_regions;
+  secondary_region public.country_regions;
+  level_two public.country_region_levels;
+  offer_row public.store_offers;
+  item jsonb;
+  product_name text;
+  item_quantity integer;
+  subtotal_amount integer := 0;
+  created_order_id uuid;
+  normalized_hash text;
+  previous_hash text;
+  previous_order_id uuid;
+  offer_country_code text;
+BEGIN
+  IF current_user_id IS NULL THEN RAISE EXCEPTION 'not_authenticated'; END IF;
+  IF _idempotency_key IS NULL THEN RAISE EXCEPTION 'idempotency_key_required'; END IF;
+  IF _payment_method IS DISTINCT FROM 'cod' THEN RAISE EXCEPTION 'invalid_payment_method'; END IF;
+  IF _receipt_url IS NOT NULL THEN RAISE EXCEPTION 'unexpected_receipt'; END IF;
+  IF _delivery_type IS NULL OR _delivery_type NOT IN ('home','desk') THEN
+    RAISE EXCEPTION 'invalid_delivery_type';
+  END IF;
+  IF _items IS NULL OR jsonb_typeof(_items) IS DISTINCT FROM 'array'
+     OR jsonb_array_length(_items) < 1 OR jsonb_array_length(_items) > 30 THEN
+    RAISE EXCEPTION 'invalid_items';
+  END IF;
+  IF _region_id IS NULL OR _region_id <= 0
+     OR (_secondary_region_id IS NOT NULL AND _secondary_region_id <= 0) THEN
+    RAISE EXCEPTION 'invalid_region';
+  END IF;
+  IF coalesce(char_length(btrim(_full_name)), 0) < 2 OR char_length(_full_name) > 120
+     OR coalesce(char_length(btrim(_commune)), 0) < 2 OR char_length(_commune) > 100
+     OR coalesce(char_length(btrim(_address_line)), 0) < 5 OR char_length(_address_line) > 300 THEN
+    RAISE EXCEPTION 'invalid_order_contact';
+  END IF;
+  IF _phone IS NULL OR _phone !~ '^\\+[1-9][0-9]{7,14}$' THEN
+    RAISE EXCEPTION 'invalid_phone';
+  END IF;
+
+  -- Account country is authoritative. Browsing country is intentionally ignored.
+  SELECT p.country_code INTO current_country_code
+  FROM public.profiles p WHERE p.user_id = current_user_id FOR SHARE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'profile_not_found'; END IF;
+
+  SELECT c.currency_code, c.calling_code
+    INTO current_currency_code, current_calling_code
+  FROM public.countries c
+  WHERE c.code = current_country_code AND c.is_enabled;
+  IF NOT FOUND THEN RAISE EXCEPTION 'account_country_not_available'; END IF;
+  IF left(_phone, length(current_calling_code)) <> current_calling_code THEN
+    RAISE EXCEPTION 'phone_country_mismatch';
+  END IF;
+
+  SELECT r.* INTO primary_region
+  FROM public.country_regions r
+  JOIN public.country_region_levels l
+    ON l.country_code = r.country_code AND l.level = 1
+   AND r.region_type = ANY(l.region_types)
+  WHERE r.id = _region_id AND r.country_code = current_country_code
+    AND r.parent_id IS NULL AND r.is_enabled;
+  IF NOT FOUND THEN RAISE EXCEPTION 'invalid_primary_region'; END IF;
+
+  SELECT * INTO level_two FROM public.country_region_levels
+  WHERE country_code = current_country_code AND level = 2;
+
+  IF _secondary_region_id IS NOT NULL THEN
+    IF level_two.country_code IS NULL THEN RAISE EXCEPTION 'secondary_region_not_supported'; END IF;
+    SELECT r.* INTO secondary_region
+    FROM public.country_regions r
+    WHERE r.id = _secondary_region_id AND r.country_code = current_country_code
+      AND r.parent_id = primary_region.id
+      AND r.region_type = ANY(level_two.region_types) AND r.is_enabled;
+    IF NOT FOUND THEN RAISE EXCEPTION 'invalid_secondary_region'; END IF;
+  ELSIF level_two.country_code IS NOT NULL AND level_two.is_required THEN
+    RAISE EXCEPTION 'secondary_region_required';
+  END IF;
+
+  normalized_hash := md5(jsonb_build_object(
+    'items', _items, 'delivery_type', _delivery_type,
+    'country_code', current_country_code, 'region_id', _region_id,
+    'secondary_region_id', _secondary_region_id, 'commune', _commune,
+    'address_line', _address_line, 'full_name', _full_name,
+    'phone', _phone, 'payment_method', _payment_method, 'receipt_url', _receipt_url
+  )::text);
+
+  PERFORM pg_advisory_xact_lock(
+    hashtextextended(current_user_id::text || ':' || _idempotency_key::text, 0)
+  );
+  SELECT request_hash, order_id INTO previous_hash, previous_order_id
+  FROM public.checkout_idempotency
+  WHERE user_id = current_user_id AND idempotency_key = _idempotency_key;
+
+  IF FOUND THEN
+    IF previous_hash <> normalized_hash THEN
+      RAISE EXCEPTION 'idempotency_key_reused_with_different_request';
+    END IF;
+    IF previous_order_id IS NULL THEN
+      RAISE EXCEPTION 'idempotent_order_no_longer_available';
+    END IF;
+    RETURN previous_order_id;
+  END IF;
+
+  INSERT INTO public.orders (
+    user_id, full_name, phone, wilaya_id, country_code, region_id,
+    daira_region_id, secondary_region_id, currency_code,
+    commune, address_line, delivery_type, payment_method, receipt_url,
+    subtotal, shipping_fee, total, commission_amount
+  ) VALUES (
+    current_user_id, btrim(_full_name), _phone, primary_region.legacy_wilaya_id,
+    current_country_code, primary_region.id,
+    CASE WHEN _secondary_region_id IS NOT NULL AND secondary_region.region_type = 'daira'
+         THEN _secondary_region_id ELSE NULL END,
+    _secondary_region_id, current_currency_code,
+    btrim(_commune), btrim(_address_line), _delivery_type,
+    'cod', NULL, 0, 0, 0, 0
+  ) RETURNING id INTO created_order_id;
+
+  FOR item IN SELECT value FROM jsonb_array_elements(_items) LOOP
+    IF jsonb_typeof(item) <> 'object' OR nullif(item ->> 'offer_id', '') IS NULL THEN
+      RAISE EXCEPTION 'invalid_item';
+    END IF;
+    item_quantity := (item ->> 'quantity')::integer;
+    IF item_quantity IS NULL OR item_quantity < 1 OR item_quantity > 20 THEN
+      RAISE EXCEPTION 'invalid_quantity';
+    END IF;
+
+    SELECT * INTO offer_row
+    FROM public.store_offers
+    WHERE id = (item ->> 'offer_id')::uuid
+    FOR UPDATE;
+    IF NOT FOUND OR NOT offer_row.is_available OR offer_row.stock_quantity < item_quantity THEN
+      RAISE EXCEPTION 'out_of_stock';
+    END IF;
+
+    SELECT s.country_code INTO offer_country_code
+    FROM public.stores s WHERE s.id = offer_row.store_id;
+    IF offer_country_code IS DISTINCT FROM current_country_code THEN
+      RAISE EXCEPTION 'order_store_country_mismatch';
+    END IF;
+
+    SELECT p.name INTO product_name
+    FROM public.products p WHERE p.id = offer_row.product_id;
+    IF product_name IS NULL THEN RAISE EXCEPTION 'product_not_found'; END IF;
+
+    -- Existing BEFORE INSERT trigger creates/updates the merchant suborder.
+    INSERT INTO public.order_items (
+      order_id, offer_id, store_id, product_name, unit_price, quantity, options
+    ) VALUES (
+      created_order_id, offer_row.id, offer_row.store_id, product_name,
+      offer_row.price, item_quantity, coalesce(item -> 'options', '{}'::jsonb)
+    );
+
+    UPDATE public.store_offers
+    SET stock_quantity = stock_quantity - item_quantity,
+        is_available = (stock_quantity - item_quantity) > 0
+    WHERE id = offer_row.id;
+
+    subtotal_amount := subtotal_amount + offer_row.price * item_quantity;
+  END LOOP;
+
+  -- Merchants quote shipping after checkout; never use legacy wilaya tariffs.
+  UPDATE public.orders
+  SET subtotal = subtotal_amount, shipping_fee = 0,
+      total = subtotal_amount, commission_amount = 0
+  WHERE id = created_order_id AND user_id = current_user_id;
+
+  INSERT INTO public.checkout_idempotency (
+    user_id, idempotency_key, request_hash, order_id
+  ) VALUES (current_user_id, _idempotency_key, normalized_hash, created_order_id);
+
+  RETURN created_order_id;
+END;
+$function$;
+
+REVOKE ALL ON FUNCTION public.create_checkout_order_for_account(
+  jsonb,text,bigint,bigint,text,text,text,text,text,text,uuid
+) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.create_checkout_order_for_account(
+  jsonb,text,bigint,bigint,text,text,text,text,text,text,uuid
+) TO authenticated;
+
+COMMENT ON FUNCTION public.create_checkout_order_for_account(
+  jsonb,text,bigint,bigint,text,text,text,text,text,text,uuid
+) IS
+'Creates an idempotent COD order in the authenticated account country, snapshots currency, reserves stock, and starts merchant-managed shipping quotes with zero shipping fee.';
+
+Review before conversion:
+- Confirm the live order_items_sync_merchant_order trigger remains the sole
+  merchant_orders creator; do not create duplicate suborders.
+- Confirm all item options are validated and snapshotted consistently with
+  current product-option behavior.
+- Confirm unique constraints and advisory-lock semantics on checkout_idempotency.
+- Verify wilaya_id can be NULL for non-DZ rows after migration.
+- Replace the DZ-only region trigger before permitting non-DZ order inserts.
+- This is review SQL only. No statements have been applied to the live database.
+
+===============================================================================
