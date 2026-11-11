@@ -139,6 +139,7 @@ declare
   selected_region_id bigint;
   selected_currency_code text;
   offer_store_country_code text;
+  account_country_code text;
 begin
   if auth.uid() is null then raise exception 'not_authenticated'; end if;
 
@@ -175,6 +176,14 @@ begin
   where id = _wilaya_id;
   if not found then raise exception 'invalid_wilaya'; end if;
 
+  select p.country_code into account_country_code
+  from public.profiles p
+  where p.user_id = auth.uid();
+
+  if not found then
+    raise exception 'profile_not_found';
+  end if;
+
   select r.country_code, r.id, c.currency_code
     into selected_country_code, selected_region_id, selected_currency_code
   from public.country_regions r
@@ -186,6 +195,10 @@ begin
 
   if selected_region_id is null then
     raise exception 'checkout_region_not_available';
+  end if;
+
+  if selected_country_code is distinct from account_country_code then
+    raise exception 'order_country_mismatch';
   end if;
 
   fee := case
