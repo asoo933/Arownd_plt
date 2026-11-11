@@ -114,6 +114,10 @@ export default function AddressesScreen() {
 
   const submit = () => {
     if (!regionOptions.data) return;
+    if (regionId === null || (regionOptions.data.levels[1]?.is_required && secondaryRegionId === null)) {
+      setFormError(translate("addressesValidation"));
+      return;
+    }
     let normalizedPhone: string;
     try {
       normalizedPhone = normalizePhoneForCallingCode(phone, regionOptions.data.callingCode);
