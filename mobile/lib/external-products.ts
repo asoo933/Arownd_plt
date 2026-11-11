@@ -14,7 +14,10 @@ const ExternalProductsResponseSchema = z.object({
   })),
 });
 
-async function fetchMarketProducts(country: "ae" | "eg", language: "ar" | "en"): Promise<ExternalProduct[]> {
+async function fetchMarketProducts(
+  country: "ae" | "eg" | "ma",
+  language: "ar" | "en",
+): Promise<ExternalProduct[]> {
   const { data, error } = await getSupabaseClient().functions.invoke("external-products", {
     body: { country, language },
   });
@@ -27,6 +30,7 @@ export async function fetchExternalProducts(language: "ar" | "en"): Promise<Exte
   const markets = await Promise.all([
     fetchMarketProducts("ae", language),
     fetchMarketProducts("eg", language),
+    fetchMarketProducts("ma", language),
   ]);
 
   const unique = new Map<string, ExternalProduct>();
