@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
-import { fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { fetchMyAccountCallingCode, fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { createStoreSlug, merchantStoreSchema, type MerchantStoreFormValues } from "@/lib/merchant-validation";
 import {
   groupMerchantOrderRows,
@@ -96,6 +96,9 @@ export async function createMerchantStore(
   const values = merchantStoreSchema.parse(input);
   if (values.regionId === null) throw new Error("merchantValidationWilaya");
   const regionContext = await fetchMyAccountRegionLevels();
+  if (regionContext.levels[1]?.is_required && values.secondaryRegionId === null) {
+    throw new Error("secondary_region_required");
+  }
   const phone = normalizePhoneForCallingCode(values.phone, regionContext.callingCode);
   const whatsapp = values.whatsapp ? normalizePhoneForCallingCode(values.whatsapp, regionContext.callingCode) : null;
 
