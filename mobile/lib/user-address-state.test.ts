@@ -5,9 +5,9 @@ import { isValidAddressPhone, normalizeAddressPhone, UserAddressSchema } from "@
 const validAddress = {
   label: "home" as const,
   recipient_name: "أحمد علي",
-  phone: "0550123456",
-  wilaya_id: 9,
-  daira_region_id: 1,
+  phone: "+213550123456",
+  region_id: 9,
+  secondary_region_id: 1,
   commune: "البليدة",
   address_line: "حي 1200 مسكن، العمارة 5",
   additional_info: ""
@@ -23,12 +23,12 @@ describe("user address validation", () => {
       ...validAddress,
       phone: "123",
       commune: "",
-      wilaya_id: 0
+      region_id: 0
     }).success).toBe(false);
   });
 
   it("validates formatted Algerian phone numbers after normalization", () => {
-    expect(isValidAddressPhone("0550 123 456")).toBe(true);
+    expect(isValidAddressPhone("+213 550 123 456")).toBe(true);
     expect(isValidAddressPhone("+213 550-123-456")).toBe(true);
     expect(isValidAddressPhone("123")).toBe(false);
   });

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
 import { checkoutRequestIdentity, MAX_CHECKOUT_ITEMS, normalizeCheckoutItems } from "@/lib/checkout-state";
-import { fetchMyAccountCountryCode, fetchMyAccountRegions, type CountryRegion } from "@/lib/country-regions";
+import { fetchMyAccountCountryCode, fetchMyAccountRegions } from "@/lib/country-regions";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
