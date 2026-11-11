@@ -28,8 +28,9 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
 import { fetchMyAddresses } from "@/lib/user-address";
 import { unregisterCurrentPushDevice } from "@/lib/push-notifications";
+import { fetchCountries, fetchMyBrowsingCountryCode, updateBrowsingCountryCode, type Country } from "@/lib/country-service";
 
-type SettingsSheet = "delivery" | "addresses" | "password" | "appearance" | "language" | null;
+type SettingsSheet = "delivery" | "addresses" | "password" | "appearance" | "language" | "country" | null;
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
@@ -56,6 +57,14 @@ export default function SettingsScreen() {
     queryKey: ["my-addresses"],
     queryFn: fetchMyAddresses,
     enabled: activeSheet === "addresses"
+  });
+
+  const countries = useQuery({ queryKey: ["available-countries"], queryFn: fetchCountries, enabled: activeSheet === "country" });
+  const browsingCountry = useQuery({ queryKey: ["browsing-country"], queryFn: fetchMyBrowsingCountryCode });
+  const browsingCountryMutation = useMutation({
+    mutationFn: updateBrowsingCountryCode,
+    onSuccess: async () => { setFormError(null); await queryClient.invalidateQueries(); await browsingCountry.refetch(); closeSheet(); },
+    onError: () => setFormError(translate("settingsCountrySaveError"))
   });
 
   const passwordMutation = useMutation({
@@ -168,6 +177,13 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Heading level={3}>{translate("settingsPreferencesTitle")}</Heading>
         <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="map-pin"
+            label={translate("settingsBrowsingCountry")}
+            onPress={() => openSheet("country")}
+            theme={theme}
+            styles={styles}
+          />
           <SettingsRow
             icon="settings"
             label={translate("settingsAppearanceHint")}
@@ -330,6 +346,25 @@ export default function SettingsScreen() {
           loading={passwordMutation.isPending}
           fullWidth
         />
+      </BottomSheet>
+
+      <BottomSheet visible={activeSheet === "country"} onRequestClose={closeSheet}>
+        <Heading level={3}>{translate("settingsBrowsingCountry")}</Heading>
+        <Caption>{translate("settingsBrowsingCountryHint")}</Caption>
+        {countries.isPending || browsingCountry.isPending ? <Caption>{translate("stateLoading")}</Caption> : countries.isError || browsingCountry.isError ? <UiText tone="danger">{translate("settingsCountryLoadError")}</UiText> : (
+          <View style={styles.sheetContent}>
+            {(countries.data ?? []).filter((country: Country) => country.is_enabled).map((country) => {
+              const selected = browsingCountry.data === country.code;
+              const countryName = language === "ar" ? country.name_ar : country.name_en ?? country.name_ar;
+              return <PressableSurface key={country.code} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => { setFormError(null); if (!selected) browsingCountryMutation.mutate(country.code); }} style={[styles.languageOption, selected && { borderWidth: 1, borderColor: theme.colors.accent }]}>
+                <UiText weight="700">{country.flag_emoji ?? "🌐"}  {countryName} · {country.currency_code}</UiText>
+                {selected ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
+              </PressableSurface>;
+            })}
+          </View>
+        )}
+        {formError ? <UiText tone="danger">{formError}</UiText> : null}
+        {browsingCountryMutation.isPending ? <Caption>{translate("stateLoading")}</Caption> : null}
       </BottomSheet>
 
       <BottomSheet visible={activeSheet === "appearance"} onRequestClose={closeSheet}>
