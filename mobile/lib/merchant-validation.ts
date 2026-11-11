@@ -9,7 +9,7 @@ export const merchantStoreSchema = z.object({
   ),
   regionId: z.number().int().positive().nullable().refine(
     (value) => value !== null,
-    "merchantValidationWilaya"
+    "merchantValidationPrimaryRegion"
   ),
   secondaryRegionId: z.number().int().positive().nullable(),
   commune: z.string().trim().min(2, "merchantValidationCommune").max(80, "merchantValidationCommune"),
