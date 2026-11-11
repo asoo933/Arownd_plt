@@ -129,7 +129,7 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
 
   const identity = checkoutRequestIdentity(input);
   const idempotencyKey = await getOrCreateIdempotencyKey(input.userId, identity);
-  const { data, error } = await getSupabaseClient().rpc("create_order_with_region", {
+  const { data, error } = await getSupabaseClient().rpc("create_checkout_order_for_account", {
     _items: normalizeCheckoutItems(input.items).map((item) => ({
       offer_id: item.offerId,
       quantity: item.quantity,

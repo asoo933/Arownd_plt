@@ -105,7 +105,7 @@ export async function createMerchantStore(
   if (!authData.user) throw new Error("not_authenticated");
 
   const suffix = Math.random().toString(36).slice(2, 8).padEnd(6, "0");
-  const { data, error } = await client.rpc("create_my_store_with_region", {
+  const { data, error } = await client.rpc("create_my_store_for_account", {
     _store_name: values.storeName,
     _slug: createStoreSlug(values.storeName, suffix),
     _phone: phone,
