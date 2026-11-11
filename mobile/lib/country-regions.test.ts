@@ -1,18 +1,23 @@
 import { describe, expect, it } from "vitest";
 
-import { COUNTRY_REGION_CONFIG, getCountryRegionConfig } from "@/lib/country-regions";
+import { getRegionDisplayName } from "@/lib/country-regions";
 
-describe("country region configuration", () => {
-  it("maps each supported country to its real administrative hierarchy", () => {
-    expect(COUNTRY_REGION_CONFIG.DZ).toMatchObject({ primaryType: "wilaya", secondaryTypes: ["daira"], secondaryRequired: true });
-    expect(COUNTRY_REGION_CONFIG.MA).toMatchObject({ primaryType: "region", secondaryTypes: ["province", "prefecture"], secondaryRequired: false });
-    expect(COUNTRY_REGION_CONFIG.EG).toMatchObject({ primaryType: "governorate", secondaryTypes: [], secondaryRequired: false });
-    expect(COUNTRY_REGION_CONFIG.SA).toMatchObject({ primaryType: "region", secondaryTypes: ["governorate"], secondaryRequired: true });
-    expect(COUNTRY_REGION_CONFIG.AE).toMatchObject({ primaryType: "emirate", secondaryTypes: ["municipality"], secondaryRequired: false });
-  });
+describe("country region helpers", () => {
+  it("uses the best available localized region name", () => {
+    const region = {
+      id: 1,
+      country_code: "DZ",
+      parent_id: null,
+      code: "DZ-01",
+      name_ar: "الجزائر",
+      name_fr: "Alger",
+      name_en: null,
+      region_type: "wilaya",
+      is_enabled: true
+    };
 
-  it("rejects countries outside the supported Arownd markets", () => {
-    expect(() => getCountryRegionConfig("US")).toThrow("unsupported_country");
-    expect(() => getCountryRegionConfig("dz")).not.toThrow();
+    expect(getRegionDisplayName(region, "ar")).toBe("الجزائر");
+    expect(getRegionDisplayName(region, "fr")).toBe("Alger");
+    expect(getRegionDisplayName(region, "en")).toBe("Alger");
   });
 });
