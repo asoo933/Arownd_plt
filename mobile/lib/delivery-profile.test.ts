@@ -8,6 +8,7 @@ describe("delivery profile validation", () => {
       full_name: "أحمد",
       phone: "0550123456",
       wilaya_id: 9,
+      daira_region_id: 1,
       commune: "البليدة"
     }).success).toBe(true);
   });
@@ -26,6 +27,7 @@ describe("delivery profile validation", () => {
       full_name: "أحمد",
       phone: normalizeAlgerianPhone("+213 550-123-456"),
       wilaya_id: 9,
+      daira_region_id: 1,
       commune: "البليدة"
     }).success).toBe(true);
   });
