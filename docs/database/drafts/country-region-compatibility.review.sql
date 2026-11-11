@@ -1256,3 +1256,113 @@ Still required before writing a complete executable migration:
 
 END OF ADDITIONAL PHASE A AUDIT.
 */
+
+
+/*
+===============================================================================
+20. PHASE A — PROFILE MIRROR, NOTIFICATION DELIVERY AND LIVE DATA VALIDATION
+READ-ONLY LIVE CATALOG / DATA CHECK — 2026-11-11
+===============================================================================
+
+A. private.public_personal_profiles exact structure
+- Columns: user_id uuid NOT NULL PK/FK auth.users(id) ON DELETE CASCADE;
+  full_name text nullable; avatar_url text nullable; wilaya_id integer nullable;
+  commune text nullable; updated_at timestamptz NOT NULL DEFAULT now().
+- RLS enabled, not FORCE RLS.
+- SELECT policy applies to {anon,authenticated} with USING (true).
+- Table grants: anon and authenticated SELECT only; postgres owns mutation
+  privileges. The sync function is SECURITY DEFINER, search_path='' and has
+  no anon/authenticated EXECUTE grant.
+- Current live count: 1 row, with wilaya_id and commune populated.
+- The mirror currently has no region_id, country_code or currency metadata.
+  If the product continues to display public profile locations, migration
+  must explicitly preserve a meaningful location for non-DZ profiles or
+  define a reviewed behavior for countries whose address level differs.
+- Privacy gating is implemented by the profiles trigger: only is_public=true
+  AND account_type='personal' are mirrored; other profile updates delete the
+  mirror. Preserve this exact condition.
+
+B. Notification delivery chain
+- notifications has RLS enabled, not FORCE RLS. Authenticated users can SELECT,
+  UPDATE-read-state and DELETE only their own notifications. No client INSERT
+  policy is present in the inspected policy inventory.
+- AFTER INSERT trigger notifications_send_push invokes
+  private.dispatch_notification_push().
+- The dispatcher is SECURITY DEFINER, search_path='', reads
+  vault.decrypted_secrets for PUSH_WEBHOOK_SECRET, then calls
+  net.http_post() to the send-push-notification Edge Function with the saved
+  notification row and a webhook-secret header.
+- If the Vault secret is absent it emits a warning and preserves the database
+  notification without push. Preserve the trigger and payload contract; do not
+  send push directly from client code or expose the secret.
+- The trigger is attached to notifications, so notifications created by order
+  and merchant-order triggers enter the same delivery chain.
+
+C. Order and inventory consistency checks (current live rows)
+Read-only aggregate checks returned:
+- order country vs each linked store country mismatches: 0.
+- order_items missing merchant_order_id: 0.
+- order_items with missing/mismatched merchant_order parent/store link: 0.
+- order currency vs countries.currency_code mismatches: 0.
+- stores whose primary region is missing or not a root region: 0.
+- orders whose primary region is missing or not a root region: 0.
+- orders whose secondary daira is not a child of selected primary wilaya: 0.
+These are current data observations, not a guarantee about future writes.
+Keep equivalent checks in migration preflight and post-migration validation.
+
+D. Additional notification/security notes
+- notify_created_activity(), notify_merchant_order_activity(),
+  notify_order_status(), notify_reservation_status(), notify_shipment_status(),
+  sync_merchant_order_from_item() and guard_order_status_transition() are
+  SECURITY DEFINER functions using search_path=public in the inspected
+  definitions; their relation references are schema-qualified. A security
+  hardening pass can set search_path='' only after verifying all referenced
+  functions/operators/types are schema-qualified and preserving grants.
+- private.dispatch_notification_push() and private.sync_public_personal_profile()
+  already use search_path=''.
+- Trigger functions have no anon/authenticated EXECUTE grants in the inspected
+  privilege result. Keep them non-callable as RPC endpoints.
+- notifications_send_push is an additional trigger not attached to the order
+  tables directly; it must remain attached to notifications for all workflows.
+
+E. Confirmed app/database contract conflict to resolve in coordinated rollout
+- Existing app checkout still submits wilaya_id + daira_region_id and expects
+  the current create_order_with_delivery overload. Existing address forms
+  still require Algeria-specific phone validation and legacy location fields.
+- The database currently requires wilaya_id on stores, user_addresses and
+  orders and has an Algeria-only phone CHECK on user_addresses.
+- Therefore the migration cannot be deployed safely as a database-only change.
+  The generic app service/screens and RPC contract must be released in a
+  compatible order with rollback support. Do not enable any additional country
+  until the app and database contracts have passed integration tests together.
+
+===============================================================================
+21. PHASE A — UPDATED AUDIT CHECKLIST
+===============================================================================
+
+Newly completed:
+- Exact private public-personal-profile mirror columns, PK/FK, RLS policy,
+  grants, sync function behavior and live row count.
+- Notification row RLS, notification push trigger and private dispatcher body.
+- Current row-level consistency aggregates for order/store country,
+  order currency, region hierarchy and merchant-order links.
+- Relevant order/inventory/notification trigger functions and security posture.
+
+Still open before final executable SQL:
+1. Complete dependency inventory for all callers of private profile mirror,
+   and determine whether any public discovery/search query depends on wilaya_id.
+2. Review exact app contracts from current source for address/profile/store/
+   checkout/order/quote/notification and currency formatting; do not infer
+   compatibility from the region helper alone.
+3. Review quote notification body and define country-aware currency rendering
+   without changing numeric notification payload fields.
+4. Define a safe data-preserving compatibility plan for legacy wilaya_id
+   columns/FKs and the existing address phone CHECK.
+5. Produce migration preflight assertions, postflight assertions, transaction
+   boundaries and a rollback/recovery plan.
+6. Do not activate MA/EG/SA/AE or alter live data until the coordinated app
+   release and explicit approval of the exact final migration.
+
+This remains documentation only. No live database or application changes
+were made by this inspection.
+*/
