@@ -166,7 +166,11 @@ const MerchantDashboardOrderRowSchema = z.object({
     commune: z.string().nullable(),
     delivery_type: z.string(),
     created_at: z.string(),
-    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable(),
+    country_code: z.string().length(2),
+    currency_code: z.string().length(3),
+    region: z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() }).nullable(),
+    secondary_region: z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() }).nullable(),
+    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable().optional(),
     daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional()
   }),
   items: z.array(MerchantDashboardOrderItemSchema)
@@ -206,7 +210,7 @@ export async function fetchMerchantDashboard(storeId: string): Promise<MerchantD
       .eq("store_id", storeId),
     client
       .from("merchant_orders")
-      .select("id, status, subtotal, shipping_fee, quoted_at, created_at, order:orders!inner(id, status, full_name, commune, delivery_type, created_at, wilaya:wilayas(id, name_ar, name_fr)), items:order_items!inner(id, store_id, merchant_archived_at, product_name, quantity)")
+      .select("id, status, subtotal, shipping_fee, quoted_at, created_at, order:orders!inner(id, status, full_name, commune, delivery_type, created_at, country_code, currency_code, region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!orders_secondary_region_fkey(name_ar, name_fr, name_en), wilaya:wilayas(id, name_ar, name_fr)), items:order_items!inner(id, store_id, merchant_archived_at, product_name, quantity)")
       .eq("store_id", storeId)
       .eq("items.store_id", storeId)
       .is("items.merchant_archived_at", null)
@@ -263,12 +267,18 @@ const MerchantOrderDetailSchema = z.object({
     full_name: z.string().nullable(),
     phone: z.string().nullable(),
     commune: z.string().nullable(),
-    wilaya_id: z.number().nullable(),
+    country_code: z.string().length(2),
+    currency_code: z.string().length(3),
+    region_id: z.number().nullable(),
+    secondary_region_id: z.number().nullable(),
+    region: z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() }).nullable(),
+    secondary_region: z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() }).nullable(),
+    wilaya_id: z.number().nullable().optional(),
     address_line: z.string().nullable(),
     delivery_type: z.string(),
     payment_method: z.string().nullable(),
     created_at: z.string(),
-    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable(),
+    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable().optional(),
     daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional()
   })
 }).passthrough();
@@ -328,7 +338,7 @@ export async function fetchMerchantOrderDetails(
 
   const { data: merchantOrderData, error: merchantOrderError } = await client
     .from("merchant_orders")
-    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, wilaya_id, address_line, delivery_type, payment_method, created_at, wilaya:wilayas(id, name_ar, name_fr), daira:country_regions!orders_daira_region_fkey(name_ar, name_fr))")
+    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, country_code, currency_code, region_id, secondary_region_id, address_line, delivery_type, payment_method, created_at, region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!orders_secondary_region_fkey(name_ar, name_fr, name_en), wilaya:wilayas(id, name_ar, name_fr), daira:country_regions!orders_daira_region_fkey(name_ar, name_fr))")
     .eq("id", merchantOrderId)
     .eq("store_id", storeId)
     .maybeSingle();
