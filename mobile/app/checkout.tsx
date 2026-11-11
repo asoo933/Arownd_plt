@@ -326,7 +326,6 @@ export default function CheckoutScreen() {
         <UiText style={[styles.selectText, !selectedRegion && styles.placeholder]}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.isError ? translate("checkoutWilayaError") : (regionOptions.data?.selectedLevel.label_ar ?? "")}</UiText>
         {regionOptions.isPending ? <Spinner size="small" /> : null}
       </PressableSurface>
-      {regionOptions.isError ? <PressableSurface accessibilityLabel={translate("retry")} onPress={() => void regionOptions.refetch()}><UiText style={styles.retryText}>{translate("retry")}</UiText></PressableSurface> : null}
 
       {regionOptions.data?.levels[1] ? <>
         <UiText style={styles.fieldLabel}>{regionOptions.data.levels[1].label_ar}</UiText>
