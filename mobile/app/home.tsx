@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { Avatar, Icon, PressableSurface, Skeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 import Logo from "@/components/logo";
+import { ExternalProductsSection } from "@/components/external-product-card";
 import {
   CustomerScreen,
   CustomerHeading,
@@ -139,6 +140,7 @@ export default function CustomerHomeScreen() {
           </ScrollView>
         )}
       </View>
+      <ExternalProductsSection products={[]} />
     </CustomerScreen>
   );
 }
