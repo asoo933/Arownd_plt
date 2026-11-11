@@ -170,7 +170,7 @@ const MerchantDashboardOrderRowSchema = z.object({
     currency_code: z.string().length(3),
     region: z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() }).nullable(),
     secondary_region: z.object({ name_ar: z.string(), name_fr: z.string().nullable(), name_en: z.string().nullable() }).nullable(),
-    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable().optional(),
+    wilaya: z.object({ id: z.number(), name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable(),
     daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional()
   }),
   items: z.array(MerchantDashboardOrderItemSchema)

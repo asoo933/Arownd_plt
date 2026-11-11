@@ -28,6 +28,9 @@ function row(overrides: Partial<MerchantOrderRow> = {}): MerchantOrderRow {
       commune: "البليدة",
       delivery_type: "home",
       created_at: "2026-11-07T10:00:00.000Z",
+      country_code: "DZ", currency_code: "DZD",
+      region: { name_ar: "البليدة", name_fr: null, name_en: null },
+      secondary_region: { name_ar: "البليدة", name_fr: null, name_en: null },
       wilaya: { id: 9, name_ar: "البليدة", name_fr: null }
     },
     ...overrides
@@ -91,6 +94,9 @@ describe("groupMerchantOrderRows", () => {
           commune: "الشفة",
           delivery_type: "home",
           created_at: "2026-11-07T11:00:00.000Z",
+          country_code: "DZ", currency_code: "DZD",
+          region: { name_ar: "البليدة", name_fr: null, name_en: null },
+          secondary_region: { name_ar: "الشفة", name_fr: null, name_en: null },
           wilaya: { id: 9, name_ar: "البليدة", name_fr: null }
         }
       })

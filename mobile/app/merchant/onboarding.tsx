@@ -281,9 +281,9 @@ export default function MerchantOnboardingScreen() {
               control={control}
               name="secondaryRegionId"
               render={() => (
-                <FormField theme={theme} label={regionOptions.data.levels[1].label_ar}>
-                  <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data.levels[1].label_ar} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={!regionId || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}>
-                    <UiText style={[styles.selectText, { color: selectedSecondaryRegion ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+                <FormField theme={theme} label={regionOptions.data?.levels[1]?.label_ar ?? ""}>
+                  <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data?.levels[1]?.label_ar ?? ""} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={!regionId || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}>
+                    <UiText style={[styles.selectText, { color: selectedSecondaryRegion ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data?.levels[1]?.label_ar ?? ""}</UiText>
                     <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
                   </PressableSurface>
                 </FormField>

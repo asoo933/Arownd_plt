@@ -256,7 +256,7 @@ export default function SettingsScreen() {
               <DetailRow label={translate("checkoutPhonePlaceholder")} value={deliveryProfile.data.phone || "—"} />
             </Surface>
             <Surface elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
-              <DetailRow label={translate("checkoutWilaya")} value={deliveryProfile.data.wilaya_id ? String(deliveryProfile.data.wilaya_id).padStart(2, "0") : "—"} />
+              <DetailRow label={translate("checkoutWilaya")} value={deliveryProfile.data.region_id ? String(deliveryProfile.data.region_id) : "—"} />
               <DetailRow label={translate("checkoutCommune")} value={deliveryProfile.data.commune || "—"} />
             </Surface>
           </View>
