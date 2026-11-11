@@ -61,6 +61,7 @@ const OrderSchema = z.object({
   address_line: z.string().nullable().optional(),
   commune: z.string().nullable().optional(),
   wilaya_id: z.number().nullable().optional(),
+  daira: z.object({ name_ar: z.string(), name_fr: z.string().nullable() }).nullable().optional(),
   payment_method: z.string().nullable().optional(),
   wilaya: z.object({ name_ar: z.string().nullable(), name_fr: z.string().nullable() }).nullable().optional(),
   items: z.array(OrderItemSchema).default([]),
@@ -77,7 +78,8 @@ const ORDER_SELECT = [
   "*,",
   "items:order_items(*),",
   "merchant_orders(id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, store:stores(name, address_line, commune), items:order_items(*)),",
-  "wilaya:wilayas(name_ar, name_fr)"
+  "wilaya:wilayas(name_ar, name_fr),",
+  "daira:country_regions!orders_daira_region_fkey(name_ar, name_fr)"
 ].join(" ");
 
 export async function fetchMyOrders(): Promise<CustomerOrder[]> {

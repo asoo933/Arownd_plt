@@ -19,6 +19,7 @@ describe("checkoutRequestIdentity", () => {
       items: [item("offer-1", 2, { size: "M", color: "black" })],
       deliveryType: "home",
       wilayaId: 16,
+      dairaRegionId: 101,
       commune: "  الجزائر الوسطى ",
       addressLine: "  شارع 1 ",
       fullName: " أحمد ",
@@ -28,6 +29,7 @@ describe("checkoutRequestIdentity", () => {
       items: [item("offer-1", 2, { color: "black", size: "M" })],
       deliveryType: "home",
       wilayaId: 16,
+      dairaRegionId: 101,
       commune: "الجزائر الوسطى",
       addressLine: "شارع 1",
       fullName: "أحمد",
@@ -41,6 +43,7 @@ describe("checkoutRequestIdentity", () => {
       items: [item("offer-1", 1, { color: "Black", size: "M" })],
       deliveryType: "desk" as const,
       wilayaId: 9,
+      dairaRegionId: 99,
       commune: "البليدة",
       addressLine: "",
       fullName: "أحمد",
@@ -65,6 +68,7 @@ describe("checkoutRequestIdentity", () => {
       items,
       deliveryType: "home",
       wilayaId: 16,
+      dairaRegionId: 101,
       commune: "الجزائر الوسطى",
       addressLine: "شارع 1",
       fullName: "أحمد",
@@ -73,6 +77,7 @@ describe("checkoutRequestIdentity", () => {
       items: reordered,
       deliveryType: "home",
       wilayaId: 16,
+      dairaRegionId: 101,
       commune: "الجزائر الوسطى",
       addressLine: "شارع 1",
       fullName: "أحمد",
@@ -85,12 +90,14 @@ describe("checkoutRequestIdentity", () => {
       items: [item("offer-1", 1, {})],
       deliveryType: "desk" as const,
       wilayaId: 9,
+      dairaRegionId: 99,
       commune: "البليدة",
       addressLine: "",
       fullName: "أحمد",
       phone: "0550000000"
     };
     expect(checkoutRequestIdentity(base)).not.toBe(checkoutRequestIdentity({ ...base, deliveryType: "home" }));
+    expect(checkoutRequestIdentity(base)).not.toBe(checkoutRequestIdentity({ ...base, dairaRegionId: 100 }));
     expect(checkoutRequestIdentity(base)).not.toBe(checkoutRequestIdentity({ ...base, items: [item("offer-1", 2, {})] }));
   });
 });
