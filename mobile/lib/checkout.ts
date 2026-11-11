@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import type { CartItem } from "@/lib/cart-state";
 import { checkoutRequestIdentity, MAX_CHECKOUT_ITEMS, normalizeCheckoutItems } from "@/lib/checkout-state";
-import { fetchMyAccountCountryCode, fetchMyAccountRegions } from "@/lib/country-regions";
+import { fetchMyAccountCountryCode, fetchMyAccountRegionLevels, fetchMyAccountRegions } from "@/lib/country-regions";
 import { getSupabaseClient } from "@/lib/supabase";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
@@ -124,8 +124,13 @@ export async function submitCheckout(input: CheckoutInput): Promise<string> {
   if (input.fullName.trim().length < 2 || input.fullName.trim().length > 120) throw new Error("invalid_full_name");
   if (!/^\+[1-9]\d{7,14}$/.test(input.phone.trim())) throw new Error("invalid_phone");
 
-  // Ensure the location belongs to the immutable account country, never the browsing market.
-  await fetchMyAccountCountryCode();
+  // Ensure the location belongs to the enabled immutable account country,
+  // and honor that country's required administrative levels.
+  const regionContext = await fetchMyAccountRegionLevels();
+  if (regionContext.levels[1]?.is_required && input.secondaryRegionId === null) {
+    throw new Error("secondary_region_required");
+  }
+  if (!input.phone.startsWith(regionContext.callingCode)) throw new Error("invalid_phone");
 
   const identity = checkoutRequestIdentity(input);
   const idempotencyKey = await getOrCreateIdempotencyKey(input.userId, identity);
