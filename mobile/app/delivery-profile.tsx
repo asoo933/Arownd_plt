@@ -103,10 +103,17 @@ export default function DeliveryProfileScreen() {
       setFormError(translate("deliveryProfileValidationError"));
       return;
     }
+    let normalizedPhone: string;
+    try {
+      normalizedPhone = normalizePhoneForCallingCode(phone, regionOptions.data?.callingCode ?? "");
+    } catch {
+      setFormError(translate("deliveryProfileValidationError"));
+      return;
+    }
     const input: DeliveryProfileInput = {
       full_name: fullName.trim(),
-      phone: normalizePhoneForCallingCode(phone, regionOptions.data?.callingCode ?? ""),
-      region_id: regionId ?? 0,
+      phone: normalizedPhone,
+      region_id: regionId,
       secondary_region_id: secondaryRegionId,
       commune: commune.trim()
     };
