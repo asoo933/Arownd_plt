@@ -11,7 +11,7 @@ import type {
 } from "@/lib/auth-validation";
 
 export async function signIn(input: LoginInput): Promise<void> {
-  const { error } = await getSupabaseClient().auth.signInWithPassword({
+  const { data, error } = await getSupabaseClient().auth.signInWithPassword({
     email: input.email,
     password: input.password
   });
