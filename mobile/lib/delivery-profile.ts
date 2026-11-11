@@ -5,6 +5,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 
 const ProfileSchema = z.object({
   full_name: z.string().nullable().optional(),
+  avatar_url: z.string().url().nullable().optional(),
   phone: z.string().nullable().optional(),
   wilaya_id: z.number().nullable().optional(),
   daira_region_id: z.number().nullable().optional(),
@@ -19,7 +20,7 @@ export async function fetchMyDeliveryProfile(): Promise<DeliveryProfile | null> 
   if (authError) throw authError;
   if (!auth.user) throw new Error("not_authenticated");
   const { data, error } = await client.from("profiles")
-    .select("full_name, phone, wilaya_id, daira_region_id, commune")
+    .select("full_name, avatar_url, phone, wilaya_id, daira_region_id, commune")
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (error) throw error;
