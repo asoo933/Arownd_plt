@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Avatar, Icon, PressableSurface, Skeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 import Logo from "@/components/logo";
 import { ExternalProductsSection } from "@/components/external-product-card";
+import { fetchExternalProducts } from "@/lib/external-products";
 import {
   CustomerScreen,
   CustomerHeading,
@@ -29,6 +30,12 @@ export default function CustomerHomeScreen() {
   const browsingCurrency = useQuery({ queryKey: ["browsing-country-currency"], queryFn: fetchBrowsingCurrencyCode, staleTime: 60_000 });
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
+  const externalProducts = useQuery({
+    queryKey: ["external-products", "noon", language],
+    queryFn: () => fetchExternalProducts(language),
+    staleTime: 15 * 60_000,
+    retry: 1,
+  });
 
   const orderedStores = language === "ar" && stores.data ? [...stores.data].reverse() : stores.data ?? [];
 
@@ -53,8 +60,8 @@ export default function CustomerHomeScreen() {
 
   return (
     <CustomerScreen
-      refreshing={stores.isFetching || products.isFetching}
-      onRefresh={() => { void Promise.all([stores.refetch(), products.refetch()]); }}
+      refreshing={stores.isFetching || products.isFetching || externalProducts.isFetching}
+      onRefresh={() => { void Promise.all([stores.refetch(), products.refetch(), externalProducts.refetch()]); }}
     >
       <View style={styles.header}>
         <Logo color={theme.colors.foreground} width={148} />
@@ -140,7 +147,7 @@ export default function CustomerHomeScreen() {
           </ScrollView>
         )}
       </View>
-      <ExternalProductsSection products={[]} />
+      <ExternalProductsSection products={externalProducts.data ?? []} />
     </CustomerScreen>
   );
 }
