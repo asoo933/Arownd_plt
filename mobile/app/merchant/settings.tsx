@@ -24,7 +24,6 @@ export default function MerchantStoreSettingsScreen() {
   const storeId = access.data?.store?.id ?? null;
   const ready = access.data?.status === "merchant_ready" && Boolean(storeId);
   const regionOptions = useQuery({ queryKey: ["merchant-regions"], queryFn: () => fetchCheckoutRegions(), staleTime: Infinity });
-  const secondaryOptions = useQuery({ queryKey: ["merchant-regions", form?.region_id], queryFn: () => fetchCheckoutRegions(form?.region_id ?? null), enabled: form?.region_id !== undefined && form?.region_id !== null, staleTime: Infinity });
   const settings = useQuery({
     queryKey: ["merchant-store-settings", storeId],
     queryFn: () => fetchMyMerchantStoreSettings(storeId ?? ""),
@@ -32,6 +31,7 @@ export default function MerchantStoreSettingsScreen() {
     retry: false
   });
   const [form, setForm] = useState<MerchantStoreSettings | null>(null);
+  const secondaryOptions = useQuery({ queryKey: ["merchant-regions", form?.region_id], queryFn: () => fetchCheckoutRegions(form?.region_id ?? null), enabled: form?.region_id !== undefined && form?.region_id !== null, staleTime: Infinity });
   const [formDirty, setFormDirty] = useState(false);
   const [formError, setFormError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});

@@ -271,7 +271,7 @@ export default function MerchantOnboardingScreen() {
                     onPress={() => { setRegionPickerLevel("primary"); setRegionPickerOpen(true); }}
                     style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}
                   >
-                    <UiText style={[styles.selectText, { color: selectedWilaya ? theme.colors.foreground : theme.colors.placeholder }]}>
+                    <UiText style={[styles.selectText, { color: selectedRegion ? theme.colors.foreground : theme.colors.placeholder }]}>
                       {selectedRegion ? getRegionDisplayName(selectedRegion, language) : (regionOptions.data?.selectedLevel.label_ar ?? translate("merchantStoreChooseWilaya"))}
                     </UiText>
                     <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
@@ -279,6 +279,18 @@ export default function MerchantOnboardingScreen() {
                 </FormField>
               )}
             />
+            {regionOptions.data?.levels[1] ? <Controller
+              control={control}
+              name="secondaryRegionId"
+              render={() => (
+                <FormField theme={theme} label={regionOptions.data.levels[1].label_ar}>
+                  <PressableSurface accessibilityRole="button" accessibilityLabel={regionOptions.data.levels[1].label_ar} onPress={() => { setRegionPickerLevel("secondary"); setRegionPickerOpen(true); }} disabled={!regionId || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted, borderColor: theme.colors.inputBorder }]}>
+                    <UiText style={[styles.selectText, { color: selectedSecondaryRegion ? theme.colors.foreground : theme.colors.placeholder }]}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+                    <UiText style={[styles.selectIcon, { color: theme.colors.muted }]}>⌄</UiText>
+                  </PressableSurface>
+                </FormField>
+              )}
+            /> : null}
 
             <Controller
               control={control}
