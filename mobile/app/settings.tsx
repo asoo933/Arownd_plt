@@ -544,7 +544,7 @@ function createStyles(theme: AppTheme) {
       height: 30,
       alignItems: "center",
       justifyContent: "center",
-      borderRadius: designTokens.radius.full,
+      borderRadius: designTokens.radius.pill,
       backgroundColor: theme.colors.surfaceMuted
     },
     sheetContent: {
