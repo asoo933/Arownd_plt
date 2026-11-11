@@ -2196,3 +2196,165 @@ Verification:
   named objects.
 - No DDL/DML, app edits, country activation, or tests were run in this pass.
 */
+
+
+/*
+===============================================================================
+33. FOLLOW-UP VERIFICATION AFTER MOBILE CONTRACT ALIGNMENT — 2026-11-11
+===============================================================================
+
+This section records additional facts found while reconciling the current
+mobile branch with the live database. It does not authorize execution.
+
+A. Live schema confirmation
+- public.country_region_levels DOES NOT EXIST in the inspected live database.
+  The current mobile helper reads it in fetchMyAccountRegionLevels(); therefore
+  the new region-picker path cannot run until the table and seed metadata are
+  deployed.
+- Live country_regions currently contains:
+    DZ: 69 wilaya + 551 daira
+    MA: 12 region + 7 province + 1 prefecture
+    EG: 27 governorate
+    SA: 13 region + 136 governorate
+    AE: 7 emirate + 9 municipality
+- The existing profiles/stores/user_addresses/orders tables have region_id
+  and country_code, but only profiles has browsing_country_code.
+- Live stores, user_addresses and orders still have wilaya_id NOT NULL.
+  Non-DZ inserts therefore cannot succeed even if a valid generic region_id
+  is supplied. These legacy columns must become nullable while retaining
+  existing values and foreign keys.
+- Live profiles, user_addresses and orders have daira_region_id; stores does
+  not. No table currently has secondary_region_id.
+- Live orders has country_code, currency_code, region_id and daira_region_id.
+- Live user_addresses.phone retains its Algeria-only CHECK.
+- Live RPCs create_my_store and create_order_with_delivery remain the
+  wilaya-based contracts; there are no generic region RPCs yet.
+
+B. Required additive schema statements for the eventual CLI migration
+(Names below are the names consumed by the current mobile code.)
+
+CREATE TABLE public.country_region_levels (
+  country_code text NOT NULL
+    REFERENCES public.countries(code) ON DELETE RESTRICT,
+  level smallint NOT NULL CHECK (level > 0),
+  region_types text[] NOT NULL
+    CHECK (cardinality(region_types) > 0),
+  label_ar text NOT NULL CHECK (length(btrim(label_ar)) > 0),
+  label_en text NOT NULL CHECK (length(btrim(label_en)) > 0),
+  is_required boolean NOT NULL DEFAULT true,
+  PRIMARY KEY (country_code, level)
+);
+
+ALTER TABLE public.country_region_levels ENABLE ROW LEVEL SECURITY;
+CREATE POLICY country_region_levels_read_enabled
+  ON public.country_region_levels FOR SELECT TO anon, authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.countries c
+    WHERE c.code = country_region_levels.country_code AND c.is_enabled
+  ));
+GRANT SELECT ON public.country_region_levels TO anon, authenticated;
+GRANT ALL ON public.country_region_levels TO service_role;
+
+INSERT INTO public.country_region_levels
+  (country_code, level, region_types, label_ar, label_en, is_required)
+VALUES
+  ('DZ', 1, ARRAY['wilaya'], 'الولاية', 'Wilaya', true),
+  ('DZ', 2, ARRAY['daira'], 'الدائرة', 'Daira', true),
+  ('MA', 1, ARRAY['region'], 'الجهة', 'Region', true),
+  ('MA', 2, ARRAY['province','prefecture'], 'الإقليم أو العمالة', 'Province or Prefecture', false),
+  ('EG', 1, ARRAY['governorate'], 'المحافظة', 'Governorate', true),
+  ('SA', 1, ARRAY['region'], 'المنطقة', 'Region', true),
+  ('SA', 2, ARRAY['governorate'], 'المحافظة', 'Governorate', true),
+  ('AE', 1, ARRAY['emirate'], 'الإمارة', 'Emirate', true),
+  ('AE', 2, ARRAY['municipality'], 'البلدية', 'Municipality', false);
+
+ALTER TABLE public.profiles
+  ADD COLUMN secondary_region_id bigint;
+ALTER TABLE public.user_addresses
+  ADD COLUMN secondary_region_id bigint;
+ALTER TABLE public.orders
+  ADD COLUMN secondary_region_id bigint;
+ALTER TABLE public.stores
+  ADD COLUMN secondary_region_id bigint;
+
+-- Backfill the generic secondary identifier without deleting the legacy
+-- Algeria-specific daira column. The generic column is authoritative after
+-- the replacement validator is installed.
+UPDATE public.profiles SET secondary_region_id = daira_region_id
+WHERE daira_region_id IS NOT NULL;
+UPDATE public.user_addresses SET secondary_region_id = daira_region_id
+WHERE daira_region_id IS NOT NULL;
+UPDATE public.orders SET secondary_region_id = daira_region_id
+WHERE daira_region_id IS NOT NULL;
+
+ALTER TABLE public.profiles
+  ADD CONSTRAINT profiles_secondary_region_fkey
+  FOREIGN KEY (country_code, secondary_region_id)
+  REFERENCES public.country_regions(country_code, id) ON DELETE RESTRICT;
+ALTER TABLE public.user_addresses
+  ADD CONSTRAINT user_addresses_secondary_region_fkey
+  FOREIGN KEY (country_code, secondary_region_id)
+  REFERENCES public.country_regions(country_code, id) ON DELETE RESTRICT;
+ALTER TABLE public.orders
+  ADD CONSTRAINT orders_secondary_region_fkey
+  FOREIGN KEY (country_code, secondary_region_id)
+  REFERENCES public.country_regions(country_code, id) ON DELETE RESTRICT;
+ALTER TABLE public.stores
+  ADD CONSTRAINT stores_secondary_region_fkey
+  FOREIGN KEY (country_code, secondary_region_id)
+  REFERENCES public.country_regions(country_code, id) ON DELETE RESTRICT;
+
+ALTER TABLE public.stores ALTER COLUMN wilaya_id DROP NOT NULL;
+ALTER TABLE public.user_addresses ALTER COLUMN wilaya_id DROP NOT NULL;
+ALTER TABLE public.orders ALTER COLUMN wilaya_id DROP NOT NULL;
+
+CREATE INDEX profiles_country_secondary_region_idx
+  ON public.profiles(country_code, secondary_region_id);
+CREATE INDEX stores_country_secondary_region_idx
+  ON public.stores(country_code, secondary_region_id);
+CREATE INDEX user_addresses_country_secondary_region_idx
+  ON public.user_addresses(country_code, secondary_region_id);
+CREATE INDEX orders_country_secondary_region_idx
+  ON public.orders(country_code, secondary_region_id);
+
+Important review conditions:
+- Make all DDL idempotent or guard existing objects when converting this
+  fragment into the real migration; this fragment is a design record, not a
+  replayable script.
+- Existing rows must be checked for backfill completeness and parent-child
+  correctness before any NOT NULL or trigger enforcement changes.
+- Replace enforce_daira_region_selection() with a generic validator before
+  permitting non-DZ writes. Keep daira_region_id populated as a DZ mirror for
+  old readers until compatibility is retired.
+- Do not relax user_addresses.phone CHECK yet. Until validated phone metadata
+  is agreed and tested, non-DZ countries remain disabled.
+- The current app calls exactly:
+    public.create_my_store_for_account(...)
+    public.create_checkout_order_for_account(...)
+  Their full SQL bodies, ACLs, and all dependent order/store side effects must
+  be completed and reviewed before this can become an executable migration.
+- The mobile RPC argument names are _region_id and _secondary_region_id;
+  checkout also sends _items, _delivery_type, _commune, _address_line,
+  _full_name, _phone, _payment_method, _receipt_url, _idempotency_key.
+  Store creation sends _store_name, _slug, _phone, _whatsapp, _region_id,
+  _secondary_region_id, _commune, _address_line, _latitude, _longitude,
+  _opening_hours, _category, _subcategories.
+
+C. Remaining release blockers
+1. Implement and review both generic RPC bodies. Do not route them through
+   create_order(), because it calculates legacy wilaya tariffs and requires
+   wilaya_id. Initial generic checkout shipping_fee must be zero and total
+   equal subtotal until merchant quotes are accepted.
+2. Replace the daira-only region trigger with one authoritative country/type/
+   parent validator and synchronize daira_region_id only for DZ.
+3. Update store/address/order relational selects to use the new FK names above.
+4. Localize DZD-only formatters and quote/COD notifications using each
+   record's currency_code; historical order displays use orders.currency_code.
+5. Do not enable MA/EG/SA/AE until phone validation, catalog data completeness,
+   generic RPCs, currency display, and full quote/accept/reject flows pass.
+6. Generate the real migration with Supabase CLI from a proper checkout. This
+   review file remains guarded and outside supabase/migrations/.
+
+No live database statements were executed while recording these findings.
+===============================================================================
+*/
