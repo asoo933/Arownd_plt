@@ -1996,3 +1996,153 @@ E. Merchant analytics and currency
 8. No live DDL, data update, country activation, app-code edit or test run was
    performed by this contract-design pass.
 */
+
+/*
+===============================================================================
+32. FINAL VERIFIED FUNCTION / TRIGGER / ACL AUDIT — 2026-11-11
+===============================================================================
+
+This is the final read-only dependency audit section. This file remains a
+guarded review artifact, not an executable migration.
+
+A. Store and checkout RPCs
+- create_my_store(...) is SECURITY DEFINER, search_path='', authenticated
+  EXECUTE. It locks the caller profile, derives account type/country from it,
+  validates active parent category and subcategories, resolves only
+  legacy_wilaya_id, prevents duplicate store, promotes merchant account,
+  inserts merchant role and creates store. Generic replacement must preserve
+  every check and side effect, derive country from auth.uid/profile, and fill
+  legacy wilaya_id only for DZ.
+- create_order(...) is SECURITY DEFINER, search_path='', not directly
+  executable by authenticated. It validates auth, 1..30 items, home/desk,
+  COD, null receipt, contact bounds, country match; locks each offer, checks
+  availability/stock/store country, inserts items, decrements stock and
+  calculates subtotal. Confirmed defect: it reads wilayas.home_price /
+  desk_price and sets initial shipping_fee/total from that tariff. Generic
+  checkout must not call this legacy function; initial fee=0 and total=subtotal.
+- Two create_order_with_delivery overloads exist: wilaya-only (not executable
+  by authenticated) and wilaya+daira (authenticated EXECUTE). Both are
+  SECURITY DEFINER/search_path=''. The latter hashes request, advisory-locks,
+  rejects mismatched key reuse, calls create_order then updates daira using a
+  transaction-local trigger bypass. New generic checkout needs a distinct RPC
+  name, atomic primary/secondary persistence, full hash coverage and same
+  replay/concurrency behavior. Keep legacy grants during mobile rollout.
+
+B. Region/account trigger attachments
+- profiles_country_immutable, stores_account_country_guard,
+  user_addresses_account_country_guard and orders_account_country_guard call
+  enforce_account_country_consistency(). It prevents account-country changes
+  and compares row country to profile country when auth.uid() exists; with
+  auth.uid() NULL it returns NEW. Privileged RPCs must independently validate
+  account ownership and country.
+- profiles_daira_region_guard, user_addresses_daira_region_guard and
+  orders_daira_region_guard call enforce_daira_region_selection(). It hardcodes
+  wilaya/daira, permits profile with no location, requires daira for addresses
+  and ordinary orders, and allows a narrow checkout bypass. Replace only its
+  validation logic with country-aware primary/secondary checks; preserve DZ
+  mapping and profile no-location behavior.
+- Exact trigger families inspected:
+  profiles: BEFORE prepare_profile_update, browsing-country, immutable-country,
+  daira-region, updated_at; AFTER public-personal-profile mirror.
+  stores: BEFORE account-country; AFTER store-created notification.
+  user_addresses: BEFORE account-country and daira-region.
+  orders: BEFORE status transition, account-country and daira-region; AFTER
+  created/status notifications.
+  order_items: BEFORE INSERT merchant-order sync.
+  merchant_orders: AFTER INSERT or UPDATE OF status activity notification.
+  store_offers: BEFORE availability sync; AFTER insert notification.
+  notifications: AFTER INSERT push dispatch.
+  Preserve unrelated attachments and timing.
+
+C. Order, stock and aggregate dependencies
+- sync_merchant_order_from_item() is a SECURITY DEFINER BEFORE INSERT trigger;
+  it reads parent customer/status, upserts merchant_orders per
+  (order_id,store_id), accumulates subtotal and sets NEW.merchant_order_id.
+  Generic checkout must rely on this trigger, not duplicate suborder creation.
+- merchant_submit_order_quote() locks parent/suborder, verifies store owner,
+  pending state, fee 0..1,000,000 and desk fee=0; marks quoted and refreshes
+  totals. Notification hardcodes DZD three times. Localize from parent order
+  currency while preserving signature, checks, numeric JSON and URL.
+- customer_respond_to_merchant_order() locks parent/suborder, verifies customer
+  ownership and quoted state; accept confirms; reject cancels and restores
+  stock; both refresh totals and notify store owner. Keep contract unchanged.
+- merchant_reject_order() verifies store owner and pending pre-quote state,
+  cancels, restores stock, refreshes totals and notifies customer.
+- private.cancel_my_merchant_order() (public wrapper only) verifies customer
+  ownership and pending pre-quote state, restores stock, refreshes totals and
+  notifies store owner. Preserve private boundary.
+- guard_order_status_transition() permits customer parent cancellation only
+  while pending/all suborders pending; rejects direct merchant parent changes;
+  rejects in-flight shipments, rejects pending shipments, cancels suborders
+  and restores stock. Preserve internal aggregate bypass.
+- refresh_parent_order_totals() is SECURITY DEFINER with no authenticated
+  EXECUTE. It aggregates non-cancelled suborder subtotal/fees and preserves
+  precedence: all cancelled -> cancelled; all delivered/cancelled -> delivered;
+  any shipped -> shipped; any confirmed/delivered -> confirmed; else pending.
+  Preserve exact precedence and test mixed multi-store states.
+- sync_store_offer_availability() derives is_available from stock and hidden
+  state. Preserve it; test hidden offers remain hidden after stock restoration.
+
+D. Notifications, profile mirror and analytics
+- notify_merchant_order_activity() sends merchant new-order and customer
+  status notifications, but skips generic quoted notifications to avoid
+  duplication with quote RPC. Preserve.
+- notify_created_activity() and notify_order_status() cover creation and
+  parent status events; parent status notifier skips orders with merchant
+  suborders. Preserve.
+- private.dispatch_notification_push() is SECURITY DEFINER/search_path='',
+  reads PUSH_WEBHOOK_SECRET from Vault and calls existing push Edge Function.
+  Missing secret warns while preserving DB notification. Preserve chain.
+- private.sync_public_personal_profile() mirrors public personal accounts to
+  private.public_personal_profiles; mirror/view currently expose
+  user_id/full_name/avatar_url/wilaya_id/commune. It does not include generic
+  region metadata. If changing public location display, update mirror, view and
+  sync function atomically, retaining privacy eligibility and not exposing
+  private account location.
+- collect_merchant_order_cod() has another hard-coded DZD notification.
+  Include it in currency localization for multi-currency, preserving numeric
+  amount and payment state.
+- get_my_store_analytics() is SECURITY INVOKER/search_path='', checks owner,
+  preserves delivered_revenue=sum(delivered merchant_order subtotal) excluding
+  shipping, average subtotal and seven-day created_at daily series. Preserve
+  metric semantics; use store currency at app boundary and never aggregate
+  unlike currencies into an unlabeled total.
+
+E. ACL findings
+- authenticated EXECUTE: create_my_store, current wilaya+daira checkout
+  overload, merchant_submit_order_quote, merchant_reject_order,
+  customer_respond_to_merchant_order, get_my_store_analytics,
+  is_store_owner and is_order_merchant.
+- authenticated lacks EXECUTE: create_order, wilaya-only checkout overload,
+  refresh_parent_order_totals and sync_merchant_order_from_item.
+- Keep helper/trigger functions internal; no PUBLIC/anon execution on new
+  write RPCs. Explicitly revoke PUBLIC/anon and grant authenticated only after
+  full auth/ownership validation.
+- is_store_owner() and is_order_merchant() are SECURITY DEFINER with
+  search_path='public'; bodies schema-qualify relations. Harden search_path=''
+  without changing ownership predicate or authenticated ACL.
+
+F. Final blockers before executable migration
+1. This audit covers the named critical definitions and trigger attachments,
+   not the entire transitive dependency closure of all order/status/stock/
+   reservation/notification callers. Complete that closure before executable
+   SQL generation.
+2. Mobile callers still use legacy wilaya/daira contracts; DB and app rollout
+   must be coordinated, including generated types.
+3. Address phone CHECK and app schemas remain Algeria-only. No non-DZ country
+   activation until authoritative country numbering validation is implemented.
+4. MA second-level data is partial and AE municipality data is not a uniform
+   administrative level. Keep all non-DZ countries disabled.
+5. Decide whether generic public location is actually required before changing
+   public_personal_profiles; preserve privacy behavior.
+6. Currency localization must include quote and COD notifications, all DZD-only
+   UI formatters, and store-scoped analytics.
+7. No executable migration is authorized by this audit. Generate a real
+   migration with Supabase CLI in a proper checkout, review exact SQL, and
+   obtain separate explicit approval before applying it to live.
+
+Verification:
+- Read-only function bodies, trigger attachments and ACLs inspected for the
+  named objects.
+- No DDL/DML, app edits, country activation, or tests were run in this pass.
+*/
