@@ -31,7 +31,7 @@ export default function CustomerHomeScreen() {
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
   const externalProducts = useQuery({
-    queryKey: ["external-products", "noon", language],
+    queryKey: ["external-products", "noon-jumia", language],
     queryFn: () => fetchExternalProducts(language),
     staleTime: 15 * 60_000,
     retry: 1,
