@@ -130,7 +130,7 @@ export default function SettingsScreen() {
         <Card contentStyle={styles.sectionContent}>
           <SettingsRow
             icon="user"
-            label={translate("profileEditDetails")}
+            label={translate("settingsAccountCustomize")}
             onPress={() => openSheet("delivery")}
             theme={theme}
             styles={styles}
