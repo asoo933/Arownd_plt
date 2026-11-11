@@ -6,7 +6,9 @@ import { MerchantStoreSettingsSchema, type MerchantStoreSettings } from "@/lib/m
 const StoreSettingsRecordSchema = z.object({
   id: z.string().uuid(),
   owner_id: z.string().uuid(),
-  wilaya_id: z.number().int().positive(),
+  country_code: z.string().length(2),
+  region_id: z.number().int().positive(),
+  secondary_region_id: z.number().int().positive().nullable(),
   logo_url: z.string().nullable(),
   cover_url: z.string().nullable(),
   name: z.string(),
@@ -31,7 +33,7 @@ export async function fetchMyMerchantStoreSettings(storeId: string): Promise<Mer
   if (!auth.user) throw new Error("not_authenticated");
 
   const { data, error } = await client.from("stores")
-    .select("id, owner_id, name, description, phone, whatsapp, wilaya_id, commune, address_line, opening_hours, logo_url, cover_url, instagram_url, facebook_url")
+    .select("id, owner_id, country_code, name, description, phone, whatsapp, region_id, secondary_region_id, commune, address_line, opening_hours, logo_url, cover_url, instagram_url, facebook_url")
     .eq("id", storeId)
     .eq("owner_id", auth.user.id)
     .maybeSingle();
@@ -41,7 +43,8 @@ export async function fetchMyMerchantStoreSettings(storeId: string): Promise<Mer
   const record = StoreSettingsRecordSchema.parse(data as unknown);
   return MerchantStoreSettingsSchema.parse({
     name: record.name,
-    wilaya_id: record.wilaya_id,
+    region_id: record.region_id,
+    secondary_region_id: record.secondary_region_id,
     logo_url: record.logo_url ?? "",
     cover_url: record.cover_url ?? "",
     description: record.description ?? "",

@@ -11,7 +11,8 @@ function isHttpsUrl(value: string): boolean {
 
 export const MerchantStoreSettingsSchema = z.object({
   name: z.string().trim().min(2).max(100),
-  wilaya_id: z.number().int().positive(),
+  region_id: z.number().int().positive(),
+  secondary_region_id: z.number().int().positive().nullable(),
   logo_url: z.string().trim().max(1000),
   cover_url: z.string().trim().max(1000),
   description: z.string().trim().max(2000),
