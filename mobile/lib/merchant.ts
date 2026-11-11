@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
-import { fetchMyAccountCallingCode, fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { createStoreSlug, merchantStoreSchema, type MerchantStoreFormValues } from "@/lib/merchant-validation";
 import {
   groupMerchantOrderRows,
