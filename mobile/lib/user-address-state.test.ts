@@ -18,6 +18,11 @@ describe("user address validation", () => {
     expect(UserAddressSchema.safeParse(validAddress).success).toBe(true);
   });
 
+  it("accepts international phone numbers from supported account countries", () => {
+    expect(UserAddressSchema.safeParse({ ...validAddress, phone: "+212612345678" }).success).toBe(true);
+    expect(UserAddressSchema.safeParse({ ...validAddress, phone: "+966501234567" }).success).toBe(true);
+  });
+
   it("rejects invalid phone numbers and missing location details", () => {
     expect(UserAddressSchema.safeParse({
       ...validAddress,
