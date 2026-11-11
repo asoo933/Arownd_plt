@@ -7,10 +7,11 @@ export const merchantStoreSchema = z.object({
     (value) => value.length === 0 || /^[+0-9()\s-]{7,20}$/.test(value),
     "merchantValidationWhatsApp"
   ),
-  wilayaId: z.number().int().positive().nullable().refine(
+  regionId: z.number().int().positive().nullable().refine(
     (value) => value !== null,
     "merchantValidationWilaya"
   ),
+  secondaryRegionId: z.number().int().positive().nullable(),
   commune: z.string().trim().min(2, "merchantValidationCommune").max(80, "merchantValidationCommune"),
   addressLine: z.string().trim().min(4, "merchantValidationAddress").max(300, "merchantValidationAddress"),
   open: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "merchantValidationTime"),

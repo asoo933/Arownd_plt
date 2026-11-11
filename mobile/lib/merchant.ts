@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { createStoreSlug, merchantStoreSchema, type MerchantStoreFormValues } from "@/lib/merchant-validation";
 import {
   groupMerchantOrderRows,
@@ -93,7 +94,10 @@ export async function createMerchantStore(
   input: MerchantStoreFormValues
 ): Promise<string> {
   const values = merchantStoreSchema.parse(input);
-  if (values.wilayaId === null) throw new Error("merchantValidationWilaya");
+  if (values.regionId === null) throw new Error("merchantValidationWilaya");
+  const regionContext = await fetchMyAccountRegionLevels();
+  const phone = normalizePhoneForCallingCode(values.phone, regionContext.callingCode);
+  const whatsapp = values.whatsapp ? normalizePhoneForCallingCode(values.whatsapp, regionContext.callingCode) : null;
 
   const client = getSupabaseClient();
   const { data: authData, error: authError } = await client.auth.getUser();
@@ -101,12 +105,13 @@ export async function createMerchantStore(
   if (!authData.user) throw new Error("not_authenticated");
 
   const suffix = Math.random().toString(36).slice(2, 8).padEnd(6, "0");
-  const { data, error } = await client.rpc("create_my_store", {
+  const { data, error } = await client.rpc("create_my_store_with_region", {
     _store_name: values.storeName,
     _slug: createStoreSlug(values.storeName, suffix),
-    _phone: values.phone,
-    _whatsapp: values.whatsapp,
-    _wilaya_id: values.wilayaId,
+    _phone: phone,
+    _whatsapp: whatsapp,
+    _region_id: values.regionId,
+    _secondary_region_id: values.secondaryRegionId,
     _commune: values.commune,
     _address_line: values.addressLine,
     _latitude: null,
