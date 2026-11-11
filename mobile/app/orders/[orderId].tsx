@@ -153,7 +153,7 @@ export default function OrderDetailsScreen() {
   const parentCancelled = order.status === "cancelled" || order.status === "rejected";
   const activeStep = getOrderTrackingSteps(order.status);
   const orderCode = formatOrderCode(order.id);
-  const formatOrderMoney = (amount: number) => formatMarketPrice(amount, order.currency_code ?? "DZD");
+  const formatOrderMoney = (amount: number) => formatMarketPrice(amount, order.currency_code);
 
   return <CustomerScreen refreshing={auth.isFetching || (Boolean(auth.data) && query.isFetching)} onRefresh={() => { void auth.refetch().then((result) => { if (result.isSuccess && result.data) void query.refetch(); }); }}>
     <AppHeader title={translate("orderDetailsTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={22} color={theme.colors.foreground} />} />} />
