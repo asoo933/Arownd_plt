@@ -728,3 +728,64 @@ cutover before the matching app release would break compatibility.
 No live schema, rows, function definitions, grants, RLS policies or country
 enablement were changed by this review.
 */
+
+
+/*
+===============================================================================
+14. PHASE A — TRIGGER ATTACHMENTS AND CONSTRAINT CHECK (READ-ONLY)
+===============================================================================
+
+Verified trigger attachments on the live schema:
+
+profiles:
+- profiles_country_immutable -> enforce_account_country_consistency()
+- profiles_daira_region_guard -> enforce_daira_region_selection()
+- prepare_profile_update, profiles_browsing_country_guard,
+  profiles_set_updated_at and private.sync_public_personal_profile() also run.
+
+stores:
+- stores_account_country_guard -> enforce_account_country_consistency()
+- stores_notify_created.
+
+user_addresses:
+- user_addresses_account_country_guard -> enforce_account_country_consistency()
+- user_addresses_daira_region_guard -> enforce_daira_region_selection().
+
+orders:
+- orders_account_country_guard -> enforce_account_country_consistency()
+- orders_daira_region_guard -> enforce_daira_region_selection()
+- guard_order_status_transition, orders_notify_created and orders_notify_status
+  also run.
+
+merchant_orders:
+- merchant_orders_notify_activity runs after insert or status update.
+
+store_offers:
+- sync_store_offer_availability runs before insert/update of stock/availability;
+  store_offers_notify_created runs after insert.
+
+Implication: replacing the region trigger function body will affect all four
+tables through existing triggers. The migration must preserve trigger timing
+and update-column lists, and must not accidentally interfere with profile
+sync, order status transitions, notifications or stock availability.
+
+Constraint verification:
+- stores.wilaya_id, user_addresses.wilaya_id and orders.wilaya_id are currently
+  NOT NULL and retain their legacy FK to public.wilayas(id).
+- user_addresses.phone CHECK is still Algeria-specific:
+  ^(0[567][0-9]{8}|+213[567][0-9]{8}|00213[567][0-9]{8})$ (with the literal
+  plus escaped in the actual SQL expression).
+- orders enforces payment_method='cod' and delivery_type in ('home','desk').
+- orders.country_code/currency_code have a composite country-currency FK.
+- orders/stores/user_addresses have composite country-region and
+  country-daira FKs. These should be preserved and validated, not replaced
+  with country-agnostic foreign keys.
+- merchant_orders enforces nonnegative shipping_fee/subtotal and its existing
+  status/payment-status state constraints.
+- checkout_idempotency primary key is (user_id,idempotency_key), with an
+  order_id FK. Keep this uniqueness contract unchanged.
+
+The metadata query returned the constraints and trigger attachments only;
+it did not execute DDL or modify rows. The complete migration still requires
+the remaining dependency and ACL inspection listed in section 13.
+*/
