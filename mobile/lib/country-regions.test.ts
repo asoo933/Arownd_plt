@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { getRegionDisplayName, getRegionLevelDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 
 describe("country region and phone helpers", () => {
   it("uses the best available localized region name", () => {
@@ -8,6 +8,20 @@ describe("country region and phone helpers", () => {
     expect(getRegionDisplayName(region, "ar")).toBe("الجزائر");
     expect(getRegionDisplayName(region, "fr")).toBe("Alger");
     expect(getRegionDisplayName(region, "en")).toBe("Alger");
+  });
+
+  it("localizes administrative level labels for the selected app language", () => {
+    const level = {
+      country_code: "DZ",
+      level: 1,
+      region_types: ["wilaya"],
+      label_ar: "الولاية",
+      label_en: "Wilaya",
+      is_required: true
+    };
+    expect(getRegionLevelDisplayName(level, "ar")).toBe("الولاية");
+    expect(getRegionLevelDisplayName(level, "en")).toBe("Wilaya");
+    expect(getRegionLevelDisplayName(level, "fr")).toBe("Wilaya");
   });
 
   it("normalizes national and international phone formats using the account calling code", () => {
