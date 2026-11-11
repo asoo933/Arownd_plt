@@ -1,5 +1,7 @@
 import * as Linking from "expo-linking";
 
+import { getSelectedCountryCode } from "@/lib/country-service";
+
 import { getSupabaseClient } from "@/lib/supabase";
 import type {
   BusinessSignupInput,
@@ -18,6 +20,9 @@ export async function signIn(input: LoginInput): Promise<void> {
 }
 
 export async function signUpPersonal(input: PersonalSignupInput): Promise<boolean> {
+  const countryCode = await getSelectedCountryCode();
+  if (!countryCode) throw new Error("COUNTRY_NOT_SELECTED");
+
   const redirectTo = Linking.createURL("auth/callback", {
     scheme: "com.arownd.app"
   });
@@ -29,7 +34,8 @@ export async function signUpPersonal(input: PersonalSignupInput): Promise<boolea
       emailRedirectTo: redirectTo,
       data: {
         full_name: input.fullName.trim(),
-        account_type: "personal"
+        account_type: "personal",
+        country_code: countryCode
       }
     }
   });
@@ -39,6 +45,9 @@ export async function signUpPersonal(input: PersonalSignupInput): Promise<boolea
 }
 
 export async function signUpBusiness(input: BusinessSignupInput): Promise<boolean> {
+  const countryCode = await getSelectedCountryCode();
+  if (!countryCode) throw new Error("COUNTRY_NOT_SELECTED");
+
   const redirectTo = Linking.createURL("auth/callback", {
     scheme: "com.arownd.app"
   });
@@ -51,6 +60,7 @@ export async function signUpBusiness(input: BusinessSignupInput): Promise<boolea
       data: {
         full_name: input.fullName.trim(),
         account_type: "merchant",
+        country_code: countryCode,
         business_name: input.businessName.trim()
       }
     }
