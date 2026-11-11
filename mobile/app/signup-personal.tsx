@@ -50,7 +50,9 @@ export default function PersonalSignupScreen() {
       setServerError(
         error instanceof Error && error.message === "SUPABASE_CONFIG_MISSING"
           ? translate("configError")
-          : translate("genericError")
+          : error instanceof Error && error.message === "COUNTRY_NOT_SELECTED"
+            ? translate("countryRequired")
+            : translate("genericError")
       );
     }
   });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 
@@ -22,14 +22,15 @@ export default function CountrySelectionScreen() {
     [countries, selectedCode]
   );
 
-  const loadCountries = async () => {
+  const loadCountries = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [availableCountries, detectedCode] = await Promise.all([fetchCountries(), detectCountryFromIp()]);
+      const availableCountries = await fetchCountries();
       setCountries(availableCountries);
-      setSuggestedCode(detectedCode);
+      const detectedCode = await detectCountryFromIp();
       const suggested = availableCountries.find((country) => country.code === detectedCode && country.is_enabled);
+      setSuggestedCode(suggested?.code ?? null);
       const firstEnabled = availableCountries.find((country) => country.is_enabled);
       setSelectedCode(suggested?.code ?? firstEnabled?.code ?? null);
     } catch {
@@ -37,11 +38,11 @@ export default function CountrySelectionScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void loadCountries();
-  }, []);
+  }, [loadCountries]);
 
   const continueWithCountry = async () => {
     if (!selectedCountry || saving) return;
@@ -71,6 +72,9 @@ export default function CountrySelectionScreen() {
             <UiText style={{ color: theme.colors.foreground }}>{error}</UiText>
             <Pressable onPress={() => void loadCountries()} accessibilityRole="button">
               <UiText style={[styles.retry, { color: theme.colors.foreground }]}>{translate("retry")}</UiText>
+            </Pressable>
+            <Pressable onPress={() => router.replace("/login")} accessibilityRole="button">
+              <UiText style={[styles.retry, { color: theme.colors.muted }]}>{translate("countrySelectionLogin")}</UiText>
             </Pressable>
           </View>
         ) : (
