@@ -64,6 +64,9 @@ describe("groupMerchantOrderRows", () => {
           commune: "البليدة",
           delivery_type: "home",
           created_at: "2026-11-07T10:00:00.000Z",
+          country_code: "DZ", currency_code: "DZD",
+          region: { name_ar: "البليدة", name_fr: null, name_en: null },
+          secondary_region: { name_ar: "البليدة", name_fr: null, name_en: null },
           wilaya: { id: 9, name_ar: "البليدة", name_fr: null }
         }
       })
