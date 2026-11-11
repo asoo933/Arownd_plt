@@ -10,7 +10,7 @@ import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-pr
 import { DeliveryProfileSchema, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
-import { getRegionDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
+import { getRegionDisplayName, getRegionLevelDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 
 type Picker = "region" | "secondary" | "commune" | null;
 
@@ -134,14 +134,14 @@ export default function DeliveryProfileScreen() {
       <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" />
       <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
       <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" />
-      <FormLabel>{regionOptions.data?.selectedLevel.label_ar ?? ""}</FormLabel>
-      <PressableSurface accessibilityLabel={regionOptions.data?.selectedLevel.label_ar ?? "Region"} onPress={() => setPicker("region")} style={pickerStyle}>
-        <UiText tone={selectedRegion ? "foreground" : "muted"}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data?.selectedLevel.label_ar ?? ""}</UiText>
+      <FormLabel>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</FormLabel>
+      <PressableSurface accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"} onPress={() => setPicker("region")} style={pickerStyle}>
+        <UiText tone={selectedRegion ? "foreground" : "muted"}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
       </PressableSurface>
       {regionOptions.data?.levels[1] ? <>
-        <FormLabel>{regionOptions.data.levels[1].label_ar}</FormLabel>
-        <PressableSurface accessibilityLabel={regionOptions.data.levels[1].label_ar} onPress={() => setPicker("secondary")} style={pickerStyle} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
-          <UiText tone={selectedSecondaryRegion ? "foreground" : "muted"}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : regionOptions.data.levels[1].label_ar}</UiText>
+        <FormLabel>{getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</FormLabel>
+        <PressableSurface accessibilityLabel={getRegionLevelDisplayName(regionOptions.data.levels[1], language)} onPress={() => setPicker("secondary")} style={pickerStyle} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
+          <UiText tone={selectedSecondaryRegion ? "foreground" : "muted"}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
         </PressableSurface>
         {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
       </> : null}
@@ -168,7 +168,7 @@ export default function DeliveryProfileScreen() {
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
       <View style={styles.backdrop}>
         <View accessibilityViewIsModal style={[styles.modalPanel, { backgroundColor: theme.colors.surface }]}>
-          <UiText weight="800" style={styles.modalTitle}>{picker === "region" ? (regionOptions.data?.selectedLevel.label_ar ?? "") : picker === "secondary" ? (secondaryOptions.data?.selectedLevel.label_ar ?? "") : translate("checkoutChooseCommune")}</UiText>
+          <UiText weight="800" style={styles.modalTitle}>{picker === "region" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : picker === "secondary" ? (secondaryOptions.data?.selectedLevel.label_ar ?? "") : translate("checkoutChooseCommune")}</UiText>
           {picker === "commune" && communes.isPending ? <Spinner size="small" /> : null}
           {picker === "secondary" && secondaryOptions.isPending ? <Spinner size="small" /> : null}
           {picker === "commune" && communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
