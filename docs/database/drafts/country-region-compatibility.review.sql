@@ -1609,3 +1609,61 @@ This review confirms that quote notification currency and merchant analytics
 currency presentation are app/database integration requirements, not merely
 region-column changes. No live objects were modified.
 */
+
+
+/*
+===============================================================================
+26. PHASE A — COUNTRY AND REGION CATALOG SECURITY / STRUCTURE REVIEW
+READ-ONLY LIVE CATALOG REVIEW — 2026-11-11
+===============================================================================
+
+A. countries
+- Columns: code PK text, name_ar/name_en, flag_emoji, currency_code,
+  currency_name_ar/currency_name_en, calling_code, is_enabled default false,
+  created_at/updated_at.
+- Checks enforce uppercase two-letter country code and uppercase three-letter
+  currency code. UNIQUE(code,currency_code) supports the composite order FK.
+- RLS enabled, not FORCE RLS. SELECT policy allows anon/authenticated with
+  USING(true). No INSERT/UPDATE/DELETE policies were found.
+- information_schema reports authenticated DML table grants, but RLS has no
+  matching write policies; do not treat table grants alone as authorization.
+  Keep country catalog writes administrative/service-only in effective access.
+
+B. country_regions
+- Columns: id bigint PK, country_code text NOT NULL, parent_id bigint nullable,
+  code text NOT NULL, name_ar text NOT NULL, name_fr/name_en nullable,
+  region_type text NOT NULL, legacy_wilaya_id integer nullable,
+  is_enabled boolean NOT NULL DEFAULT true, created_at timestamptz NOT NULL.
+- Constraints: country FK RESTRICT; unique (country_code,code) and
+  (country_code,id); composite self-FK (country_code,parent_id) RESTRICT;
+  legacy_wilaya_id FK to wilayas with RESTRICT and UNIQUE(legacy_wilaya_id);
+  non-empty code and region_type checks.
+- RLS enabled, not FORCE RLS. SELECT policy allows anon/authenticated only
+  where region is_enabled AND its country is_enabled.
+- Authenticated has table DML grants in information_schema, but there are no
+  INSERT/UPDATE/DELETE RLS policies. Preserve this effective read-only client
+  behavior; never add client write policies for region catalogs.
+- region_type is free text; the DB does not enforce each country's hierarchy
+  or that roots/children use the configured labels. This is currently enforced
+  by application helper logic and the location guard trigger, which is still
+  DZ-specific. Generic trigger/RPC validation must explicitly enforce the
+  configured primary type, root parent=NULL, allowed child types and required
+  vs optional child semantics per country.
+- The self-FK prevents cross-country parent links, but does not alone prevent
+  a root region from having a parent or a child from pointing to an invalid
+  region_type. Keep hierarchy checks in server-side validation.
+
+C. Legacy wilayas catalog
+- RLS enabled, not FORCE RLS; anon/authenticated SELECT policy is USING(true).
+- It remains the legacy source for checkout and several merchant/customer UI
+  screens. Do not remove it while the DZ app contract still references it.
+
+D. Design consequence
+- The generic region table is a country-scoped catalog, not yet a complete
+  country-specific administrative hierarchy constraint system.
+- A safe implementation needs one authoritative server-side hierarchy
+  contract used consistently by store creation, address/profile writes,
+  checkout, public browsing and order snapshots. Do not duplicate slightly
+  different region rules across triggers and RPCs.
+- No catalog rows, policies, grants or database objects were changed.
+*/
