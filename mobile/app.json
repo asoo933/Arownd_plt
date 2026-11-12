@@ -24,7 +24,13 @@
         }
       ],
       "./plugins/with-optional-camera-feature",
-      "expo-notifications"
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android/notification-icon.png",
+          "color": "#FDE72A"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -38,7 +44,9 @@
       "versionCode": 1,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/android/adaptive-foreground.png",
+        "backgroundImage": "./assets/android/adaptive-background.png",
+        "monochromeImage": "./assets/android/adaptive-monochrome.png",
         "backgroundColor": "#0A0A0A"
       }
     },
