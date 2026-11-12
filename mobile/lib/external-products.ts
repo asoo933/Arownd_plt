@@ -14,28 +14,32 @@ const ExternalProductsResponseSchema = z.object({
   })),
 });
 
+const SUPPORTED_MARKETS: Record<string, "ae" | "eg" | "ma"> = {
+  AE: "ae",
+  EG: "eg",
+  MA: "ma",
+};
+
 async function fetchMarketProducts(
-  country: "ae" | "eg" | "ma",
   language: "ar" | "en",
 ): Promise<ExternalProduct[]> {
   const { data, error } = await getSupabaseClient().functions.invoke("external-products", {
-    body: { country, language },
+    body: { language },
   });
 
   if (error) throw error;
   return ExternalProductsResponseSchema.parse(data).products;
 }
 
-export async function fetchExternalProducts(language: "ar" | "en"): Promise<ExternalProduct[]> {
-  const markets = await Promise.all([
-    fetchMarketProducts("ae", language),
-    fetchMarketProducts("eg", language),
-    fetchMarketProducts("ma", language),
-  ]);
-
-  const unique = new Map<string, ExternalProduct>();
-  for (const product of markets.flat()) {
-    if (!unique.has(product.id)) unique.set(product.id, product);
-  }
-  return [...unique.values()];
+/**
+ * External product sources are displayed only when the selected browsing
+ * country has a configured market. The Edge Function independently resolves
+ * the authenticated user's browsing country before querying a provider.
+ */
+export async function fetchExternalProducts(
+  language: "ar" | "en",
+  browsingCountryCode: string,
+): Promise<ExternalProduct[] | null> {
+  if (!SUPPORTED_MARKETS[browsingCountryCode]) return null;
+  return fetchMarketProducts(language);
 }
