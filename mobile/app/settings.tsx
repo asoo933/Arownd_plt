@@ -134,13 +134,7 @@ export default function SettingsScreen() {
             onPress={() => openSheet("language")}
             theme={theme}
             styles={styles}
-            last
           />
-        </Card>
-
-      <View style={styles.section}>
-        <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
-        <Card contentStyle={styles.sectionContent}>
           <SettingsRow
             icon="bell"
             label={translate("notificationsTitle")}
@@ -150,7 +144,6 @@ export default function SettingsScreen() {
             last
           />
         </Card>
-      </View>
       </View>
 
       <View style={styles.section}>
@@ -166,7 +159,6 @@ export default function SettingsScreen() {
           />
         </Card>
       </View>
-
 
       <View style={styles.section}>
         <Heading level={3}>{translate("settingsSupportSection")}</Heading>
