@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Image as NativeImage, Modal, StyleSheet, View } from "react-native";
 
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -32,6 +32,7 @@ export default function ProfileScreen() {
   const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [avatarPickerError, setAvatarPickerError] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const uploadAvatar = useMutation({
     mutationFn: uploadMyProfileAvatar,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-delivery-profile"] })
@@ -54,7 +55,7 @@ export default function ProfileScreen() {
         aspect: [1, 1],
         quality: 0.85
       });
-      if (!result.canceled && result.assets[0]) uploadAvatar.mutate(result.assets[0]);
+      if (!result.canceled && result.assets[0]) setSelectedAvatar(result.assets[0]);
     } catch {
       setAvatarPickerError(true);
     }
@@ -289,6 +290,57 @@ export default function ProfileScreen() {
           ) : null}
         </>
       )}
+      <Modal
+        visible={Boolean(selectedAvatar)}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedAvatar(null)}
+      >
+        <View style={[styles.avatarModalOverlay, { backgroundColor: theme.colors.overlay }]}>
+          <Card contentStyle={styles.avatarPreviewCard}>
+            <UiText weight="700">{translate("profileAvatarPreviewTitle")}</UiText>
+            <Caption>{translate("profileAvatarPreviewHint")}</Caption>
+            {selectedAvatar ? (
+              <NativeImage
+                source={{ uri: selectedAvatar.uri }}
+                resizeMode="cover"
+                style={styles.avatarPreviewImage}
+              />
+            ) : null}
+            {uploadAvatar.isError ? <Caption>{translate("profileAvatarError")}</Caption> : null}
+            <Button
+              label={translate("profileAvatarConfirm")}
+              onPress={() => {
+                if (selectedAvatar) {
+                  uploadAvatar.mutate(selectedAvatar, {
+                    onSuccess: () => setSelectedAvatar(null)
+                  });
+                }
+              }}
+              loading={uploadAvatar.isPending}
+              disabled={!selectedAvatar || removeAvatar.isPending}
+              fullWidth
+            />
+            <Button
+              label={translate("profileAvatarChooseAgain")}
+              variant="outline"
+              onPress={() => {
+                setSelectedAvatar(null);
+                void chooseAvatar();
+              }}
+              disabled={uploadAvatar.isPending}
+              fullWidth
+            />
+            <Button
+              label={translate("profileAvatarCancel")}
+              variant="outline"
+              onPress={() => setSelectedAvatar(null)}
+              disabled={uploadAvatar.isPending}
+              fullWidth
+            />
+          </Card>
+        </View>
+      </Modal>
     </CustomerScreen>
   );
 }
@@ -296,6 +348,9 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   headerActions: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   identityCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  avatarModalOverlay: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg },
+  avatarPreviewCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md, alignItems: "center" },
+  avatarPreviewImage: { width: 220, height: 220, borderRadius: 110, backgroundColor: "transparent" },
   identityRow: { flexDirection: "row" },
   accountLinks: { gap: designTokens.spacing.sm },
   accountLinkOuter: { width: "100%" },
