@@ -11,6 +11,7 @@ import {
   Button,
   Caption,
   Card,
+  Text as UiText,
   Icon,
   IconButton,
   IdentityRow,
@@ -150,11 +151,6 @@ export default function ProfileScreen() {
               accessibilityLabel={translate("profileSettings")}
               onPress={() => router.push("/settings")}
             />
-            <IconButton
-              icon={<Icon name="bell" size={20} />}
-              accessibilityLabel={translate("notificationsTitle")}
-              onPress={() => router.push("/notifications")}
-            />
           </View>
         }
       />
@@ -199,6 +195,29 @@ export default function ProfileScreen() {
               </View>
             ) : null}
           </Card>
+
+          <View style={styles.accountLinks}>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={translate("profileEditDetails")} onPress={() => router.push("/delivery-profile")} style={styles.accountLinkOuter}>
+              <Card contentStyle={styles.accountLinkCard}>
+                <View style={styles.accountLinkIcon}><Icon name="user" size={20} color={theme.colors.accent} /></View>
+                <View style={styles.accountLinkText}>
+                  <UiText weight="700">{translate("profileEditDetails")}</UiText>
+                  <Caption>{translate("profileEditDetailsHint")}</Caption>
+                </View>
+                <Icon name="chevron-left" size={18} color={theme.colors.subtle} />
+              </Card>
+            </PressableSurface>
+            <PressableSurface accessibilityRole="button" accessibilityLabel={translate("profileAddresses")} onPress={() => router.push("/addresses")} style={styles.accountLinkOuter}>
+              <Card contentStyle={styles.accountLinkCard}>
+                <View style={styles.accountLinkIcon}><Icon name="map-pin" size={20} color={theme.colors.accent} /></View>
+                <View style={styles.accountLinkText}>
+                  <UiText weight="700">{translate("profileAddresses")}</UiText>
+                  <Caption>{translate("profileAddressesHint")}</Caption>
+                </View>
+                <Icon name="chevron-left" size={18} color={theme.colors.subtle} />
+              </Card>
+            </PressableSurface>
+          </View>
 
           <View style={styles.stats}>
             <PressableSurface
@@ -278,6 +297,11 @@ const styles = StyleSheet.create({
   headerActions: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   identityCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
   identityRow: { flexDirection: "row" },
+  accountLinks: { gap: designTokens.spacing.sm },
+  accountLinkOuter: { width: "100%" },
+  accountLinkCard: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md },
+  accountLinkIcon: { width: 42, height: 42, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.04)" },
+  accountLinkText: { flex: 1, minWidth: 0, gap: 2 },
   phoneRow: {
     flexDirection: "row",
     alignItems: "center",
