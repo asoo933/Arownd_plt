@@ -3,23 +3,27 @@ import { describe, expect, it } from "vitest";
 import { formatInviteCode, normalizeInviteCode } from "./invite-code";
 
 describe("Arownd invite codes", () => {
-  it("normalizes formatted modern codes", () => {
-    expect(normalizeInviteCode("ARW-2345-6789-ABCD")).toBe("23456789ABCD");
+  it("normalizes lowercase invite codes", () => {
+    expect(normalizeInviteCode("ar-invite-km-4821")).toBe("AR-INVITE-KM-4821");
   });
 
-  it("keeps legacy hexadecimal codes valid", () => {
-    expect(normalizeInviteCode("ARW-0123-ABCD-4567-EF89")).toBe("0123ABCD4567EF89");
+  it("formats valid codes without changing the standard format", () => {
+    expect(formatInviteCode("AR-INVITE-KM-4821")).toBe("AR-INVITE-KM-4821");
   });
 
-  it("formats modern codes with a short brand prefix", () => {
-    expect(formatInviteCode("23456789ABCD")).toBe("ARW-2345-6789-ABCD");
+  it("rejects codes with an invalid prefix", () => {
+    expect(normalizeInviteCode("ARW-KM-4821")).toBeNull();
   });
 
-  it("formats legacy codes without changing their value", () => {
-    expect(formatInviteCode("0123ABCDEF4567EF")).toBe("ARW-0123-ABCD-EF45-67EF");
+  it("rejects codes with the wrong letter count", () => {
+    expect(normalizeInviteCode("AR-INVITE-K-4821")).toBeNull();
   });
 
-  it("rejects malformed codes", () => {
-    expect(normalizeInviteCode("ARW-0000-1111-OOOO")).toBeNull();
+  it("rejects codes with the wrong digit count", () => {
+    expect(normalizeInviteCode("AR-INVITE-KM-482")).toBeNull();
+  });
+
+  it("rejects non-numeric suffixes", () => {
+    expect(normalizeInviteCode("AR-INVITE-KM-48AB")).toBeNull();
   });
 });
