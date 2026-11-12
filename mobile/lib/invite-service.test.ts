@@ -8,7 +8,7 @@ describe("Arownd invite codes", () => {
   });
 
   it("keeps legacy hexadecimal codes valid", () => {
-    expect(normalizeInviteCode("ARW-0123-ABCD-4567-EF89")).toBe("0123ABCDEF4567EF89");
+    expect(normalizeInviteCode("ARW-0123-ABCD-4567-EF89")).toBe("0123ABCD4567EF89");
   });
 
   it("formats modern codes with a short brand prefix", () => {
