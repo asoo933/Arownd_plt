@@ -199,7 +199,7 @@ export default function ProfileScreen() {
           <View style={styles.accountLinks}>
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("profileEditDetails")} onPress={() => router.push("/delivery-profile")} style={styles.accountLinkOuter}>
               <Card contentStyle={styles.accountLinkCard}>
-                <View style={styles.accountLinkIcon}><Icon name="user" size={20} color={theme.colors.accent} /></View>
+                <View style={[styles.accountLinkIcon, { backgroundColor: theme.colors.surfaceSecondary }]}><Icon name="user" size={20} color={theme.colors.accent} /></View>
                 <View style={styles.accountLinkText}>
                   <UiText weight="700">{translate("profileEditDetails")}</UiText>
                   <Caption>{translate("profileEditDetailsHint")}</Caption>
@@ -209,7 +209,7 @@ export default function ProfileScreen() {
             </PressableSurface>
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("profileAddresses")} onPress={() => router.push("/addresses")} style={styles.accountLinkOuter}>
               <Card contentStyle={styles.accountLinkCard}>
-                <View style={styles.accountLinkIcon}><Icon name="map-pin" size={20} color={theme.colors.accent} /></View>
+                <View style={[styles.accountLinkIcon, { backgroundColor: theme.colors.surfaceSecondary }]}><Icon name="map-pin" size={20} color={theme.colors.accent} /></View>
                 <View style={styles.accountLinkText}>
                   <UiText weight="700">{translate("profileAddresses")}</UiText>
                   <Caption>{translate("profileAddressesHint")}</Caption>
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   accountLinks: { gap: designTokens.spacing.sm },
   accountLinkOuter: { width: "100%" },
   accountLinkCard: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md, padding: designTokens.spacing.md },
-  accountLinkIcon: { width: 42, height: 42, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.04)" },
+  accountLinkIcon: { width: 42, height: 42, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
   accountLinkText: { flex: 1, minWidth: 0, gap: 2 },
   phoneRow: {
     flexDirection: "row",
