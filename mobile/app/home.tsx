@@ -15,7 +15,7 @@ import {
   SectionTitle
 } from "@/components/customer-ui";
 import { fetchFeaturedStores, fetchHomeProducts, fetchProductDetails, fetchProductOffers, fetchStoreDetails, fetchStoreOffers, formatMarketPrice, getPrimaryImage } from "@/lib/catalog";
-import { fetchBrowsingCurrencyCode } from "@/lib/country-service";
+import { fetchBrowsingCurrencyCode, fetchMyBrowsingCountryCode } from "@/lib/country-service";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -28,11 +28,15 @@ export default function CustomerHomeScreen() {
   const theme = useAppTheme();
   const queryClient = useQueryClient();
   const browsingCurrency = useQuery({ queryKey: ["browsing-country-currency"], queryFn: fetchBrowsingCurrencyCode, staleTime: 60_000 });
+  const browsingCountry = useQuery({ queryKey: ["browsing-country-code"], queryFn: fetchMyBrowsingCountryCode, staleTime: 60_000 });
   const products = useQuery({ queryKey: ["customer-home-products"], queryFn: fetchHomeProducts, staleTime: 60_000 });
   const stores = useQuery({ queryKey: ["customer-featured-stores"], queryFn: fetchFeaturedStores, staleTime: 120_000 });
   const externalProducts = useQuery({
-    queryKey: ["external-products", "noon-jumia", language],
-    queryFn: () => fetchExternalProducts(language),
+    queryKey: ["external-products", "noon-jumia", browsingCountry.data ?? "unresolved", language],
+    queryFn: () => browsingCountry.data
+      ? fetchExternalProducts(language, browsingCountry.data)
+      : Promise.resolve(null),
+    enabled: Boolean(browsingCountry.data),
     staleTime: 15 * 60_000,
     retry: 1,
   });
@@ -60,8 +64,8 @@ export default function CustomerHomeScreen() {
 
   return (
     <CustomerScreen
-      refreshing={stores.isFetching || products.isFetching || externalProducts.isFetching}
-      onRefresh={() => { void Promise.all([stores.refetch(), products.refetch(), externalProducts.refetch()]); }}
+      refreshing={stores.isFetching || products.isFetching || externalProducts.isFetching || browsingCountry.isFetching}
+      onRefresh={() => { void Promise.all([stores.refetch(), products.refetch(), externalProducts.refetch(), browsingCountry.refetch()]); }}
     >
       <View style={styles.header}>
         <Logo color={theme.colors.foreground} width={148} />
@@ -147,7 +151,7 @@ export default function CustomerHomeScreen() {
           </ScrollView>
         )}
       </View>
-      <ExternalProductsSection products={externalProducts.data ?? []} />
+      <ExternalProductsSection products={externalProducts.data ?? null} />
     </CustomerScreen>
   );
 }
