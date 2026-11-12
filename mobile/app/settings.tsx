@@ -17,7 +17,6 @@ import {
   Icon,
   PressableSurface,
   SegmentedControl,
-  Surface,
   Text as UiText,
   TextField,
   type IconName
@@ -372,24 +371,6 @@ function SettingsRow({
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={detailStyles.row}>
-      <Caption>{label}</Caption>
-      <UiText weight="700">{value}</UiText>
-    </View>
-  );
-}
-
-const detailStyles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: designTokens.spacing.md
-  }
-});
-
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
     backButton: {
@@ -449,17 +430,6 @@ function createStyles(theme: AppTheme) {
     },
     sheetContent: {
       gap: designTokens.spacing.md
-    },
-    sheetGroup: {
-      gap: designTokens.spacing.md,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.surfaceMuted
-    },
-    addressSummaryHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between"
     },
     languageOption: {
       minHeight: designTokens.dimensions.controlHeight.lg,
