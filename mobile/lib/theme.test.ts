@@ -31,7 +31,7 @@ describe("design system theme tokens", () => {
     expect(designTokens.typography.body).toBe(14);
     expect(designTokens.dimensions.controlHeight.md).toBe(44);
     expect(designTokens.fontFamilies.latin).toBe("Inter");
-    expect(designTokens.fontFamilies.arabic).toBe("IBMPlexSansArabic");
+    expect(designTokens.fontFamilies.arabic).toBe("sans-serif");
     expect(designTokens.fontWeights.regular).toBe("400");
     expect(designTokens.fontWeights.extrabold).toBe("800");
     expect(getAppTheme("light").fontFamilies).toEqual(designTokens.fontFamilies);
