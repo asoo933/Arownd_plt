@@ -1,6 +1,7 @@
 import * as Linking from "expo-linking";
 
 import { getSelectedCountryCode, syncSelectedCountryCodeFromProfile } from "@/lib/country-service";
+import { clearPendingInviteCode, getPendingInviteCode } from "@/lib/invite-service";
 
 import { getSupabaseClient } from "@/lib/supabase";
 import type {
@@ -26,6 +27,7 @@ export async function signUpPersonal(input: PersonalSignupInput): Promise<boolea
   const countryCode = await getSelectedCountryCode();
   if (!countryCode) throw new Error("COUNTRY_NOT_SELECTED");
 
+  const inviteCode = await getPendingInviteCode();
   const redirectTo = Linking.createURL("auth/callback", {
     scheme: "com.arownd.app"
   });
@@ -38,12 +40,14 @@ export async function signUpPersonal(input: PersonalSignupInput): Promise<boolea
       data: {
         full_name: input.fullName.trim(),
         account_type: "personal",
-        country_code: countryCode
+        country_code: countryCode,
+        ...(inviteCode ? { invite_code: inviteCode } : {})
       }
     }
   });
 
   if (error) throw error;
+  await clearPendingInviteCode().catch(() => undefined);
   return data.session !== null;
 }
 
@@ -51,6 +55,7 @@ export async function signUpBusiness(input: BusinessSignupInput): Promise<boolea
   const countryCode = await getSelectedCountryCode();
   if (!countryCode) throw new Error("COUNTRY_NOT_SELECTED");
 
+  const inviteCode = await getPendingInviteCode();
   const redirectTo = Linking.createURL("auth/callback", {
     scheme: "com.arownd.app"
   });
@@ -64,12 +69,14 @@ export async function signUpBusiness(input: BusinessSignupInput): Promise<boolea
         full_name: input.fullName.trim(),
         account_type: "merchant",
         country_code: countryCode,
-        business_name: input.businessName.trim()
+        business_name: input.businessName.trim(),
+        ...(inviteCode ? { invite_code: inviteCode } : {})
       }
     }
   });
 
   if (error) throw error;
+  await clearPendingInviteCode().catch(() => undefined);
   return data.session !== null;
 }
 
