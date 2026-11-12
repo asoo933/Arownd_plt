@@ -158,6 +158,6 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     ownMessage: { alignSelf: "flex-end", borderBottomRightRadius: 4 },
     teamMessage: { alignSelf: "flex-start", borderBottomLeftRadius: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
     composer: { gap: designTokens.spacing.sm, paddingTop: designTokens.spacing.md },
-    input: { minHeight: 88, maxHeight: 160, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, color: theme.colors.foreground, backgroundColor: theme.colors.surface, textAlign: "auto", fontFamily: "IBMPlexSansArabic" }
+    input: { minHeight: 88, maxHeight: 160, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, color: theme.colors.foreground, backgroundColor: theme.colors.surface, textAlign: "auto", fontFamily: theme.fontFamilies.arabic }
   });
 }
