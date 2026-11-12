@@ -18,6 +18,52 @@ type NoonProduct = {
 
 type JumiaProduct = NoonProduct;
 
+const PROVIDER_MARKETS: Record<string, "ae" | "eg" | "ma"> = {
+  AE: "ae",
+  EG: "eg",
+  MA: "ma",
+};
+
+async function resolveAuthenticatedBrowsingCountry(req: Request): Promise<string | null> {
+  const authorization = req.headers.get("Authorization");
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!authorization?.startsWith("Bearer ") || !supabaseUrl || !anonKey) return null;
+
+  const authResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: { apikey: anonKey, Authorization: authorization },
+  });
+  if (!authResponse.ok) return null;
+
+  const user: unknown = await authResponse.json().catch(() => null);
+  if (typeof user !== "object" || user === null || typeof (user as { id?: unknown }).id !== "string") return null;
+  const userId = (user as { id: string }).id;
+
+  const profileUrl = new URL("/rest/v1/profiles", supabaseUrl);
+  profileUrl.searchParams.set("user_id", `eq.${userId}`);
+  profileUrl.searchParams.set("select", "browsing_country_code");
+  const profileResponse = await fetch(profileUrl, {
+    headers: { apikey: anonKey, Authorization: authorization },
+  });
+  if (!profileResponse.ok) return null;
+
+  const profiles: unknown = await profileResponse.json().catch(() => null);
+  if (!Array.isArray(profiles) || profiles.length !== 1) return null;
+  const countryCode = profiles[0]?.browsing_country_code;
+  if (typeof countryCode !== "string" || !/^[A-Z]{2}$/.test(countryCode)) return null;
+
+  const countryUrl = new URL("/rest/v1/countries", supabaseUrl);
+  countryUrl.searchParams.set("code", `eq.${countryCode}`);
+  countryUrl.searchParams.set("is_enabled", "eq.true");
+  countryUrl.searchParams.set("select", "code");
+  const countryResponse = await fetch(countryUrl, {
+    headers: { apikey: anonKey, Authorization: authorization },
+  });
+  if (!countryResponse.ok) return null;
+
+  const enabledCountries: unknown = await countryResponse.json().catch(() => null);
+  return Array.isArray(enabledCountries) && enabledCountries.length === 1 ? countryCode : null;
+}
 
 function isHttpsUrl(value: unknown, allowedHosts: string[]): value is string {
   if (typeof value !== "string") return false;
@@ -113,13 +159,22 @@ Deno.serve(async (req: Request) => {
       return Response.json({ error: "Invalid request" }, { status: 400, headers: corsHeaders });
     }
 
-    const country = (payload as { country?: unknown }).country;
     const language = (payload as { language?: unknown }).language;
-    if (country !== "ae" && country !== "eg" && country !== "ma") {
-      return Response.json({ error: "Unsupported market" }, { status: 400, headers: corsHeaders });
-    }
     if (language !== "ar" && language !== "en") {
       return Response.json({ error: "Unsupported language" }, { status: 400, headers: corsHeaders });
+    }
+
+    if (!req.headers.get("Authorization")?.startsWith("Bearer ")) {
+      return Response.json({ error: "Unauthorized" }, { status: 401, headers: corsHeaders });
+    }
+
+    const browsingCountryCode = await resolveAuthenticatedBrowsingCountry(req);
+    if (!browsingCountryCode) {
+      return Response.json({ error: "Browsing market is unavailable" }, { status: 403, headers: corsHeaders });
+    }
+    const country = PROVIDER_MARKETS[browsingCountryCode];
+    if (!country) {
+      return Response.json({ products: [] }, { headers: corsHeaders });
     }
 
     const apiKey = Deno.env.get("REEFAPI_API_KEY");
@@ -188,7 +243,7 @@ Deno.serve(async (req: Request) => {
         .map((item) => normalizeJumiaProduct(item as JumiaProduct))
         .filter((item): item is NonNullable<typeof item> => item !== null)
       : result.data.results
-        .map((item) => normalizeNoonProduct(item as NoonProduct, country))
+        .map((item) => normalizeNoonProduct(item as NoonProduct, country as "ae" | "eg"))
         .filter((item): item is NonNullable<typeof item> => item !== null);
 
     return Response.json({ products }, { headers: corsHeaders });
