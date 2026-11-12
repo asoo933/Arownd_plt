@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatInviteCode, normalizeInviteCode } from "./invite-service";
+import { formatInviteCode, normalizeInviteCode } from "./invite-code";
 
 describe("Arownd invite codes", () => {
   it("normalizes formatted modern codes", () => {
