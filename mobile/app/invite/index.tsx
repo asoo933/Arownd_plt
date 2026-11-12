@@ -18,7 +18,7 @@ import {
 } from "@/components/ui";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { fetchMyInviteOverview } from "@/lib/arownd-invite";
-import { formatInviteCode } from "@/lib/invite-service";
+import { formatInviteCode } from "@/lib/invite-code";
 import { getProfileInitial } from "@/lib/profile-state";
 import { translate, useLanguage } from "@/lib/i18n";
 
