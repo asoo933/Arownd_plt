@@ -75,7 +75,9 @@ function ExternalProductCard({ product }: { product: ExternalProduct }) {
   );
 }
 
-export function ExternalProductsSection({ products }: { products: ExternalProduct[] }) {
+export function ExternalProductsSection({ products }: { products: ExternalProduct[] | null }) {
+  if (products === null) return null;
+
   return (
     <View>
       <SectionTitle title={translate("homeExternalProducts")} subtitle={translate("homeExternalProductsSubtitle")} />
