@@ -25,12 +25,10 @@ import {
 import { translate, useLanguage } from "@/lib/i18n";
 import { resetPasswordSchema } from "@/lib/auth-validation";
 import { getSupabaseClient } from "@/lib/supabase";
-import { fetchMyDeliveryProfile } from "@/lib/delivery-profile";
-import { fetchMyAddresses } from "@/lib/user-address";
 import { unregisterCurrentPushDevice } from "@/lib/push-notifications";
 import { fetchCountries, fetchMyBrowsingCountryCode, updateBrowsingCountryCode, type Country } from "@/lib/country-service";
 
-type SettingsSheet = "delivery" | "addresses" | "password" | "appearance" | "language" | "country" | null;
+type SettingsSheet = "password" | "appearance" | "language" | "country" | null;
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
@@ -47,17 +45,6 @@ export default function SettingsScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState(false);
   const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
-
-  const deliveryProfile = useQuery({
-    queryKey: ["my-delivery-profile"],
-    queryFn: fetchMyDeliveryProfile,
-    enabled: activeSheet === "delivery"
-  });
-  const addresses = useQuery({
-    queryKey: ["my-addresses"],
-    queryFn: fetchMyAddresses,
-    enabled: activeSheet === "addresses"
-  });
 
   const countries = useQuery({ queryKey: ["available-countries"], queryFn: fetchCountries, enabled: activeSheet === "country" });
   const browsingCountry = useQuery({ queryKey: ["browsing-country"], queryFn: fetchMyBrowsingCountryCode });
@@ -124,27 +111,6 @@ export default function SettingsScreen() {
       </PressableSurface>
       <AppHeader title={translate("settingsTitle")} />
       <Caption>{translate("settingsSubtitle")}</Caption>
-
-      <View style={styles.section}>
-        <Heading level={3}>{translate("settingsSecurityTitle")}</Heading>
-        <Card contentStyle={styles.sectionContent}>
-          <SettingsRow
-            icon="user"
-            label={translate("settingsAccountCustomize")}
-            onPress={() => openSheet("delivery")}
-            theme={theme}
-            styles={styles}
-          />
-          <SettingsRow
-            icon="map-pin"
-            label={translate("profileAddresses")}
-            onPress={() => openSheet("addresses")}
-            theme={theme}
-            styles={styles}
-            last
-          />
-        </Card>
-      </View>
 
       <View style={styles.section}>
         <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
@@ -242,72 +208,6 @@ export default function SettingsScreen() {
         style={styles.signOutButton}
       />
       {signOutError ? <UiText tone="danger">{translate("settingsSignOutError")}</UiText> : null}
-
-      <BottomSheet visible={activeSheet === "delivery"} onRequestClose={closeSheet}>
-        <Heading level={3}>{translate("profileEditDetails")}</Heading>
-        {deliveryProfile.isPending ? (
-          <Caption>{translate("stateLoading")}</Caption>
-        ) : deliveryProfile.isError ? (
-          <UiText tone="danger">{translate("deliveryProfileLoadError")}</UiText>
-        ) : deliveryProfile.data ? (
-          <View style={styles.sheetContent}>
-            <Surface elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
-              <DetailRow label={translate("fullNamePlaceholder")} value={deliveryProfile.data.full_name || "—"} />
-              <DetailRow label={translate("checkoutPhonePlaceholder")} value={deliveryProfile.data.phone || "—"} />
-            </Surface>
-            <Surface elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
-              <DetailRow label={translate("checkoutWilaya")} value={deliveryProfile.data.region_id ? String(deliveryProfile.data.region_id) : "—"} />
-              <DetailRow label={translate("checkoutCommune")} value={deliveryProfile.data.commune || "—"} />
-            </Surface>
-          </View>
-        ) : (
-          <Caption>{translate("deliveryProfileSubtitle")}</Caption>
-        )}
-        <Button
-          label={translate("deliveryProfileManage")}
-          onPress={() => {
-            closeSheet();
-            router.push("/delivery-profile");
-          }}
-          fullWidth
-        />
-      </BottomSheet>
-
-      <BottomSheet visible={activeSheet === "addresses"} onRequestClose={closeSheet}>
-        <Heading level={3}>{translate("addressesTitle")}</Heading>
-        {addresses.isPending ? (
-          <Caption>{translate("stateLoading")}</Caption>
-        ) : addresses.isError ? (
-          <UiText tone="danger">{translate("addressesLoadError")}</UiText>
-        ) : addresses.data.length === 0 ? (
-          <Caption>{translate("addressesEmptyHint")}</Caption>
-        ) : (
-          <View style={styles.sheetContent}>
-            {addresses.data.map((address) => (
-              <Surface key={address.id} elevated={false} padding={designTokens.spacing.md} radius="md" style={styles.sheetGroup}>
-                <View style={styles.addressSummaryHeader}>
-                  <UiText weight="700">
-                    {translate(address.label === "home" ? "addressesHome" : address.label === "work" ? "addressesWork" : "addressesOther")}
-                  </UiText>
-                  {address.is_default ? <Icon name="circle-check" size={17} color={theme.colors.success} /> : null}
-                </View>
-                <DetailRow label={translate("fullNamePlaceholder")} value={address.recipient_name} />
-                <DetailRow label={translate("checkoutPhonePlaceholder")} value={address.phone} />
-                <DetailRow label={translate("checkoutCommune")} value={address.commune} />
-                <DetailRow label={translate("addressesStreet")} value={address.address_line} />
-              </Surface>
-            ))}
-          </View>
-        )}
-        <Button
-          label={translate("profileAddresses")}
-          onPress={() => {
-            closeSheet();
-            router.push("/addresses");
-          }}
-          fullWidth
-        />
-      </BottomSheet>
 
       <BottomSheet visible={activeSheet === "password"} onRequestClose={closeSheet}>
         <Heading level={3}>{translate("settingsPasswordChangeTitle")}</Heading>
