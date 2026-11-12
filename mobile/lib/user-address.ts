@@ -31,7 +31,7 @@ export async function fetchMyAddresses(): Promise<UserAddress[]> {
   const userId = await getCurrentUserId();
   const { data, error } = await client
     .from("user_addresses")
-    .select("id, user_id, label, recipient_name, phone, country_code, region_id, secondary_region_id, region:country_regions!user_addresses_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!user_addresses_secondary_region_fkey(name_ar, name_fr, name_en), commune, address_line, additional_info, is_default, created_at, updated_at")
+    .select("id, user_id, label, recipient_name, phone, country_code, region_id, secondary_region_id, region:country_regions!user_addresses_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!user_addresses_country_secondary_region_fkey(name_ar, name_fr, name_en), commune, address_line, additional_info, is_default, created_at, updated_at")
     .eq("user_id", userId)
     .order("is_default", { ascending: false })
     .order("created_at", { ascending: false });
@@ -59,7 +59,7 @@ export async function createMyAddress(input: UserAddressInput): Promise<UserAddr
       user_id: userId,
       is_default: false
     })
-    .select("id, user_id, label, recipient_name, phone, country_code, region_id, secondary_region_id, region:country_regions!user_addresses_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!user_addresses_secondary_region_fkey(name_ar, name_fr, name_en), commune, address_line, additional_info, is_default, created_at, updated_at")
+    .select("id, user_id, label, recipient_name, phone, country_code, region_id, secondary_region_id, region:country_regions!user_addresses_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!user_addresses_country_secondary_region_fkey(name_ar, name_fr, name_en), commune, address_line, additional_info, is_default, created_at, updated_at")
     .single();
   if (error) throw error;
   return UserAddressRecordSchema.parse(data);
@@ -86,7 +86,7 @@ export async function updateMyAddress(addressId: string, input: UserAddressInput
     })
     .eq("id", addressId)
     .eq("user_id", userId)
-    .select("id, user_id, label, recipient_name, phone, country_code, region_id, secondary_region_id, region:country_regions!user_addresses_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!user_addresses_secondary_region_fkey(name_ar, name_fr, name_en), commune, address_line, additional_info, is_default, created_at, updated_at")
+    .select("id, user_id, label, recipient_name, phone, country_code, region_id, secondary_region_id, region:country_regions!user_addresses_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!user_addresses_country_secondary_region_fkey(name_ar, name_fr, name_en), commune, address_line, additional_info, is_default, created_at, updated_at")
     .single();
   if (error) throw error;
   return UserAddressRecordSchema.parse(data);
