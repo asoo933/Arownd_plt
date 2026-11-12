@@ -137,6 +137,20 @@ export default function SettingsScreen() {
             last
           />
         </Card>
+
+      <View style={styles.section}>
+        <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="bell"
+            label={translate("notificationsTitle")}
+            onPress={() => router.push("/notifications")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
       </View>
 
       <View style={styles.section}>
@@ -153,19 +167,6 @@ export default function SettingsScreen() {
         </Card>
       </View>
 
-      <View style={styles.section}>
-        <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
-        <Card contentStyle={styles.sectionContent}>
-          <SettingsRow
-            icon="bell"
-            label={translate("notificationsTitle")}
-            onPress={() => router.push("/notifications")}
-            theme={theme}
-            styles={styles}
-            last
-          />
-        </Card>
-      </View>
 
       <View style={styles.section}>
         <Heading level={3}>{translate("settingsSupportSection")}</Heading>
