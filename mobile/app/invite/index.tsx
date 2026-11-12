@@ -90,7 +90,7 @@ export default function InviteScreen() {
               <Heading level={1} style={styles.count}>{String(invite.data.total)}</Heading>
             </View>
             <View style={styles.summaryIcon}>
-              <Icon name="users" size={22} color={theme.colors.accentForeground} />
+              <Icon name="user" size={22} color={theme.colors.accentForeground} />
             </View>
           </View>
 
@@ -101,7 +101,7 @@ export default function InviteScreen() {
               label={translate("inviteShareCode")}
               variant="outline"
               fullWidth
-              startIcon={<Icon name="share-2" size={17} />}
+              startIcon={<Icon name="share" size={17} />}
               onPress={() => {
                 void share(`${translate("inviteShareCodeMessage")}\n${formatInviteCode(invite.data.code)}\n${inviteLink}`);
               }}
@@ -114,7 +114,7 @@ export default function InviteScreen() {
               <View style={styles.linkCopy}>
                 <UiText numberOfLines={2} style={styles.linkText}>{inviteLink}</UiText>
               </View>
-              <Icon name="link" size={18} color={theme.colors.muted} />
+              <Icon name="share" size={18} color={theme.colors.muted} />
             </View>
             <Button
               label={translate("inviteShare")}
@@ -133,7 +133,7 @@ export default function InviteScreen() {
 
           {invite.data.referrals.length === 0 ? (
             <View style={styles.emptyState}>
-              <Icon name="user-plus" size={22} color={theme.colors.subtle} />
+              <Icon name="user" size={22} color={theme.colors.subtle} />
               <UiText weight="600">{translate("inviteEmpty")}</UiText>
               <Caption>{translate("inviteEmptyHint")}</Caption>
             </View>
@@ -152,7 +152,7 @@ export default function InviteScreen() {
                       <UiText weight="600" numberOfLines={1}>{displayName}</UiText>
                       <Caption>{formatDate(item.createdAt)}</Caption>
                     </View>
-                    <Icon name="check-circle-2" size={18} color={theme.colors.success} />
+                    <Icon name="circle-check" size={18} color={theme.colors.success} />
                   </View>
                 );
               })}
