@@ -10,12 +10,6 @@ import {
   Inter_700Bold,
   Inter_800ExtraBold
 } from "@expo-google-fonts/inter";
-import {
-  IBMPlexSansArabic_400Regular,
-  IBMPlexSansArabic_500Medium,
-  IBMPlexSansArabic_600SemiBold,
-  IBMPlexSansArabic_700Bold
-} from "@expo-google-fonts/ibm-plex-sans-arabic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ActivityIndicator, Alert, Platform, StyleSheet, View } from "react-native";
 import { useEffect, useState } from "react";
@@ -53,15 +47,6 @@ function RootLayoutContent() {
         { path: Inter_600SemiBold, weight: 600 },
         { path: Inter_700Bold, weight: 700 },
         { path: Inter_800ExtraBold, weight: 800 }
-      ]
-    },
-    {
-      fontFamily: "IBMPlexSansArabic",
-      fontDefinitions: [
-        { path: IBMPlexSansArabic_400Regular, weight: 400 },
-        { path: IBMPlexSansArabic_500Medium, weight: 500 },
-        { path: IBMPlexSansArabic_600SemiBold, weight: 600 },
-        { path: IBMPlexSansArabic_700Bold, weight: 700 }
       ]
     }
   ]);
