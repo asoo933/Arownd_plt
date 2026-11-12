@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "doctor": "npx expo-doctor",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
     "@expo-google-fonts/ibm-plex-sans-arabic": "^0.4.2",
