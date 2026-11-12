@@ -220,7 +220,7 @@ export default function ProfileScreen() {
             </PressableSurface>
             <PressableSurface accessibilityRole="button" accessibilityLabel={translate("profileInvite")} onPress={() => router.push("/invite")} style={styles.accountLinkOuter}>
               <Card contentStyle={styles.accountLinkCard}>
-                <View style={[styles.accountLinkIcon, { backgroundColor: theme.colors.surfaceSecondary }]}><Icon name="users" size={20} color={theme.colors.accent} /></View>
+                <View style={[styles.accountLinkIcon, { backgroundColor: theme.colors.surfaceSecondary }]}><Icon name="user" size={20} color={theme.colors.accent} /></View>
                 <View style={styles.accountLinkText}>
                   <UiText weight="700">{translate("profileInvite")}</UiText>
                   <Caption>{translate("profileInviteHint")}</Caption>
