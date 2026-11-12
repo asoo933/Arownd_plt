@@ -1,6 +1,6 @@
 export const fontFamilies = {
   latin: "Inter",
-  arabic: "IBMPlexSansArabic"
+  arabic: "sans-serif"
 } as const;
 
 export const typography = {
