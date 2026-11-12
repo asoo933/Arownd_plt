@@ -112,34 +112,6 @@ export default function SettingsScreen() {
       <Caption>{translate("settingsSubtitle")}</Caption>
 
       <View style={styles.section}>
-        <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
-        <Card contentStyle={styles.sectionContent}>
-          <SettingsRow
-            icon="bell"
-            label={translate("notificationsTitle")}
-            onPress={() => router.push("/notifications")}
-            theme={theme}
-            styles={styles}
-            last
-          />
-        </Card>
-      </View>
-
-      <View style={styles.section}>
-        <Heading level={3}>{translate("settingsSupportSection")}</Heading>
-        <Card contentStyle={styles.sectionContent}>
-          <SettingsRow
-            icon="info"
-            label={translate("settingsSupportTitle")}
-            onPress={() => router.push("/support")}
-            theme={theme}
-            styles={styles}
-            last
-          />
-        </Card>
-      </View>
-
-      <View style={styles.section}>
         <Heading level={3}>{translate("settingsPreferencesTitle")}</Heading>
         <Card contentStyle={styles.sectionContent}>
           <SettingsRow
@@ -182,8 +154,29 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Heading level={3}>{translate("settingsAboutSection")}</Heading>
+        <Heading level={3}>{translate("settingsNotificationsTitle")}</Heading>
         <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="bell"
+            label={translate("notificationsTitle")}
+            onPress={() => router.push("/notifications")}
+            theme={theme}
+            styles={styles}
+            last
+          />
+        </Card>
+      </View>
+
+      <View style={styles.section}>
+        <Heading level={3}>{translate("settingsSupportSection")}</Heading>
+        <Card contentStyle={styles.sectionContent}>
+          <SettingsRow
+            icon="info"
+            label={translate("settingsSupportTitle")}
+            onPress={() => router.push("/support")}
+            theme={theme}
+            styles={styles}
+          />
           <SettingsRow
             icon="info"
             label={translate("settingsAboutTitle")}
