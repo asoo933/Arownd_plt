@@ -21,6 +21,7 @@ describe("getCustomerTab", () => {
     expect(getCustomerTab("/notifications")).toBe("profile");
     expect(getCustomerTab("/my-reviews")).toBe("profile");
     expect(getCustomerTab("/delivery-profile")).toBe("profile");
+    expect(getCustomerTab("/invite")).toBe("profile");
     expect(getCustomerTab("/settings")).toBe("profile");
   });
 
