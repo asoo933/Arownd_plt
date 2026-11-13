@@ -101,7 +101,7 @@ export function ProductTile({ name, store, price, imageUrl, onPress, style }: {
       contentStyle={styles.productContent}
     >
       <UiText numberOfLines={2} weight="700" style={styles.productName}>{name}</UiText>
-      <Caption numberOfLines={1}>{store}</Caption>
+      {store.trim().length > 0 ? <Caption numberOfLines={1}>{store}</Caption> : null}
       <PriceDisplay value={price} />
     </ProductCard>
   );
