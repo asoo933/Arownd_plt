@@ -1,10 +1,10 @@
 const { withAndroidManifest } = require("@expo/config-plugins");
 
 /**
- * Keep the camera optional for devices that do not have camera hardware.
- * expo-image-picker removes the CAMERA permission when cameraPermission is
- * disabled; Android Lint still requires the corresponding optional feature
- * declaration for Play/ChromeOS device filtering.
+ * Harden the generated Android manifest for distributable builds.
+ *
+ * Development builds remain unchanged so Metro can use the local dev server.
+ * Release controls are applied to both EAS preview and production profiles.
  */
 module.exports = function withOptionalCameraFeature(config) {
   return withAndroidManifest(config, (config) => {
@@ -14,11 +14,23 @@ module.exports = function withOptionalCameraFeature(config) {
       throw new Error("Android manifest is missing its application element.");
     }
 
-    // Release and preview builds must never permit cleartext HTTP traffic.
-    // Leave local development builds untouched so Metro can use the dev server.
     const buildProfile = process.env.EAS_BUILD_PROFILE;
-    if (buildProfile === "preview" || buildProfile === "production") {
+    const isDistributableBuild =
+      buildProfile === "preview" || buildProfile === "production";
+
+    if (isDistributableBuild) {
       application.$ = application.$ ?? {};
+
+      // Do not allow app data to be included in Android backup/transfer flows.
+      // SecureStore's own backup exclusions remain configured by its Expo plugin.
+      application.$["android:allowBackup"] = "false";
+
+      // The release Gradle variant should already set this. Keep the manifest
+      // explicit so an unexpected build configuration cannot produce a
+      // debuggable distributable package.
+      application.$["android:debuggable"] = "false";
+
+      // Block cleartext HTTP traffic in preview and production APK/AAB builds.
       application.$["android:usesCleartextTraffic"] = "false";
     }
 
