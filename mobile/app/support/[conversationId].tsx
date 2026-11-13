@@ -91,7 +91,7 @@ export default function SupportConversationScreen() {
   }
   if (!auth.data || !conversation.data) {
     return <CustomerScreen showNavigation={false}>
-      <AppHeader title={translate("supportConversationTitle")} />
+      <SupportHeader title={translate("supportConversationTitle")} theme={theme} styles={styles} />
       <EmptyState icon="message-circle" title={translate("supportNotFound")} hint={translate("supportNotFoundHint")} />
     </CustomerScreen>;
   }
