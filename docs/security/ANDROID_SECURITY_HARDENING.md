@@ -8,7 +8,7 @@ This document records the Android-native hardening currently applied to the Expo
 
 The config plugin at `mobile/plugins/with-optional-camera-feature.js` applies the following manifest attributes when `EAS_BUILD_PROFILE` is `preview` or `production`:
 
-- `android:allowBackup="false"`: disables Android app-data backup for distributable builds.
+- `android:allowBackup="false"`: disables the standard Android app-data backup path for distributable builds. Device-to-device transfer behavior can vary by Android version and manufacturer, so this is not represented as a universal data-transfer block.
 - `android:debuggable="false"`: explicitly marks distributable builds as non-debuggable.
 - `android:usesCleartextTraffic="false"`: blocks cleartext HTTP traffic in distributable builds.
 
