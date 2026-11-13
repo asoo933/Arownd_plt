@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { assertActionRateLimit } from "@/lib/action-rate-limit";
 
 export { getOrderStatusTone, getOrderTrackingSteps } from "@/lib/orders-state";
 
@@ -144,6 +145,7 @@ export async function fetchCustomerOrderDetails(orderId: string): Promise<{
 
 /** Customer accepts or declines a merchant's shipping quote through the guarded RPC. */
 export async function respondToMerchantQuote(merchantOrderId: string, accept: boolean): Promise<void> {
+  assertActionRateLimit("order:quote-response:" + merchantOrderId, 2_000);
   const client = getSupabaseClient();
   const call = client.rpc.bind(client) as unknown as (
     functionName: string,
@@ -158,6 +160,7 @@ export async function respondToMerchantQuote(merchantOrderId: string, accept: bo
 
 /** Cancel a pending store suborder; authorization and stock restoration are server-side. */
 export async function cancelMyMerchantOrder(merchantOrderId: string): Promise<void> {
+  assertActionRateLimit("order:cancel-merchant:" + merchantOrderId, 2_000);
   const { error } = await getSupabaseClient().rpc("cancel_my_merchant_order", {
     _merchant_order_id: merchantOrderId
   });
@@ -166,6 +169,7 @@ export async function cancelMyMerchantOrder(merchantOrderId: string): Promise<vo
 
 /** Cancel a legacy single-store order while it is still pending. */
 export async function cancelMyOrder(orderId: string): Promise<void> {
+  assertActionRateLimit("order:cancel:" + orderId, 2_000);
   const { error } = await getSupabaseClient().rpc("cancel_my_order", {
     _order_id: orderId
   });
