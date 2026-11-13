@@ -122,7 +122,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
               fontFamily: language === "ar" ? theme.fontFamilies.arabic : theme.fontFamilies.latin
             },
             style,
-            secureTextEntry ? styles.textInputWithPasswordToggle : null
+            secureTextEntry ? (language === "ar" ? styles.textInputWithPasswordToggleRtl : styles.textInputWithPasswordToggleLtr) : null
           ]}
         />
         {secureTextEntry ? (
@@ -133,7 +133,7 @@ export function TextField({ label, error, style, containerStyle, accessibilityLa
             disabled={!editable}
             hitSlop={10}
             onPress={() => setPasswordVisible((visible) => !visible)}
-            style={styles.passwordVisibilityToggle}
+            style={language === "ar" ? styles.passwordVisibilityToggleRtl : styles.passwordVisibilityToggleLtr}
           >
             <UiIcon
               name={passwordVisible ? "eye-off" : "eye"}
@@ -206,12 +206,14 @@ export function QuantityStepper({
 const styles = StyleSheet.create({
   field: { gap: designTokens.spacing.xs },
   inputContainer: { position: "relative", justifyContent: "center" },
-  floatingLabel: { position: "absolute", zIndex: 1, start: designTokens.spacing.lg, top: designTokens.spacing.lg, maxWidth: "82%", paddingHorizontal: 3 },
+  floatingLabel: { position: "absolute", zIndex: 1, start: designTokens.spacing.lg, top: designTokens.spacing.lg, maxWidth: "72%", paddingHorizontal: 3 },
   fieldLabel: { fontSize: designTokens.typography.caption + 2, fontWeight: designTokens.fontWeights.bold, textAlign: "auto" },
   textInput: { minHeight: designTokens.dimensions.controlHeight.lg, borderWidth: 1, borderRadius: designTokens.radius.lg - 3, paddingHorizontal: designTokens.spacing.lg, fontSize: designTokens.typography.body },
   textInputWithLabel: { paddingTop: designTokens.spacing.lg + 2 },
-  textInputWithPasswordToggle: { paddingEnd: designTokens.spacing.xxl + designTokens.spacing.md },
-  passwordVisibilityToggle: { position: "absolute", end: designTokens.spacing.md, minWidth: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" },
+  textInputWithPasswordToggleRtl: { paddingLeft: designTokens.spacing.xxl + designTokens.spacing.md },
+  textInputWithPasswordToggleLtr: { paddingRight: designTokens.spacing.xxl + designTokens.spacing.md },
+  passwordVisibilityToggleRtl: { position: "absolute", left: designTokens.spacing.md, minWidth: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" },
+  passwordVisibilityToggleLtr: { position: "absolute", right: designTokens.spacing.md, minWidth: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, alignItems: "center", justifyContent: "center" },
   fieldError: { fontSize: designTokens.typography.caption, textAlign: "auto" },
   stepper: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   stepButton: { width: designTokens.dimensions.controlHeight.md, height: designTokens.dimensions.controlHeight.md, borderWidth: 1, borderRadius: designTokens.radius.md, alignItems: "center", justifyContent: "center" },
