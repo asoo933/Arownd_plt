@@ -7,6 +7,7 @@ import { router } from "expo-router";
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
+  BadgeText,
   Button,
   Caption,
   Card,
@@ -127,7 +128,7 @@ export default function InviteScreen() {
 
           <View style={styles.historyHeader}>
             <Heading level={3}>{translate("inviteHistoryTitle")}</Heading>
-            <UiText weight="700" style={styles.historyCount}>{String(invite.data.total)}</UiText>
+            <BadgeText tone="accent">{String(invite.data.total)}</BadgeText>
           </View>
 
           {invite.data.referrals.length === 0 ? (
@@ -208,7 +209,6 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     linkCopy: { flex: 1, minWidth: 0 },
     linkText: { color: theme.colors.muted, fontSize: theme.typography.caption, writingDirection: "ltr", textAlign: "left" },
     historyHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-    historyCount: { color: theme.colors.accentMuted, fontSize: theme.typography.subtitle },
     inviteeList: { gap: 0 },
     inviteeRow: {
       minHeight: 68,
