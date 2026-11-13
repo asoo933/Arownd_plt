@@ -17,7 +17,7 @@ const SupportMessageSchema = z.object({
   id: z.string().uuid(),
   conversation_id: z.string().uuid(),
   sender_id: z.string().uuid(),
-  sender_role: z.enum(["customer", "admin"]),
+  sender_role: z.enum(["customer", "support"]),
   message: z.string(),
   created_at: z.string()
 });
