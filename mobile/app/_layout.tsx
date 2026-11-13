@@ -20,7 +20,7 @@ import { CartFlyOverlay } from "@/components/cart-fly-overlay";
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
 import { listenForPushTokenChanges, registerDeviceForPushNotifications } from "@/lib/push-notifications";
-import { markNotificationRead } from "@/lib/notifications";
+import { markNotificationRead } from "@/lib/notifications";\nimport { getPushNotificationDestination } from "@/lib/notifications-state";
 import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
 
 const SPLASH_DURATION_MS = 2500;
@@ -130,22 +130,12 @@ function RootLayoutContent() {
       if (lastHandledResponseId === responseId) return;
       lastHandledResponseId = responseId;
       const data = response.notification.request.content.data ?? {};
-      if (typeof data.notification_id === "string") {
+      if (typeof data.notification_id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.notification_id)) {
         void markNotificationRead(data.notification_id).catch((error: unknown) => {
           console.warn("[push-notifications] Could not mark the notification as read.");
         });
       }
-      const merchantOrderId = typeof data.url === "string"
-        ? data.url.match(/^\/studio\/orders\/([^/?#]+)/)?.[1]
-        : undefined;
-      const destination = merchantOrderId
-        ? "/merchant/orders/" + encodeURIComponent(merchantOrderId)
-        : typeof data.url === "string" && data.url.startsWith("/") && !data.url.startsWith("//")
-          ? data.url
-          : typeof data.order_id === "string" && data.order_id.length > 0
-            ? "/orders/" + encodeURIComponent(data.order_id)
-            : null;
-      if (destination) router.push(destination as never);
+      const destination = getPushNotificationDestination(data);\n      if (destination) router.push(destination as never);
     };
 
     const subscription = Notifications.addNotificationResponseReceivedListener(openNotificationDestination);
