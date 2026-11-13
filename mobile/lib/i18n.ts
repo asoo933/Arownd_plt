@@ -423,6 +423,8 @@ export const messages = {
     settingsPreferencesTitle: "التفضيلات",
     settingsBrowsingCountry: "دولة التصفح",
     settingsBrowsingCountryHint: "ستتغير المتاجر والمنتجات والأسعار والعملة المعروضة حسب الدولة المختارة، دون تغيير دولة حسابك الأصلية.",
+    settingsBrowsingCountryImpact: "يتغير نطاق المتاجر والمنتجات المتاحة والأسعار والعملة المستخدمة في التصفح فقط؛ بلد حسابك وبياناته لا تتغير.",
+    settingsCountrySearch: "ابحث عن دولة أو عملة...",
     settingsCountryLoadError: "تعذر تحميل الدول المتاحة.",
     settingsCountrySaveError: "تعذر تغيير دولة التصفح. حاول مجددًا.",
     signupAccountCountry: "دولة إنشاء الحساب",
@@ -1318,6 +1320,8 @@ export const messages = {
     settingsPreferencesTitle: "Preferences",
     settingsBrowsingCountry: "Browsing country",
     settingsBrowsingCountryHint: "The selected country changes the stores, products, displayed prices, and browsing currency. Your account country stays unchanged.",
+    settingsBrowsingCountryImpact: "Only the browsing market changes: available stores, products, displayed prices, and currency. Your account country and account details remain unchanged.",
+    settingsCountrySearch: "Search countries or currencies...",
     settingsCountryLoadError: "Could not load available countries.",
     settingsCountrySaveError: "Could not change the browsing country. Try again.",
     signupAccountCountry: "Account creation country",
@@ -1804,7 +1808,6 @@ export type TranslationKey = keyof typeof messages.ar;
 type LanguageContextValue = {
   language: Language;
   isReady: boolean;
-  restartNoticeVersion: number;
   setLanguage: (language: Language) => Promise<void>;
 };
 
@@ -1817,7 +1820,6 @@ function isLanguage(value: string | null): value is Language {
 export function LanguageProvider({ children }: PropsWithChildren) {
   const [language, setLanguageState] = useState<Language>("ar");
   const [isReady, setIsReady] = useState(false);
-  const [restartNoticeVersion, setRestartNoticeVersion] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -1856,8 +1858,8 @@ export function LanguageProvider({ children }: PropsWithChildren) {
   }, [language]);
 
   const value = useMemo(
-    () => ({ language, isReady, restartNoticeVersion, setLanguage }),
-    [language, isReady, restartNoticeVersion, setLanguage]
+    () => ({ language, isReady, setLanguage }),
+    [language, isReady, setLanguage]
   );
 
   return createElement(LanguageContext.Provider, { value }, children);
