@@ -295,6 +295,11 @@ export const messages = {
     deliveryProfileSingleAddressNote: "هذه البيانات الافتراضية الوحيدة في ملفك حاليًا؛ لا يدعم النظام بعد حفظ عدة عناوين أو عنوان شارع دائم.",
     deliveryProfileDefaultAreaNote: "تُستخدم المنطقة الإدارية والمنطقة المحلية كبيانات افتراضية عند عدم اختيار عنوان محفوظ. لإدارة عناوين الشارع المتعددة، استخدم دفتر العناوين.",
     deliveryProfileValidationError: "تحقق من الاسم ورقم الهاتف والمناطق الإدارية المطلوبة والمنطقة المحلية قبل الحفظ.",
+    deliveryProfileNameError: "أدخل اسماً صحيحاً يتكون من حرفين على الأقل.",
+    deliveryProfilePhoneError: "أدخل رقم هاتف صحيحاً مع رمز الدولة.",
+    deliveryProfileRegionError: "اختر الولاية.",
+    deliveryProfileSecondaryRegionError: "اختر الدائرة.",
+    deliveryProfileCommuneError: "أدخل المنطقة المحلية أو اخترها."
     checkoutTitle: "إتمام الشراء",
     checkoutSubtitle: "أدخل بيانات الاستلام وراجع طلبك قبل التأكيد.",
     checkoutSavedAddresses: "عناوينك المحفوظة",
@@ -1178,6 +1183,11 @@ export const messages = {
     deliveryProfileSingleAddressNote: "Your profile currently supports one default area only; multiple saved addresses and a permanent street address are not supported yet.",
     deliveryProfileDefaultAreaNote: "Your administrative region and local area are used as fallback details when no saved address is selected. Manage multiple street addresses in your address book.",
     deliveryProfileValidationError: "Check the name, phone number, required administrative regions, and local area before saving.",
+    deliveryProfileNameError: "Enter a valid name with at least two characters.",
+    deliveryProfilePhoneError: "Enter a valid phone number with country code.",
+    deliveryProfileRegionError: "Choose a region.",
+    deliveryProfileSecondaryRegionError: "Choose a secondary region.",
+    deliveryProfileCommuneError: "Enter or choose a local area."
     checkoutTitle: "Checkout",
     checkoutSubtitle: "Enter your delivery details and review your order before confirming.",
     checkoutSavedAddresses: "Your saved addresses",
