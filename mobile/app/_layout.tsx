@@ -20,7 +20,8 @@ import { CartFlyOverlay } from "@/components/cart-fly-overlay";
 import { ThemeProvider, useAppTheme, useThemePreference } from "@/lib/design-system";
 import { getSupabaseClient } from "@/lib/supabase";
 import { listenForPushTokenChanges, registerDeviceForPushNotifications } from "@/lib/push-notifications";
-import { markNotificationRead } from "@/lib/notifications";\nimport { getPushNotificationDestination } from "@/lib/notifications-state";
+import { markNotificationRead } from "@/lib/notifications";
+import { getPushNotificationDestination } from "@/lib/notifications-state";
 import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
 
 const SPLASH_DURATION_MS = 2500;
@@ -99,7 +100,7 @@ function RootLayoutContent() {
             if (Platform.OS === "android" && !pushTokenSubscription) {
               pushTokenSubscription = listenForPushTokenChanges();
             }
-            void registerDeviceForPushNotifications(language).catch((error: unknown) => {
+            void registerDeviceForPushNotifications(language).catch(() => {
               console.warn("[push-notifications] Device registration failed.");
             });
           });
@@ -131,17 +132,18 @@ function RootLayoutContent() {
       lastHandledResponseId = responseId;
       const data = response.notification.request.content.data ?? {};
       if (typeof data.notification_id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.notification_id)) {
-        void markNotificationRead(data.notification_id).catch((error: unknown) => {
+        void markNotificationRead(data.notification_id).catch(() => {
           console.warn("[push-notifications] Could not mark the notification as read.");
         });
       }
-      const destination = getPushNotificationDestination(data);\n      if (destination) router.push(destination as never);
+      const destination = getPushNotificationDestination(data);
+      if (destination) router.push(destination as never);
     };
 
     const subscription = Notifications.addNotificationResponseReceivedListener(openNotificationDestination);
     void Notifications.getLastNotificationResponseAsync().then((response) => {
       if (response) openNotificationDestination(response);
-    }).catch((error: unknown) => {
+    }).catch(() => {
       console.warn("[push-notifications] Could not read the launch notification.");
     });
 
