@@ -1,9 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
+import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { Button, Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import { fetchMySupportConversations } from "@/lib/support";
 import { getSupabaseClient } from "@/lib/supabase";
