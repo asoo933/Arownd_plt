@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -13,6 +13,8 @@ import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { getRegionDisplayName, getRegionLevelDisplayName, normalizePhoneForCallingCode } from "@/lib/country-regions";
 
 type Picker = "region" | "secondary" | "commune" | null;
+type DeliveryProfileField = "full_name" | "phone" | "region_id" | "secondary_region_id" | "commune";
+const deliveryProfileFieldOrder: DeliveryProfileField[] = ["full_name", "phone", "region_id", "secondary_region_id", "commune"];
 
 export default function DeliveryProfileScreen() {
   const { language } = useLanguage();
@@ -26,6 +28,9 @@ export default function DeliveryProfileScreen() {
   const [commune, setCommune] = useState("");
   const [picker, setPicker] = useState<Picker>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<DeliveryProfileField, string>>>({});
+  const scrollRef = useRef<ScrollView | null>(null);
+  const fieldRefs = useRef<Partial<Record<DeliveryProfileField, View | null>>>({});
   const [initialized, setInitialized] = useState(false);
 
   const profile = useQuery({
@@ -49,6 +54,7 @@ export default function DeliveryProfileScreen() {
     secondaryRegionId !== (profile.data?.secondary_region_id ?? null) ||
     commune !== (profile.data?.commune ?? "")
   );
+  const firstErrorField = deliveryProfileFieldOrder.find((field) => Boolean(fieldErrors[field])) ?? null;
   const mutation = useMutation({
     mutationFn: saveMyDeliveryProfile,
     onSuccess: async () => {
@@ -58,6 +64,21 @@ export default function DeliveryProfileScreen() {
     },
     onError: () => setFormError(translate("deliveryProfileSaveError"))
   });
+
+  useEffect(() => {
+    if (!firstErrorField) return;
+    const frame = requestAnimationFrame(() => {
+      const field = fieldRefs.current[firstErrorField];
+      const scroll = scrollRef.current;
+      if (!field || !scroll) return;
+      field.measureLayout(
+        scroll,
+        (_x, y) => scroll.scrollTo({ y: Math.max(0, y - designTokens.spacing.lg), animated: true }),
+        () => undefined
+      );
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [firstErrorField]);
 
   useEffect(() => {
     if (!mutation.isSuccess) return;
@@ -105,63 +126,95 @@ export default function DeliveryProfileScreen() {
       ? (secondaryOptions.data?.regions ?? []).map((item) => ({ id: String(item.id), label: getRegionDisplayName(item, language) }))
       : (communes.data ?? []).map((item) => ({ id: item, label: item }));
 
-  const clearSaveFeedback = () => {
+  const clearSaveFeedback = (field?: DeliveryProfileField) => {
     setFormError(null);
     mutation.reset();
+    if (field) setFieldErrors((current) => ({ ...current, [field]: undefined }));
+    else setFieldErrors({});
   };
 
   const submit = () => {
     setFormError(null);
-    if (regionId === null || (regionOptions.data?.levels[1]?.is_required && secondaryRegionId === null)) {
-      setFormError(translate("deliveryProfileValidationError"));
-      return;
+    const nextErrors: Partial<Record<DeliveryProfileField, string>> = {};
+    if (fullName.trim().length < 2 || fullName.trim().length > 120) {
+      nextErrors.full_name = translate("deliveryProfileNameError");
     }
-    let normalizedPhone: string;
+
+    let normalizedPhone = "";
     try {
       normalizedPhone = normalizePhoneForCallingCode(phone, regionOptions.data?.callingCode ?? "");
     } catch {
-      setFormError(translate("deliveryProfileValidationError"));
-      return;
+      nextErrors.phone = translate("deliveryProfilePhoneError");
     }
+
+    if (regionId === null) nextErrors.region_id = translate("deliveryProfileRegionError");
+    if (regionOptions.data?.levels[1]?.is_required && secondaryRegionId === null) {
+      nextErrors.secondary_region_id = translate("deliveryProfileSecondaryRegionError");
+    }
+    if (commune.trim().length < 2 || commune.trim().length > 100) {
+      nextErrors.commune = translate("deliveryProfileCommuneError");
+    }
+
     const input: DeliveryProfileInput = {
       full_name: fullName.trim(),
       phone: normalizedPhone,
-      region_id: regionId,
+      region_id: regionId ?? 0,
       secondary_region_id: secondaryRegionId,
       commune: commune.trim()
     };
     const parsed = DeliveryProfileSchema.safeParse(input);
     if (!parsed.success) {
-      setFormError(translate("deliveryProfileValidationError"));
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0];
+        if (field === "full_name" && !nextErrors.full_name) nextErrors.full_name = translate("deliveryProfileNameError");
+        if (field === "phone" && !nextErrors.phone) nextErrors.phone = translate("deliveryProfilePhoneError");
+        if (field === "region_id" && !nextErrors.region_id) nextErrors.region_id = translate("deliveryProfileRegionError");
+        if (field === "secondary_region_id" && regionOptions.data?.levels[1]?.is_required && !nextErrors.secondary_region_id) nextErrors.secondary_region_id = translate("deliveryProfileSecondaryRegionError");
+        if (field === "commune" && !nextErrors.commune) nextErrors.commune = translate("deliveryProfileCommuneError");
+      }
+    }
+
+    if (Object.keys(nextErrors).length > 0 || !parsed.success) {
+      setFieldErrors(nextErrors);
       return;
     }
+    setFieldErrors({});
     mutation.mutate(parsed.data);
   };
 
-  return <CustomerScreen footer={<View style={styles.stickyFooter}>
+  return <CustomerScreen scrollRef={scrollRef} footer={<View style={styles.stickyFooter}>
     {mutation.isSuccess ? <View accessibilityRole="alert" style={styles.snackbar}><Icon name="check-circle" size={18} color={theme.colors.success} /><UiText tone="success" weight="700">{translate("deliveryProfileSaved")}</UiText></View> : null}
     <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} disabled={!hasChanges || mutation.isPending} fullWidth />
   </View>}>
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />} />
     <Caption>{translate("deliveryProfileSubtitle")}</Caption>
     <Card style={styles.panel} contentStyle={{ gap: designTokens.spacing.md, padding: designTokens.spacing.lg }}>
-      <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
-      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
-      <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
-      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" writingDirection="ltr" />
+      <View ref={(node) => { fieldRefs.current.full_name = node; }}>
+        <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
+        <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback("full_name"); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" error={fieldErrors.full_name} />
+      </View>
+      <View ref={(node) => { fieldRefs.current.phone = node; }}>
+        <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
+        <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback("phone"); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" writingDirection="ltr" error={fieldErrors.phone} />
+      </View>
+      <View ref={(node) => { fieldRefs.current.region_id = node; }}>
       <FormLabel>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</FormLabel>
       <PressableSurface accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"} onPress={() => setPicker("region")} style={[pickerStyle, styles.pickerRow]}>
         <UiText tone={selectedRegion ? "foreground" : "muted"}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
         <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
       </PressableSurface>
-      {regionOptions.data?.levels[1] ? <>
+      {fieldErrors.region_id ? <UiText tone="danger" accessibilityRole="alert">{fieldErrors.region_id}</UiText> : null}
+      </View>
+      {regionOptions.data?.levels[1] ? <View ref={(node) => { fieldRefs.current.secondary_region_id = node; }}>
         <FormLabel>{getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</FormLabel>
         <PressableSurface accessibilityLabel={getRegionLevelDisplayName(regionOptions.data.levels[1], language)} onPress={() => setPicker("secondary")} style={[pickerStyle, styles.pickerRow, (regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0) && styles.disabled]} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
           <UiText tone={selectedSecondaryRegion ? "foreground" : "muted"}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
           <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
         </PressableSurface>
+        {fieldErrors.secondary_region_id ? <UiText tone="danger" accessibilityRole="alert">{fieldErrors.secondary_region_id}</UiText> : null}
         {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
-      </> : null}
+      </View> : null}
+      <View ref={(node) => { fieldRefs.current.commune = node; }}>
       <FormLabel>{translate("checkoutCommune")}</FormLabel>
       {(communes.data?.length ?? 0) > 0 ? (
         <PressableSurface accessibilityLabel={translate("checkoutCommune")} onPress={() => setPicker("commune")} style={[pickerStyle, styles.pickerRow, !regionId && styles.disabled]} disabled={!regionId}>
@@ -172,15 +225,18 @@ export default function DeliveryProfileScreen() {
         <TextField
           accessibilityLabel={translate("checkoutCommune")}
           value={commune}
-          onChangeText={(value) => { setCommune(value); clearSaveFeedback(); }}
+          onChangeText={(value) => { setCommune(value); clearSaveFeedback("commune"); }}
           editable={regionId !== null}
           maxLength={100}
           placeholder={translate("checkoutCommunePlaceholder")}
           style={[...fieldStyle, regionId === null && styles.disabled]}
           textAlign="right"
+          error={fieldErrors.commune}
         />
       )}
+      {(communes.data?.length ?? 0) > 0 && fieldErrors.commune ? <UiText tone="danger" accessibilityRole="alert">{fieldErrors.commune}</UiText> : null}
       {communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
+      </View>
       {formError ? <UiText tone="danger">{formError}</UiText> : null}
     </Card>
     <Caption>{translate("deliveryProfileDefaultAreaNote")}</Caption>
@@ -197,13 +253,14 @@ export default function DeliveryProfileScreen() {
                 setRegionId(Number(item.id));
                 setSecondaryRegionId(null);
                 setCommune("");
-                clearSaveFeedback();
+                clearSaveFeedback("region_id");
+                setFieldErrors((current) => ({ ...current, secondary_region_id: undefined, commune: undefined }));
               } else if (picker === "secondary") {
                 setSecondaryRegionId(Number(item.id));
-                clearSaveFeedback();
+                clearSaveFeedback("secondary_region_id");
               } else if (picker === "commune") {
                 setCommune(item.label);
-                clearSaveFeedback();
+                clearSaveFeedback("commune");
               }
               setPicker(null);
             }} style={styles.option}>
