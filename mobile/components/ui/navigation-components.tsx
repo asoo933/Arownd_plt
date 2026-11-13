@@ -172,7 +172,7 @@ function NavigationTab({
         style={{
           color: selected ? (theme.mode === "dark" ? theme.colors.accent : theme.colors.accentForeground) : theme.colors.muted,
           fontSize: theme.typography.caption,
-          fontWeight: selected ? theme.fontWeights.bold : theme.fontWeights.regular,
+          fontWeight: theme.fontWeights.medium,
           flexShrink: 1
         }}
       >
