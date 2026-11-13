@@ -12,7 +12,8 @@ export default defineConfig({
       "@": mobileRoot,
       "react-native": resolve(mobileRoot, "test/react-native.ts"),
       "react-native-url-polyfill/auto": resolve(mobileRoot, "test/url-polyfill.ts"),
-      "@react-native-async-storage/async-storage": resolve(mobileRoot, "test/async-storage.ts")
+      "@react-native-async-storage/async-storage": resolve(mobileRoot, "test/async-storage.ts"),
+      "expo-secure-store": resolve(mobileRoot, "test/secure-store.ts")
     }
   },
   test: {
