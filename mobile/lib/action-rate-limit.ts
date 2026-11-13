@@ -1,4 +1,4 @@
-const lastAttemptAt = new Map<string, number>();
+const lastAttemptAt = new Map<string, { attemptedAt: number; cooldownMs: number }>();
 
 export class ActionRateLimitError extends Error {
   readonly code = "ACTION_RATE_LIMITED";
@@ -24,17 +24,17 @@ export function assertActionRateLimit(
 
   const previousAttempt = lastAttemptAt.get(key);
   if (previousAttempt !== undefined) {
-    const elapsed = now - previousAttempt;
-    if (elapsed >= 0 && elapsed < cooldownMs) {
-      throw new ActionRateLimitError(cooldownMs - elapsed);
+    const elapsed = now - previousAttempt.attemptedAt;
+    if (elapsed >= 0 && elapsed < previousAttempt.cooldownMs) {
+      throw new ActionRateLimitError(previousAttempt.cooldownMs - elapsed);
     }
   }
 
-  lastAttemptAt.set(key, now);
+  lastAttemptAt.set(key, { attemptedAt: now, cooldownMs });
 
   if (lastAttemptAt.size > 1_000) {
-    for (const [entryKey, timestamp] of lastAttemptAt) {
-      if (now - timestamp >= cooldownMs) lastAttemptAt.delete(entryKey);
+    for (const [entryKey, entry] of lastAttemptAt) {
+      if (now - entry.attemptedAt >= entry.cooldownMs) lastAttemptAt.delete(entryKey);
     }
   }
 }
