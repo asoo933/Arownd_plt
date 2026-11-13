@@ -19,3 +19,20 @@ export function getNotificationDestination(item: AppNotification): string | null
   }
   return null;
 }
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export function getPushNotificationDestination(data: Record<string, unknown>): string | null {
+  const notificationUrl = typeof data.url === "string" ? data.url : "";
+  const merchantOrderId = notificationUrl.match(/^\\/studio\\/orders\\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1];
+  if (merchantOrderId) return "/merchant/orders/" + merchantOrderId;
+
+  const supportConversationId = notificationUrl.match(/^\\/support\\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1];
+  if (supportConversationId) return "/support/" + supportConversationId;
+
+  const orderId = data.order_id;
+  if (typeof orderId === "string" && UUID_PATTERN.test(orderId)) {
+    return "/orders/" + orderId;
+  }
+  return null;
+}
