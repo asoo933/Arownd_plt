@@ -515,7 +515,7 @@ function getPasswordStrength(value: string): number {
   return [
     value.length >= 8,
     /[a-z]/.test(value) && /[A-Z]/.test(value),
-    /\\d/.test(value),
+    /\d/.test(value),
     /[^A-Za-z0-9]/.test(value)
   ].filter(Boolean).length;
 }
