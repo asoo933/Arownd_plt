@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { Avatar, Icon, PressableSurface, Skeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
+import { Avatar, Icon, IconButton, PressableSurface, Skeleton, ProductCardSkeleton, Text as UiText } from "@/components/ui";
 import Logo from "@/components/logo";
 import { ExternalProductsSection } from "@/components/external-product-card";
 import { fetchExternalProducts } from "@/lib/external-products";
@@ -70,14 +70,12 @@ export default function CustomerHomeScreen() {
       <View style={styles.header}>
         <Logo color={theme.colors.foreground} width={148} />
         <View style={styles.headerActions}>
-          <PressableSurface
-            accessibilityRole="button"
+          <IconButton
             accessibilityLabel={translate("notificationsTitle")}
             onPress={() => router.push("/notifications")}
+            icon={<Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />}
             style={[styles.headerIconButton, { backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface, borderWidth: theme.mode === "light" ? 0 : 1, borderColor: theme.colors.border }]}
-          >
-            <Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />
-          </PressableSurface>
+          />
         </View>
       </View>
 
