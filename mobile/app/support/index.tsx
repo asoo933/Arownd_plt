@@ -59,7 +59,10 @@ export default function SupportScreen() {
 
 
   if (auth.isPending || (auth.data && conversations.isPending)) {
-    return <CustomerScreen showNavigation={false}><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
+    return <CustomerScreen showNavigation={false}>
+      <SupportHeader title={translate("supportTitle")} theme={theme} styles={styles} />
+      <LoadingState label={translate("stateLoading")} />
+    </CustomerScreen>;
   }
   if (auth.isError || conversations.isError) {
     return <CustomerScreen showNavigation={false}>
