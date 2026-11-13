@@ -57,7 +57,13 @@ function RootLayoutContent() {
         defaultOptions: {
           queries: {
             staleTime: 30_000,
-            retry: 1,
+            retry: (failureCount, error) => {
+              const status = typeof error === "object" && error !== null && "status" in error
+                ? error.status
+                : undefined;
+              if (status === 429) return false;
+              return failureCount < 1;
+            },
             refetchOnWindowFocus: false
           }
         }
