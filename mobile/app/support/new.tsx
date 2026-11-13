@@ -17,9 +17,6 @@ export default function NewSupportConversationScreen() {
   const [message, setMessage] = useState("");
   const [submitError, setSubmitError] = useState(false);
 
-  const parsed = supportConversationInputSchema.safeParse({ subject, message });
-  const canSubmit = parsed.success && !createMutationPending;
-
   const createMutation = useMutation({
     mutationFn: () => createSupportConversation(subject, message),
     onSuccess: async (conversationId) => {
@@ -29,6 +26,7 @@ export default function NewSupportConversationScreen() {
     onError: () => setSubmitError(true)
   });
   const createMutationPending = createMutation.isPending;
+  const canSubmit = supportConversationInputSchema.safeParse({ subject, message }).success && !createMutationPending;
 
   return (
     <CustomerScreen
