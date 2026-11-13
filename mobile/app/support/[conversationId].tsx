@@ -136,7 +136,7 @@ export default function SupportConversationScreen() {
             </PressableSurface>
           </View>
           <View style={styles.composerMeta}>
-            <Caption>{translate("supportReplyHint")}</Caption>
+            <Caption>{sendMutation.isSuccess ? translate("supportMessageSent") : translate("supportReplyHint")}</Caption>
             {errors.message ? <UiText tone="danger">{translate("supportMessageInvalid")}</UiText> : null}
             {sendError ? <UiText tone="danger">{translate("supportSendError")}</UiText> : null}
           </View>
