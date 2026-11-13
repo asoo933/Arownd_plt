@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { assertActionRateLimit } from "@/lib/action-rate-limit";
 import { fetchMyAccountRegionLevels, normalizePhoneForCallingCode } from "@/lib/country-regions";
 import { createStoreSlug, merchantStoreSchema, type MerchantStoreFormValues } from "@/lib/merchant-validation";
 import {
@@ -431,7 +432,7 @@ export async function updateMerchantOrderTracking(
   if (error) throw error;
 }
 
-export async function collectMerchantOrderCod(merchantOrderId: string): Promise<void> {
+export async function collectMerchantOrderCod(merchantOrderId: string): Promise<void> {\n  assertActionRateLimit("merchant:collect-cod:" + merchantOrderId, 2_000);
   const { error } = await getSupabaseClient().rpc("collect_merchant_order_cod", {
     _merchant_order_id: merchantOrderId
   });
