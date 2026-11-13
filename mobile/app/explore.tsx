@@ -27,7 +27,7 @@ const categories = [
   { id: "makeup", icon: "sparkles" },
   { id: "skincare", icon: "sparkles" },
   { id: "home", icon: "house" },
-  { id: "furniture", icon: "house" },
+  { id: "furniture", icon: "sofa" },
   { id: "home-tools", icon: "settings" },
   { id: "decor", icon: "house" },
   { id: "kitchenware", icon: "cake-slice" },
