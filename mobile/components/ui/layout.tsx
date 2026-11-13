@@ -121,6 +121,7 @@ export type ScrollAreaProps = PropsWithChildren<
 >;
 
 export type RefreshableScrollViewProps = PropsWithChildren<{
+  scrollRef?: React.Ref<ScrollView>;
   refreshing?: boolean;
   onRefresh?: (() => void) | undefined;
   contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
@@ -136,13 +137,15 @@ export function RefreshableScrollView({
   contentContainerStyle,
   style,
   keyboardShouldPersistTaps = "handled",
-  showsVerticalScrollIndicator = false
+  showsVerticalScrollIndicator = false,
+  scrollRef
 }: RefreshableScrollViewProps) {
   const theme = useAppTheme();
   const indicatorColor = theme.mode === "light" ? theme.colors.foreground : theme.colors.accent;
 
   return (
     <ScrollView
+      ref={scrollRef}
       style={style}
       contentContainerStyle={contentContainerStyle}
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}
