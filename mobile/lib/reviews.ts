@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getSupabaseClient } from "@/lib/supabase";
+import { assertActionRateLimit } from "@/lib/action-rate-limit";
 
 const ReviewSchema = z.object({
   id: z.string(),
@@ -54,6 +55,7 @@ export function getReviewTargetPath(review: Pick<AppReview, "target_type" | "tar
 }
 
 export async function submitMyReview(targetType: "product" | "store", targetId: string, rating: number, comment: string): Promise<AppReview> {
+  assertActionRateLimit("review:" + targetType + ":" + targetId, 30_000);
   if (!isValidReviewRating(rating)) throw new Error("invalid_rating");
   const args: { _target_type: "product" | "store"; _target_id: string; _rating: number; _comment?: string } = {
     _target_type: targetType, _target_id: targetId, _rating: rating
