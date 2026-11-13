@@ -40,6 +40,7 @@ export default function SettingsScreen() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
   const passwordStrength = getPasswordStrength(password);
   const [formError, setFormError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -121,6 +122,7 @@ export default function SettingsScreen() {
     setActiveSheet(sheet);
     setFormError(null);
     setMessage(null);
+    if (sheet === "country") setCountrySearch("");
   };
   const closeSheet = () => setActiveSheet(null);
 
@@ -297,14 +299,33 @@ export default function SettingsScreen() {
       <BottomSheet visible={activeSheet === "country"} onRequestClose={closeSheet}>
         <Heading level={3}>{translate("settingsBrowsingCountry")}</Heading>
         <Caption>{translate("settingsBrowsingCountryHint")}</Caption>
+        <Caption>{translate("settingsBrowsingCountryImpact")}</Caption>
         {countries.isPending || browsingCountry.isPending ? <Caption>{translate("stateLoading")}</Caption> : countries.isError || browsingCountry.isError ? <UiText tone="danger">{translate("settingsCountryLoadError")}</UiText> : (
           <View style={styles.sheetContent}>
-            {(countries.data ?? []).filter((country: Country) => country.is_enabled).map((country) => {
+            <TextField
+              value={countrySearch}
+              onChangeText={setCountrySearch}
+              placeholder={translate("settingsCountrySearch")}
+              autoCapitalize="none"
+              style={styles.countrySearch}
+            />
+            {(countries.data ?? []).filter((country: Country) => {
+              if (!country.is_enabled) return false;
+              const name = language === "ar" ? country.name_ar : country.name_en ?? country.name_ar;
+              const currencySymbol = getCurrencySymbol(country.currency_code);
+              const haystack = [name, country.code, country.currency_code, country.currency_name_ar, country.currency_name_en, currencySymbol].filter(Boolean).join(" ").toLocaleLowerCase();
+              return haystack.includes(countrySearch.trim().toLocaleLowerCase());
+            }).map((country) => {
               const selected = browsingCountry.data === country.code;
               const countryName = language === "ar" ? country.name_ar : country.name_en ?? country.name_ar;
-              return <PressableSurface key={country.code} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => { setFormError(null); if (!selected) browsingCountryMutation.mutate(country.code); }} style={[styles.languageOption, selected && { borderWidth: 1, borderColor: theme.colors.accent }]}>
-                <UiText weight="700">{country.flag_emoji ?? "🌐"}  {countryName} · {country.currency_code}</UiText>
-                {selected ? <Icon name="circle-check" size={19} color={theme.colors.success} /> : null}
+              const currencySymbol = getCurrencySymbol(country.currency_code);
+              const currencyLabel = language === "ar" ? `${country.currency_name_ar ?? country.currency_code} · ${currencySymbol}` : `${country.currency_code} · ${currencySymbol}`;
+              return <PressableSurface key={country.code} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => { setFormError(null); if (!selected) browsingCountryMutation.mutate(country.code); }} style={[styles.languageOption, selected && { borderWidth: 1, borderColor: theme.colors.accent, backgroundColor: theme.colors.accent }]}>
+                <View style={styles.countryOptionCopy}>
+                  <UiText weight="700" style={{ color: selected ? theme.colors.accentForeground : theme.colors.foreground }}>{country.flag_emoji ?? "🌐"}  {countryName}</UiText>
+                  <Caption style={{ color: selected ? theme.colors.accentForeground : theme.colors.foregroundSecondary }}>{currencyLabel}</Caption>
+                </View>
+                {selected ? <Icon name="circle-check" size={19} color={theme.colors.accentForeground} /> : null}
               </PressableSurface>;
             })}
           </View>
@@ -457,6 +478,8 @@ function createStyles(theme: AppTheme) {
     passwordStrength: {
       gap: designTokens.spacing.xs
     },
+    countrySearch: { minHeight: designTokens.dimensions.controlHeight.md },
+    countryOptionCopy: { flex: 1, gap: designTokens.spacing.xs },
     strengthHeader: {
       flexDirection: "row",
       alignItems: "center",
@@ -539,4 +562,17 @@ function passwordStrengthLabel(score: number): "passwordStrengthWeak" | "passwor
   if (score === 2) return "passwordStrengthFair";
   if (score === 3) return "passwordStrengthGood";
   return "passwordStrengthStrong";
+}
+
+function getCurrencySymbol(code: string): string {
+  const symbols: Record<string, string> = {
+    DZD: "دج",
+    AED: "د.إ",
+    SAR: "ر.س",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    CNY: "¥"
+  };
+  return symbols[code] ?? code;
 }
