@@ -37,8 +37,10 @@ export default function SettingsScreen() {
   const [activeSheet, setActiveSheet] = useState<SettingsSheet>(null);
   const [appearanceError, setAppearanceError] = useState(false);
   const [languageError, setLanguageError] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const passwordStrength = getPasswordStrength(password);
   const [formError, setFormError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState(false);
@@ -54,20 +56,32 @@ export default function SettingsScreen() {
 
   const passwordMutation = useMutation({
     mutationFn: async () => {
+      if (!currentPassword) throw new Error("passwordCurrentRequired");
       const parsed = resetPasswordSchema.safeParse({ password, confirmPassword });
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "passwordInvalid");
-      const { error } = await getSupabaseClient().auth.updateUser({ password: parsed.data.password });
-      if (error) throw error;
+      const { error } = await getSupabaseClient().auth.updateUser({
+        password: parsed.data.password,
+        current_password: currentPassword
+      });
+      if (error) {
+        if (error.code === "current_password_mismatch" || error.code === "current_password_required") {
+          throw new Error("passwordCurrentInvalid");
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       setFormError(null);
       setMessage(translate("settingsPasswordSaved"));
+      setCurrentPassword("");
       setPassword("");
       setConfirmPassword("");
     },
     onError: (error: Error) => {
       setMessage(null);
-      setFormError(error.message === "passwordMin"
+      setFormError(error.message === "passwordCurrentRequired" || error.message === "passwordCurrentInvalid"
+        ? translate("passwordCurrentInvalid")
+        : error.message === "passwordMin"
         ? translate("passwordMin")
         : error.message === "passwordMismatch"
           ? translate("passwordMismatch")
@@ -199,6 +213,19 @@ export default function SettingsScreen() {
         <Heading level={3}>{translate("settingsPasswordChangeTitle")}</Heading>
         <Caption>{translate("settingsPasswordHint")}</Caption>
         <TextField
+          value={currentPassword}
+          onChangeText={(value) => {
+            setCurrentPassword(value);
+            setFormError(null);
+            setMessage(null);
+          }}
+          placeholder={translate("currentPassword")}
+          secureTextEntry
+          autoCapitalize="none"
+          textContentType="password"
+          style={styles.input}
+        />
+        <TextField
           value={password}
           onChangeText={(value) => {
             setPassword(value);
@@ -211,6 +238,25 @@ export default function SettingsScreen() {
           textContentType="newPassword"
           style={styles.input}
         />
+        <View style={styles.passwordStrength}>
+          <Caption>{translate("passwordMin")}</Caption>
+          <View style={styles.strengthHeader}>
+            <Caption>{translate("passwordStrength")}: {translate(passwordStrengthLabel(passwordStrength))}</Caption>
+            <View style={styles.strengthBars}>
+              {[0, 1, 2, 3].map((index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.strengthBar,
+                    index < passwordStrength && {
+                      backgroundColor: passwordStrength >= 3 ? theme.colors.success : theme.colors.accent
+                    }
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
         <TextField
           value={confirmPassword}
           onChangeText={(value) => {
@@ -389,8 +435,30 @@ function createStyles(theme: AppTheme) {
       borderRadius: designTokens.radius.xl
     },
     input: {
+      height: designTokens.dimensions.controlHeight.lg,
       minHeight: designTokens.dimensions.controlHeight.lg,
+      paddingVertical: 0,
       textAlign: "auto"
+    },
+    passwordStrength: {
+      gap: designTokens.spacing.xs
+    },
+    strengthHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: designTokens.spacing.md
+    },
+    strengthBars: {
+      flex: 1,
+      flexDirection: "row",
+      gap: designTokens.spacing.xs
+    },
+    strengthBar: {
+      flex: 1,
+      height: 5,
+      borderRadius: designTokens.radius.pill,
+      backgroundColor: theme.colors.surfaceMuted
     },
     linkRow: {
       minHeight: 68,
@@ -440,4 +508,21 @@ function createStyles(theme: AppTheme) {
       marginBottom: designTokens.spacing.sm
     }
   });
+}
+
+function getPasswordStrength(value: string): number {
+  if (!value) return 0;
+  return [
+    value.length >= 8,
+    /[a-z]/.test(value) && /[A-Z]/.test(value),
+    /\\d/.test(value),
+    /[^A-Za-z0-9]/.test(value)
+  ].filter(Boolean).length;
+}
+
+function passwordStrengthLabel(score: number): "passwordStrengthWeak" | "passwordStrengthFair" | "passwordStrengthGood" | "passwordStrengthStrong" {
+  if (score <= 1) return "passwordStrengthWeak";
+  if (score === 2) return "passwordStrengthFair";
+  if (score === 3) return "passwordStrengthGood";
+  return "passwordStrengthStrong";
 }
