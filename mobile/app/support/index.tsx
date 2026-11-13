@@ -39,6 +39,8 @@ export default function SupportScreen() {
     queryFn: fetchMySupportConversations,
     enabled: auth.isSuccess && Boolean(auth.data)
   });
+  const openConversations = (conversations.data ?? []).filter((item) => item.status === "open");
+  const closedConversations = (conversations.data ?? []).filter((item) => item.status === "closed");
 
   useEffect(() => {
     const userId = auth.data?.id;
@@ -81,6 +83,22 @@ export default function SupportScreen() {
         <Heading level={2}>{translate("supportHeadline")}</Heading>
         <Caption>{translate("supportSubtitle")}</Caption>
       </View>
+      {openConversations.length > 0 ? (
+        <View style={styles.section}>
+          <Heading level={3}>{translate("supportOpenConversations")}</Heading>
+          {openConversations.map((item) => (
+            <PressableSurface key={item.id} onPress={() => router.push("/support/" + item.id)} style={styles.conversation}>
+              <View style={styles.conversationTop}>
+                <UiText weight="700" style={styles.conversationSubject}>{item.subject}</UiText>
+                <View style={[styles.status, { backgroundColor: theme.colors.accent }]}>
+                  <Caption style={{ color: theme.colors.foreground }}>{translate("supportStatusOpen")}</Caption>
+                </View>
+              </View>
+              <Caption>{dateLabel(item.last_message_at, language)}</Caption>
+            </PressableSurface>
+          ))}
+        </View>
+      ) : null}
 
       <View style={styles.section}>
         <Heading level={3}>{translate("supportFaqTitle")}</Heading>
@@ -117,26 +135,29 @@ export default function SupportScreen() {
         <Button label={translate("supportContactUs")} onPress={() => router.push("/support/new")} fullWidth />
       </View>
 
-      <View style={styles.section}>
-        <Heading level={3}>{translate("supportConversations")}</Heading>
-        {(conversations.data ?? []).length === 0 ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}><Icon name="message-circle" size={26} color={theme.colors.foreground} /></View>
-            <Heading level={3}>{translate("supportEmpty")}</Heading>
-            <Caption>{translate("supportEmptyHint")}</Caption>
-          </View>
-        ) : (conversations.data ?? []).map((item) => (
-          <PressableSurface key={item.id} onPress={() => router.push("/support/" + item.id)} style={styles.conversation}>
-            <View style={styles.conversationTop}>
-              <UiText weight="700" style={styles.conversationSubject}>{item.subject}</UiText>
-              <View style={[styles.status, { backgroundColor: item.status === "open" ? theme.colors.accent : theme.colors.surfaceMuted }]}>
-                <Caption style={{ color: theme.colors.foreground }}>{item.status === "open" ? translate("supportStatusOpen") : translate("supportStatusClosed")}</Caption>
+      {closedConversations.length > 0 ? (
+        <View style={styles.section}>
+          <Heading level={3}>{translate("supportPreviousConversations")}</Heading>
+          {closedConversations.map((item) => (
+            <PressableSurface key={item.id} onPress={() => router.push("/support/" + item.id)} style={styles.conversation}>
+              <View style={styles.conversationTop}>
+                <UiText weight="700" style={styles.conversationSubject}>{item.subject}</UiText>
+                <View style={[styles.status, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <Caption style={{ color: theme.colors.foreground }}>{translate("supportStatusClosed")}</Caption>
+                </View>
               </View>
-            </View>
-            <Caption>{dateLabel(item.last_message_at, language)}</Caption>
-          </PressableSurface>
-        ))}
-      </View>
+              <Caption>{dateLabel(item.last_message_at, language)}</Caption>
+            </PressableSurface>
+          ))}
+        </View>
+      ) : null}
+      {openConversations.length === 0 && closedConversations.length === 0 ? (
+        <View style={styles.emptyState}>
+          <View style={styles.emptyIcon}><Icon name="message-circle" size={26} color={theme.colors.foreground} /></View>
+          <Heading level={3}>{translate("supportEmpty")}</Heading>
+          <Caption>{translate("supportEmptyHint")}</Caption>
+        </View>
+      ) : null}
     </CustomerScreen>
   );
 }
