@@ -51,7 +51,7 @@ export async function registerDeviceForPushNotifications(language: "ar" | "en"):
 export function listenForPushTokenChanges(): Notifications.EventSubscription {
   return Notifications.addPushTokenListener((token) => {
     void persistDeviceToken(token.data).catch((error: unknown) => {
-      console.warn("[push-notifications] Token refresh registration failed", error);
+      console.warn("[push-notifications] Token refresh registration failed.");
     });
   });
 }
