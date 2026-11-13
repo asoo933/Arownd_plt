@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from "react";
+import type { ComponentRef, ReactNode, Ref } from "react";
 import { CustomerNavigation } from "@/components/customer-navigation";
 import {
   ScrollView,
@@ -14,7 +14,7 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { Button, Caption, Heading, Icon, Image as UiImage, PriceDisplay, ProductCard, PressableSurface, RatingStars, RefreshableScrollView, SearchField, Text as UiText } from "@/components/ui";
 export { EmptyState, ErrorState, LoadingState } from "@/components/ui";
 
-export function CustomerScreen({ children, footer, showNavigation = true, onRefresh, refreshing = false, contentStyle, scrollRef }: { children: ReactNode; footer?: ReactNode; showNavigation?: boolean; onRefresh?: (() => void) | undefined; refreshing?: boolean; contentStyle?: StyleProp<ViewStyle>; scrollRef?: Ref<ScrollView> }) {
+export function CustomerScreen({ children, footer, showNavigation = true, onRefresh, refreshing = false, contentStyle, scrollRef }: { children: ReactNode; footer?: ReactNode; showNavigation?: boolean; onRefresh?: (() => void) | undefined; refreshing?: boolean; contentStyle?: StyleProp<ViewStyle>; scrollRef?: Ref<ComponentRef<typeof ScrollView>> | undefined }) {
   const theme = useAppTheme();
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
