@@ -100,7 +100,7 @@ function RootLayoutContent() {
               pushTokenSubscription = listenForPushTokenChanges();
             }
             void registerDeviceForPushNotifications(language).catch((error: unknown) => {
-              console.warn("[push-notifications] Device registration failed", error);
+              console.warn("[push-notifications] Device registration failed.");
             });
           });
         }
@@ -132,7 +132,7 @@ function RootLayoutContent() {
       const data = response.notification.request.content.data ?? {};
       if (typeof data.notification_id === "string") {
         void markNotificationRead(data.notification_id).catch((error: unknown) => {
-          console.warn("[push-notifications] Could not mark the notification as read", error);
+          console.warn("[push-notifications] Could not mark the notification as read.");
         });
       }
       const merchantOrderId = typeof data.url === "string"
@@ -152,7 +152,7 @@ function RootLayoutContent() {
     void Notifications.getLastNotificationResponseAsync().then((response) => {
       if (response) openNotificationDestination(response);
     }).catch((error: unknown) => {
-      console.warn("[push-notifications] Could not read the launch notification", error);
+      console.warn("[push-notifications] Could not read the launch notification.");
     });
 
     return () => subscription.remove();
