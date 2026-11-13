@@ -84,7 +84,7 @@ export default function SupportScreen() {
   }
   if (!auth.data) {
     return <CustomerScreen showNavigation={false}>
-      <AppHeader title={translate("supportTitle")} />
+      <SupportHeader title={translate("supportTitle")} theme={theme} styles={styles} />
       <Caption>{translate("supportLoginHint")}</Caption>
       <Button label={translate("login")} onPress={() => router.push("/login")} fullWidth />
     </CustomerScreen>;
