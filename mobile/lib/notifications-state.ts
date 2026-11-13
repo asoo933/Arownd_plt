@@ -20,15 +20,14 @@ export function getNotificationDestination(item: AppNotification): string | null
   return null;
 }
 
-const UUID_SOURCE = "[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
-const UUID_PATTERN = new RegExp("^" + UUID_SOURCE + "$", "i");
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function getPushNotificationDestination(data: Record<string, unknown>): string | null {
   const notificationUrl = typeof data.url === "string" ? data.url : "";
-  const merchantOrderId = notificationUrl.match(new RegExp("^/studio/orders/(" + UUID_SOURCE + ")$", "i"))?.[1];
+  const merchantOrderId = notificationUrl.match(/^\/studio\/orders\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1];
   if (merchantOrderId) return "/merchant/orders/" + merchantOrderId;
 
-  const supportConversationId = notificationUrl.match(new RegExp("^/support/(" + UUID_SOURCE + ")$", "i"))?.[1];
+  const supportConversationId = notificationUrl.match(/^\/support\/([0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i)?.[1];
   if (supportConversationId) return "/support/" + supportConversationId;
 
   const orderId = data.order_id;
