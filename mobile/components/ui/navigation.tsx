@@ -19,7 +19,7 @@ export function AppHeader({
 
   return (
     <View style={[styles.header, { gap: theme.spacing.md }, style]}>
-      <View style={styles.slot}>{leading}</View>
+      {leading ? <View style={styles.slot}>{leading}</View> : null}
       <UiText
         accessibilityRole="header"
         numberOfLines={1}
