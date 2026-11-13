@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { assertActionRateLimit } from "@/lib/action-rate-limit";
 
 const SupportConversationSchema = z.object({
   id: z.string().uuid(),
@@ -73,6 +74,7 @@ export async function fetchSupportMessages(conversationId: string): Promise<Supp
 }
 
 export async function createSupportConversation(subject: string, message: string): Promise<string> {
+  assertActionRateLimit("support:create-conversation", 10_000);
   const { data, error } = await getSupabaseClient().rpc("create_support_conversation", {
     _subject: subject.trim(),
     _message: message.trim()
@@ -82,6 +84,7 @@ export async function createSupportConversation(subject: string, message: string
 }
 
 export async function sendSupportMessage(conversationId: string, message: string): Promise<void> {
+  assertActionRateLimit("support:send-message:" + conversationId, 1_500);
   const client = getSupabaseClient();
   const { data: auth, error: authError } = await client.auth.getUser();
   if (authError) throw authError;
