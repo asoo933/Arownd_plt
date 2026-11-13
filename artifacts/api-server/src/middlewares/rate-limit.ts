@@ -32,6 +32,12 @@ export const apiRateLimit: RequestHandler = (req, res, next) => {
   }
 
   counter.count += 1;
+  const remaining = Math.max(0, maxRequests - counter.count);
+  const resetAfterSeconds = Math.max(1, Math.ceil((counter.resetAt - now) / 1000));
+
+  res.setHeader("RateLimit-Limit", String(maxRequests));
+  res.setHeader("RateLimit-Remaining", String(remaining));
+  res.setHeader("RateLimit-Reset", String(resetAfterSeconds));
 
   if (counters.size > 10_000) {
     for (const [address, entry] of counters) {
@@ -40,11 +46,11 @@ export const apiRateLimit: RequestHandler = (req, res, next) => {
   }
 
   if (counter.count > maxRequests) {
-    const retryAfterSeconds = Math.max(1, Math.ceil((counter.resetAt - now) / 1000));
-    res.setHeader("Retry-After", String(retryAfterSeconds));
+    res.setHeader("Retry-After", String(resetAfterSeconds));
     logSecurityEvent("rate_limit_exceeded", req, {
       limit: maxRequests,
       windowMs,
+      scope: "ip"
     });
     res.status(429).json({ error: "Too many requests. Please try again later." });
     return;
