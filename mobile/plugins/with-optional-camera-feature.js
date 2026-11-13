@@ -9,6 +9,13 @@ const { withAndroidManifest } = require("@expo/config-plugins");
 module.exports = function withOptionalCameraFeature(config) {
   return withAndroidManifest(config, (config) => {
     const manifest = config.modResults.manifest;
+    const application = manifest.application?.[0];
+    if (!application) {
+      throw new Error("Android manifest is missing its application element.");
+    }
+    application.$ = application.$ ?? {};
+    application.$["android:usesCleartextTraffic"] = "false";
+
     const features = manifest["uses-feature"] ?? [];
 
     const cameraFeature = features.find(
