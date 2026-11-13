@@ -60,7 +60,6 @@ export default function NewSupportConversationScreen() {
         accessibilityLabel={translate("supportSubjectPlaceholder")}
       />
       <View style={styles.subjectMeta}>
-        <Caption>{translate("supportSubjectRequired")}</Caption>
         <Caption>{subject.length}/120</Caption>
       </View>
       <View style={styles.messageField}>
