@@ -14,6 +14,7 @@ export function getCustomerTab(pathname: string): CustomerTab | null {
     pathname === "/settings" ||
     pathname === "/delivery-profile" ||
     pathname === "/addresses" ||
+    pathname === "/invite" ||
     pathname === "/notifications" ||
     pathname === "/my-reviews" ||
     pathname === "/orders" ||
