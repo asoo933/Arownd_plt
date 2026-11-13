@@ -175,3 +175,40 @@ button { font: inherit; }
 @media (max-width: 640px) {
   .brand-logo { width: 112px; }
 }
+
+
+/* Shared inner-page layouts */
+.inner-hero { position: relative; overflow: hidden; background: var(--soft); }
+.inner-hero::after { content: ""; position: absolute; left: 8%; top: -150px; width: 420px; height: 420px; border: 1px solid rgba(0,0,0,.09); border-radius: 50%; box-shadow: 0 0 0 42px rgba(0,0,0,.018), 0 0 0 84px rgba(0,0,0,.014); pointer-events: none; }
+.inner-hero-inner { position: relative; z-index: 1; width: min(1080px, calc(100% - 64px)); min-height: 330px; margin: auto; padding: 82px 0 76px; }
+.inner-hero h1 { max-width: 760px; margin: 24px 0 14px; font-size: clamp(42px, 6vw, 68px); line-height: 1.35; letter-spacing: -2px; }
+.inner-hero h1 span { background: linear-gradient(transparent 67%, var(--brand) 67%); }
+.inner-hero p { max-width: 590px; margin: 0; color: var(--muted); font-size: 15px; line-height: 2.1; }
+.content-section { width: min(1080px, calc(100% - 64px)); margin: auto; padding: 82px 0 112px; }
+.content-section .section-heading { margin-bottom: 28px; }
+.placeholder-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.placeholder-card { min-height: 205px; padding: 24px; border-left: 1px solid var(--line); }
+.placeholder-card:last-child { border-left: 0; }
+.placeholder-card > span { color: #999; font: 11px var(--font-en); }
+.placeholder-card h3 { margin: 44px 0 8px; font-size: 19px; }
+.placeholder-card p, .download-panel p, .legal-placeholder p { margin: 0; color: var(--muted); font-size: 13px; line-height: 2; }
+.download-panel { display: flex; align-items: center; gap: 30px; max-width: 760px; padding: 38px; border: 1px solid var(--line); background: #fff; }
+.download-mark { display: grid; place-items: center; width: 112px; height: 112px; flex: 0 0 112px; background: var(--brand); border-radius: 50%; font: 800 76px/1 var(--font-en); }
+.download-panel h2, .legal-placeholder h2 { margin: 12px 0 8px; font-size: 27px; }
+.download-status, .status-label { display: inline-flex; align-items: center; margin-top: 20px; padding: 8px 12px; background: var(--soft); color: #555; font-size: 11px; font-weight: 600; }
+.legal-section { min-height: 340px; }
+.legal-placeholder { max-width: 760px; padding: 34px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.legal-placeholder .status-label { margin-top: 0; background: var(--brand); color: var(--ink); }
+@media (max-width: 760px) {
+  .inner-hero-inner { width: calc(100% - 48px); min-height: 280px; padding: 64px 0 58px; }
+  .inner-hero h1 { font-size: clamp(39px, 11vw, 54px); }
+  .inner-hero p { font-size: 13px; }
+  .content-section { width: calc(100% - 48px); padding: 60px 0 78px; }
+  .placeholder-grid { grid-template-columns: 1fr; }
+  .placeholder-card { min-height: 150px; padding: 20px 4px; border-left: 0; border-bottom: 1px solid var(--line); }
+  .placeholder-card:last-child { border-bottom: 0; }
+  .placeholder-card h3 { margin-top: 24px; }
+  .download-panel { align-items: flex-start; flex-direction: column; padding: 25px; gap: 22px; }
+  .download-mark { width: 82px; height: 82px; flex-basis: 82px; font-size: 56px; }
+  .download-panel h2, .legal-placeholder h2 { font-size: 23px; }
+}
