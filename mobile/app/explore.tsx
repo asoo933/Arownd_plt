@@ -215,6 +215,14 @@ export default function ExploreScreen() {
             accessibilityLabel={translate("notificationsTitle")}
             onPress={() => router.push("/notifications")}
             icon={<Icon name="bell" size={21} color={theme.colors.foreground} accessibilityHidden />}
+            style={{
+              width: designTokens.dimensions.controlHeight.md,
+              height: designTokens.dimensions.controlHeight.md,
+              borderRadius: theme.radius.pill,
+              backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+              borderWidth: theme.mode === "light" ? 0 : 1,
+              borderColor: theme.colors.border
+            }}
           />
         </View>
         <CustomerHeading
@@ -281,7 +289,7 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  topSection: { gap: designTokens.spacing.xs },
+  topSection: { gap: designTokens.spacing.md },
   header: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
   search: { flex: 1 },
   categoryViewport: { overflow: "hidden" },
