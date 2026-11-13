@@ -59,7 +59,20 @@ export default function SettingsScreen() {
       if (!currentPassword) throw new Error("passwordCurrentRequired");
       const parsed = resetPasswordSchema.safeParse({ password, confirmPassword });
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "passwordInvalid");
-      const { error } = await getSupabaseClient().auth.updateUser({
+      const client = getSupabaseClient();
+      const { data: currentUserData, error: currentUserError } = await client.auth.getUser();
+      const currentUser = currentUserData.user;
+      if (currentUserError || !currentUser?.email) throw new Error("passwordCurrentInvalid");
+
+      const { data: reauthenticated, error: reauthenticationError } = await client.auth.signInWithPassword({
+        email: currentUser.email,
+        password: currentPassword
+      });
+      if (reauthenticationError || reauthenticated.user?.id !== currentUser.id) {
+        throw new Error("passwordCurrentInvalid");
+      }
+
+      const { error } = await client.auth.updateUser({
         password: parsed.data.password,
         current_password: currentPassword
       });
