@@ -57,8 +57,33 @@ jobs:
       - name: Install locked mobile dependencies
         run: npm ci --legacy-peer-deps --no-audit --no-fund
 
-      - name: Generate Expo Android native project
+      - name: Generate Expo Android native preview project
+        env:
+          EAS_BUILD_PROFILE: preview
         run: npx expo prebuild --platform android --no-install --non-interactive
+
+      - name: Verify Android security manifest settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          test -s "$MANIFEST" || { echo "::error::Generated Android manifest is missing."; exit 1; }
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+
+          const manifest = fs.readFileSync("android/app/src/main/AndroidManifest.xml", "utf8");
+          const required = [
+            ['android:allowBackup="false"', "app backup must be disabled"],
+            ['android:debuggable="false"', "debuggable must be disabled"],
+            ['android:usesCleartextTraffic="false"', "cleartext traffic must be disabled"],
+          ];
+          const missing = required.filter(([attribute]) => !manifest.includes(attribute));
+          if (missing.length) {
+            for (const [, message] of missing) console.error("::error::" + message);
+            process.exit(1);
+          }
+          console.log("Android preview manifest security attributes verified.");
+          NODE
 
       - name: Assemble release APK with embedded JS bundle
         working-directory: mobile/android
