@@ -74,7 +74,6 @@ jobs:
           const manifest = fs.readFileSync("android/app/src/main/AndroidManifest.xml", "utf8");
           const required = [
             ['android:allowBackup="false"', "app backup must be disabled"],
-            ['android:debuggable="false"', "debuggable must be disabled"],
             ['android:usesCleartextTraffic="false"', "cleartext traffic must be disabled"],
           ];
           const missing = required.filter(([attribute]) => !manifest.includes(attribute));
@@ -82,6 +81,14 @@ jobs:
             for (const [, message] of missing) console.error("::error::" + message);
             process.exit(1);
           }
+
+          // The release Gradle variant sets debuggable=false automatically.
+          // A source-manifest override is rejected by Android Lint (HardcodedDebugMode).
+          if (/android:debuggable\\s*=/.test(manifest)) {
+            console.error("::error::Do not hardcode android:debuggable in the source manifest; Gradle controls release debuggability.");
+            process.exit(1);
+          }
+
           console.log("Android preview manifest security attributes verified.");
           NODE
 
