@@ -25,10 +25,9 @@ module.exports = function withOptionalCameraFeature(config) {
       // SecureStore's own backup exclusions remain configured by its Expo plugin.
       application.$["android:allowBackup"] = "false";
 
-      // The release Gradle variant should already set this. Keep the manifest
-      // explicit so an unexpected build configuration cannot produce a
-      // debuggable distributable package.
-      application.$["android:debuggable"] = "false";
+      // Android Gradle automatically sets debuggable=false for release variants.
+      // Do not hardcode android:debuggable in the source manifest: Android Lint
+      // correctly rejects that attribute because it can undermine build-type defaults.
 
       // Block cleartext HTTP traffic in preview and production APK/AAB builds.
       application.$["android:usesCleartextTraffic"] = "false";
