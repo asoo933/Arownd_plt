@@ -55,7 +55,7 @@ export default function CartScreen() {
     <AppHeader title={translate("cartTitle")} />
     <Card contentStyle={style.emptyContent}>
       <View style={style.emptyIcon}>
-        <Icon name="shopping-cart" size={30} color={theme.colors.accentMuted} accessibilityHidden />
+        <Icon name="shopping-cart" size={30} color={theme.colors.foreground} accessibilityHidden />
       </View>
       <UiText weight="800" style={style.emptyTitle}>{translate("cartEmpty")}</UiText>
       <Caption style={style.emptyHint}>{translate("cartEmptyHint")}</Caption>
