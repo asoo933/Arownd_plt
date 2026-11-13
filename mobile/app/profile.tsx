@@ -8,6 +8,7 @@ import { designTokens, useAppTheme } from "@/lib/theme";
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import {
   AppHeader,
+  BottomSheet,
   Button,
   Caption,
   Card,
@@ -32,6 +33,7 @@ export default function ProfileScreen() {
   const theme = useAppTheme();
   const queryClient = useQueryClient();
   const [avatarPickerError, setAvatarPickerError] = useState(false);
+  const [avatarActionsOpen, setAvatarActionsOpen] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const uploadAvatar = useMutation({
     mutationFn: uploadMyProfileAvatar,
@@ -42,6 +44,7 @@ export default function ProfileScreen() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-delivery-profile"] })
   });
   const chooseAvatar = async () => {
+    setAvatarActionsOpen(false);
     setAvatarPickerError(false);
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -50,6 +53,26 @@ export default function ProfileScreen() {
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85
+      });
+      if (!result.canceled && result.assets[0]) setSelectedAvatar(result.assets[0]);
+    } catch {
+      setAvatarPickerError(true);
+    }
+  };
+  const captureAvatar = async () => {
+    setAvatarActionsOpen(false);
+    setAvatarPickerError(false);
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        setAvatarPickerError(true);
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [1, 1],
@@ -162,30 +185,26 @@ export default function ProfileScreen() {
       ) : (
         <>
           <Card contentStyle={styles.identityCard}>
-            <IdentityRow
-              name={displayName}
-              {...(user.data.email ? { subtitle: user.data.email } : {})}
-              {...(profile.data?.avatar_url ? { imageUri: profile.data.avatar_url } : {})}
-              avatarSize={64}
-              style={styles.identityRow}
-            />
-            <Button
-              label={translate("profileAvatarChange")}
-              onPress={() => { void chooseAvatar(); }}
-              loading={uploadAvatar.isPending}
-              disabled={removeAvatar.isPending}
-              fullWidth
-            />
-            {profile.data?.avatar_url ? (
-              <Button
-                label={translate("profileAvatarRemove")}
-                variant="outline"
-                onPress={() => removeAvatar.mutate()}
-                loading={removeAvatar.isPending}
-                disabled={uploadAvatar.isPending}
-                fullWidth
+            <View style={styles.avatarIdentityWrap}>
+              <IdentityRow
+                name={displayName}
+                {...(user.data.email ? { subtitle: user.data.email } : {})}
+                {...(profile.data?.avatar_url ? { imageUri: profile.data.avatar_url } : {})}
+                avatarSize={64}
+                style={styles.identityRow}
               />
-            ) : null}
+              <PressableSurface
+                accessibilityLabel={translate("profileAvatarChange")}
+                accessibilityHint={translate("profileAvatarOptionsTitle")}
+                onPress={() => setAvatarActionsOpen(true)}
+                disabled={uploadAvatar.isPending || removeAvatar.isPending}
+                style={styles.avatarActionTrigger}
+              >
+                <View style={[styles.avatarCameraBadge, { backgroundColor: theme.colors.accent, borderColor: theme.colors.surface }]}>
+                  <Icon name="camera" size={13} color={theme.colors.accentForeground} />
+                </View>
+              </PressableSurface>
+            </View>
             {avatarPickerError || uploadAvatar.isError || removeAvatar.isError ? (
               <Caption>{translate("profileAvatarError")}</Caption>
             ) : null}
@@ -300,6 +319,47 @@ export default function ProfileScreen() {
           ) : null}
         </>
       )}
+      <BottomSheet
+        visible={avatarActionsOpen}
+        onRequestClose={() => setAvatarActionsOpen(false)}
+      >
+        <UiText weight="700">{translate("profileAvatarOptionsTitle")}</UiText>
+        <PressableSurface
+          onPress={() => { void chooseAvatar(); }}
+          disabled={uploadAvatar.isPending || removeAvatar.isPending}
+          style={[styles.avatarOption, { backgroundColor: theme.colors.surfaceSecondary }]}
+        >
+          <Icon name="image" size={21} color={theme.colors.accent} />
+          <UiText weight="600">{translate("profileAvatarChooseFromGallery")}</UiText>
+        </PressableSurface>
+        <PressableSurface
+          onPress={() => { void captureAvatar(); }}
+          disabled={uploadAvatar.isPending || removeAvatar.isPending}
+          style={[styles.avatarOption, { backgroundColor: theme.colors.surfaceSecondary }]}
+        >
+          <Icon name="camera" size={21} color={theme.colors.accent} />
+          <UiText weight="600">{translate("profileAvatarTakePhoto")}</UiText>
+        </PressableSurface>
+        {profile.data?.avatar_url ? (
+          <PressableSurface
+            onPress={() => {
+              setAvatarActionsOpen(false);
+              removeAvatar.mutate();
+            }}
+            disabled={uploadAvatar.isPending || removeAvatar.isPending}
+            style={[styles.avatarOption, { backgroundColor: theme.colors.dangerSurface }]}
+          >
+            <Icon name="trash-2" size={21} color={theme.colors.danger} />
+            <UiText weight="600" style={{ color: theme.colors.danger }}>{translate("profileAvatarRemove")}</UiText>
+          </PressableSurface>
+        ) : null}
+        <Button
+          label={translate("profileAvatarCancel")}
+          variant="outline"
+          onPress={() => setAvatarActionsOpen(false)}
+          fullWidth
+        />
+      </BottomSheet>
       <Modal
         visible={Boolean(selectedAvatar)}
         transparent
@@ -358,6 +418,10 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   headerActions: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
   identityCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md },
+  avatarIdentityWrap: { position: "relative" },
+  avatarActionTrigger: { position: "absolute", start: 0, top: 0, width: 64, height: 64, alignItems: "flex-end", justifyContent: "flex-end" },
+  avatarCameraBadge: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, alignItems: "center", justifyContent: "center" },
+  avatarOption: { minHeight: 52, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
   avatarModalOverlay: { flex: 1, justifyContent: "center", padding: designTokens.spacing.lg },
   avatarPreviewCard: { padding: designTokens.spacing.lg, gap: designTokens.spacing.md, alignItems: "center" },
   avatarPreviewImage: { width: 220, height: 220, borderRadius: 110, backgroundColor: "transparent" },
