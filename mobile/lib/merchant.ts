@@ -432,7 +432,8 @@ export async function updateMerchantOrderTracking(
   if (error) throw error;
 }
 
-export async function collectMerchantOrderCod(merchantOrderId: string): Promise<void> {\n  assertActionRateLimit("merchant:collect-cod:" + merchantOrderId, 2_000);
+export async function collectMerchantOrderCod(merchantOrderId: string): Promise<void> {
+  assertActionRateLimit("merchant:collect-cod:" + merchantOrderId, 2_000);
   const { error } = await getSupabaseClient().rpc("collect_merchant_order_cod", {
     _merchant_order_id: merchantOrderId
   });
