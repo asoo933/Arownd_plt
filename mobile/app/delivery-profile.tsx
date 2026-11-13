@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Card, Caption, FormLabel, Heading, Icon, IconButton, PressableSurface, Spinner, Text as UiText, TextField } from "@/components/ui";
+import { AppHeader, Button, Card, Caption, FormLabel, Icon, IconButton, PressableSurface, Spinner, Text as UiText, TextField } from "@/components/ui";
 import { fetchCheckoutCommunes, fetchCheckoutRegions } from "@/lib/checkout";
 import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
