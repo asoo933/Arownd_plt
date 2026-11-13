@@ -276,6 +276,7 @@ export default function SettingsScreen() {
           label={translate("settingsPasswordSave")}
           onPress={() => passwordMutation.mutate()}
           loading={passwordMutation.isPending}
+          disabled={passwordMutation.isPending || !currentPassword || !password || !confirmPassword}
           fullWidth
         />
       </BottomSheet>
