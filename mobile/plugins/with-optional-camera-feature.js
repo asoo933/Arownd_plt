@@ -13,8 +13,14 @@ module.exports = function withOptionalCameraFeature(config) {
     if (!application) {
       throw new Error("Android manifest is missing its application element.");
     }
-    application.$ = application.$ ?? {};
-    application.$["android:usesCleartextTraffic"] = "false";
+
+    // Release and preview builds must never permit cleartext HTTP traffic.
+    // Leave local development builds untouched so Metro can use the dev server.
+    const buildProfile = process.env.EAS_BUILD_PROFILE;
+    if (buildProfile === "preview" || buildProfile === "production") {
+      application.$ = application.$ ?? {};
+      application.$["android:usesCleartextTraffic"] = "false";
+    }
 
     const features = manifest["uses-feature"] ?? [];
 
