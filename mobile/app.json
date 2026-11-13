@@ -30,6 +30,12 @@
           "icon": "./assets/android/notification-icon.png",
           "color": "#FDE72A"
         }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
       ]
     ],
     "experiments": {
