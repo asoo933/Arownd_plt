@@ -1,13 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
 import { Button, Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
-import { createSupportConversation, fetchMySupportConversations, supportConversationInputSchema, type SupportConversationInput } from "@/lib/support";
+import { fetchMySupportConversations } from "@/lib/support";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
@@ -25,13 +23,7 @@ export default function SupportScreen() {
   const styles = createStyles(theme);
   const { language } = useLanguage();
   const queryClient = useQueryClient();
-  const [formError, setFormError] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
-  const { control, handleSubmit, reset, formState: { errors, isValid } } = useForm<SupportConversationInput>({
-    resolver: zodResolver(supportConversationInputSchema),
-    defaultValues: { subject: "", message: "" },
-    mode: "onChange"
-  });
 
   const auth = useQuery({
     queryKey: ["support-auth"],
@@ -62,16 +54,7 @@ export default function SupportScreen() {
       .subscribe();
     return () => { void client.removeChannel(channel); };
   }, [auth.data?.id, queryClient]);
-  const createMutation = useMutation({
-    mutationFn: (values: SupportConversationInput) => createSupportConversation(values.subject, values.message),
-    onSuccess: async (id) => {
-      reset({ subject: "", message: "" });
-      setFormError(false);
-      await queryClient.invalidateQueries({ queryKey: ["my-support-conversations", auth.data?.id] });
-      router.push("/support/" + id);
-    },
-    onError: () => setFormError(true)
-  });
+
 
   if (auth.isPending || (auth.data && conversations.isPending)) {
     return <CustomerScreen showNavigation={false}><LoadingState label={translate("stateLoading")} /></CustomerScreen>;
@@ -126,58 +109,22 @@ export default function SupportScreen() {
         })}
       </View>
 
-      <View style={styles.section}>
-        <Heading level={3}>{translate("supportNewMessage")}</Heading>
-        <Controller
-          control={control}
-          name="subject"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder={translate("supportSubjectPlaceholder")}
-              placeholderTextColor={theme.colors.subtle}
-              maxLength={120}
-              style={styles.input}
-              accessibilityLabel={translate("supportSubjectPlaceholder")}
-            />
-          )}
-        />
-        {errors.subject ? <UiText tone="danger">{translate("supportSubjectInvalid")}</UiText> : null}
-        <Controller
-          control={control}
-          name="message"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              placeholder={translate("supportMessagePlaceholder")}
-              placeholderTextColor={theme.colors.subtle}
-              maxLength={4000}
-              multiline
-              textAlignVertical="top"
-              style={[styles.input, styles.messageInput]}
-              accessibilityLabel={translate("supportMessagePlaceholder")}
-            />
-          )}
-        />
-        {errors.message ? <UiText tone="danger">{translate("supportMessageInvalid")}</UiText> : null}
-        {formError ? <UiText tone="danger">{translate("supportSendError")}</UiText> : null}
-        <Button
-          label={translate("supportSend")}
-          onPress={() => { void handleSubmit((values) => createMutation.mutate(values))(); }}
-          loading={createMutation.isPending}
-          disabled={!isValid}
-          fullWidth
-        />
+      <View style={styles.contactCard}>
+        <View style={styles.contactCopy}>
+          <Heading level={3}>{translate("supportNewMessage")}</Heading>
+          <Caption>{translate("supportContactHint")}</Caption>
+        </View>
+        <Button label={translate("supportContactUs")} onPress={() => router.push("/support/new")} fullWidth />
       </View>
 
       <View style={styles.section}>
         <Heading level={3}>{translate("supportConversations")}</Heading>
         {(conversations.data ?? []).length === 0 ? (
-          <EmptyState icon="message-circle" title={translate("supportEmpty")} hint={translate("supportEmptyHint")} />
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIcon}><Icon name="message-circle" size={26} color={theme.colors.foreground} /></View>
+            <Heading level={3}>{translate("supportEmpty")}</Heading>
+            <Caption>{translate("supportEmptyHint")}</Caption>
+          </View>
         ) : (conversations.data ?? []).map((item) => (
           <PressableSurface key={item.id} onPress={() => router.push("/support/" + item.id)} style={styles.conversation}>
             <View style={styles.conversationTop}>
@@ -202,6 +149,10 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     hero: { alignItems: "flex-start", gap: designTokens.spacing.sm, paddingVertical: designTokens.spacing.lg },
     heroMark: { width: 54, height: 54, borderRadius: designTokens.radius.lg, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center", marginBottom: designTokens.spacing.sm },
     section: { gap: designTokens.spacing.md },
+    contactCard: { gap: designTokens.spacing.md, padding: designTokens.spacing.lg, borderRadius: designTokens.radius.lg, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border },
+    contactCopy: { gap: designTokens.spacing.xs },
+    emptyState: { alignItems: "center", gap: designTokens.spacing.sm, paddingVertical: designTokens.spacing.xl },
+    emptyIcon: { width: 56, height: 56, borderRadius: designTokens.radius.lg, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center" },
     faqItem: { paddingVertical: designTokens.spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border, gap: designTokens.spacing.sm },
     faqHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.md },
     faqQuestion: { flex: 1 },
