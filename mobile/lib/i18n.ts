@@ -299,7 +299,7 @@ export const messages = {
     deliveryProfilePhoneError: "أدخل رقم هاتف صحيحاً مع رمز الدولة.",
     deliveryProfileRegionError: "اختر الولاية.",
     deliveryProfileSecondaryRegionError: "اختر الدائرة.",
-    deliveryProfileCommuneError: "أدخل المنطقة المحلية أو اخترها."
+    deliveryProfileCommuneError: "أدخل المنطقة المحلية أو اخترها.",
     checkoutTitle: "إتمام الشراء",
     checkoutSubtitle: "أدخل بيانات الاستلام وراجع طلبك قبل التأكيد.",
     checkoutSavedAddresses: "عناوينك المحفوظة",
@@ -1201,7 +1201,7 @@ export const messages = {
     deliveryProfilePhoneError: "Enter a valid phone number with country code.",
     deliveryProfileRegionError: "Choose a region.",
     deliveryProfileSecondaryRegionError: "Choose a secondary region.",
-    deliveryProfileCommuneError: "Enter or choose a local area."
+    deliveryProfileCommuneError: "Enter or choose a local area.",
     checkoutTitle: "Checkout",
     checkoutSubtitle: "Enter your delivery details and review your order before confirming.",
     checkoutSavedAddresses: "Your saved addresses",
