@@ -3,10 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { Button, Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
+import { Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import { fetchSupportConversation, fetchSupportMessages, sendSupportMessage, supportMessageInputSchema, type SupportMessageInput } from "@/lib/support";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -98,7 +98,51 @@ export default function SupportConversationScreen() {
 
   const closed = conversation.data.status === "closed";
   return (
-    <CustomerScreen showNavigation={false} onRefresh={() => { void messages.refetch(); }} refreshing={messages.isFetching}>
+    <KeyboardAvoidingView style={styles.keyboardRoot} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <CustomerScreen
+      showNavigation={false}
+      onRefresh={() => { void messages.refetch(); }}
+      refreshing={messages.isFetching}
+      footer={!closed ? (
+        <View style={styles.composer}>
+          <View style={styles.composerRow}>
+            <Controller
+              control={control}
+              name="message"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder={translate("supportReplyPlaceholder")}
+                  placeholderTextColor={theme.colors.subtle}
+                  maxLength={4000}
+                  multiline
+                  textAlignVertical="center"
+                  style={styles.input}
+                  accessibilityLabel={translate("supportReplyPlaceholder")}
+                />
+              )}
+            />
+            <PressableSurface
+              accessibilityRole="button"
+              accessibilityLabel={translate("supportSend")}
+              accessibilityState={{ disabled: !isValid || sendMutation.isPending }}
+              disabled={!isValid || sendMutation.isPending}
+              onPress={() => { void handleSubmit(({ message }) => sendMutation.mutate(message))(); }}
+              style={[styles.sendButton, { backgroundColor: theme.colors.accent, opacity: !isValid || sendMutation.isPending ? 0.45 : 1 }]}
+            >
+              <Icon name="send" size={19} color={theme.colors.foreground} />
+            </PressableSurface>
+          </View>
+          <View style={styles.composerMeta}>
+            <Caption>{translate("supportReplyHint")}</Caption>
+            {errors.message ? <UiText tone="danger">{translate("supportMessageInvalid")}</UiText> : null}
+            {sendError ? <UiText tone="danger">{translate("supportSendError")}</UiText> : null}
+          </View>
+        </View>
+      ) : undefined}
+    >
       <SupportHeader title={translate("supportConversationTitle")} theme={theme} styles={styles} />
       <View style={styles.heading}>
         <UiText weight="800">{conversation.data.subject}</UiText>
@@ -116,39 +160,15 @@ export default function SupportConversationScreen() {
           </View>
         );
       })}
-      {closed ? (
-        <Caption>{translate("supportClosedHint")}</Caption>
-      ) : (
-        <View style={styles.composer}>
-          <Controller
-            control={control}
-            name="message"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                placeholder={translate("supportReplyPlaceholder")}
-                placeholderTextColor={theme.colors.subtle}
-                maxLength={4000}
-                multiline
-                textAlignVertical="top"
-                style={styles.input}
-                accessibilityLabel={translate("supportReplyPlaceholder")}
-              />
-            )}
-          />
-          {errors.message ? <UiText tone="danger">{translate("supportMessageInvalid")}</UiText> : null}
-          {sendError ? <UiText tone="danger">{translate("supportSendError")}</UiText> : null}
-          <Button label={translate("supportSend")} onPress={() => { void handleSubmit(({ message }) => sendMutation.mutate(message))(); }} loading={sendMutation.isPending} disabled={!isValid} fullWidth />
-        </View>
-      )}
+      {closed ? <Caption>{translate("supportClosedHint")}</Caption> : null}
     </CustomerScreen>
+    </KeyboardAvoidingView>
   );
 }
 
 function createStyles(theme: ReturnType<typeof useAppTheme>) {
   return StyleSheet.create({
+    keyboardRoot: { flex: 1 },
     headerRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
     headerTitle: { flex: 1, textAlign: "auto" },
     backButton: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: designTokens.radius.md, backgroundColor: theme.colors.surfaceSecondary },
@@ -158,8 +178,11 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     ownMessageRtl: { alignSelf: "flex-start", borderBottomRightRadius: 4 },
     teamMessageLtr: { alignSelf: "flex-start", borderBottomLeftRadius: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
     teamMessageRtl: { alignSelf: "flex-end", borderBottomLeftRadius: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.colors.border },
-    composer: { gap: designTokens.spacing.sm, paddingTop: designTokens.spacing.md },
-    input: { minHeight: 88, maxHeight: 160, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.md, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.md, color: theme.colors.foreground, backgroundColor: theme.colors.surface, textAlign: "auto", fontFamily: theme.fontFamilies.arabic }
+    composer: { gap: designTokens.spacing.xs },
+    composerRow: { flexDirection: "row", alignItems: "flex-end", gap: designTokens.spacing.sm },
+    input: { flex: 1, minHeight: 44, maxHeight: 88, borderWidth: 1, borderColor: theme.colors.border, borderRadius: designTokens.radius.lg, paddingHorizontal: designTokens.spacing.md, paddingVertical: designTokens.spacing.sm, color: theme.colors.foreground, backgroundColor: theme.colors.surface, textAlign: "auto", fontFamily: theme.fontFamilies.arabic },
+    sendButton: { width: 44, height: 44, borderRadius: designTokens.radius.lg, alignItems: "center", justifyContent: "center" },
+    composerMeta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: designTokens.spacing.sm }
   });
 }
 
