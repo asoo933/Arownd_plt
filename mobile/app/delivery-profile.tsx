@@ -75,7 +75,7 @@ export default function DeliveryProfileScreen() {
   const fieldStyle = [
     styles.input,
     {
-      backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
+      backgroundColor: theme.colors.surface,
       color: theme.colors.foreground
     }
   ];
@@ -129,36 +129,41 @@ export default function DeliveryProfileScreen() {
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />} />
     <Caption>{translate("deliveryProfileSubtitle")}</Caption>
     <Card style={styles.panel} contentStyle={{ gap: designTokens.spacing.md, padding: designTokens.spacing.lg }}>
-      <Heading level={3}>{translate("deliveryProfileTitle")}</Heading>
       <FormLabel>{translate("fullNamePlaceholder")}</FormLabel>
-      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="auto" />
+      <TextField accessibilityLabel={translate("fullNamePlaceholder")} value={fullName} onChangeText={(value) => { setFullName(value); clearSaveFeedback(); }} maxLength={120} placeholder={translate("fullNamePlaceholder")} style={fieldStyle} textAlign="right" />
       <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
-      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="auto" />
+      <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback(); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" writingDirection="ltr" />
       <FormLabel>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</FormLabel>
-      <PressableSurface accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"} onPress={() => setPicker("region")} style={pickerStyle}>
+      <PressableSurface accessibilityLabel={regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "Region"} onPress={() => setPicker("region")} style={[pickerStyle, styles.pickerRow]}>
         <UiText tone={selectedRegion ? "foreground" : "muted"}>{selectedRegion ? getRegionDisplayName(selectedRegion, language) : regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</UiText>
+        <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
       </PressableSurface>
       {regionOptions.data?.levels[1] ? <>
         <FormLabel>{getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</FormLabel>
-        <PressableSurface accessibilityLabel={getRegionLevelDisplayName(regionOptions.data.levels[1], language)} onPress={() => setPicker("secondary")} style={pickerStyle} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
+        <PressableSurface accessibilityLabel={getRegionLevelDisplayName(regionOptions.data.levels[1], language)} onPress={() => setPicker("secondary")} style={[pickerStyle, styles.pickerRow, (regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0) && styles.disabled]} disabled={regionId === null || secondaryOptions.isPending || secondaryOptions.isError || secondaryOptions.data?.regions.length === 0}>
           <UiText tone={selectedSecondaryRegion ? "foreground" : "muted"}>{selectedSecondaryRegion ? getRegionDisplayName(selectedSecondaryRegion, language) : getRegionLevelDisplayName(regionOptions.data.levels[1], language)}</UiText>
+          <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
         </PressableSurface>
         {secondaryOptions.isError ? <UiText tone="danger">{translate("checkoutDairaLoadError")}</UiText> : null}
       </> : null}
       <FormLabel>{translate("checkoutCommune")}</FormLabel>
-      <TextField
-        accessibilityLabel={translate("checkoutCommune")}
-        value={commune}
-        onChangeText={(value) => { setCommune(value); clearSaveFeedback(); }}
-        editable={regionId !== null}
-        maxLength={100}
-        placeholder={translate("checkoutCommunePlaceholder")}
-        style={[...fieldStyle, regionId === null && styles.disabled]}
-        textAlign="auto"
-      />
-      {(communes.data?.length ?? 0) > 0 ? <PressableSurface accessibilityLabel={translate("checkoutChooseCommune")} onPress={() => setPicker("commune")} style={styles.suggestionButton}>
-        <UiText tone="accentMuted" weight="700">{translate("checkoutChooseCommune")}</UiText>
-      </PressableSurface> : null}
+      {(communes.data?.length ?? 0) > 0 ? (
+        <PressableSurface accessibilityLabel={translate("checkoutCommune")} onPress={() => setPicker("commune")} style={[pickerStyle, styles.pickerRow, !regionId && styles.disabled]} disabled={!regionId}>
+          <UiText tone={commune ? "foreground" : "muted"}>{commune || translate("checkoutChooseCommune")}</UiText>
+          <Icon name="chevron-down" size={18} color={theme.colors.muted} accessibilityHidden />
+        </PressableSurface>
+      ) : (
+        <TextField
+          accessibilityLabel={translate("checkoutCommune")}
+          value={commune}
+          onChangeText={(value) => { setCommune(value); clearSaveFeedback(); }}
+          editable={regionId !== null}
+          maxLength={100}
+          placeholder={translate("checkoutCommunePlaceholder")}
+          style={[...fieldStyle, regionId === null && styles.disabled]}
+          textAlign="right"
+        />
+      )}
       {communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
       {formError ? <UiText tone="danger">{formError}</UiText> : null}
       <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} fullWidth />
@@ -220,6 +225,7 @@ function createStyles(theme: AppTheme) { return StyleSheet.create({
     justifyContent: "center"
   },
   pickerText: { textAlign: "auto", fontSize: designTokens.typography.body - 1 },
+  pickerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   suggestionButton: {
     alignSelf: "flex-start",
     minHeight: designTokens.dimensions.controlHeight.md,
