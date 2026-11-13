@@ -112,7 +112,11 @@ export default function SupportConversationScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   value={value}
-                  onChangeText={onChange}
+                  onChangeText={(value) => {
+                    onChange(value);
+                    if (sendMutation.isSuccess) sendMutation.reset();
+                    if (sendError) setSendError(false);
+                  }}
                   onBlur={onBlur}
                   placeholder={translate("supportReplyPlaceholder")}
                   placeholderTextColor={theme.colors.subtle}
