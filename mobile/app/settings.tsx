@@ -98,8 +98,9 @@ export default function SettingsScreen() {
   const closeSheet = () => setActiveSheet(null);
 
   return (
-    <CustomerScreen showNavigation={false}>
+    <CustomerScreen showNavigation={false} contentStyle={styles.screenContent}>
       <View style={styles.headerRow}>
+        <Heading level={2} style={styles.headerTitle}>{translate("settingsTitle")}</Heading>
         <PressableSurface
           accessibilityRole="button"
           accessibilityLabel={translate("back")}
@@ -108,7 +109,6 @@ export default function SettingsScreen() {
         >
           <Icon name="chevron-right" size={22} color={theme.colors.foreground} />
         </PressableSurface>
-        <Heading level={2} style={styles.headerTitle}>{translate("settingsTitle")}</Heading>
       </View>
       <Caption>{translate("settingsSubtitle")}</Caption>
 
@@ -360,6 +360,7 @@ function SettingsRow({
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
+    screenContent: { gap: designTokens.spacing.md },
     headerRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -379,7 +380,7 @@ function createStyles(theme: AppTheme) {
     },
     section: {
       gap: designTokens.spacing.sm,
-      marginTop: designTokens.spacing.lg
+      marginTop: 0
     },
     sectionContent: {
       gap: 0,
@@ -435,8 +436,8 @@ function createStyles(theme: AppTheme) {
       backgroundColor: theme.mode === "dark" ? theme.colors.surfaceSecondary : theme.colors.surfaceMuted
     },
     signOutButton: {
-      marginTop: designTokens.spacing.xl,
-      marginBottom: designTokens.spacing.lg
+      marginTop: designTokens.spacing.md,
+      marginBottom: designTokens.spacing.sm
     }
   });
 }
