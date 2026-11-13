@@ -4,6 +4,7 @@ import { getSelectedCountryCode, syncSelectedCountryCodeFromProfile } from "@/li
 import { clearPendingInviteCode, getPendingInviteCode } from "@/lib/invite-service";
 
 import { getSupabaseClient } from "@/lib/supabase";
+import { assertActionRateLimit } from "@/lib/action-rate-limit";
 import type {
   BusinessSignupInput,
   LoginInput,
@@ -12,6 +13,7 @@ import type {
 } from "@/lib/auth-validation";
 
 export async function signIn(input: LoginInput): Promise<void> {
+  assertActionRateLimit("auth:sign-in", 1_500);
   const { data, error } = await getSupabaseClient().auth.signInWithPassword({
     email: input.email,
     password: input.password
@@ -24,6 +26,7 @@ export async function signIn(input: LoginInput): Promise<void> {
 }
 
 export async function signUpPersonal(input: PersonalSignupInput): Promise<boolean> {
+  assertActionRateLimit("auth:sign-up", 10_000);
   const countryCode = await getSelectedCountryCode();
   if (!countryCode) throw new Error("COUNTRY_NOT_SELECTED");
 
@@ -52,6 +55,7 @@ export async function signUpPersonal(input: PersonalSignupInput): Promise<boolea
 }
 
 export async function signUpBusiness(input: BusinessSignupInput): Promise<boolean> {
+  assertActionRateLimit("auth:sign-up", 10_000);
   const countryCode = await getSelectedCountryCode();
   if (!countryCode) throw new Error("COUNTRY_NOT_SELECTED");
 
@@ -81,6 +85,7 @@ export async function signUpBusiness(input: BusinessSignupInput): Promise<boolea
 }
 
 export async function requestPasswordRecovery(input: RecoveryInput): Promise<void> {
+  assertActionRateLimit("auth:password-recovery", 60_000);
   const redirectTo = Linking.createURL("reset-password", {
     scheme: "com.arownd.app"
   });
