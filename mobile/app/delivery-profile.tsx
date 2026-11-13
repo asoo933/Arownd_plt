@@ -42,6 +42,13 @@ export default function DeliveryProfileScreen() {
   });
   const selectedRegion = useMemo(() => regionOptions.data?.regions.find((item) => item.id === regionId) ?? null, [regionOptions.data, regionId]);
   const selectedSecondaryRegion = useMemo(() => secondaryOptions.data?.regions.find((item) => item.id === secondaryRegionId) ?? null, [secondaryOptions.data, secondaryRegionId]);
+  const hasChanges = initialized && (
+    fullName !== (profile.data?.full_name ?? "") ||
+    phone !== (profile.data?.phone ?? "") ||
+    regionId !== (profile.data?.region_id ?? null) ||
+    secondaryRegionId !== (profile.data?.secondary_region_id ?? null) ||
+    commune !== (profile.data?.commune ?? "")
+  );
   const mutation = useMutation({
     mutationFn: saveMyDeliveryProfile,
     onSuccess: async () => {
@@ -51,6 +58,12 @@ export default function DeliveryProfileScreen() {
     },
     onError: () => setFormError(translate("deliveryProfileSaveError"))
   });
+
+  useEffect(() => {
+    if (!mutation.isSuccess) return;
+    const timeout = setTimeout(() => mutation.reset(), 3000);
+    return () => clearTimeout(timeout);
+  }, [mutation.isSuccess, mutation.reset]);
 
   useEffect(() => {
     if (!profile.isSuccess || initialized) return;
@@ -125,7 +138,10 @@ export default function DeliveryProfileScreen() {
     mutation.mutate(parsed.data);
   };
 
-  return <CustomerScreen>
+  return <CustomerScreen footer={<View style={styles.stickyFooter}>
+    {mutation.isSuccess ? <View accessibilityRole="alert" style={styles.snackbar}><Icon name="check-circle" size={18} color={theme.colors.success} /><UiText tone="success" weight="700">{translate("deliveryProfileSaved")}</UiText></View> : null}
+    <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} disabled={!hasChanges || mutation.isPending} fullWidth />
+  </View>}>
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />} />
     <Caption>{translate("deliveryProfileSubtitle")}</Caption>
     <Card style={styles.panel} contentStyle={{ gap: designTokens.spacing.md, padding: designTokens.spacing.lg }}>
@@ -166,8 +182,6 @@ export default function DeliveryProfileScreen() {
       )}
       {communes.isError ? <UiText tone="danger">{translate("deliveryProfileCommunesError")}</UiText> : null}
       {formError ? <UiText tone="danger">{formError}</UiText> : null}
-      <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} fullWidth />
-      {mutation.isSuccess ? <UiText tone="success" weight="700">{translate("deliveryProfileSaved")}</UiText> : null}
     </Card>
     <Caption>{translate("deliveryProfileDefaultAreaNote")}</Caption>
     <Modal visible={picker !== null} transparent animationType="fade" onRequestClose={() => setPicker(null)}>
@@ -189,6 +203,7 @@ export default function DeliveryProfileScreen() {
                 clearSaveFeedback();
               } else if (picker === "commune") {
                 setCommune(item.label);
+                clearSaveFeedback();
               }
               setPicker(null);
             }} style={styles.option}>
@@ -203,6 +218,8 @@ export default function DeliveryProfileScreen() {
 }
 
 function createStyles(theme: AppTheme) { return StyleSheet.create({
+  stickyFooter: { gap: designTokens.spacing.sm },
+  snackbar: { minHeight: 42, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: designTokens.spacing.sm, paddingHorizontal: designTokens.spacing.md, borderRadius: theme.radius.md, backgroundColor: theme.colors.surfaceSecondary },
   panel: {
     backgroundColor: theme.mode === "light" ? theme.colors.surfaceSecondary : theme.colors.surface,
     borderColor: theme.mode === "light" ? "transparent" : theme.colors.border,
