@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, Ref } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -121,7 +121,7 @@ export type ScrollAreaProps = PropsWithChildren<
 >;
 
 export type RefreshableScrollViewProps = PropsWithChildren<{
-  scrollRef?: React.Ref<ScrollView>;
+  scrollRef?: Ref<ScrollView>;
   refreshing?: boolean;
   onRefresh?: (() => void) | undefined;
   contentContainerStyle?: ScrollViewProps["contentContainerStyle"];
