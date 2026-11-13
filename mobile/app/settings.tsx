@@ -7,7 +7,6 @@ import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
 import { isThemeMode, useThemePreference } from "@/lib/design-system";
 import { CustomerScreen } from "@/components/customer-ui";
 import {
-  AppHeader,
   BottomSheet,
   Button,
   Caption,
@@ -100,15 +99,17 @@ export default function SettingsScreen() {
 
   return (
     <CustomerScreen showNavigation={false}>
-      <PressableSurface
-        accessibilityRole="button"
-        accessibilityLabel={translate("back")}
-        onPress={() => router.back()}
-        style={styles.backButton}
-      >
-        <Icon name="chevron-right" size={22} color={theme.colors.foreground} />
-      </PressableSurface>
-      <AppHeader title={translate("settingsTitle")} />
+      <View style={styles.headerRow}>
+        <PressableSurface
+          accessibilityRole="button"
+          accessibilityLabel={translate("back")}
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Icon name="chevron-right" size={22} color={theme.colors.foreground} />
+        </PressableSurface>
+        <Heading level={2} style={styles.headerTitle}>{translate("settingsTitle")}</Heading>
+      </View>
       <Caption>{translate("settingsSubtitle")}</Caption>
 
       <View style={styles.section}>
@@ -122,14 +123,14 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingsRow
-            icon="settings"
+            icon="palette"
             label={translate("settingsAppearanceHint")}
             onPress={() => openSheet("appearance")}
             theme={theme}
             styles={styles}
           />
           <SettingsRow
-            icon="list"
+            icon="globe"
             label={translate("settingsLanguageTitle")}
             onPress={() => openSheet("language")}
             theme={theme}
@@ -359,13 +360,20 @@ function SettingsRow({
 
 function createStyles(theme: AppTheme) {
   return StyleSheet.create({
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: designTokens.spacing.md
+    },
+    headerTitle: {
+      flex: 1,
+      textAlign: "auto"
+    },
     backButton: {
       width: 44,
       height: 44,
       alignItems: "center",
       justifyContent: "center",
-      alignSelf: "flex-start",
-      marginBottom: designTokens.spacing.xs,
       borderRadius: designTokens.radius.lg,
       backgroundColor: theme.colors.surfaceSecondary
     },
