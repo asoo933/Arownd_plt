@@ -94,6 +94,7 @@ export async function fetchMerchantCategories(): Promise<MerchantCategory[]> {
 export async function createMerchantStore(
   input: MerchantStoreFormValues
 ): Promise<string> {
+  assertActionRateLimit("merchant:create-store", 30_000);
   const values = merchantStoreSchema.parse(input);
   if (values.regionId === null) throw new Error("merchantValidationPrimaryRegion");
   const regionContext = await fetchMyAccountRegionLevels();
@@ -384,6 +385,7 @@ export async function submitMerchantOrderQuote(
   merchantOrderId: string,
   shippingFee: number
 ): Promise<void> {
+  assertActionRateLimit("merchant:quote:" + merchantOrderId, 2_000);
   if (!Number.isInteger(shippingFee) || shippingFee < 0 || shippingFee > 1_000_000) {
     throw new Error("invalid_shipping_fee");
   }
@@ -400,6 +402,7 @@ export async function rejectMerchantOrder(
   merchantOrderId: string,
   reason: string | null = null
 ): Promise<void> {
+  assertActionRateLimit("merchant:reject:" + merchantOrderId, 2_000);
   const { error } = await getSupabaseClient().rpc("merchant_reject_order", {
     _merchant_order_id: merchantOrderId,
     _reason: reason
@@ -423,6 +426,7 @@ export async function updateMerchantOrderTracking(
   merchantOrderId: string,
   status: MerchantTrackingStatus
 ): Promise<void> {
+  assertActionRateLimit("merchant:tracking:" + merchantOrderId, 2_000);
   const { error } = await getSupabaseClient().rpc("merchant_update_order_tracking", {
     _merchant_order_id: merchantOrderId,
     _status: status,
