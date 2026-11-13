@@ -11,7 +11,7 @@ import {
   Inter_800ExtraBold
 } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ActivityIndicator, Alert, Platform, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Platform, StyleSheet, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -22,7 +22,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { listenForPushTokenChanges, registerDeviceForPushNotifications } from "@/lib/push-notifications";
 import { markNotificationRead } from "@/lib/notifications";
 import { getPushNotificationDestination } from "@/lib/notifications-state";
-import { LanguageProvider, useLanguage, translate } from "@/lib/i18n";
+import { LanguageProvider, useLanguage } from "@/lib/i18n";
 
 const SPLASH_DURATION_MS = 2500;
 
@@ -72,7 +72,7 @@ function RootLayoutContent() {
   const [showSplash, setShowSplash] = useState(true);
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
-  const { language, isReady: languageReady, restartNoticeVersion } = useLanguage();
+  const { language, isReady: languageReady } = useLanguage();
   const { isReady: themeReady } = useThemePreference();
   const appReady = (fontsLoaded || Boolean(fontError)) && themeReady && languageReady;
 
@@ -85,12 +85,6 @@ function RootLayoutContent() {
     return () => clearTimeout(timeout);
   }, [appReady]);
 
-
-  useEffect(() => {
-    if (restartNoticeVersion > 0) {
-      Alert.alert(translate("settingsLanguageRestartTitle"), translate("settingsLanguageRestartMessage"));
-    }
-  }, [restartNoticeVersion]);
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
