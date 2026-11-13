@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
@@ -29,8 +29,8 @@ export default function DeliveryProfileScreen() {
   const [picker, setPicker] = useState<Picker>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<DeliveryProfileField, string>>>({});
-  const scrollRef = useRef<ScrollView | null>(null);
-  const fieldRefs = useRef<Partial<Record<DeliveryProfileField, View | null>>>({});
+  const scrollRef = useRef<ComponentRef<typeof ScrollView> | null>(null);
+  const fieldRefs = useRef<Partial<Record<DeliveryProfileField, ComponentRef<typeof View> | null>>>({});
   const [initialized, setInitialized] = useState(false);
 
   const profile = useQuery({
@@ -129,7 +129,7 @@ export default function DeliveryProfileScreen() {
   const clearSaveFeedback = (field?: DeliveryProfileField) => {
     setFormError(null);
     mutation.reset();
-    if (field) setFieldErrors((current) => ({ ...current, [field]: undefined }));
+    if (field) setFieldErrors((current) => { const next = { ...current }; delete next[field]; return next; });
     else setFieldErrors({});
   };
 
@@ -183,7 +183,7 @@ export default function DeliveryProfileScreen() {
   };
 
   return <CustomerScreen scrollRef={scrollRef} footer={<View style={styles.stickyFooter}>
-    {mutation.isSuccess ? <View accessibilityRole="alert" style={styles.snackbar}><Icon name="check-circle" size={18} color={theme.colors.success} /><UiText tone="success" weight="700">{translate("deliveryProfileSaved")}</UiText></View> : null}
+    {mutation.isSuccess ? <View accessibilityRole="alert" style={styles.snackbar}><Icon name="circle-check" size={18} color={theme.colors.success} /><UiText tone="success" weight="700">{translate("deliveryProfileSaved")}</UiText></View> : null}
     <Button label={translate("deliveryProfileSave")} onPress={submit} loading={mutation.isPending} disabled={!hasChanges || mutation.isPending} fullWidth />
   </View>}>
     <AppHeader title={translate("deliveryProfileTitle")} leading={<IconButton accessibilityLabel={translate("back")} onPress={() => router.back()} icon={<Icon name="chevron-right" size={20} />} />} />
@@ -195,7 +195,7 @@ export default function DeliveryProfileScreen() {
       </View>
       <View ref={(node) => { fieldRefs.current.phone = node; }}>
         <FormLabel>{translate("checkoutPhonePlaceholder")}</FormLabel>
-        <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback("phone"); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="right" writingDirection="ltr" error={fieldErrors.phone} />
+        <TextField accessibilityLabel={translate("checkoutPhonePlaceholder")} value={phone} onChangeText={(value) => { setPhone(value); clearSaveFeedback("phone"); }} maxLength={20} keyboardType="phone-pad" placeholder={translate("checkoutPhonePlaceholder")} style={fieldStyle} textAlign="left" error={fieldErrors.phone} />
       </View>
       <View ref={(node) => { fieldRefs.current.region_id = node; }}>
       <FormLabel>{regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : ""}</FormLabel>
@@ -254,7 +254,7 @@ export default function DeliveryProfileScreen() {
                 setSecondaryRegionId(null);
                 setCommune("");
                 clearSaveFeedback("region_id");
-                setFieldErrors((current) => ({ ...current, secondary_region_id: undefined, commune: undefined }));
+                setFieldErrors((current) => { const next = { ...current }; delete next.secondary_region_id; delete next.commune; return next; });
               } else if (picker === "secondary") {
                 setSecondaryRegionId(Number(item.id));
                 clearSaveFeedback("secondary_region_id");
