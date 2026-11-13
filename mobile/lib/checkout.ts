@@ -5,6 +5,7 @@ import type { CartItem } from "@/lib/cart-state";
 import { checkoutRequestIdentity, MAX_CHECKOUT_ITEMS, normalizeCheckoutItems } from "@/lib/checkout-state";
 import { fetchMyAccountRegionLevels, fetchMyAccountRegions } from "@/lib/country-regions";
 import { getSupabaseClient } from "@/lib/supabase";
+import { assertActionRateLimit } from "@/lib/action-rate-limit";
 
 export { checkoutRequestIdentity } from "@/lib/checkout-state";
 export type { CountryRegion as CheckoutRegion } from "@/lib/country-regions";
@@ -112,6 +113,7 @@ async function removeIdempotencyKey(userId: string, identity: string): Promise<v
 }
 
 export async function submitCheckout(input: CheckoutInput): Promise<string> {
+  assertActionRateLimit("checkout:" + input.userId, 5_000);
   if (!input.userId) throw new Error("not_authenticated");
   if (input.items.length === 0) throw new Error("empty_cart");
   if (input.items.length > MAX_CHECKOUT_ITEMS) throw new Error("too_many_items");
