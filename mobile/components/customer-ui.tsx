@@ -18,7 +18,7 @@ export function CustomerScreen({ children, footer, showNavigation = true, onRefr
   const theme = useAppTheme();
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-      <RefreshableScrollView scrollRef={scrollRef} style={styles.scroll> contentContainerStyle={[styles.content, contentStyle]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} onRefresh={onRefresh} refreshing={refreshing}>
+      <RefreshableScrollView scrollRef={scrollRef} style={styles.scroll} contentContainerStyle={[styles.content, contentStyle]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} onRefresh={onRefresh} refreshing={refreshing}>
         {children}
       </RefreshableScrollView>
       {footer ? <View style={[styles.footer, { backgroundColor: theme.colors.background, borderTopColor: theme.colors.border }]}>{footer}</View> : null}
