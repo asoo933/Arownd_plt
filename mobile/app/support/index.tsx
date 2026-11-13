@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, TextInput, View } from "react-native";
 
 import { CustomerScreen, EmptyState, ErrorState, LoadingState } from "@/components/customer-ui";
-import { AppHeader, Button, Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
+import { Button, Caption, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import { createSupportConversation, fetchMySupportConversations, supportConversationInputSchema, type SupportConversationInput } from "@/lib/support";
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate, useLanguage } from "@/lib/i18n";
@@ -78,7 +78,7 @@ export default function SupportScreen() {
   }
   if (auth.isError || conversations.isError) {
     return <CustomerScreen showNavigation={false}>
-      <AppHeader title={translate("supportTitle")} />
+      <SupportHeader title={translate("supportTitle")} theme={theme} styles={styles} />
       <ErrorState title={translate("supportLoadError")} retryLabel={translate("retry")} onRetry={() => { void auth.refetch(); void conversations.refetch(); }} busy={auth.isFetching || conversations.isFetching} />
     </CustomerScreen>;
   }
@@ -92,10 +92,7 @@ export default function SupportScreen() {
 
   return (
     <CustomerScreen showNavigation={false} onRefresh={() => { void conversations.refetch(); }} refreshing={conversations.isFetching}>
-      <PressableSurface accessibilityRole="button" accessibilityLabel={translate("back")} onPress={() => router.back()} style={styles.backButton}>
-        <Icon name="chevron-right" size={22} color={theme.colors.foreground} />
-      </PressableSurface>
-      <AppHeader title={translate("supportTitle")} />
+      <SupportHeader title={translate("supportTitle")} theme={theme} styles={styles} />
       <View style={styles.hero}>
         <View style={styles.heroMark}><Icon name="message-circle" size={28} color={theme.colors.foreground} /></View>
         <Heading level={2}>{translate("supportHeadline")}</Heading>
@@ -199,7 +196,9 @@ export default function SupportScreen() {
 
 function createStyles(theme: ReturnType<typeof useAppTheme>) {
   return StyleSheet.create({
-    backButton: { width: 44, height: 44, alignItems: "center", justifyContent: "center", alignSelf: "flex-start", borderRadius: designTokens.radius.md },
+    headerRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.md },
+    headerTitle: { flex: 1, textAlign: "auto" },
+    backButton: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: designTokens.radius.md, backgroundColor: theme.colors.surfaceSecondary },
     hero: { alignItems: "flex-start", gap: designTokens.spacing.sm, paddingVertical: designTokens.spacing.lg },
     heroMark: { width: 54, height: 54, borderRadius: designTokens.radius.lg, backgroundColor: theme.colors.accent, alignItems: "center", justifyContent: "center", marginBottom: designTokens.spacing.sm },
     section: { gap: designTokens.spacing.md },
@@ -213,4 +212,25 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     conversationSubject: { flex: 1 },
     status: { borderRadius: designTokens.radius.pill, paddingHorizontal: designTokens.spacing.sm, paddingVertical: 4 }
   });
+}
+
+
+function SupportHeader({ title, theme, styles }: {
+  title: string;
+  theme: ReturnType<typeof useAppTheme>;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  return (
+    <View style={styles.headerRow}>
+      <Heading level={2} style={styles.headerTitle}>{title}</Heading>
+      <PressableSurface
+        accessibilityRole="button"
+        accessibilityLabel={translate("back")}
+        onPress={() => router.back()}
+        style={styles.backButton}
+      >
+        <Icon name="chevron-right" size={22} color={theme.colors.foreground} />
+      </PressableSurface>
+    </View>
+  );
 }
