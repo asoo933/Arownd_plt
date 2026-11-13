@@ -57,7 +57,12 @@ export default function NewSupportConversationScreen() {
         placeholder={translate("supportSubjectPlaceholder")}
         maxLength={120}
         style={styles.subject}
+        accessibilityLabel={translate("supportSubjectPlaceholder")}
       />
+      <View style={styles.subjectMeta}>
+        <Caption>{translate("supportSubjectRequired")}</Caption>
+        <Caption>{subject.length}/120</Caption>
+      </View>
       <View style={styles.messageField}>
         <TextInput
           value={message}
@@ -87,6 +92,7 @@ function createStyles(theme: ReturnType<typeof useAppTheme>) {
     title: { flex: 1 },
     backButton: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: designTokens.radius.md, backgroundColor: theme.colors.surfaceSecondary },
     subject: { minHeight: designTokens.dimensions.controlHeight.lg },
+    subjectMeta: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: designTokens.spacing.sm, marginTop: -designTokens.spacing.xs },
     messageField: { minHeight: 180, borderWidth: 1, borderColor: theme.colors.inputBorder, borderRadius: designTokens.radius.lg, backgroundColor: theme.colors.surface, padding: designTokens.spacing.md, gap: designTokens.spacing.xs },
     messageInput: { minHeight: 130, color: theme.colors.foreground, fontSize: designTokens.typography.body, textAlign: "auto", fontFamily: theme.fontFamilies.arabic },
     counter: { textAlign: "right" }
