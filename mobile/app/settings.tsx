@@ -185,6 +185,13 @@ export default function SettingsScreen() {
             onPress={() => openSheet("password")}
             theme={theme}
             styles={styles}
+          />
+          <SettingsRow
+            icon="trash-2"
+            label={translate("deleteAccountTitle")}
+            onPress={() => router.push("/delete-account")}
+            theme={theme}
+            styles={styles}
             last
           />
         </Card>
