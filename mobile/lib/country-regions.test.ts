@@ -28,6 +28,9 @@ describe("country region and phone helpers", () => {
     expect(normalizePhoneForCallingCode("0550 123 456", "+213")).toBe("+213550123456");
     expect(normalizePhoneForCallingCode("06 12 34 56 78", "+212")).toBe("+212612345678");
     expect(normalizePhoneForCallingCode("+966 50 123 4567", "+966")).toBe("+966501234567");
+    expect(normalizePhoneForCallingCode("٠٥٥٠ ١٢٣ ٤٥٦", "+213")).toBe("+213550123456");
+    expect(normalizePhoneForCallingCode("۰۵۵۰ ۱۲۳ ۴۵۶", "+213")).toBe("+213550123456");
+    expect(normalizePhoneForCallingCode("00213 550 123 456", "+213")).toBe("+213550123456");
   });
 
   it("rejects a number from another country or an invalid E.164 length", () => {
