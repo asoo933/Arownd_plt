@@ -5,8 +5,8 @@ import { Modal, ScrollView, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { AppHeader, Button, Card, Caption, FormLabel, Icon, IconButton, PressableSurface, Spinner, Text as UiText, TextField } from "@/components/ui";
-import { fetchCheckoutCommunes, fetchCheckoutRegions } from "@/lib/checkout";
-import { fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
+import { fetchCheckoutRegions } from "@/lib/checkout";
+import { fetchDeliveryProfileCommunes, fetchMyDeliveryProfile, saveMyDeliveryProfile } from "@/lib/delivery-profile";
 import { DeliveryProfileSchema, type DeliveryProfileInput } from "@/lib/delivery-profile-state";
 import {  translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
@@ -41,7 +41,7 @@ export default function DeliveryProfileScreen() {
   const secondaryOptions = useQuery({ queryKey: ["checkout-regions", regionId], queryFn: () => fetchCheckoutRegions(regionId), enabled: regionId !== null, staleTime: Infinity });
   const communes = useQuery({
     queryKey: ["checkout-communes", regionId],
-    queryFn: () => fetchCheckoutCommunes(regionId as number),
+    queryFn: () => fetchDeliveryProfileCommunes(regionId as number),
     enabled: regionId !== null,
     staleTime: 5 * 60 * 1000
   });
