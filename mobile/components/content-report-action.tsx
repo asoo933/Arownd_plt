@@ -11,15 +11,6 @@ type ReportTargetType = ContentReportInput["targetType"];
 type ReportReason = ContentReportInput["reason"];
 
 const REASONS: ReportReason[] = ["spam", "harassment", "hate", "sexual_content", "scam", "other"];
-const REASON_LABELS: Record<ReportReason, string> = {
-  spam: translate("contentReportReason_spam"),
-  harassment: translate("contentReportReason_harassment"),
-  hate: translate("contentReportReason_hate"),
-  sexual_content: translate("contentReportReason_sexual_content"),
-  scam: translate("contentReportReason_scam"),
-  other: translate("contentReportReason_other")
-};
-
 export function ContentReportAction({
   targetType,
   targetId,
@@ -31,6 +22,14 @@ export function ContentReportAction({
 }) {
   const theme = useAppTheme();
   const styles = createStyles(theme);
+  const reasonLabels: Record<ReportReason, string> = {
+    spam: translate("contentReportReason_spam"),
+    harassment: translate("contentReportReason_harassment"),
+    hate: translate("contentReportReason_hate"),
+    sexual_content: translate("contentReportReason_sexual_content"),
+    scam: translate("contentReportReason_scam"),
+    other: translate("contentReportReason_other")
+  };
   const [visible, setVisible] = useState(false);
   const [reason, setReason] = useState<ReportReason>("other");
   const [details, setDetails] = useState("");
@@ -66,7 +65,7 @@ export function ContentReportAction({
               onPress={() => setReason(item)}
               style={[styles.reason, reason === item && styles.reasonSelected]}
             >
-              <UiText weight={reason === item ? "700" : "500"}>{REASON_LABELS[item]}</UiText>
+              <UiText weight={reason === item ? "700" : "500"}>{reasonLabels[item]}</UiText>
             </PressableSurface>
           ))}
         </View>
