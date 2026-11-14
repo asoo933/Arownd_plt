@@ -355,3 +355,163 @@ body {
   .placeholder-card { border-bottom-color: var(--line); }
 }
 
+
+
+/* Professional responsive refinement — November 2026 */
+:root {
+  color-scheme: dark;
+  scroll-padding-top: 92px;
+  text-rendering: optimizeLegibility;
+}
+html { scrollbar-color: #525252 #080808; }
+body { min-width: 320px; }
+::selection { color: #000; background: #FFF01F; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid #FFF01F;
+  outline-offset: 4px;
+}
+.site-header {
+  box-shadow: 0 8px 28px rgba(0,0,0,.16);
+}
+.header-inner { min-height: 78px; }
+.brand-logo {
+  width: 148px;
+  filter: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.brand:hover .brand-logo { opacity: .88; transform: translateY(-1px); }
+.footer-brand .brand-logo { width: 124px; }
+.nav-link, .more-toggle { transition: color .2s ease; }
+.header-cta {
+  min-height: 46px;
+  padding-inline: 20px;
+  border-radius: 7px;
+  box-shadow: 0 8px 24px rgba(255,240,31,.10);
+}
+.hero {
+  min-height: 650px;
+  padding-top: 88px;
+  padding-bottom: 105px;
+}
+.hero::before {
+  border: 1px solid rgba(255,255,255,.035);
+  border-radius: 8px;
+}
+.hero-content { max-width: 560px; }
+.hero h1 {
+  line-height: 1.22;
+  letter-spacing: -1.8px;
+  text-wrap: balance;
+}
+.hero-description { font-size: 16px; line-height: 2; }
+.button { min-height: 56px; border-radius: 7px; padding-inline: 24px; }
+.hero-art { max-width: 450px; }
+.art-small-card { border-radius: 7px; }
+.intro-section, .page-links-section, .content-section { scroll-margin-top: 100px; }
+.page-card { transition: background .22s ease, transform .22s ease; }
+.page-card:hover { transform: translateY(-3px); }
+.site-footer { padding-top: 34px; padding-bottom: 34px; }
+.inner-hero { border-bottom: 1px solid #262626; }
+.inner-hero-inner { min-height: 350px; }
+.legal-placeholder { line-height: 2; }
+.legal-placeholder h2 { margin-top: 34px; }
+.legal-placeholder h2:first-child { margin-top: 0; }
+.legal-placeholder li { margin-block: 7px; padding-inline-start: 4px; }
+@media (min-width: 761px) {
+  .hero { border-radius: 0 0 10px 10px; }
+  .hero-content { padding-inline-start: 10px; }
+}
+@media (max-width: 760px) {
+  :root { scroll-padding-top: 78px; }
+  .header-inner {
+    width: calc(100% - 36px);
+    min-height: 76px;
+    gap: 12px;
+  }
+  .brand { margin-left: auto; }
+  .brand-logo { width: 142px; }
+  .menu-toggle {
+    order: 0;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 8px;
+  }
+  .header-cta {
+    order: 1;
+    margin: 0 auto 0 0;
+    min-height: 44px;
+    padding-inline: 13px;
+    gap: 9px;
+    font-size: 11px;
+    border-radius: 7px;
+  }
+  .main-navigation { top: 76px; padding: 12px 22px 18px; }
+  .nav-link, .more-toggle { min-height: 44px; display: flex; align-items: center; }
+  .hero {
+    width: 100%;
+    padding: 58px 30px 82px;
+    gap: 12px;
+  }
+  .hero::before { inset: 10px 12px 18px; border-radius: 8px; }
+  .hero-content { padding: 0; }
+  .eyebrow { font-size: 13px; }
+  .hero h1 {
+    max-width: 12ch;
+    margin: 22px 0 18px;
+    font-size: clamp(40px, 10.2vw, 58px);
+    line-height: 1.3;
+    letter-spacing: -1.2px;
+  }
+  .hero h1 span::after { height: 11px; bottom: 5px; }
+  .hero-description { max-width: 34rem; font-size: 14px; line-height: 2; }
+  .hero-actions { align-items: stretch; gap: 14px; margin-top: 26px; }
+  .hero-actions .button { min-width: 190px; }
+  .text-link { min-height: 44px; }
+  .hero-note { margin-top: 32px; font-size: 11px; }
+  .hero-art {
+    width: min(100%, 340px);
+    margin: 8px auto 0;
+  }
+  .art-caption { font-size: 8px; letter-spacing: 1.6px; }
+  .art-small-card { font-size: 10px; }
+  .hero-index { bottom: 25px; left: 30px; }
+  .intro-section, .page-links-section {
+    width: calc(100% - 52px);
+    padding-block: 68px;
+  }
+  .intro-grid { gap: 18px; }
+  .intro-grid h2 { font-size: clamp(31px, 8.5vw, 40px); line-height: 1.5; }
+  .intro-copy p { font-size: 14px; line-height: 2.05; }
+  .page-links-section { padding-top: 8px; padding-bottom: 82px; }
+  .page-card { min-height: 132px; }
+  .site-footer { gap: 18px 14px; }
+  .footer-links { flex-wrap: wrap; gap: 12px 18px; line-height: 1.8; }
+  .inner-hero-inner {
+    width: calc(100% - 52px);
+    min-height: 250px;
+    padding-block: 54px 48px;
+  }
+  .inner-hero h1 {
+    max-width: 100%;
+    font-size: clamp(36px, 9.5vw, 52px);
+    line-height: 1.35;
+    letter-spacing: -1px;
+    overflow-wrap: anywhere;
+  }
+  .content-section { width: calc(100% - 52px); padding-block: 52px 72px; }
+  .legal-placeholder { overflow-wrap: anywhere; }
+}
+@media (max-width: 390px) {
+  .header-inner { width: calc(100% - 24px); gap: 8px; }
+  .brand-logo { width: 124px; }
+  .header-cta { padding-inline: 10px; font-size: 10px; }
+  .hero { padding-inline: 23px; }
+  .hero h1 { font-size: clamp(38px, 10vw, 46px); }
+  .hero-art { width: 94%; }
+  .intro-section, .page-links-section, .inner-hero-inner, .content-section { width: calc(100% - 42px); }
+}
+@media (hover: none) {
+  .page-card:hover, .header-cta:hover, .button:hover { transform: none; }
+}
