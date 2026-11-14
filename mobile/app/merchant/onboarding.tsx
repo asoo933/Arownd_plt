@@ -206,18 +206,23 @@ export default function MerchantOnboardingScreen() {
                   label={translate("merchantStorePhoneLabel")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextField
-                    value={field.value}
-                    onChangeText={field.onChange}
-                    onBlur={field.onBlur}
-                    accessibilityLabel={translate("merchantStorePhoneLabel")}
-                    placeholder={translate("merchantStorePhonePlaceholder")}
-                    placeholderTextColor={theme.colors.placeholder}
-                    style={styles.input}
-                    keyboardType="phone-pad"
-                    maxLength={20}
-                    textAlign="auto"
-                  />
+                  <View style={styles.phoneInputRow}>
+                    <View style={[styles.phoneCallingCode, { borderColor: theme.colors.inputBorder, backgroundColor: theme.colors.surfaceSecondary }]}>
+                      <UiText style={[styles.phoneCallingCodeText, { color: theme.colors.muted }]}>{regionOptions.data?.callingCode ?? ""}</UiText>
+                    </View>
+                    <TextField
+                      value={field.value}
+                      onChangeText={field.onChange}
+                      onBlur={field.onBlur}
+                      accessibilityLabel={translate("merchantStorePhoneLabel")}
+                      placeholder={translate("merchantStorePhonePlaceholder")}
+                      placeholderTextColor={theme.colors.placeholder}
+                      style={[styles.input, styles.phoneNumberInput]}
+                      keyboardType="phone-pad"
+                      maxLength={20}
+                      textAlign="auto"
+                    />
+                  </View>
                 </FormField>
               )}
             />
@@ -232,18 +237,23 @@ export default function MerchantOnboardingScreen() {
                   hint={translate("merchantStoreWhatsAppHint")}
                   error={fieldError(fieldState.error?.message)}
                 >
-                  <TextField
-                    value={field.value}
-                    onChangeText={field.onChange}
-                    onBlur={field.onBlur}
-                    accessibilityLabel={translate("merchantStoreWhatsAppLabel")}
-                    placeholder={translate("merchantStoreWhatsAppPlaceholder")}
-                    placeholderTextColor={theme.colors.placeholder}
-                    style={styles.input}
-                    keyboardType="phone-pad"
-                    maxLength={20}
-                    textAlign="auto"
-                  />
+                  <View style={styles.phoneInputRow}>
+                    <View style={[styles.phoneCallingCode, { borderColor: theme.colors.inputBorder, backgroundColor: theme.colors.surfaceSecondary }]}>
+                      <UiText style={[styles.phoneCallingCodeText, { color: theme.colors.muted }]}>{regionOptions.data?.callingCode ?? ""}</UiText>
+                    </View>
+                    <TextField
+                      value={field.value}
+                      onChangeText={field.onChange}
+                      onBlur={field.onBlur}
+                      accessibilityLabel={translate("merchantStoreWhatsAppLabel")}
+                      placeholder={translate("merchantStoreWhatsAppPlaceholder")}
+                      placeholderTextColor={theme.colors.placeholder}
+                      style={[styles.input, styles.phoneNumberInput]}
+                      keyboardType="phone-pad"
+                      maxLength={20}
+                      textAlign="auto"
+                    />
+                  </View>
                 </FormField>
               )}
             />
@@ -644,6 +654,18 @@ function createStyles(theme: AppTheme) {
       color: theme.colors.foreground,
       fontSize: designTokens.typography.body
     },
+    phoneInputRow: { flexDirection: "row", alignItems: "center", gap: designTokens.spacing.sm },
+    phoneCallingCode: {
+      minHeight: designTokens.dimensions.controlHeight.lg,
+      minWidth: 66,
+      borderWidth: 1,
+      borderRadius: designTokens.radius.sm,
+      paddingHorizontal: designTokens.spacing.md,
+      alignItems: "center",
+      justifyContent: "center"
+    },
+    phoneCallingCodeText: { fontSize: designTokens.typography.body, fontWeight: designTokens.fontWeights.bold },
+    phoneNumberInput: { flex: 1, minWidth: 0 },
     multiline: { minHeight: 88, paddingTop: 12 },
     select: {
       minHeight: designTokens.dimensions.controlHeight.lg,
