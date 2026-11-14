@@ -187,6 +187,20 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingsRow
+            icon="lock"
+            label={translate("settingsPrivacyPolicy")}
+            onPress={() => router.push("/privacy")}
+            theme={theme}
+            styles={styles}
+          />
+          <SettingsRow
+            icon="info"
+            label={translate("settingsTermsOfUse")}
+            onPress={() => router.push("/terms")}
+            theme={theme}
+            styles={styles}
+          />
+          <SettingsRow
             icon="trash-2"
             label={translate("deleteAccountTitle")}
             onPress={() => router.push("/delete-account")}
