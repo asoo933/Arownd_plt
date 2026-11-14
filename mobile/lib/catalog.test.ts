@@ -57,8 +57,11 @@ describe("catalog presentation helpers", () => {
 
   it("formats prices using the selected browsing market currency", () => {
     for (const currency of ["DZD", "MAD", "EGP", "SAR", "AED"]) {
-      expect(formatMarketPrice(1250, currency)).not.toBe("");
+      const formattedPrice = formatMarketPrice(1250, currency);
+      expect(formattedPrice).not.toBe("");
+      expect(formattedPrice).not.toContain(".");
     }
+    expect(formatDZD(1250)).not.toContain(".");
     expect(formatMarketPrice(1250, "MAD")).not.toBe(formatDZD(1250));
   });
 
