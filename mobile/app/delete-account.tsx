@@ -29,6 +29,7 @@ export default function DeleteAccountScreen() {
     onSuccess: refresh
   });
   const active = request.data && ["pending", "under_review", "blocked"].includes(request.data.status);
+  const activeRequest = request.data && active ? request.data : null;
 
   return (
     <CustomerScreen showNavigation={false} contentStyle={styles.content}>
@@ -54,16 +55,16 @@ export default function DeleteAccountScreen() {
         />
       ) : null}
 
-      {request.isSuccess && request.data && active ? (
+      {request.isSuccess && activeRequest ? (
         <View style={styles.statusCard}>
           <UiText weight="800">{translate("deleteAccountRequestPending")}</UiText>
-          <Caption>{translate("deleteAccountRequestedAt")}: {new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { dateStyle: "medium" }).format(new Date(request.data.requested_at))}</Caption>
+          <Caption>{translate("deleteAccountRequestedAt")}: {new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { dateStyle: "medium" }).format(new Date(activeRequest.requested_at))}</Caption>
           <Button
             label={translate("deleteAccountCancel")}
             variant="outline"
             loading={cancelRequest.isPending}
             disabled={cancelRequest.isPending}
-            onPress={() => cancelRequest.mutate(request.data.id)}
+            onPress={() => cancelRequest.mutate(activeRequest.id)}
             fullWidth
           />
         </View>
