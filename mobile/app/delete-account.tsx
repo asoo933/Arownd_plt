@@ -6,9 +6,8 @@ import { Linking, StyleSheet, View } from "react-native";
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { Alert, AppHeader, Button, Caption, ConfirmDialog, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import { cancelMyAccountDeletion, fetchMyAccountDeletionRequest, requestMyAccountDeletion } from "@/lib/account-deletion";
-import { translate } from "@/lib/i18n";
+import { translate, useLanguage } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
-import { useLanguage } from "@/lib/i18n";
 
 export default function DeleteAccountScreen() {
   const theme = useAppTheme();
@@ -55,7 +54,7 @@ export default function DeleteAccountScreen() {
         />
       ) : null}
 
-      {request.isSuccess && active ? (
+      {request.isSuccess && request.data && active ? (
         <View style={styles.statusCard}>
           <UiText weight="800">{translate("deleteAccountRequestPending")}</UiText>
           <Caption>{translate("deleteAccountRequestedAt")}: {new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { dateStyle: "medium" }).format(new Date(request.data.requested_at))}</Caption>
@@ -64,7 +63,7 @@ export default function DeleteAccountScreen() {
             variant="outline"
             loading={cancelRequest.isPending}
             disabled={cancelRequest.isPending}
-            onPress={() => cancelRequest.mutate(request.data!.id)}
+            onPress={() => cancelRequest.mutate(request.data.id)}
             fullWidth
           />
         </View>
