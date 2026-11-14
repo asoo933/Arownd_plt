@@ -730,3 +730,43 @@ body,
 .button .ui-icon { width: 19px; height: 19px; }
 .text-link .ui-icon { width: 18px; height: 18px; }
 .page-arrow .ui-icon { width: 21px; height: 21px; }
+
+
+/* Unified home + features and legal center */
+.features-overview { background: #080808; border-block: 1px solid rgba(255,255,255,.16); }
+.features-overview .content-section { padding-top: 92px; padding-bottom: 96px; }
+.features-overview .section-heading { align-items: end; margin-bottom: 48px; }
+.features-overview .section-heading h2 span { display: inline-block; padding: .02em .14em .08em; border-radius: .12em; background: #FFF01F; color: #000; }
+.feature-audience { margin-top: 38px; }
+.feature-audience-heading { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 10px 30px; margin-bottom: 18px; }
+.feature-audience-heading .section-kicker { grid-column: 1 / -1; }
+.feature-audience-heading h3 { margin: 0; color: #fff; font-size: clamp(23px,3vw,32px); }
+.feature-audience-heading p { margin: 0; color: #fff; opacity: .78; font-size: 13px; line-height: 2; }
+.features-overview .placeholder-grid { border: 1px solid rgba(255,255,255,.2); border-radius: 10px; overflow: hidden; }
+.features-overview .placeholder-card { min-height: 218px; padding: 25px; border-bottom: 1px solid rgba(255,255,255,.2); }
+.features-overview .placeholder-card h3 { margin-top: 36px; font-size: 18px; }
+.features-overview .placeholder-card p { color: #fff; opacity: .76; }
+.features-overview .placeholder-card > span { color: #FFF01F; }
+.merchant-audience { margin-top: 62px; }
+.legal-page .inner-hero-inner { min-height: 290px; }
+.section-switcher { position: sticky; top: 78px; z-index: 20; display: flex; justify-content: center; gap: 10px; padding: 14px 24px; background: rgba(0,0,0,.96); border-bottom: 1px solid rgba(255,255,255,.2); backdrop-filter: blur(14px); }
+.section-switcher a { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 8px 18px; border: 1px solid rgba(255,255,255,.28); border-radius: 7px; color: #fff; text-decoration: none; font-size: 13px; transition: background .2s,color .2s,border-color .2s; }
+.section-switcher a:hover, .section-switcher a:focus-visible { background: #FFF01F; color: #000; border-color: #FFF01F; }
+.legal-page .legal-section { scroll-margin-top: 145px; padding-top: 66px; padding-bottom: 70px; border-bottom: 1px solid rgba(255,255,255,.2); }
+.legal-section-heading { max-width: 760px; margin: 0 auto 30px; }
+.legal-section-heading h2 { margin: 10px 0; color: #fff; font-size: clamp(28px,4vw,40px); }
+.legal-section-heading p { margin: 0; color: #fff; opacity: .78; line-height: 2; font-size: 14px; }
+.legal-page .legal-placeholder { max-width: 760px; margin-inline: auto; padding-block: 30px; border-bottom: 0; }
+.legal-page .legal-placeholder[lang="en"] { margin-top: 12px; padding-top: 24px; border-top: 1px dashed rgba(255,255,255,.28); }
+.legal-page .legal-placeholder h2, .legal-page .legal-placeholder h3 { color: #fff; }
+.legal-page .legal-placeholder li { color: #fff; opacity: .9; }
+@media (max-width:760px) {
+ .features-overview .content-section { width: calc(100% - 42px); padding-block: 62px; }
+ .feature-audience-heading { grid-template-columns: 1fr; gap: 8px; }
+ .features-overview .placeholder-card { min-height: 0; padding: 20px; }
+ .features-overview .placeholder-card h3 { margin-top: 20px; }
+ .merchant-audience { margin-top: 42px; }
+ .section-switcher { top: 76px; justify-content: flex-start; overflow-x: auto; padding-inline: 18px; }
+ .section-switcher a { flex: 0 0 auto; padding-inline: 14px; font-size: 12px; }
+ .legal-page .legal-section { scroll-margin-top: 132px; padding-block: 48px; }
+}
