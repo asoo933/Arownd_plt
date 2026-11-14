@@ -215,7 +215,7 @@ export async function fetchMerchantDashboard(storeId: string): Promise<MerchantD
       .eq("store_id", storeId),
     client
       .from("merchant_orders")
-      .select("id, status, subtotal, shipping_fee, quoted_at, created_at, order:orders!inner(id, status, full_name, commune, delivery_type, created_at, country_code, currency_code, region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!orders_secondary_region_fkey(name_ar, name_fr, name_en), wilaya:wilayas(id, name_ar, name_fr)), items:order_items!inner(id, store_id, merchant_archived_at, product_name, quantity)")
+      .select("id, status, subtotal, shipping_fee, quoted_at, created_at, order:orders!inner(id, status, full_name, commune, delivery_type, created_at, country_code, currency_code, region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!orders_country_secondary_region_fkey(name_ar, name_fr, name_en), wilaya:wilayas(id, name_ar, name_fr)), items:order_items!inner(id, store_id, merchant_archived_at, product_name, quantity)")
       .eq("store_id", storeId)
       .eq("items.store_id", storeId)
       .is("items.merchant_archived_at", null)
@@ -343,7 +343,7 @@ export async function fetchMerchantOrderDetails(
 
   const { data: merchantOrderData, error: merchantOrderError } = await client
     .from("merchant_orders")
-    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, country_code, currency_code, region_id, secondary_region_id, address_line, delivery_type, payment_method, created_at, region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!orders_secondary_region_fkey(name_ar, name_fr, name_en), wilaya:wilayas(id, name_ar, name_fr), daira:country_regions!orders_daira_region_fkey(name_ar, name_fr))")
+    .select("id, order_id, store_id, status, subtotal, shipping_fee, quoted_at, payment_status, paid_amount, paid_at, order:orders!inner(id, status, full_name, phone, commune, country_code, currency_code, region_id, secondary_region_id, address_line, delivery_type, payment_method, created_at, region:country_regions!orders_country_region_fkey(name_ar, name_fr, name_en), secondary_region:country_regions!orders_country_secondary_region_fkey(name_ar, name_fr, name_en), wilaya:wilayas(id, name_ar, name_fr), daira:country_regions!orders_daira_region_fkey(name_ar, name_fr))")
     .eq("id", merchantOrderId)
     .eq("store_id", storeId)
     .maybeSingle();
