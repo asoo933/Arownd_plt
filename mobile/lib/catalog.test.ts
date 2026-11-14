@@ -55,14 +55,42 @@ describe("catalog presentation helpers", () => {
     expect(getPrimaryImage({ ...product, images: [] })).toBeNull();
   });
 
-  it("formats prices using the selected browsing market currency", () => {
-    for (const currency of ["DZD", "MAD", "EGP", "SAR", "AED"]) {
+  it("formats prices using the selected browsing market currency without punctuation in currency symbols", () => {
+    const regions: Record<string, string> = {
+      DZD: "DZ",
+      MAD: "MA",
+      EGP: "EG",
+      SAR: "SA",
+      AED: "AE"
+    };
+
+    for (const currency of Object.keys(regions)) {
       const formattedPrice = formatMarketPrice(1250, currency);
+      const parts = new Intl.NumberFormat(`ar-${regions[currency]}`, {
+        style: "currency",
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: currency === "DZD" ? 0 : 2
+      }).formatToParts(1250);
+      const currencyPart = parts.find((part) => part.type === "currency")?.value;
+
       expect(formattedPrice).not.toBe("");
-      expect(formattedPrice).not.toContain(".");
+      expect(currencyPart).toBeDefined();
+      const cleanCurrencyPart = currencyPart!.replace(/\./g, "");
+      expect(formattedPrice).toContain(cleanCurrencyPart);
+      if (cleanCurrencyPart !== currencyPart) {
+        expect(formattedPrice).not.toContain(currencyPart!);
+      }
     }
-    expect(formatDZD(1250)).not.toContain(".");
-    expect(formatMarketPrice(1250, "MAD")).not.toBe(formatDZD(1250));
+
+    const formattedDzd = formatDZD(1250);
+    const dzdCurrencyPart = new Intl.NumberFormat("ar-DZ", {
+      style: "currency",
+      currency: "DZD",
+      maximumFractionDigits: 0
+    }).formatToParts(1250).find((part) => part.type === "currency")?.value;
+    expect(formattedDzd).toContain(dzdCurrencyPart!.replace(/\./g, ""));
+    expect(formatMarketPrice(1250, "MAD")).not.toBe(formattedDzd);
   });
 
   it("keeps unknown currency codes visible instead of silently using DZD", () => {
