@@ -515,3 +515,20 @@ a:focus-visible, button:focus-visible {
 @media (hover: none) {
   .page-card:hover, .header-cta:hover, .button:hover { transform: none; }
 }
+
+/* Refined yellow text highlights */
+.hero h1 span,
+.intro-grid h2 span,
+.inner-hero h1 span {
+  display: inline;
+  padding: 0.025em 0.16em 0.105em;
+  border-radius: 0.14em;
+  background: var(--brand);
+  color: #000000;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  box-shadow: 0 2px 0 rgba(255, 240, 31, .16);
+}
+.hero h1 span::after {
+  content: none;
+}
