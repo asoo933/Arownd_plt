@@ -770,3 +770,5 @@ body,
  .section-switcher a { flex: 0 0 auto; padding-inline: 14px; font-size: 12px; }
  .legal-page .legal-section { scroll-margin-top: 132px; padding-block: 48px; }
 }
+
+@media (min-width:761px) { .page-links { grid-template-columns: repeat(3,minmax(0,1fr)); } }
