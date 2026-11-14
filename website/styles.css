@@ -706,3 +706,27 @@ body,
 .site-footer {
   border-top-color: rgba(255,255,255,.22);
 }
+
+
+/* Consistent interface icons */
+.ui-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+.header-cta .ui-icon { width: 17px; height: 17px; }
+.button .ui-icon { width: 19px; height: 19px; }
+.text-link .ui-icon { width: 18px; height: 18px; }
+.page-arrow .ui-icon { width: 21px; height: 21px; }
