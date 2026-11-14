@@ -212,3 +212,146 @@ button { font: inherit; }
   .download-mark { width: 82px; height: 82px; flex-basis: 82px; font-size: 56px; }
   .download-panel h2, .legal-placeholder h2 { font-size: 23px; }
 }
+
+/* Arownd dark brand theme — aligned with the native app palette */
+:root {
+  color-scheme: dark;
+  --brand: #FFF01F;
+  --brand-hover: #F0E100;
+  --ink: #FFFFFF;
+  --muted: #A3A3A3;
+  --paper: #000000;
+  --soft: #171717;
+  --line: #262626;
+}
+body {
+  background: #000000;
+  color: #FFFFFF;
+}
+.site-header {
+  background: rgba(0, 0, 0, .92);
+  border-bottom-color: #262626;
+}
+.brand-mark { color: var(--brand); }
+.brand-dot {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+.nav-link, .more-toggle { color: #A3A3A3; }
+.nav-link:hover, .nav-link.active, .more-toggle:hover { color: #FFFFFF; }
+.nav-link.active::after,
+.eyebrow-dot, .caption-dot { background: var(--brand); }
+.more-menu {
+  background: #171717;
+  border-color: #262626;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
+}
+.more-menu a { color: #D4D4D4; }
+.more-menu a:hover { background: #262626; color: #FFFFFF; }
+.header-cta {
+  background: var(--brand);
+  color: #000000;
+}
+.header-cta:hover { background: var(--brand-hover); }
+.hero::before { background: #111111; }
+.hero-glow {
+  background: radial-gradient(circle, rgba(255,240,31,.16), rgba(255,240,31,0) 68%);
+}
+.eyebrow, .section-kicker { color: #A3A3A3; }
+.eyebrow { color: #D4D4D4; }
+.hero h1, .intro-grid h2, .section-heading h2,
+.inner-hero h1, .download-panel h2, .legal-placeholder h2,
+.placeholder-card h3, .page-card-title { color: #FFFFFF; }
+.hero h1 span::after { background: var(--brand); }
+.hero-description, .intro-copy p, .section-heading > p,
+.inner-hero p, .placeholder-card p, .download-panel p,
+.legal-placeholder p { color: #A3A3A3; }
+.button-dark {
+  background: var(--brand);
+  color: #000000;
+}
+.button-dark:hover { background: var(--brand-hover); }
+.text-link, .underlined-link { color: #FFFFFF; }
+.underlined-link { border-bottom-color: var(--brand); }
+.note-line, .caption-divider, .hero-index i { background: #525252; }
+.hero-note, .hero-index { color: #A3A3A3; }
+.hero-index span:first-child { color: #FFFFFF; }
+.art-orbit { border-color: rgba(255,255,255,.16); }
+.art-disc {
+  background: var(--brand);
+  color: #000000;
+}
+.art-small-card {
+  background: #171717;
+  color: #FFFFFF;
+  border-color: #262626;
+  box-shadow: 0 14px 35px rgba(0,0,0,.4);
+}
+.mini-square { background: var(--brand); }
+.mini-ring { border-color: var(--brand); }
+.page-links {
+  border-color: var(--line);
+}
+.page-card { border-left-color: var(--line); }
+.page-card:hover, .page-card.highlighted { background: #171717; }
+.page-card.highlighted::before { background: var(--brand); }
+.page-number, .placeholder-card > span { color: #737373; }
+.page-arrow { color: var(--brand); }
+.site-footer {
+  background: #111111;
+  color: #FFFFFF;
+  border-top: 1px solid #262626;
+}
+.site-footer > p, .copyright { color: #A3A3A3; }
+.footer-links { color: #D4D4D4; }
+.footer-links a:hover { color: var(--brand); }
+.menu-toggle {
+  border-color: #262626;
+  background: #171717;
+}
+.menu-toggle span { background: #FFFFFF; }
+.main-navigation {
+  background: #000000;
+  border-bottom-color: #262626;
+  box-shadow: 0 18px 25px rgba(0,0,0,.5);
+}
+.nav-link { border-bottom-color: #262626; }
+.inner-hero { background: #111111; }
+.inner-hero::after {
+  border-color: rgba(255,255,255,.1);
+  box-shadow: 0 0 0 42px rgba(255,255,255,.018), 0 0 0 84px rgba(255,255,255,.014);
+}
+.inner-hero h1 span { background: linear-gradient(transparent 67%, var(--brand) 67%); }
+.placeholder-grid {
+  border-top-color: var(--line);
+  border-bottom-color: var(--line);
+}
+.placeholder-card { border-left-color: var(--line); }
+.download-panel {
+  background: #111111;
+  border-color: var(--line);
+}
+.download-mark {
+  background: var(--brand);
+  color: #000000;
+}
+.download-status, .status-label {
+  background: #262626;
+  color: #FFFFFF;
+}
+.legal-placeholder {
+  border-top-color: var(--line);
+  border-bottom-color: var(--line);
+}
+.legal-placeholder a,
+.content-section a { color: var(--brand); }
+.legal-placeholder a:hover,
+.content-section a:hover { color: var(--brand-hover); }
+.legal-placeholder strong { color: #FFFFFF; }
+.legal-placeholder li { color: #D4D4D4; }
+@media (max-width: 760px) {
+  .main-navigation { background: #000000; }
+  .nav-link { border-bottom-color: #262626; }
+  .placeholder-card { border-bottom-color: var(--line); }
+}
+
