@@ -26,19 +26,6 @@ export async function fetchCheckoutRegions(parentRegionId?: number | null) {
   return fetchMyAccountRegions(parentRegionId);
 }
 
-export async function fetchCheckoutCommunes(regionId: number): Promise<string[]> {
-  if (!Number.isInteger(regionId) || regionId <= 0) throw new Error("invalid_region");
-  const { data, error } = await getSupabaseClient()
-    .from("stores")
-    .select("commune")
-    .eq("region_id", regionId)
-    .not("commune", "is", null);
-  if (error) throw error;
-  return [...new Set(data.map((row) => row.commune).filter(
-    (value): value is string => typeof value === "string" && value.trim().length > 0
-  ))].sort((a, b) => a.localeCompare(b, "ar"));
-}
-
 export async function fetchCheckoutProfile(): Promise<CheckoutProfile | null> {
   const { data: authData, error: authError } = await getSupabaseClient().auth.getUser();
   if (authError) throw authError;
