@@ -203,7 +203,15 @@ export function getRegionLevelDisplayName(level: CountryRegionLevel, language: s
 
 export function normalizePhoneForCallingCode(value: string, callingCode: string): string {
   if (!/^\+[1-9]\d{0,2}$/.test(callingCode)) throw new Error("invalid_calling_code");
-  let normalized = value.trim().replace(/[\s().-]/g, "");
+
+  const asciiDigits = Array.from(value, (character) => {
+    const codePoint = character.codePointAt(0) ?? 0;
+    if (codePoint >= 0x0660 && codePoint <= 0x0669) return String(codePoint - 0x0660);
+    if (codePoint >= 0x06f0 && codePoint <= 0x06f9) return String(codePoint - 0x06f0);
+    return character;
+  }).join("");
+
+  let normalized = asciiDigits.trim().replace(/[\s().-\u200e\u200f\u202a-\u202e]/g, "");
   if (normalized.startsWith("00")) normalized = "+" + normalized.slice(2);
   if (!normalized.startsWith("+")) {
     const callingDigits = callingCode.slice(1);
