@@ -211,7 +211,7 @@ export function normalizePhoneForCallingCode(value: string, callingCode: string)
     return character;
   }).join("");
 
-  let normalized = asciiDigits.trim().replace(/[\s().-\u200e\u200f\u202a-\u202e]/g, "");
+  let normalized = asciiDigits.trim().replace(/[\s().\-\u200e\u200f\u202a-\u202e]/g, "");
   if (normalized.startsWith("00")) normalized = "+" + normalized.slice(2);
   if (!normalized.startsWith("+")) {
     const callingDigits = callingCode.slice(1);
