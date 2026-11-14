@@ -532,3 +532,59 @@ a:focus-visible, button:focus-visible {
 .hero h1 span::after {
   content: none;
 }
+
+
+/* App identity inside the hero orbit */
+.art-disc {
+  width: 52%;
+  background: transparent;
+  box-shadow: none;
+  transform: rotate(-8deg);
+}
+.app-icon-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 23%;
+  filter: drop-shadow(0 24px 34px rgba(0,0,0,.28));
+}
+.web-orbit-badge {
+  position: absolute;
+  z-index: 2;
+  left: 1%;
+  top: 17%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  border: 1px solid #333;
+  border-radius: 999px;
+  background: rgba(23,23,23,.94);
+  color: #fff;
+  box-shadow: 0 14px 38px rgba(0,0,0,.3);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+}
+.web-orbit-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #000;
+}
+.web-orbit-icon svg { display: block; width: 19px; height: 19px; }
+@media (max-width: 760px) {
+  .web-orbit-badge {
+    left: -1%;
+    top: 14%;
+    gap: 8px;
+    padding: 8px 11px;
+    font-size: 10px;
+  }
+  .web-orbit-icon { width: 27px; height: 27px; }
+}
