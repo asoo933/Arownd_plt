@@ -781,3 +781,8 @@ body,
   .header-cta { order: 1; margin: 0; }
   .menu-toggle { order: 2; margin: 0; }
 }
+
+
+/* Lucide icon sizing */
+.menu-icon { display:block; width:21px; height:21px; }
+.menu-toggle span { display:none; }
