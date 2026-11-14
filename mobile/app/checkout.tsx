@@ -13,7 +13,6 @@ import { AppHeader, Button, Card, CheckoutSummary, Icon, IconButton, PressableSu
 import { fetchOffersByIds, formatMarketPrice } from "@/lib/catalog";
 import {
   completeCheckout,
-  fetchCheckoutCommunes,
   fetchCheckoutProfile,
   fetchCheckoutRegions,
   submitCheckout,
@@ -32,7 +31,7 @@ import { isValidAddressPhone, normalizeAddressPhone } from "@/lib/user-address-s
 import { formatOrderCode } from "@/lib/orders-state";
 import { MAX_CHECKOUT_ITEMS } from "@/lib/checkout-state";
 
-type Picker = "region" | "secondary" | "commune" | null;
+type Picker = "region" | "secondary" | null;
 
 export default function CheckoutScreen() {
   const { language } = useLanguage();
@@ -73,12 +72,6 @@ export default function CheckoutScreen() {
   const formatAccountAmount = (amount: number) => accountCurrency.data ? formatMarketPrice(amount, accountCurrency.data) : "—";
   const regionOptions = useQuery({ queryKey: ["checkout-regions"], queryFn: () => fetchCheckoutRegions(), staleTime: Infinity });
   const secondaryOptions = useQuery({ queryKey: ["checkout-regions", regionId], queryFn: () => fetchCheckoutRegions(regionId), enabled: regionId !== null, staleTime: Infinity });
-  const communes = useQuery({
-    queryKey: ["checkout-communes", regionId],
-    queryFn: () => fetchCheckoutCommunes(regionId as number),
-    enabled: regionId !== null,
-    staleTime: 5 * 60 * 1000
-  });
   const profile = useQuery({
     queryKey: ["checkout-profile"],
     queryFn: fetchCheckoutProfile,
@@ -231,12 +224,12 @@ export default function CheckoutScreen() {
   };
 
   const fieldStyle = [styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.inputBorder, color: theme.colors.foreground }];
-  const modalTitle = picker === "region" ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "") : picker === "secondary" ? (secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : "") : translate("checkoutChooseCommune");
+  const modalTitle = picker === "region"
+    ? (regionOptions.data ? getRegionLevelDisplayName(regionOptions.data.selectedLevel, language) : "")
+    : (secondaryOptions.data ? getRegionLevelDisplayName(secondaryOptions.data.selectedLevel, language) : "");
   const pickerItems = picker === "region"
     ? (regionOptions.data?.regions ?? []).map((item) => ({ id: String(item.id), label: getRegionDisplayName(item, language) }))
-    : picker === "secondary"
-      ? (secondaryOptions.data?.regions ?? []).map((item) => ({ id: String(item.id), label: getRegionDisplayName(item, language) }))
-      : (communes.data ?? []).map((item) => ({ id: item, label: item }));
+    : (secondaryOptions.data?.regions ?? []).map((item) => ({ id: String(item.id), label: getRegionDisplayName(item, language) }));
 
   return <CustomerScreen
     footer={
@@ -338,14 +331,7 @@ export default function CheckoutScreen() {
         </PressableSurface>
       </> : null}
       <UiText style={styles.fieldLabel}>{translate("checkoutCommune")}</UiText>
-      {communes.data && communes.data.length > 0 ? (
-        <PressableSurface accessibilityLabel={translate("checkoutCommune")} onPress={() => setPicker("commune")} style={[styles.select, { backgroundColor: theme.colors.surfaceMuted }]} disabled={!regionId}>
-          <UiText style={[styles.selectText, !commune && styles.placeholder]}>{commune || translate("checkoutChooseCommune")}</UiText>
-        </PressableSurface>
-      ) : (
-        <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={100} editable={regionId !== null && !communes.isPending} />
-      )}
-      {communes.isError ? <UiText style={styles.fieldHint}>{translate("checkoutCommunesFallback")}</UiText> : null}
+      <TextField accessibilityLabel={translate("checkoutCommune")} value={commune} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setCommune(value); }} placeholder={translate("checkoutCommunePlaceholder")} style={fieldStyle} textAlign="auto" maxLength={100} editable={regionId !== null} />
 
       <UiText style={styles.fieldLabel}>{translate("checkoutAddress")}</UiText>
       <TextField accessibilityLabel={translate("checkoutAddress")} value={addressLine} onChangeText={(value) => { setFormEdited(true); setSelectedAddressId(null); setAddressLine(value); }} placeholder={translate("checkoutAddressPlaceholder")} style={[...fieldStyle, styles.multiline]} textAlign="auto" multiline maxLength={300} />
@@ -400,7 +386,7 @@ export default function CheckoutScreen() {
             <UiText style={[styles.sectionTitle, { color: theme.colors.foreground }]}>{modalTitle}</UiText>
             <PressableSurface accessibilityLabel={translate("back")} onPress={() => setPicker(null)} hitSlop={10}><UiText style={styles.back}>{translate("back")}</UiText></PressableSurface>
           </View>
-          {((picker === "region" && regionOptions.isPending) || (picker === "secondary" && secondaryOptions.isPending) || (picker === "commune" && communes.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
+          {((picker === "region" && regionOptions.isPending) || (picker === "secondary" && secondaryOptions.isPending)) ? <LoadingState label={translate("stateLoading")} /> : null}
           
           <ScrollView keyboardShouldPersistTaps="handled">
             {pickerItems.map((item) => <PressableSurface key={item.id} onPress={() => {
@@ -414,15 +400,11 @@ export default function CheckoutScreen() {
                 setFormEdited(true);
                 setSelectedAddressId(null);
                 setSecondaryRegionId(Number(item.id));
-              } else if (picker === "commune") {
-                setFormEdited(true);
-                setCommune(item.label);
               }
               setPicker(null);
             }} style={styles.pickerItem}>
               <UiText style={[styles.pickerText, { color: theme.colors.foreground }]}>{item.label}</UiText>
             </PressableSurface>)}
-            {picker === "commune" && pickerItems.length === 0 ? <UiText style={styles.fieldHint}>{translate("checkoutNoCommunes")}</UiText> : null}
           </ScrollView>
         </View>
       </View>
