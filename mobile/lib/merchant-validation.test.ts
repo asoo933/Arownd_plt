@@ -41,6 +41,14 @@ describe("merchantStoreSchema", () => {
     }).success).toBe(false);
   });
 
+  it("accepts Arabic-Indic and Persian digits in phone fields", () => {
+    expect(merchantStoreSchema.safeParse({
+      ...validStore,
+      phone: "٠٥٥٠ ١٢٣ ٤٥٦",
+      whatsapp: "۰۵۵۰ ۱۲۳ ۴۵۶"
+    }).success).toBe(true);
+  });
+
   it("rejects duplicate subcategories", () => {
     expect(merchantStoreSchema.safeParse({
       ...validStore,
