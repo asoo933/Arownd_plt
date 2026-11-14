@@ -4,7 +4,7 @@ export const merchantStoreSchema = z.object({
   storeName: z.string().trim().min(2, "merchantValidationStoreName").max(100, "merchantValidationStoreName"),
   phone: z.string().trim().regex(/^[+0-9٠-٩۰-۹()\s-]{7,20}$/, "merchantValidationPhone"),
   whatsapp: z.string().trim().max(20, "merchantValidationWhatsApp").refine(
-    (value) => value.length === 0 || /^[+0-9()\s-]{7,20}$/.test(value),
+    (value) => value.length === 0 || /^[+0-9٠-٩۰-۹()\s-]{7,20}$/.test(value),
     "merchantValidationWhatsApp"
   ),
   regionId: z.number().int().positive().nullable().refine(
