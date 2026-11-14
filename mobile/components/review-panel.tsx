@@ -9,6 +9,7 @@ import { fetchApprovedReviews, fetchMyReview, submitMyReview } from "@/lib/revie
 import { getSupabaseClient } from "@/lib/supabase";
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme, type AppTheme } from "@/lib/theme";
+import { ContentReportAction } from "@/components/content-report-action";
 
 export function ReviewPanel({ targetType, targetId }: { targetType: "product" | "store"; targetId: string }) {
   const theme = useAppTheme();
@@ -98,6 +99,7 @@ export function ReviewPanel({ targetType, targetId }: { targetType: "product" | 
             <RatingStars value={item.rating} size={16} />
           </View>
           {item.comment ? <UiText style={[styles.body, { color: theme.colors.foreground }]}>{item.comment}</UiText> : null}
+          <ContentReportAction targetType="review" targetId={item.id} compact />
         </View>
       )) : !reviews.isPending && !reviews.isError ? <EmptyState title={translate("reviewsEmpty")} hint={translate("reviewsEmptyHint")} /> : null}
     </View>
