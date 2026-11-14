@@ -7,7 +7,7 @@
   --paper: #ffffff;
   --soft: #f5f5f5;
   --line: #e8e8e8;
-  --font-ar: "IBM Plex Sans Arabic", sans-serif;
+  --font-ar: sans-serif;
   --font-en: "Inter", sans-serif;
 }
 * { box-sizing: border-box; }
@@ -587,4 +587,122 @@ a:focus-visible, button:focus-visible {
     font-size: 10px;
   }
   .web-orbit-icon { width: 27px; height: 27px; }
+}
+
+
+/* Native app typography and strict Arownd monochrome palette */
+:root {
+  --font-ar: sans-serif;
+  --font-en: "Inter", sans-serif;
+  --ink: #FFFFFF;
+  --muted: #FFFFFF;
+  --paper: #000000;
+  --soft: #000000;
+  --line: #FFFFFF;
+  color-scheme: dark;
+}
+html {
+  scrollbar-color: #FFFFFF #000000;
+}
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-ar);
+}
+:lang(en),
+[dir="ltr"] {
+  font-family: var(--font-en), sans-serif;
+}
+body,
+.site-header,
+.main-navigation,
+.more-menu,
+.hero::before,
+.inner-hero,
+.download-panel,
+.art-small-card,
+.site-footer,
+.menu-toggle {
+  background-color: #000000;
+}
+.site-header,
+.main-navigation,
+.more-menu,
+.menu-toggle,
+.download-panel,
+.page-links,
+.page-card,
+.placeholder-grid,
+.placeholder-card,
+.legal-placeholder,
+.inner-hero {
+  border-color: rgba(255,255,255,.22);
+}
+.hero::before { border-color: rgba(255,255,255,.16); }
+.nav-link,
+.more-toggle,
+.more-menu a,
+.eyebrow,
+.section-kicker,
+.hero-description,
+.hero-note,
+.hero-index,
+.intro-copy p,
+.section-heading > p,
+.inner-hero p,
+.placeholder-card p,
+.download-panel p,
+.legal-placeholder p,
+.legal-placeholder li,
+.site-footer > p,
+.copyright,
+.footer-links,
+.page-number,
+.placeholder-card > span {
+  color: #FFFFFF;
+}
+.nav-link,
+.more-toggle,
+.more-menu a,
+.footer-links a {
+  opacity: .9;
+}
+.note-line,
+.caption-divider,
+.hero-index i {
+  background: #FFFFFF;
+  opacity: .7;
+}
+.art-orbit,
+.inner-hero::after {
+  border-color: rgba(255,255,255,.35);
+}
+.inner-hero::after {
+  box-shadow: 0 0 0 42px rgba(255,255,255,.06), 0 0 0 84px rgba(255,255,255,.035);
+}
+.page-card:hover,
+.page-card.highlighted,
+.more-menu a:hover {
+  background: #FFF01F;
+  color: #000000;
+}
+.page-card:hover *,
+.page-card.highlighted *,
+.more-menu a:hover {
+  color: #000000;
+}
+.download-status,
+.status-label {
+  background: #FFF01F;
+  color: #000000;
+}
+.web-orbit-badge {
+  background: #000000;
+  border-color: rgba(255,255,255,.45);
+  color: #FFFFFF;
+}
+.site-footer {
+  border-top-color: rgba(255,255,255,.22);
 }
