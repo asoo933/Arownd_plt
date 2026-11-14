@@ -1,16 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Linking, StyleSheet, View } from "react-native";
 
 import { CustomerScreen, ErrorState, LoadingState } from "@/components/customer-ui";
 import { Alert, AppHeader, Button, Caption, ConfirmDialog, Heading, Icon, PressableSurface, Text as UiText } from "@/components/ui";
 import { cancelMyAccountDeletion, fetchMyAccountDeletionRequest, requestMyAccountDeletion } from "@/lib/account-deletion";
 import { translate } from "@/lib/i18n";
 import { designTokens, useAppTheme } from "@/lib/theme";
+import { useLanguage } from "@/lib/i18n";
 
 export default function DeleteAccountScreen() {
   const theme = useAppTheme();
+  const { language } = useLanguage();
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const request = useQuery({
@@ -56,7 +58,7 @@ export default function DeleteAccountScreen() {
       {request.isSuccess && active ? (
         <View style={styles.statusCard}>
           <UiText weight="800">{translate("deleteAccountRequestPending")}</UiText>
-          <Caption>{translate("deleteAccountRequestedAt")}: {new Intl.DateTimeFormat("ar-DZ", { dateStyle: "medium" }).format(new Date(request.data.requested_at))}</Caption>
+          <Caption>{translate("deleteAccountRequestedAt")}: {new Intl.DateTimeFormat(language === "ar" ? "ar-DZ" : "en-DZ", { dateStyle: "medium" }).format(new Date(request.data.requested_at))}</Caption>
           <Button
             label={translate("deleteAccountCancel")}
             variant="outline"
@@ -93,9 +95,7 @@ export default function DeleteAccountScreen() {
         variant="outline"
         fullWidth
         onPress={() => {
-          void import("expo-linking").then(({ openURL }) =>
-            openURL("mailto:arownddz@gmail.com?subject=Arownd%20account%20deletion%20request")
-          );
+          void Linking.openURL("mailto:arownddz@gmail.com?subject=Arownd%20account%20deletion%20request");
         }}
       />
 
