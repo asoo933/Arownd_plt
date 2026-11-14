@@ -241,20 +241,26 @@ export function formatMarketPrice(amount: number, currencyCode: string): string 
   if (!region) return `${formatNumber(amount)} ${normalizedCurrency}`;
 
   const language = getCurrentLanguage() === "ar" ? "ar" : "en";
-  return new Intl.NumberFormat(`${language}-${region}`, {
+  const formatter = new Intl.NumberFormat(`${language}-${region}`, {
     style: "currency",
     currency: normalizedCurrency,
     minimumFractionDigits: 0,
     maximumFractionDigits: normalizedCurrency === "DZD" ? 0 : 2
-  }).format(amount);
+  });
+  return formatter.formatToParts(amount)
+    .map((part) => part.type === "currency" ? part.value.replace(/\./g, "") : part.value)
+    .join("");
 }
 
 export function formatDZD(amount: number): string {
-  return new Intl.NumberFormat(getCurrentLanguage() === "ar" ? "ar-DZ" : "en-DZ", {
+  const formatter = new Intl.NumberFormat(getCurrentLanguage() === "ar" ? "ar-DZ" : "en-DZ", {
     style: "currency",
     currency: "DZD",
     maximumFractionDigits: 0
-  }).format(amount);
+  });
+  return formatter.formatToParts(amount)
+    .map((part) => part.type === "currency" ? part.value.replace(/\./g, "") : part.value)
+    .join("");
 }
 
 export function chooseBestProductOffer(offers: ProductOffer[]): ProductOffer | null {
