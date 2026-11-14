@@ -16,6 +16,19 @@ const ProfileSchema = z.object({
 
 export type DeliveryProfile = z.infer<typeof ProfileSchema>;
 
+export async function fetchDeliveryProfileCommunes(regionId: number): Promise<string[]> {
+  if (!Number.isInteger(regionId) || regionId <= 0) throw new Error("invalid_region");
+  const { data, error } = await getSupabaseClient()
+    .from("stores")
+    .select("commune")
+    .eq("region_id", regionId)
+    .not("commune", "is", null);
+  if (error) throw error;
+  return [...new Set(data.map((row) => row.commune).filter(
+    (value): value is string => typeof value === "string" && value.trim().length > 0
+  ))].sort((a, b) => a.localeCompare(b, "ar"));
+}
+
 export async function fetchMyDeliveryProfile(): Promise<DeliveryProfile | null> {
   const client = getSupabaseClient();
   const { data: auth, error: authError } = await client.auth.getUser();
