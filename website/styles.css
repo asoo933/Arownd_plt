@@ -772,3 +772,12 @@ body,
 }
 
 @media (min-width:761px) { .page-links { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+
+
+/* Mobile header action positions: CTA beside the brand, menu at the opposite edge. */
+@media (max-width: 760px) {
+  .header-inner { direction: rtl; }
+  .brand { order: 0; margin-inline: 0 auto; }
+  .header-cta { order: 1; margin: 0; }
+  .menu-toggle { order: 2; margin: 0; }
+}
