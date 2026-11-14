@@ -983,3 +983,17 @@ html { scroll-padding-top: 110px; }
  .download-panel { gap:24px; }
  .legal-page .legal-placeholder { font-size:14px; }
 }
+
+
+/* Mobile: align the brand mark closer to the RTL start corner */
+@media (max-width: 760px) {
+  .header-inner {
+    width: calc(100% - 12px);
+    margin-right: 0;
+    margin-left: auto;
+  }
+  .brand {
+    margin-right: 0;
+    margin-left: auto;
+  }
+}
