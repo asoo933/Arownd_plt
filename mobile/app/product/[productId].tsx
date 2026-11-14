@@ -14,6 +14,7 @@ import { emitCartFly } from "@/lib/cart-fly";
 import { fetchApprovedReviews } from "@/lib/reviews";
 import { translate, useLanguage } from "@/lib/i18n";
 import { ReviewPanel } from "@/components/review-panel";
+import { ContentReportAction } from "@/components/content-report-action";
 import { designTokens, useAppTheme } from "@/lib/theme";
 import { getLocalizedProductCategoryLabel } from "@/lib/locale-data";
 
@@ -218,6 +219,7 @@ export default function ProductDetailsScreen() {
           fullWidth
         />
       ) : null}
+      <ContentReportAction targetType="product" targetId={productId} />
       <ReviewPanel targetType="product" targetId={productId} />
     </CustomerScreen>
   );
