@@ -31,3 +31,12 @@ document.querySelectorAll(".main-navigation a").forEach((link) => {
 
 const year = document.querySelector("#current-year");
 if (year) year.textContent = String(new Date().getFullYear());
+
+// Close the mobile navigation with Escape and keep its accessibility state in sync.
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  navigation?.classList.remove("open");
+  menuButton?.setAttribute("aria-expanded", "false");
+  moreContainer?.classList.remove("open");
+  moreButton?.setAttribute("aria-expanded", "false");
+});
