@@ -938,3 +938,48 @@ body,
   .benefit-card { padding:17px 12px; }
   .home-cta-section { width:calc(100% - 34px); }
 }
+
+
+/* Global refinement and expressive inline icon system */
+:root { --brand-ink: #080808; --surface-dark: #111; --surface-border: rgba(255,255,255,.14); }
+:focus-visible { outline: 3px solid #d8cb00; outline-offset: 4px; }
+html { scroll-padding-top: 110px; }
+.site-header { box-shadow: 0 8px 28px rgba(0,0,0,.035); }
+.brand-logo { display:block; width:132px; height:auto; }
+.icon-slot { display:inline-flex; align-items:center; justify-content:center; }
+.ui-icon { display:block; width:17px; height:17px; }
+.visual-search-icon { flex:0 0 17px; width:17px; height:17px; color:#FFF01F; }
+.visual-search > span { color:#9b9b9b; font-size:10px; line-height:1.6; }
+.visual-category-icon { display:grid; place-items:center; }
+.visual-category-svg { width:20px; height:20px; display:block; }
+.benefit-icon { display:grid; place-items:center; }
+.benefit-icon .feature-svg { display:block; width:22px; height:22px; }
+.float-icon,.float-check { display:grid; place-items:center; }
+.float-svg { display:block; width:16px; height:16px; }
+.benefit-card { transition: background .22s ease, border-color .22s ease, transform .22s ease; }
+.benefit-card:hover { transform: translateY(-3px); }
+.nav-link:focus-visible,.footer-links a:focus-visible,.button:focus-visible,.header-cta:focus-visible { border-radius:5px; }
+.inner-hero { position:relative; overflow:hidden; }
+.inner-hero::after { content:""; position:absolute; width:360px; height:360px; left:-110px; top:-150px; border:1px solid rgba(255,240,31,.28); border-radius:50%; box-shadow:0 0 0 34px rgba(255,240,31,.035),0 0 0 68px rgba(255,240,31,.025); pointer-events:none; }
+.inner-hero-inner { position:relative; z-index:1; }
+.download-panel { position:relative; overflow:hidden; }
+.download-panel::after { content:"A"; position:absolute; left:5%; bottom:-90px; color:rgba(255,240,31,.07); font:800 260px/.9 var(--font-en); pointer-events:none; }
+.download-status { display:inline-flex; align-items:center; gap:9px; }
+.download-status::before { content:""; width:8px; height:8px; flex:0 0 8px; border-radius:50%; background:#FFF01F; box-shadow:0 0 0 5px rgba(255,240,31,.13); }
+.section-switcher { backdrop-filter:blur(18px); }
+.section-switcher a { transition:background .2s ease,color .2s ease,border-color .2s ease; }
+.legal-page .legal-placeholder { line-height:2.05; }
+.legal-page .legal-placeholder h2 { scroll-margin-top:150px; }
+.legal-page .legal-placeholder li::marker { color:#FFF01F; }
+.site-footer { gap:28px; }
+.footer-links a { transition:color .2s ease; }
+.footer-links a:hover { color:#FFF01F; }
+@media (prefers-reduced-motion: reduce) {
+ html { scroll-behavior:auto; }
+ *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}
+@media (max-width:760px) {
+ .brand-logo { width:116px; }
+ .download-panel { gap:24px; }
+ .legal-page .legal-placeholder { font-size:14px; }
+}
